@@ -1,0 +1,65 @@
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bt-espace-3);
+  box-sizing: border-box;
+  margin: var(--bt-espace-4) 0 0;
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  border-left: 4px solid currentColor;
+  font: var(--mat-sys-body-medium);
+}
+
+:host(.encadre-info) {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+:host(.encadre-succes) {
+  background: var(--bt-succes-fond);
+  color: var(--bt-succes-texte);
+}
+
+:host(.encadre-avertissement) {
+  background: var(--bt-attente-fond);
+  color: var(--bt-attente-texte);
+}
+
+:host(.encadre-erreur) {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.icone {
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+.contenu {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+
+  ::ng-deep {
+    p {
+      margin: 0;
+    }
+
+    p + p {
+      margin-top: var(--bt-espace-1);
+    }
+
+    ul {
+      margin: var(--bt-espace-2) 0 0;
+      padding-left: 1.25rem;
+    }
+
+    .mat-mdc-button-base {
+      margin-top: var(--bt-espace-2);
+    }
+  }
+}
+
+.titre {
+  font-weight: 500;
+}

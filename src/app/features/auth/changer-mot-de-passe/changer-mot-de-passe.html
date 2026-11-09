@@ -1,0 +1,107 @@
+<mat-card class="carte-auth" appearance="outlined">
+  <mat-card-header>
+    <div class="en-tete-auth">
+      <p class="marque-auth"><mat-icon fontIcon="lock_reset" aria-hidden="true" />Sécurité du compte</p>
+      <h1>Changer le mot de passe</h1>
+      @if (auth.nomAffiche()) {
+        <p class="sous-titre">{{ auth.nomAffiche() }} · {{ auth.utilisateur()?.courriel }}</p>
+      }
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (auth.motDePasseTemporaire()) {
+      <app-encadre type="avertissement" role="status" icone="key">
+        <p>
+          Vous utilisez un mot de passe temporaire. Choisissez votre propre mot de passe pour accéder
+          à Batulo.
+        </p>
+        @if (auth.utilisateur()?.motDePasseTemporaireExpireLe; as expireLe) {
+          <p>Le mot de passe temporaire est valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}.</p>
+        }
+      </app-encadre>
+    }
+    <app-message-erreur [erreur]="erreur()" />
+
+    <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="changer()" novalidate>
+      <mat-form-field>
+        <mat-label>{{ auth.motDePasseTemporaire() ? 'Mot de passe temporaire' : 'Mot de passe actuel' }}</mat-label>
+        <mat-icon matPrefix fontIcon="lock_open" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="motDePasseActuel"
+          autocomplete="current-password"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="motDePasseVisible.set(!motDePasseVisible())"
+          [attr.aria-label]="motDePasseVisible() ? 'Masquer les mots de passe' : 'Afficher les mots de passe'"
+          [attr.aria-pressed]="motDePasseVisible()"
+        >
+          <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
+        </button>
+        @if (formulaire.controls.motDePasseActuel.hasError('required')) {
+          <mat-error>Le mot de passe actuel est obligatoire.</mat-error>
+        } @else if (formulaire.controls.motDePasseActuel.hasError('maxlength')) {
+          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Nouveau mot de passe</mat-label>
+        <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="nouveauMotDePasse"
+          autocomplete="new-password"
+          required
+        />
+        <mat-hint>{{ aideMotDePasse }}</mat-hint>
+        @if (formulaire.controls.nouveauMotDePasse.hasError('required')) {
+          <mat-error>Le nouveau mot de passe est obligatoire.</mat-error>
+        } @else if (formulaire.controls.nouveauMotDePasse.hasError('motDePasseFaible')) {
+          <mat-error>{{ aideMotDePasse }}</mat-error>
+        } @else if (formulaire.controls.nouveauMotDePasse.hasError('maxlength')) {
+          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Confirmation du nouveau mot de passe</mat-label>
+        <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="confirmationMotDePasse"
+          autocomplete="new-password"
+          required
+        />
+        @if (formulaire.controls.confirmationMotDePasse.hasError('required')) {
+          <mat-error>La confirmation est obligatoire.</mat-error>
+        } @else if (formulaire.controls.confirmationMotDePasse.hasError('confirmationDifferente')) {
+          <mat-error>La confirmation ne correspond pas au nouveau mot de passe.</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="actions-auth">
+        <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
+          @if (enCours()) {
+            <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+          } @else {
+            Changer le mot de passe
+          }
+        </button>
+        @if (auth.motDePasseTemporaire()) {
+          <button mat-button type="button" (click)="seDeconnecter()">Se déconnecter</button>
+        } @else {
+          <a mat-button [routerLink]="auth.urlAccueil()">Annuler</a>
+        }
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

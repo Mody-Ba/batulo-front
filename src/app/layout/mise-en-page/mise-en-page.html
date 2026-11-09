@@ -1,0 +1,48 @@
+<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+<app-barre-haut [boutonMenu]="petitEcran()" (basculerMenu)="tiroirOuvert.set(!tiroirOuvert())" />
+
+<mat-sidenav-container class="conteneur">
+  <mat-sidenav
+    class="menu"
+    [mode]="petitEcran() ? 'over' : 'side'"
+    [opened]="!petitEcran() || tiroirOuvert()"
+    [fixedInViewport]="petitEcran()"
+    [fixedTopGap]="56"
+    (closedStart)="tiroirOuvert.set(false)"
+  >
+    <app-menu-lateral [liens]="liens()" />
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main id="contenu" tabindex="-1">
+      @if (auth.role() === 'ADMIN' || auth.role() === 'GESTIONNAIRE') {
+        @switch (auth.statutAbonnement()) {
+          @case ('EXPIRE') {
+            <app-encadre type="avertissement" class="bandeau" role="status" icone="event_busy">
+              <p>
+                L’abonnement de votre entreprise est expiré : l’accès est en lecture seule.
+                @if (auth.role() === 'ADMIN') {
+                  <a routerLink="/admin/abonnement">Renouveler l’abonnement</a>
+                } @else {
+                  Votre administrateur doit le renouveler.
+                }
+              </p>
+            </app-encadre>
+          }
+          @case ('EXPIRE_BIENTOT') {
+            @if (auth.role() === 'ADMIN') {
+              <app-encadre type="avertissement" class="bandeau" role="status" icone="schedule">
+                <p>
+                  Votre abonnement expire bientôt.
+                  <a routerLink="/admin/abonnement">Le renouveler</a>
+                </p>
+              </app-encadre>
+            }
+          }
+        }
+      }
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

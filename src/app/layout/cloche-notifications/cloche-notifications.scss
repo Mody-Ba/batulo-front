@@ -1,0 +1,75 @@
+// Le menu est rendu hors du composant (overlay) : styles globaux limités à .menu-notifications.
+::ng-deep .menu-notifications {
+  width: min(380px, calc(100vw - 32px));
+  max-width: none !important;
+
+  .entete {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-espace-2);
+    padding: var(--bt-espace-1) var(--bt-espace-2) var(--bt-espace-1) var(--bt-espace-4);
+  }
+
+  .titre {
+    font: var(--mat-sys-title-small);
+  }
+
+  .vide {
+    margin: 0;
+    padding: var(--bt-espace-4);
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+  }
+
+  .notification {
+    height: auto;
+    min-height: 64px;
+    padding-top: var(--bt-espace-2);
+    padding-bottom: var(--bt-espace-2);
+    align-items: flex-start;
+
+    &.non-lue {
+      background: color-mix(in srgb, var(--mat-sys-primary-container) 45%, transparent);
+
+      .titre-notification {
+        font-weight: 700;
+      }
+    }
+
+    .mat-icon {
+      margin-top: 2px;
+    }
+  }
+
+  .texte {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    white-space: normal;
+  }
+
+  .titre-notification {
+    font: var(--mat-sys-body-medium);
+    font-weight: 500;
+  }
+
+  .message {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+
+  .date {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-small);
+  }
+
+  .visuellement-cache {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

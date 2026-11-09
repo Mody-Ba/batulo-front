@@ -1,0 +1,60 @@
+<mat-card class="carte-auth" appearance="outlined">
+  <mat-card-header>
+    <div class="en-tete-auth">
+      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+      <h1>Mot de passe oublié</h1>
+      <p class="sous-titre">
+        Indiquez votre courriel : vous recevrez un lien pour choisir un nouveau mot de passe.
+      </p>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (confirmation(); as message) {
+      <app-encadre type="succes" role="status" icone="mark_email_read">
+        <p>{{ message }}</p>
+        <p>Pensez à vérifier vos courriels indésirables.</p>
+      </app-encadre>
+      <div class="actions-auth">
+        <a mat-flat-button routerLink="/connexion">Retour à la connexion</a>
+        <button mat-button type="button" (click)="confirmation.set(null)">
+          Renvoyer un lien
+        </button>
+      </div>
+    } @else {
+      <app-message-erreur [erreur]="erreur()" />
+
+      <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="envoyer()" novalidate>
+        <mat-form-field>
+          <mat-label>Courriel</mat-label>
+          <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
+          <input
+            matInput
+            type="email"
+            formControlName="courriel"
+            autocomplete="email"
+            inputmode="email"
+            required
+          />
+          @if (formulaire.controls.courriel.hasError('required')) {
+            <mat-error>Le courriel est obligatoire.</mat-error>
+          } @else if (formulaire.controls.courriel.hasError('email')) {
+            <mat-error>Le courriel n’est pas valide.</mat-error>
+          } @else if (formulaire.controls.courriel.hasError('maxlength')) {
+            <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
+          @if (enCours()) {
+            <mat-spinner diameter="20" aria-label="Envoi en cours" />
+          } @else {
+            Recevoir le lien
+          }
+        </button>
+      </form>
+
+      <p class="lien-bas"><a routerLink="/connexion">Retour à la connexion</a></p>
+    }
+  </mat-card-content>
+</mat-card>

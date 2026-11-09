@@ -1,0 +1,25 @@
+// Compléments propres aux pages d'authentification ; la carte et le formulaire sont dans styles.scss.
+.en-tete-auth {
+  padding-bottom: var(--bt-espace-2);
+}
+
+.liens-secondaires {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  margin: 0 0 var(--bt-espace-4);
+  font: var(--mat-sys-body-medium);
+}
+
+.actions-auth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  margin-top: var(--bt-espace-2);
+
+  > * {
+    width: 100%;
+    min-height: 44px;
+  }
+}

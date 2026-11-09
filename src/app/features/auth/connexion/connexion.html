@@ -1,0 +1,84 @@
+<mat-card class="carte-auth" appearance="outlined">
+  <mat-card-header>
+    <div class="en-tete-auth">
+      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+      <h1>Connexion</h1>
+      <p class="sous-titre">Accédez à votre espace de sondages.</p>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (information(); as info) {
+      <app-encadre type="info" role="status">
+        <p>{{ info }}</p>
+      </app-encadre>
+    }
+    <app-message-erreur [erreur]="erreur()" />
+
+    <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="seConnecter()" novalidate>
+      <mat-form-field>
+        <mat-label>Courriel</mat-label>
+        <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
+        <input
+          matInput
+          type="email"
+          formControlName="courriel"
+          autocomplete="username"
+          inputmode="email"
+          required
+        />
+        @if (formulaire.controls.courriel.hasError('required')) {
+          <mat-error>Le courriel est obligatoire.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('email')) {
+          <mat-error>Le courriel n’est pas valide.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('maxlength')) {
+          <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Mot de passe</mat-label>
+        <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="motDePasse"
+          autocomplete="current-password"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="motDePasseVisible.set(!motDePasseVisible())"
+          [attr.aria-label]="motDePasseVisible() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          [attr.aria-pressed]="motDePasseVisible()"
+        >
+          <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
+        </button>
+        @if (formulaire.controls.motDePasse.hasError('required')) {
+          <mat-error>Le mot de passe est obligatoire.</mat-error>
+        } @else if (formulaire.controls.motDePasse.hasError('maxlength')) {
+          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <p class="liens-secondaires">
+        <a routerLink="/mot-de-passe-oublie">Mot de passe oublié ?</a>
+      </p>
+
+      <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
+        @if (enCours()) {
+          <mat-spinner diameter="20" aria-label="Connexion en cours" />
+        } @else {
+          Se connecter
+        }
+      </button>
+    </form>
+
+    <p class="lien-bas">
+      Votre entreprise n’a pas encore de compte ?
+      <a routerLink="/inscription">Créer un compte</a>
+    </p>
+  </mat-card-content>
+</mat-card>

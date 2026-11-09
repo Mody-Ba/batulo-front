@@ -1,0 +1,72 @@
+.barre {
+  position: relative;
+  z-index: 3;
+  gap: var(--bt-espace-1);
+  height: 56px;
+  padding: 0 var(--bt-espace-2);
+}
+
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  padding: 0 var(--bt-espace-2);
+  color: inherit;
+  font: var(--mat-sys-title-large);
+  text-decoration: none;
+}
+
+.espace {
+  flex: 1;
+}
+
+.bouton-compte {
+  --mat-button-text-label-text-color: var(--bt-bandeau-texte);
+  min-width: 0;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bt-bandeau-texte);
+  color: var(--bt-bandeau-fond);
+  font: var(--mat-sys-label-large);
+}
+
+.nom {
+  margin-left: var(--bt-espace-2);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Téléphone : seulement l'avatar.
+@media (max-width: 599.98px) {
+  .nom {
+    display: none;
+  }
+}
+
+.identite {
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  max-width: 280px;
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.identite-nom {
+  font: var(--mat-sys-title-small);
+}
+
+.identite-detail {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}

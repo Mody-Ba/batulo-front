@@ -1,0 +1,126 @@
+<mat-card class="carte-auth" appearance="outlined">
+  <mat-card-header>
+    <div class="en-tete-auth">
+      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+      <h1>Créer le compte de votre entreprise</h1>
+      <p class="sous-titre">
+        Vous serez l’administrateur de l’espace. Il sera activé après le paiement de l’abonnement.
+      </p>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <app-message-erreur [erreur]="erreur()" />
+
+    <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="inscrire()" novalidate>
+      <div class="ligne-champs">
+        <mat-form-field>
+          <mat-label>Prénom</mat-label>
+          <input matInput formControlName="prenom" autocomplete="given-name" required />
+          @if (formulaire.controls.prenom.hasError('required')) {
+            <mat-error>Le prénom est obligatoire.</mat-error>
+          } @else if (formulaire.controls.prenom.hasError('maxlength')) {
+            <mat-error>100 caractères au plus.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom" autocomplete="family-name" required />
+          @if (formulaire.controls.nom.hasError('required')) {
+            <mat-error>Le nom est obligatoire.</mat-error>
+          } @else if (formulaire.controls.nom.hasError('maxlength')) {
+            <mat-error>100 caractères au plus.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field>
+        <mat-label>Courriel</mat-label>
+        <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
+        <input
+          matInput
+          type="email"
+          formControlName="courriel"
+          autocomplete="email"
+          inputmode="email"
+          required
+        />
+        @if (formulaire.controls.courriel.hasError('required')) {
+          <mat-error>Le courriel est obligatoire.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('email')) {
+          <mat-error>Le courriel n’est pas valide.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('maxlength')) {
+          <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Nom de l’entreprise (facultatif)</mat-label>
+        <mat-icon matPrefix fontIcon="business" aria-hidden="true" />
+        <input matInput formControlName="nomEntreprise" autocomplete="organization" />
+        <mat-hint>Par défaut : « Entreprise de Prénom Nom ».</mat-hint>
+        @if (formulaire.controls.nomEntreprise.hasError('maxlength')) {
+          <mat-error>150 caractères au plus.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Mot de passe</mat-label>
+        <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="motDePasse"
+          autocomplete="new-password"
+          required
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="motDePasseVisible.set(!motDePasseVisible())"
+          [attr.aria-label]="motDePasseVisible() ? 'Masquer les mots de passe' : 'Afficher les mots de passe'"
+          [attr.aria-pressed]="motDePasseVisible()"
+        >
+          <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
+        </button>
+        <mat-hint>{{ aideMotDePasse }}</mat-hint>
+        @if (formulaire.controls.motDePasse.hasError('required')) {
+          <mat-error>Le mot de passe est obligatoire.</mat-error>
+        } @else if (formulaire.controls.motDePasse.hasError('motDePasseFaible')) {
+          <mat-error>{{ aideMotDePasse }}</mat-error>
+        } @else if (formulaire.controls.motDePasse.hasError('maxlength')) {
+          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Confirmation du mot de passe</mat-label>
+        <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+        <input
+          matInput
+          [type]="motDePasseVisible() ? 'text' : 'password'"
+          formControlName="confirmationMotDePasse"
+          autocomplete="new-password"
+          required
+        />
+        @if (formulaire.controls.confirmationMotDePasse.hasError('required')) {
+          <mat-error>La confirmation est obligatoire.</mat-error>
+        } @else if (formulaire.controls.confirmationMotDePasse.hasError('confirmationDifferente')) {
+          <mat-error>La confirmation ne correspond pas au mot de passe.</mat-error>
+        }
+      </mat-form-field>
+
+      <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
+        @if (enCours()) {
+          <mat-spinner diameter="20" aria-label="Création du compte en cours" />
+        } @else {
+          Créer le compte
+        }
+      </button>
+    </form>
+
+    <p class="lien-bas">Déjà un compte ? <a routerLink="/connexion">Se connecter</a></p>
+  </mat-card-content>
+</mat-card>

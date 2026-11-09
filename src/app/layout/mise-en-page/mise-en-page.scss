@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.conteneur {
+  flex: 1;
+}
+
+.menu {
+  border-right: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+}
+
+main {
+  outline: none;
+}
+
+.bandeau {
+  box-sizing: border-box;
+  max-width: var(--bt-largeur-contenu);
+  margin: var(--bt-espace-4) auto 0;
+  width: calc(100% - 2 * var(--bt-espace-4));
+}
