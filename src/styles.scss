@@ -1,1 +1,302 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+/*
+ * Thème unique de Batulo (Material 3). Polices et icônes sont auto-hébergées (paquets
+ * @fontsource déclarés dans angular.json) : aucun navigateur ne contacte de tiers.
+ *
+ * theme-type: color-scheme -> les jetons --mat-sys-* utilisent light-dark() et suivent
+ * automatiquement le réglage clair / sombre du système (color-scheme: light dark).
+ */
+html {
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$orange-palette,
+        theme-type: color-scheme,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Barre du haut : bandeau de la couleur principale.
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--bt-bandeau-fond),
+      container-text-color: var(--bt-bandeau-texte),
+    )
+  );
+  @include mat.sidenav-overrides(
+    (
+      container-width: 288px,
+    )
+  );
+
+  // Couleurs absentes de Material 3, en clair / sombre.
+  --bt-bandeau-fond: light-dark(#005cbb, #002f65);
+  --bt-bandeau-texte: light-dark(#ffffff, #d7e3ff);
+  --bt-attente-fond: light-dark(#ffeccc, #4a2d00);
+  --bt-attente-texte: light-dark(#6b3f00, #ffdcae);
+  --bt-succes-fond: light-dark(#e6f2e7, #113d20);
+  --bt-succes-texte: light-dark(#1b6e20, #b4efc1);
+
+  // Espacements réguliers (multiples de 4 px).
+  --bt-espace-1: 0.25rem;
+  --bt-espace-2: 0.5rem;
+  --bt-espace-3: 0.75rem;
+  --bt-espace-4: 1rem;
+  --bt-espace-6: 1.5rem;
+  --bt-espace-8: 2rem;
+  --bt-largeur-contenu: 1120px;
+  --bt-rayon: 12px;
+}
+
+// Boutons-icônes du bandeau (menu, cloche, compte) : même couleur que son texte.
+.mat-toolbar {
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(--bt-bandeau-texte),
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Police d'icônes à ligatures (paquet @fontsource/material-icons, copiée dans /polices par
+ * angular.json). font-display: block évite d'afficher le nom de l'icône pendant le chargement.
+ */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('/polices/material-icons-latin-400-normal.woff2') format('woff2');
+}
+
+// Classe par défaut de <mat-icon> pour une police à ligatures.
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+// Focus clavier toujours visible.
+:focus-visible,
+.mat-mdc-button-base:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+// Lien d'évitement : visible seulement au clavier.
+.lien-evitement {
+  position: absolute;
+  left: var(--bt-espace-4);
+  top: -100px;
+  z-index: 1000;
+  padding: var(--bt-espace-2) var(--bt-espace-4);
+  border-radius: 8px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font-weight: 500;
+
+  &:focus {
+    top: var(--bt-espace-2);
+  }
+}
+
+/* ---------- Mise en page commune ---------- */
+
+.conteneur-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--bt-largeur-contenu);
+  margin: 0 auto;
+  padding: var(--bt-espace-6) var(--bt-espace-4) var(--bt-espace-8);
+
+  &.etroit {
+    max-width: 720px;
+  }
+}
+
+.texte-aide {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-3);
+  margin-top: var(--bt-espace-6);
+}
+
+// Bouton principal : hauteur stable pendant le chargement (spinner à la place du texte).
+.bouton-principal {
+  min-height: 44px;
+  min-width: 160px;
+
+  mat-spinner {
+    margin: 0 auto;
+  }
+}
+
+/* ---------- Pages d'authentification (mobile d'abord) ---------- */
+
+.page-auth {
+  // Classe posée sur l'élément hôte des pages de connexion, inscription, mot de passe...
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100dvh;
+  padding: var(--bt-espace-4) var(--bt-espace-2);
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      color-mix(in srgb, var(--mat-sys-primary-container) 70%, transparent),
+      transparent 55%
+    ),
+    var(--mat-sys-surface-container-low);
+}
+
+@media (min-width: 600px) {
+  .page-auth {
+    padding: var(--bt-espace-8) var(--bt-espace-4);
+  }
+}
+
+.carte-auth {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 460px;
+  padding: var(--bt-espace-2);
+
+  .marque-auth {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-espace-2);
+    margin: 0 0 var(--bt-espace-1);
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-title-medium);
+    letter-spacing: 0.08em;
+  }
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+  }
+
+  .sous-titre {
+    margin: var(--bt-espace-1) 0 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+  }
+
+  .bouton-principal {
+    width: 100%;
+  }
+
+  .lien-bas {
+    margin: var(--bt-espace-4) 0 0;
+    text-align: center;
+    font: var(--mat-sys-body-medium);
+  }
+}
+
+/* ---------- Formulaires ---------- */
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  // Les messages sous les champs prennent leur place à la demande (subscriptSizing dynamic).
+  gap: var(--bt-espace-4);
+  margin-top: var(--bt-espace-4);
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .mat-mdc-form-field-icon-prefix > .mat-icon {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+// Deux champs côte à côte sur grand écran, l'un sous l'autre sur téléphone.
+.ligne-champs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bt-espace-4) var(--bt-espace-3);
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ---------- Pastilles de statut d'abonnement ---------- */
+
+.pastille-statut {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid currentColor;
+  font: var(--mat-sys-label-large);
+  white-space: nowrap;
+
+  &.statut-ACTIF {
+    background: var(--bt-succes-fond);
+    color: var(--bt-succes-texte);
+  }
+
+  &.statut-EN_ATTENTE_PAIEMENT,
+  &.statut-EXPIRE_BIENTOT {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+  }
+
+  &.statut-EXPIRE,
+  &.statut-DESACTIVE {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,7 @@
+<mat-icon class="icone" [fontIcon]="nomIcone()" aria-hidden="true" />
+<div class="contenu">
+  @if (titre(); as texte) {
+    <p class="titre">{{ texte }}</p>
+  }
+  <ng-content />
+</div>

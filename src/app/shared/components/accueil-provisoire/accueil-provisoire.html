@@ -1,0 +1,30 @@
+<section class="conteneur-page">
+  @if (auth.role(); as role) {
+    <app-entete-page
+      [titre]="titre()"
+      [sousTitre]="libellesRole[role] + (auth.utilisateur()?.entreprise ? ' · ' + auth.utilisateur()?.entreprise : '')"
+      icone="waving_hand"
+    />
+  }
+
+  @if (auth.statutAbonnement(); as statut) {
+    <p class="statut">
+      Abonnement de l’entreprise :
+      <span class="pastille-statut" [class]="'statut-' + statut">
+        {{ libellesStatut[statut] }}
+      </span>
+    </p>
+  }
+
+  <h2 class="titre-section">Accès rapides</h2>
+  <ul class="raccourcis">
+    @for (lien of raccourcis(); track lien.lien) {
+      <li>
+        <a class="raccourci" [routerLink]="lien.lien">
+          <mat-icon [fontIcon]="lien.icone" aria-hidden="true" />
+          <span>{{ lien.libelle }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</section>

@@ -1,0 +1,85 @@
+<mat-card class="carte-auth" appearance="outlined">
+  <mat-card-header>
+    <div class="en-tete-auth">
+      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+      <h1>Nouveau mot de passe</h1>
+      <p class="sous-titre">Choisissez le mot de passe de votre compte.</p>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (!lienValide()) {
+      <app-encadre type="erreur" role="alert" icone="link_off">
+        <p>Ce lien est incomplet. Ouvrez le lien reçu par courriel, ou demandez-en un nouveau.</p>
+      </app-encadre>
+      <div class="actions-auth">
+        <a mat-flat-button routerLink="/mot-de-passe-oublie">Demander un nouveau lien</a>
+      </div>
+    } @else {
+      <app-message-erreur [erreur]="erreur()">
+        @if (lienExpire()) {
+          <p><a routerLink="/mot-de-passe-oublie">Demander un nouveau lien</a></p>
+        }
+      </app-message-erreur>
+
+      <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="reinitialiser()" novalidate>
+        <mat-form-field>
+          <mat-label>Nouveau mot de passe</mat-label>
+          <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+          <input
+            matInput
+            [type]="motDePasseVisible() ? 'text' : 'password'"
+            formControlName="nouveauMotDePasse"
+            autocomplete="new-password"
+            required
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="motDePasseVisible.set(!motDePasseVisible())"
+            [attr.aria-label]="motDePasseVisible() ? 'Masquer les mots de passe' : 'Afficher les mots de passe'"
+            [attr.aria-pressed]="motDePasseVisible()"
+          >
+            <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
+          </button>
+          <mat-hint>{{ aideMotDePasse }}</mat-hint>
+          @if (formulaire.controls.nouveauMotDePasse.hasError('required')) {
+            <mat-error>Le nouveau mot de passe est obligatoire.</mat-error>
+          } @else if (formulaire.controls.nouveauMotDePasse.hasError('motDePasseFaible')) {
+            <mat-error>{{ aideMotDePasse }}</mat-error>
+          } @else if (formulaire.controls.nouveauMotDePasse.hasError('maxlength')) {
+            <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Confirmation</mat-label>
+          <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
+          <input
+            matInput
+            [type]="motDePasseVisible() ? 'text' : 'password'"
+            formControlName="confirmationMotDePasse"
+            autocomplete="new-password"
+            required
+          />
+          @if (formulaire.controls.confirmationMotDePasse.hasError('required')) {
+            <mat-error>La confirmation est obligatoire.</mat-error>
+          } @else if (formulaire.controls.confirmationMotDePasse.hasError('confirmationDifferente')) {
+            <mat-error>La confirmation ne correspond pas au mot de passe.</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
+          @if (enCours()) {
+            <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+          } @else {
+            Enregistrer le mot de passe
+          }
+        </button>
+      </form>
+
+      <p class="lien-bas"><a routerLink="/connexion">Retour à la connexion</a></p>
+    }
+  </mat-card-content>
+</mat-card>

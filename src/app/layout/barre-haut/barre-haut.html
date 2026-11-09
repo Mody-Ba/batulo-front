@@ -1,0 +1,54 @@
+<mat-toolbar class="barre">
+  @if (boutonMenu()) {
+    <button mat-icon-button type="button" aria-label="Ouvrir le menu" (click)="basculerMenu.emit()">
+      <mat-icon fontIcon="menu" aria-hidden="true" />
+    </button>
+  }
+
+  <a class="marque" [routerLink]="auth.urlAccueil()" aria-label="Batulo, accueil">
+    <mat-icon fontIcon="ballot" aria-hidden="true" />
+    <span>Batulo</span>
+  </a>
+
+  <span class="espace"></span>
+
+  @if (notificationsDisponibles()) {
+    <app-cloche-notifications />
+  }
+
+  <button
+    mat-button
+    type="button"
+    class="bouton-compte"
+    [matMenuTriggerFor]="menuCompte"
+    [attr.aria-label]="'Compte de ' + auth.nomAffiche()"
+  >
+    <span class="avatar" aria-hidden="true">{{ initiales() }}</span>
+    <span class="nom">{{ auth.nomAffiche() }}</span>
+    <mat-icon fontIcon="expand_more" aria-hidden="true" iconPositionEnd />
+  </button>
+
+  <mat-menu #menuCompte="matMenu" xPosition="before">
+    <div class="identite" role="presentation">
+      <p class="identite-nom">{{ auth.nomAffiche() }}</p>
+      <p class="identite-detail">{{ auth.utilisateur()?.courriel }}</p>
+      @if (auth.role(); as role) {
+        <p class="identite-detail">
+          {{ libellesRole[role] }}
+          @if (auth.utilisateur()?.entreprise; as entreprise) {
+            · {{ entreprise }}
+          }
+        </p>
+      }
+    </div>
+    <mat-divider />
+    <a mat-menu-item routerLink="/changer-mot-de-passe">
+      <mat-icon fontIcon="lock_reset" aria-hidden="true" />
+      <span>Changer le mot de passe</span>
+    </a>
+    <button mat-menu-item type="button" (click)="seDeconnecter()">
+      <mat-icon fontIcon="logout" aria-hidden="true" />
+      <span>Se déconnecter</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

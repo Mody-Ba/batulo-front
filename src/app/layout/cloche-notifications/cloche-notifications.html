@@ -1,0 +1,63 @@
+<button
+  mat-icon-button
+  type="button"
+  [matMenuTriggerFor]="menuNotifications"
+  (menuOpened)="charger()"
+  [attr.aria-label]="libelleBouton()"
+>
+  <mat-icon
+    fontIcon="notifications"
+    aria-hidden="true"
+    [matBadge]="nonLues() > 99 ? '99+' : nonLues()"
+    [matBadgeHidden]="nonLues() === 0"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+  />
+</button>
+
+<mat-menu #menuNotifications="matMenu" xPosition="before" class="menu-notifications">
+  <div class="entete" (click)="$event.stopPropagation()" role="presentation">
+    <span class="titre">Notifications</span>
+    @if (nonLues() > 0) {
+      <button mat-button type="button" (click)="toutMarquerLu()">Tout marquer comme lu</button>
+    }
+  </div>
+  <mat-divider />
+
+  @if (chargement()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+  }
+  @if (erreur(); as message) {
+    <p class="vide" role="alert">{{ message }}</p>
+  } @else if (!chargement() && notifications().length === 0) {
+    <p class="vide">Aucune notification.</p>
+  }
+
+  @for (notification of notifications(); track notification.id) {
+    <button
+      mat-menu-item
+      type="button"
+      class="notification"
+      [class.non-lue]="!notification.lue"
+      (click)="marquerLue(notification); $event.stopPropagation()"
+    >
+      <mat-icon [fontIcon]="icones[notification.type]" aria-hidden="true" />
+      <span class="texte">
+        <span class="titre-notification">
+          @if (!notification.lue) {
+            <span class="visuellement-cache">Non lue : </span>
+          }
+          {{ notification.titre }}
+        </span>
+        <span class="message">{{ notification.message }}</span>
+        <span class="date">{{ notification.dateCreation | date: 'd MMM, HH:mm' }}</span>
+      </span>
+    </button>
+  }
+
+  <mat-divider />
+  <a mat-menu-item routerLink="/notifications">
+    <mat-icon fontIcon="list" aria-hidden="true" />
+    <span>Voir toutes les notifications</span>
+  </a>
+</mat-menu>

@@ -1,0 +1,16 @@
+<header class="entete">
+  @if (icone(); as nom) {
+    <span class="pastille-icone" aria-hidden="true">
+      <mat-icon [fontIcon]="nom" aria-hidden="true" />
+    </span>
+  }
+  <div class="textes">
+    <h1>{{ titre() }}</h1>
+    @if (sousTitre(); as texte) {
+      <p class="sous-titre">{{ texte }}</p>
+    }
+  </div>
+  <div class="actions-entete">
+    <ng-content />
+  </div>
+</header>
