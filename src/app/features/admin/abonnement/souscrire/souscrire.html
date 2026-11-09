@@ -1,0 +1,238 @@
+<section class="conteneur-page etroit">
+  <app-entete-page
+    [titre]="renouvellement() ? 'Renouveler mon abonnement' : 'S’abonner à Batulo'"
+    icone="card_membership"
+    [sousTitre]="etape() === 'succes' ? null : etape() === 'formule' ? 'Étape 1 sur 2 : choisissez votre formule' : 'Étape 2 sur 2 : paiement'"
+  >
+    @if (renouvellement() && etape() !== 'succes') {
+      <a matButton routerLink="/admin/abonnement">Retour à mon abonnement</a>
+    }
+  </app-entete-page>
+
+  <!-- Teintes du thème lues par styleStripe() (les champs Stripe sont dans des iframes). -->
+  <span #teinteErreur class="teinte teinte-erreur" aria-hidden="true"></span>
+  <span #teinteAttenuee class="teinte teinte-attenuee" aria-hidden="true"></span>
+
+  @switch (etape()) {
+    <!-- ---------- Étape 1 : formule ---------- -->
+    @case ('formule') {
+      <h2 class="titre-etape visuellement-cache" tabindex="-1">Choix de la formule</h2>
+
+      @if (renouvellement() && abonnementActuel()?.dateExpiration; as dateExpiration) {
+        <app-encadre type="info" icone="autorenew">
+          <p>
+            La nouvelle période s’ajoutera à votre abonnement actuel
+            @if (abonnementActuel()?.statut === 'EXPIRE') {
+              à partir de la date du paiement (il a expiré le {{ dateExpiration | date: 'longDate' }}).
+            } @else {
+              à partir du {{ dateExpiration | date: 'longDate' }} : vous ne perdez aucun jour.
+            }
+          </p>
+        </app-encadre>
+      }
+
+      <app-message-erreur [erreur]="erreur()" />
+      @if (erreurPaiement(); as message) {
+        <app-encadre type="erreur" role="alert"><p>{{ message }}</p></app-encadre>
+      }
+
+      @if (chargementFormules()) {
+        <mat-progress-bar mode="indeterminate" aria-label="Chargement des formules" />
+      } @else if (formules().length) {
+        <div class="formules" role="radiogroup" aria-label="Formules d’abonnement">
+          @for (formule of formules(); track formule.formule) {
+            <label class="formule" [class.choisie]="formule.formule === formuleChoisie()">
+              <input
+                type="radio"
+                name="formule"
+                class="visuellement-cache"
+                [value]="formule.formule"
+                [checked]="formule.formule === formuleChoisie()"
+                (change)="choisir(formule.formule)"
+              />
+              <span class="formule-entete">
+                <span class="formule-libelle">{{ formule.libelle }}</span>
+                <mat-icon
+                  class="coche"
+                  [fontIcon]="formule.formule === formuleChoisie() ? 'radio_button_checked' : 'radio_button_unchecked'"
+                  aria-hidden="true"
+                />
+              </span>
+              <span class="prix">{{ formule.prix | currency: (formule.devise | uppercase) }}</span>
+              <span class="duree">pour {{ formule.duree }}</span>
+              @if (formule.formule === 'ANNUEL' && economieAnnuelle() > 0) {
+                <span class="economie">
+                  Économisez {{ economieAnnuelle() | currency: (formule.devise | uppercase) }} par rapport
+                  à 12 mois
+                </span>
+              }
+            </label>
+          }
+        </div>
+
+        <div class="actions">
+          <button
+            matButton="filled"
+            type="button"
+            class="bouton-principal bouton-large"
+            [disabled]="preparation() || !formuleSelectionnee()"
+            (click)="continuer()"
+          >
+            @if (preparation()) {
+              <mat-spinner diameter="20" aria-label="Préparation du paiement" />
+            } @else {
+              Continuer vers le paiement
+            }
+          </button>
+        </div>
+      } @else if (erreur()) {
+        <div class="actions">
+          <button matButton="tonal" type="button" (click)="chargerFormules()">Réessayer</button>
+        </div>
+      }
+    }
+
+    <!-- ---------- Étape 2 : paiement ---------- -->
+    @case ('paiement') {
+      @if (intention(); as intention) {
+        <h2 class="titre-etape visuellement-cache" tabindex="-1">Paiement par carte</h2>
+
+        <div class="resume">
+          <div>
+            <p class="resume-formule">{{ libellesFormule[intention.formule] }}</p>
+            <p class="resume-montant">{{ intention.montant | currency: (intention.devise | uppercase) }}</p>
+          </div>
+          @if (!paiementEnCours() && !paiementAVerifier()) {
+            <button matButton type="button" (click)="changerFormule()">Changer de formule</button>
+          }
+        </div>
+
+        @if (modeTest()) {
+          <app-encadre type="info" icone="science">
+            <p>
+              Mode test Stripe : carte <strong>4242 4242 4242 4242</strong>, une date future et
+              n’importe quel code. Aucun montant réel n’est prélevé.
+            </p>
+          </app-encadre>
+        }
+
+        <!-- Pas de [formGroup] ici : (submit) natif, sinon le navigateur enverrait le formulaire. -->
+        <form
+          class="formulaire carte"
+          (submit)="$event.preventDefault(); payer()"
+          novalidate
+          aria-label="Informations de la carte"
+        >
+          <mat-form-field>
+            <mat-label>Nom sur la carte</mat-label>
+            <mat-icon matPrefix fontIcon="person" aria-hidden="true" />
+            <input matInput [formControl]="nomTitulaire" autocomplete="cc-name" required />
+            @if (nomTitulaire.hasError('required')) {
+              <mat-error>Le nom sur la carte est obligatoire.</mat-error>
+            } @else if (nomTitulaire.hasError('maxlength')) {
+              <mat-error>100 caractères au plus.</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="champ-stripe" [class.actif]="champActif() === 'numero'" [class.invalide]="!!erreursChamps().numero">
+            <span class="libelle-stripe" id="libelle-numero">Numéro de carte</span>
+            <div #conteneurNumero class="element-stripe" aria-labelledby="libelle-numero"></div>
+          </div>
+          @if (erreursChamps().numero; as message) {
+            <p class="erreur-champ" role="alert">{{ message }}</p>
+          }
+
+          <div class="ligne-champs-carte">
+            <div>
+              <div class="champ-stripe" [class.actif]="champActif() === 'expiration'" [class.invalide]="!!erreursChamps().expiration">
+                <span class="libelle-stripe" id="libelle-expiration">Expiration (MM / AA)</span>
+                <div #conteneurExpiration class="element-stripe" aria-labelledby="libelle-expiration"></div>
+              </div>
+              @if (erreursChamps().expiration; as message) {
+                <p class="erreur-champ" role="alert">{{ message }}</p>
+              }
+            </div>
+            <div>
+              <div class="champ-stripe" [class.actif]="champActif() === 'code'" [class.invalide]="!!erreursChamps().code">
+                <span class="libelle-stripe" id="libelle-code">Code de sécurité</span>
+                <div #conteneurCode class="element-stripe" aria-labelledby="libelle-code"></div>
+              </div>
+              @if (erreursChamps().code; as message) {
+                <p class="erreur-champ" role="alert">{{ message }}</p>
+              }
+            </div>
+          </div>
+
+          @if (erreurPaiement(); as message) {
+            <app-encadre type="erreur" role="alert" icone="credit_card_off"><p>{{ message }}</p></app-encadre>
+          }
+          <app-message-erreur [erreur]="erreur()" />
+
+          @if (paiementAVerifier()) {
+            <app-encadre type="avertissement" role="status" icone="hourglass_top">
+              <p>
+                Votre carte a été acceptée par Stripe : ne payez pas une seconde fois. Il reste à
+                faire valider le paiement par Batulo.
+              </p>
+            </app-encadre>
+            <button
+              matButton="filled"
+              type="button"
+              class="bouton-principal bouton-large"
+              [disabled]="paiementEnCours()"
+              (click)="verifier()"
+            >
+              @if (paiementEnCours()) {
+                <mat-spinner diameter="20" aria-label="Vérification en cours" />
+              } @else {
+                Vérifier à nouveau
+              }
+            </button>
+          } @else {
+            <button
+              matButton="filled"
+              type="submit"
+              class="bouton-principal bouton-large"
+              [disabled]="paiementEnCours()"
+            >
+              @if (paiementEnCours()) {
+                <mat-spinner diameter="20" aria-label="Paiement en cours" />
+              } @else {
+                Payer {{ intention.montant | currency: (intention.devise | uppercase) }}
+              }
+            </button>
+          }
+
+          <p class="securite">
+            <mat-icon fontIcon="verified_user" aria-hidden="true" />
+            Paiement sécurisé par Stripe. Vos données de carte ne transitent jamais par Batulo.
+          </p>
+        </form>
+      }
+    }
+
+    <!-- ---------- Succès ---------- -->
+    @case ('succes') {
+      @if (confirmation(); as confirmation) {
+        <div class="succes">
+          <span class="icone-succes" aria-hidden="true">
+            <mat-icon fontIcon="check_circle" aria-hidden="true" />
+          </span>
+          <h2 class="titre-etape" tabindex="-1">Vous êtes bien abonné</h2>
+          <p role="status">
+            @if (confirmation.abonnement.formule; as formule) {
+              {{ libellesFormule[formule] }} active
+            }
+            @if (confirmation.abonnement.dateExpiration; as dateExpiration) {
+              jusqu’au {{ dateExpiration | date: 'longDate' }}.
+            }
+          </p>
+          <p class="texte-aide">Redirection vers votre tableau de bord…</p>
+          <button matButton="filled" type="button" class="bouton-principal" (click)="allerAuTableauDeBord()">
+            Aller au tableau de bord
+          </button>
+        </div>
+      }
+    }
+  }
+</section>

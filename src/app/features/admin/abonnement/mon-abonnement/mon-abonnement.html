@@ -1,0 +1,96 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Mon abonnement"
+    icone="card_membership"
+    [sousTitre]="abonnement()?.entreprise ?? null"
+  >
+    @if (abonnement()?.formule) {
+      <a
+        [matButton]="enAlerte() ? 'filled' : 'tonal'"
+        routerLink="/admin/abonnement/souscrire"
+        [queryParams]="{ formule: abonnement()?.formule }"
+      >
+        <mat-icon fontIcon="autorenew" aria-hidden="true" />Renouveler
+      </a>
+    }
+  </app-entete-page>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’abonnement" />
+    }
+  </div>
+
+  <app-message-erreur [erreur]="erreur()" parDefaut="L’abonnement n’a pas pu être chargé.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (abonnement(); as abonnement) {
+    @if (expire()) {
+      <app-encadre type="erreur" role="status" icone="event_busy">
+        <p>
+          Votre abonnement a expiré le {{ abonnement.dateExpiration | date: 'longDate' }} : l’accès
+          est en lecture seule. Renouvelez-le pour modifier à nouveau vos sondages.
+        </p>
+      </app-encadre>
+    } @else if (enAlerte()) {
+      <app-encadre type="avertissement" role="status" icone="schedule">
+        <p>
+          Votre abonnement expire dans {{ abonnement.joursRestants }}
+          jour{{ (abonnement.joursRestants ?? 0) > 1 ? 's' : '' }}. Renouvelez-le pour éviter toute
+          interruption.
+        </p>
+      </app-encadre>
+    }
+
+    <div class="cartes">
+      <article class="carte">
+        <h2>Détail</h2>
+        <dl class="details">
+          <dt>Formule</dt>
+          <dd>{{ abonnement.formule ? libellesFormule[abonnement.formule] : 'Aucune' }}</dd>
+
+          <dt>Statut</dt>
+          <dd>
+            <span class="pastille-statut" [class]="'statut-' + abonnement.statut">
+              {{ libellesStatut[abonnement.statut] }}
+            </span>
+          </dd>
+
+          @if (abonnement.dateDebut) {
+            <dt>Début</dt>
+            <dd>{{ abonnement.dateDebut | date: 'longDate' }}</dd>
+          }
+          @if (abonnement.dateExpiration) {
+            <dt>Expiration</dt>
+            <dd>{{ abonnement.dateExpiration | date: 'longDate' }} à {{ abonnement.dateExpiration | date: 'HH:mm' }}</dd>
+          }
+          @if (abonnement.joursRestants !== null) {
+            <dt>Jours restants</dt>
+            <dd [class.important]="enAlerte()">{{ abonnement.joursRestants }}</dd>
+          }
+        </dl>
+      </article>
+
+      <article class="carte">
+        <h2>Paiements</h2>
+        @if (abonnement.montant !== null && abonnement.devise) {
+          <dl class="details">
+            <dt>Dernier paiement</dt>
+            <dd class="montant">{{ abonnement.montant | currency: (abonnement.devise | uppercase) }}</dd>
+          </dl>
+        } @else {
+          <p class="texte-aide">Aucun paiement pour le moment.</p>
+        }
+        <p class="texte-aide">L’historique détaillé des paiements sera bientôt disponible ici.</p>
+      </article>
+    </div>
+
+    <app-encadre type="info" icone="info">
+      <p>
+        Renouveler prolonge votre abonnement à partir de sa date d’expiration actuelle : vous ne
+        perdez aucun jour. Sans renouvellement, l’abonnement s’arrête de lui-même à cette date.
+      </p>
+    </app-encadre>
+  }
+</section>

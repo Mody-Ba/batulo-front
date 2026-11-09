@@ -23,6 +23,7 @@ import {
 } from '../models/auth.model';
 import { ACCUEIL_PAR_ROLE, Role } from '../models/role.model';
 import { UtilisateurResponse } from '../models/utilisateur.model';
+import { AbonnementService } from './abonnement.service';
 
 /** Ce qui est gardé dans sessionStorage : propre à l'onglet, effacé à sa fermeture. */
 interface Session {
@@ -48,6 +49,7 @@ export const MESSAGE_SESSION_EXPIREE = 'Votre session a expiré. Veuillez vous r
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly abonnementService = inject(AbonnementService);
   private readonly urlAuth = `${environment.apiUrl}/api/auth`;
 
   private readonly session = signal<Session | null>(null);
@@ -254,6 +256,8 @@ export class AuthService {
 
   private fermerSession(): void {
     this.session.set(null);
+    // Le prochain compte connecté ne doit pas voir l'abonnement de celui-ci.
+    this.abonnementService.oublier();
     this.rafraichissement = null;
     try {
       sessionStorage.removeItem(CLE_SESSION);
