@@ -1,0 +1,36 @@
+@if (visible()) {
+  @if (abonnement(); as abonnement) {
+    <aside
+      class="bandeau"
+      [class.alerte]="alerte()"
+      [class.expire]="expire()"
+      aria-label="Votre abonnement"
+      [attr.role]="alerte() || expire() ? 'status' : null"
+    >
+      <mat-icon
+        class="icone"
+        [fontIcon]="expire() ? 'event_busy' : alerte() ? 'schedule' : 'card_membership'"
+        aria-hidden="true"
+      />
+      <p class="texte">
+        @if (abonnement.formule; as formule) {
+          <strong>{{ libellesFormule[formule] }}</strong>
+        }
+        @if (expire()) {
+          <span>Expiré le {{ abonnement.dateExpiration | date: 'longDate' }} : accès en lecture seule.</span>
+        } @else {
+          <span [class.important]="alerte()">{{ texteJours() }}</span>
+          <span>Expire le {{ abonnement.dateExpiration | date: 'longDate' }}</span>
+        }
+      </p>
+      <a
+        [matButton]="alerte() || expire() ? 'filled' : 'tonal'"
+        class="bouton"
+        routerLink="/admin/abonnement/souscrire"
+        [queryParams]="{ formule: abonnement.formule }"
+      >
+        Renouveler
+      </a>
+    </aside>
+  }
+}

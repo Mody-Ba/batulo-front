@@ -1,0 +1,255 @@
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// Couleurs lues par le code pour les iframes Stripe.
+.teinte {
+  display: none;
+}
+
+.teinte-erreur {
+  color: var(--mat-sys-error);
+}
+
+.teinte-attenuee {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* ---------- Formules (mobile d'abord : l'une sous l'autre) ---------- */
+
+.formules {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bt-espace-3);
+  margin-top: var(--bt-espace-4);
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.formule {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-1);
+  padding: var(--bt-espace-4);
+  border: 2px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &.choisie {
+    border-color: var(--mat-sys-primary);
+    background: color-mix(in srgb, var(--mat-sys-primary-container) 40%, transparent);
+  }
+
+  // Focus clavier sur le bouton radio caché : visible sur la carte.
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.formule-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+}
+
+.formule-libelle {
+  font: var(--mat-sys-title-medium);
+}
+
+.coche {
+  color: var(--mat-sys-primary);
+}
+
+.prix {
+  font: var(--mat-sys-headline-medium);
+  font-weight: 500;
+}
+
+.duree {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.economie {
+  align-self: flex-start;
+  margin-top: var(--bt-espace-2);
+  padding: 2px var(--bt-espace-2);
+  border-radius: 8px;
+  background: var(--bt-succes-fond);
+  color: var(--bt-succes-texte);
+  font: var(--mat-sys-label-large);
+}
+
+.bouton-large {
+  width: 100%;
+
+  @media (min-width: 600px) {
+    width: auto;
+  }
+}
+
+/* ---------- Paiement ---------- */
+
+.resume {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container);
+
+  p {
+    margin: 0;
+  }
+}
+
+.resume-formule {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.resume-montant {
+  font: var(--mat-sys-title-large);
+}
+
+.carte .bouton-large {
+  width: 100%;
+}
+
+// Champ Stripe présenté comme un champ Material « outline ».
+.champ-stripe {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 22px 16px 8px;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 4px;
+  background: transparent;
+
+  &.actif {
+    border: 2px solid var(--mat-sys-primary);
+    padding: 21px 15px 7px;
+
+    .libelle-stripe {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  &.invalide {
+    border-color: var(--mat-sys-error);
+
+    .libelle-stripe {
+      color: var(--mat-sys-error);
+    }
+  }
+}
+
+.libelle-stripe {
+  position: absolute;
+  top: 6px;
+  left: 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.element-stripe {
+  min-height: 24px;
+}
+
+.erreur-champ {
+  margin: calc(-1 * var(--bt-espace-2)) 0 0 var(--bt-espace-4);
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+// Expiration et code : côte à côte même sur téléphone (champs courts).
+.ligne-champs-carte {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bt-espace-3);
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-espace-3);
+  }
+}
+
+.securite {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bt-espace-2);
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  text-align: center;
+
+  .mat-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+/* ---------- Succès ---------- */
+
+.succes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  padding-top: var(--bt-espace-6);
+  text-align: center;
+
+  h2 {
+    margin: var(--bt-espace-2) 0 0;
+    font: var(--mat-sys-headline-medium);
+    outline: none;
+  }
+
+  p {
+    margin: 0;
+    font: var(--mat-sys-body-large);
+  }
+
+  .bouton-principal {
+    margin-top: var(--bt-espace-4);
+  }
+}
+
+.icone-succes {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--bt-succes-fond);
+  color: var(--bt-succes-texte);
+
+  .mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+  }
+}

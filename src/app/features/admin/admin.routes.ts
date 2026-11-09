@@ -16,8 +16,7 @@ export const routes: Routes = [
   },
   {
     path: 'abonnement',
-    title: 'Abonnement · Batulo',
-    loadComponent: () => import('./abonnement/abonnement').then((m) => m.Abonnement),
+    loadChildren: () => import('./abonnement/abonnement.routes').then((m) => m.routes),
   },
   {
     path: 'gestionnaires',

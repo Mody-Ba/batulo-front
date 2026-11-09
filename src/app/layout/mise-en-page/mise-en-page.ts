@@ -1,12 +1,13 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
+import { AbonnementService } from '../../core/services/abonnement.service';
 import { AuthService } from '../../core/services/auth.service';
 import { Encadre } from '../../shared/components/encadre/encadre';
+import { BandeauAbonnement } from '../bandeau-abonnement/bandeau-abonnement';
 import { BarreHaut } from '../barre-haut/barre-haut';
 import { LIENS_PAR_ROLE } from '../menu-lateral/liens-navigation';
 import { MenuLateral } from '../menu-lateral/menu-lateral';
@@ -19,10 +20,9 @@ const REQUETE_PETIT_ECRAN = '(max-width: 959.98px)';
   selector: 'app-mise-en-page',
   imports: [
     RouterOutlet,
-    RouterLink,
     MatSidenavModule,
-    MatButtonModule,
     BarreHaut,
+    BandeauAbonnement,
     MenuLateral,
     Encadre,
   ],
@@ -57,6 +57,14 @@ export class MiseEnPage {
   });
 
   constructor() {
+    // Abonnement de l'admin (bandeau). Rechargé si le statut change (paiement, 403 du serveur).
+    const abonnementService = inject(AbonnementService);
+    effect(() => {
+      if (this.auth.role() === 'ADMIN') {
+        this.auth.statutAbonnement();
+        abonnementService.actualiser();
+      }
+    });
     // Retour en grand écran : le tiroir se ferme. Changement de page : idem sur petit écran.
     effect(() => {
       if (!this.petitEcran()) {

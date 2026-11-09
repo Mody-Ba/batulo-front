@@ -1,0 +1,59 @@
+.bandeau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+  box-sizing: border-box;
+  padding: var(--bt-espace-2) var(--bt-espace-4);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // 7 jours ou moins.
+  &.alerte {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+    border-bottom-color: currentColor;
+  }
+
+  // Expiré.
+  &.expire {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    border-bottom-color: currentColor;
+  }
+}
+
+.icone {
+  flex-shrink: 0;
+}
+
+.texte {
+  display: flex;
+  flex: 1 1 240px;
+  flex-wrap: wrap;
+  gap: 0 var(--bt-espace-3);
+  margin: 0;
+
+  // Séparateur visuel entre les informations, sauf au début d'une ligne.
+  > * + *::before {
+    content: '·';
+    margin-right: var(--bt-espace-3);
+  }
+}
+
+.important {
+  font-weight: 700;
+}
+
+.bouton {
+  min-height: 40px;
+}
+
+// Téléphone : le bouton passe sous le texte, pleine largeur.
+@media (max-width: 599.98px) {
+  .bouton {
+    width: 100%;
+  }
+}

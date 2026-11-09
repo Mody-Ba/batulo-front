@@ -41,13 +41,16 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
 src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role)
-    services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification)
+    services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
+                   abonnement, stripe = chargement de Stripe.js)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend)
-  layout/          mise-en-page (sidenav + contenu), barre-haut, menu-lateral (+ liens-navigation.ts), cloche-notifications
+  layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
+                   cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire
+  testing/         données partagées par les tests unitaires (donnees-test.ts)
 ```
 
 ## Session, intercepteur et gardes (F1)
@@ -68,6 +71,29 @@ src/app/
 - Le statut d'abonnement est écrit dans le jeton : après un paiement (F2), appeler `rafraichir()` (ou
   `mettreAJourStatutAbonnement`) pour que le front et le backend voient le nouveau statut.
 
+## Abonnement et paiement Stripe (F2)
+- Pages : `/admin/abonnement` (Mon abonnement ; redirige vers `souscrire` si EN_ATTENTE_PAIEMENT) et
+  `/admin/abonnement/souscrire?formule=MENSUEL|ANNUEL` (choix -> paiement -> succès). Pas de bouton d'annulation.
+- Parcours : `POST /paiement/intention { formule }` -> `StripeService.charger(clePublique)` (`@stripe/stripe-js/pure`,
+  locale `fr-CA`, Stripe.js chargé seulement à ce moment) -> champs `cardNumber`, `cardExpiry`, `cardCvc` ->
+  `stripe.confirmCardPayment(clientSecret)` -> si `succeeded` : `POST /paiement/confirmer { paymentIntentId }`
+  -> `auth.rafraichir()` (le statut est dans le jeton ; échec = `terminerSession`) -> « Vous êtes bien abonné »
+  -> `/admin` après 4 s.
+- Les données de carte restent dans les iframes Stripe ; ne jamais journaliser `clientSecret`.
+- Paiement accepté par Stripe mais non confirmé par Batulo (réseau, `PAIEMENT_NON_REUSSI`) : ne jamais reproposer
+  la carte (double paiement) ; seulement « Vérifier à nouveau » (`/confirmer` est idempotent).
+- Erreurs Stripe traduites dans `core/utils/stripe-erreurs.ts` (`decline_code`, puis `code`, puis message
+  localisé pour les erreurs de saisie ; jamais un message anglais).
+- `AbonnementService.abonnement` (signal) alimente le bandeau de l'admin (`layout/bandeau-abonnement`) : chargé
+  par la mise en page pour le rôle ADMIN, mis à jour par `/confirmer`, vidé à la déconnexion. Alerte à 7 jours ou
+  moins (`abonnementEnAlerte`), erreur si EXPIRE ; masqué sur `/admin/abonnement/**`.
+- Champs Stripe dans des iframes : les couleurs du thème leur sont passées calculées (`styleStripe()`).
+- **À ajouter au backend** pour l'historique des paiements : `GET /api/abonnements/paiements?page&taille`
+  (ADMIN, entreprise du jeton, plus récents d'abord) -> `PageResponse<PaiementResponse>` avec `id`, `formule`,
+  `montant`, `devise`, `statut` (`EN_ATTENTE|REUSSI|ECHOUE`), `datePaiement`, `periodeDebut`, `periodeFin`.
+  Permise en EN_ATTENTE_PAIEMENT et EXPIRE (déjà le cas pour `/api/abonnements/**`). Côté front : un tableau
+  dans la carte « Paiements » de `mon-abonnement`.
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
@@ -86,8 +112,9 @@ src/app/
   notifications, menu latéral par rôle), connexion, inscription admin, mot de passe oublié, réinitialisation,
   changement obligatoire du mot de passe temporaire, intercepteur (jeton, rafraîchissement, déconnexion),
   gardes par rôle et par statut, affichage des erreurs.
-- [ ] **F2 – Abonnement et Stripe** : formules, paiement (Stripe.js, clientSecret), confirmation, renouvellement,
-  demande d'augmentation ; remplir `features/admin/abonnement`.
+- [x] **F2 – Abonnement et Stripe** : formules, paiement Stripe Elements, confirmation, rafraîchissement du jeton,
+  bandeau d'abonnement de l'admin, page « Mon abonnement » (dernier paiement ; historique en attente du backend).
+  Reste : demande d'augmentation (`/api/abonnements/demandes`, avec la messagerie en F8).
 - [ ] **F3 – Super admin** : admins et entreprises, abonnements, demandes d'abonnement.
 - [ ] **F4 – Admin et gestionnaires** : gestion des gestionnaires (création, activation, permission sondages).
 - [ ] **F5 – Éditeur de sondage** : sondages, sections, questions, versions, modèles, assignations, publication.
