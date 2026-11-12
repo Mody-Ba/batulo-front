@@ -12,9 +12,7 @@ export const routes: Routes = [
         pathMatch: 'full',
         title: 'Tableau de bord · Batulo',
         loadComponent: () =>
-          import('../../shared/components/accueil-provisoire/accueil-provisoire').then(
-            (m) => m.AccueilProvisoire,
-          ),
+          import('./tableau-de-bord/tableau-de-bord-super-admin').then((m) => m.TableauDeBordSuperAdmin),
       },
       {
         path: 'admins',

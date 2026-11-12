@@ -4,7 +4,8 @@ import { of } from 'rxjs';
 import { expireBientot } from '../../../../core/models/super-admin.model';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
 import { abonnementAdminDeTest, abonnementDeTest } from '../../../../testing/donnees-test';
-import { libelleJoursRestants, ListeAbonnements } from './liste-abonnements';
+import { libelleJoursRestants } from '../../../../shared/components/echeance-abonnement/echeance-abonnement';
+import { ListeAbonnements } from './liste-abonnements';
 
 describe('ListeAbonnements', () => {
   let fixture: ComponentFixture<ListeAbonnements>;

@@ -2,7 +2,13 @@ import { AbonnementResponse } from '../core/models/abonnement.model';
 import { DemandeAbonnementResponse } from '../core/models/demande-abonnement.model';
 import { GestionnaireResponse } from '../core/models/gestionnaire.model';
 import { SondageResumeResponse } from '../core/models/sondage.model';
-import { AbonnementAdminResponse, AdminDetailResponse } from '../core/models/super-admin.model';
+import {
+  AbonnementAdminResponse,
+  AdminDetailResponse,
+  AdminLigneResponse,
+  CompteAdmin,
+  TableauDeBordSuperAdminResponse,
+} from '../core/models/super-admin.model';
 import { TableauDeBordResponse } from '../core/models/tableau-de-bord.model';
 import { UtilisateurResponse } from '../core/models/utilisateur.model';
 
@@ -126,6 +132,47 @@ export function demandeDeTest(modifs: Partial<DemandeAbonnementResponse> = {}): 
     traiteeParNom: null,
     dateDemande: '2026-11-10T12:00:00Z',
     dateTraitement: null,
+    ...modifs,
+  };
+}
+
+export function compteAdminDeTest(modifs: Partial<CompteAdmin> = {}): CompteAdmin {
+  return {
+    id: 3,
+    prenom: 'Fatou',
+    nom: 'Sow',
+    courriel: 'fatou@test.local',
+    actif: true,
+    entreprise: 'Entreprise Test',
+    ...modifs,
+  };
+}
+
+export function adminLigneDeTest(modifs: Partial<AdminLigneResponse> = {}): AdminLigneResponse {
+  return {
+    entreprise: { id: 1, nom: 'Entreprise Test', actif: true },
+    admin: {
+      id: 3,
+      prenom: 'Fatou',
+      nom: 'Sow',
+      courriel: 'fatou@test.local',
+      actif: true,
+      motDePasseTemporaire: false,
+      motDePasseTemporaireExpireLe: null,
+      dateCreation: '2026-10-01T12:00:00Z',
+    },
+    abonnement: { formule: 'MENSUEL', statut: 'ACTIF', dateExpiration: '2026-12-01T12:00:00Z', joursRestants: 23 },
+    nombreGestionnaires: 4,
+    ...modifs,
+  };
+}
+
+export function tableauDeBordSuperAdminDeTest(
+  modifs: Partial<TableauDeBordSuperAdminResponse> = {},
+): TableauDeBordSuperAdminResponse {
+  return {
+    entreprises: { total: 12, actif: 6, expireBientot: 2, expire: 1, enAttentePaiement: 2, desactive: 1 },
+    demandesAugmentationEnAttente: 3,
     ...modifs,
   };
 }

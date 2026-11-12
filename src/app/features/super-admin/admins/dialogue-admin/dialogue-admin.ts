@@ -5,15 +5,14 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { AdminDetailResponse } from '../../../../core/models/super-admin.model';
-import { UtilisateurResponse } from '../../../../core/models/utilisateur.model';
+import { AdminDetailResponse, CompteAdmin } from '../../../../core/models/super-admin.model';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 
 export interface DonneesDialogueAdmin {
   /** Absent : création. */
-  admin?: UtilisateurResponse;
+  admin?: CompteAdmin;
 }
 
 /**

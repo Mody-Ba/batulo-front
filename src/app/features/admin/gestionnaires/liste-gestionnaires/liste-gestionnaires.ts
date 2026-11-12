@@ -23,9 +23,8 @@ import { EntetePage } from '../../../../shared/components/entete-page/entete-pag
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { ActionsGestionnaire } from '../actions-gestionnaire';
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../../core/utils/pagination-url';
+import { DELAI_RECHERCHE_MS } from '../../../../core/utils/recherche';
 
-/** Délai après la dernière frappe avant de lancer la recherche. */
-export const DELAI_RECHERCHE_MS = 300;
 
 /** Filtre d'état : ?actif=true|false dans l'URL, absent pour tous. */
 export type FiltreActif = 'tous' | 'actifs' | 'desactives';

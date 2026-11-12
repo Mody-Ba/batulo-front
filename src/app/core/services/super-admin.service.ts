@@ -6,10 +6,13 @@ import { PageResponse } from '../models/page.model';
 import {
   AbonnementAdminResponse,
   AdminDetailResponse,
+  AdminLigneResponse,
   CreationAdminRequest,
   FiltreAbonnements,
+  FiltreAdmins,
   ModificationAdminRequest,
   MotDePasseTemporaireResponse,
+  TableauDeBordSuperAdminResponse,
 } from '../models/super-admin.model';
 
 /** Comptes admin et abonnements des entreprises (rôle SUPER_ADMIN). */
@@ -17,6 +20,24 @@ import {
 export class SuperAdminService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/api/super-admin`;
+
+  /** Entreprises par statut d'abonnement affiché, total et demandes d'augmentation en attente. */
+  tableauDeBord(): Observable<TableauDeBordSuperAdminResponse> {
+    return this.http.get<TableauDeBordSuperAdminResponse>(`${this.url}/tableau-de-bord`);
+  }
+
+  /** Du plus récent au plus ancien ; statut et recherche facultatifs et combinables. Jamais le super admin. */
+  listerAdmins(filtre: FiltreAdmins = {}): Observable<PageResponse<AdminLigneResponse>> {
+    let params = new HttpParams().set('page', filtre.page ?? 0).set('taille', filtre.taille ?? 20);
+    if (filtre.statut) {
+      params = params.set('statut', filtre.statut);
+    }
+    const recherche = filtre.recherche?.trim();
+    if (recherche) {
+      params = params.set('recherche', recherche);
+    }
+    return this.http.get<PageResponse<AdminLigneResponse>>(`${this.url}/admins`, { params });
+  }
 
   /** L'admin, l'abonnement de son entreprise et son nombre de gestionnaires. */
   detailAdmin(id: number): Observable<AdminDetailResponse> {

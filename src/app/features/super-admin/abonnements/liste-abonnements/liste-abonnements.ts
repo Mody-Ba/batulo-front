@@ -1,9 +1,8 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
@@ -26,17 +25,10 @@ import {
   taillePageUrl,
   TAILLES_PAGE,
 } from '../../../../core/utils/pagination-url';
+import { EcheanceAbonnement } from '../../../../shared/components/echeance-abonnement/echeance-abonnement';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { FiltreStatutAbonnement } from '../../../../shared/components/filtre-statut-abonnement/filtre-statut-abonnement';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
-
-/** « Expire dans 3 jours », « Expire demain », « Expire aujourd’hui ». */
-export function libelleJoursRestants(jours: number): string {
-  if (jours <= 0) {
-    return 'Expire aujourd’hui';
-  }
-  return jours === 1 ? 'Expire demain' : `Expire dans ${jours} jours`;
-}
 
 /**
  * Abonnements de toutes les entreprises (SA-04, SA-06) : expiration la plus proche d'abord, les jamais payés à
@@ -46,14 +38,13 @@ export function libelleJoursRestants(jours: number): string {
 @Component({
   selector: 'app-liste-abonnements',
   imports: [
-    DatePipe,
     NgTemplateOutlet,
     RouterLink,
     MatButtonModule,
-    MatIconModule,
     MatPaginatorModule,
     MatProgressBarModule,
     MatTableModule,
+    EcheanceAbonnement,
     EntetePage,
     FiltreStatutAbonnement,
     MessageErreur,
@@ -67,7 +58,6 @@ export class ListeAbonnements {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly libellesStatut = LIBELLES_STATUT_ABONNEMENT;
   protected readonly expireBientot = expireBientot;
-  protected readonly libelleJoursRestants = libelleJoursRestants;
   protected readonly tailles = [...TAILLES_PAGE];
   /** Garde les lignes (et le focus) quand la page est rechargée. */
   protected readonly parId = (_index: number, element: AbonnementAdminResponse) => element.abonnement.id;

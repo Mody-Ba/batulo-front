@@ -8,32 +8,12 @@ a.nom:hover {
   text-decoration: underline;
 }
 
-.expiration {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bt-espace-1);
-}
-
 // 7 jours ou moins avant l'expiration : ligne teintée, filet à gauche et mention en clair (pas seulement la couleur).
 tr.en-alerte {
   background: var(--bt-attente-fond);
 
   td:first-child {
     box-shadow: inset 4px 0 0 var(--bt-attente-texte);
-  }
-}
-
-.alerte-expiration {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bt-espace-1);
-  color: var(--bt-attente-texte);
-  font: var(--mat-sys-label-large);
-
-  .mat-icon {
-    width: 18px;
-    height: 18px;
-    font-size: 18px;
   }
 }
 

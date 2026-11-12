@@ -1,0 +1,35 @@
+.grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bt-espace-4);
+
+  @media (min-width: 840px) {
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+
+    .entreprises {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.entreprises .tuiles {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.tuile.total {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  border-color: transparent;
+}
+
+// Compteur non vide qui demande une action : couleur d'attente, en plus du libellé.
+.tuile.a-surveiller {
+  background: var(--bt-attente-fond);
+  color: var(--bt-attente-texte);
+  border-color: currentColor;
+
+  .precision {
+    color: inherit;
+  }
+}

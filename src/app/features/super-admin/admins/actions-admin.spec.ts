@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { SuperAdminService } from '../../../core/services/super-admin.service';
-import { adminDeTest, adminDetailDeTest } from '../../../testing/donnees-test';
+import { adminDetailDeTest, compteAdminDeTest } from '../../../testing/donnees-test';
 import { ActionsAdmin, libelleGestionnaires } from './actions-admin';
 
 describe('ActionsAdmin (confirmations)', () => {
@@ -49,7 +49,7 @@ describe('ActionsAdmin (confirmations)', () => {
   it('supprimer : confirmation forte avec le nom de l’entreprise, rien sans confirmation', () => {
     reponseDialogue = false;
     const supprime = vi.fn();
-    actions.supprimer(adminDeTest(), 4).subscribe(supprime);
+    actions.supprimer(compteAdminDeTest(), 4).subscribe(supprime);
     expect(derniereConfirmation().saisieAttendue).toBe('Entreprise Test');
     expect(derniereConfirmation().destructive).toBe(true);
     expect(derniereConfirmation().message).toContain('ses 4 gestionnaires');
@@ -57,29 +57,29 @@ describe('ActionsAdmin (confirmations)', () => {
     expect(supprime).not.toHaveBeenCalled();
 
     reponseDialogue = true;
-    actions.supprimer(adminDeTest(), 4).subscribe(supprime);
+    actions.supprimer(compteAdminDeTest(), 4).subscribe(supprime);
     expect(service['supprimerAdmin']).toHaveBeenCalledWith(3);
     expect(supprime).toHaveBeenCalledWith(true);
   });
 
   it('désactiver prévient que les gestionnaires seront bloqués ; activer sans confirmation', () => {
     reponseDialogue = false;
-    actions.basculerActif(adminDeTest({ actif: true }), 4).subscribe();
+    actions.basculerActif(compteAdminDeTest({ actif: true }), 4).subscribe();
     expect(derniereConfirmation().message).toContain('Ses 4 gestionnaires seront bloqués aussi.');
     expect(service['desactiverAdmin']).not.toHaveBeenCalled();
 
-    actions.basculerActif(adminDeTest({ actif: true })).subscribe();
+    actions.basculerActif(compteAdminDeTest({ actif: true })).subscribe();
     expect(derniereConfirmation().message).toContain('Ses gestionnaires seront bloqués aussi.');
 
     dialog.open.mockClear();
-    actions.basculerActif(adminDeTest({ actif: false })).subscribe();
+    actions.basculerActif(compteAdminDeTest({ actif: false })).subscribe();
     expect(dialog.open).not.toHaveBeenCalled();
     expect(service['activerAdmin']).toHaveBeenCalledWith(3);
   });
 
   it('renvoyer un mot de passe : confirmation, puis courriel et expiration dans le message', () => {
     const resultat = vi.fn();
-    actions.renvoyerMotDePasse(adminDeTest()).subscribe(resultat);
+    actions.renvoyerMotDePasse(compteAdminDeTest()).subscribe(resultat);
     expect(service['renvoyerMotDePasseTemporaire']).toHaveBeenCalledWith(3);
     expect(resultat).toHaveBeenCalledTimes(1);
     expect(snackBar.open.mock.calls.at(-1)![0]).toContain('fatou@test.local');

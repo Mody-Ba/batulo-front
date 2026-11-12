@@ -11,7 +11,7 @@ import {
   LIBELLES_STATUT_ABONNEMENT,
 } from '../../../../core/models/abonnement.model';
 import { nomComplet } from '../../../../core/models/gestionnaire.model';
-import { AdminDetailResponse } from '../../../../core/models/super-admin.model';
+import { AdminDetailResponse, compteDepuisDetail } from '../../../../core/models/super-admin.model';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
@@ -80,23 +80,23 @@ export class DetailAdmin {
   }
 
   protected modifier(detail: AdminDetailResponse): void {
-    this.actions.modifier(detail.admin).subscribe((maj) => this.detail.set(maj));
+    this.actions.modifier(compteDepuisDetail(detail)).subscribe((maj) => this.detail.set(maj));
   }
 
   protected basculerActif(detail: AdminDetailResponse): void {
     this.actions
-      .basculerActif(detail.admin, detail.nombreGestionnaires)
+      .basculerActif(compteDepuisDetail(detail), detail.nombreGestionnaires)
       .subscribe((maj) => this.detail.set(maj));
   }
 
   /** L'expiration du mot de passe temporaire change : on relit le détail. */
   protected renvoyerMotDePasse(detail: AdminDetailResponse): void {
-    this.actions.renvoyerMotDePasse(detail.admin).subscribe(() => this.charger());
+    this.actions.renvoyerMotDePasse(compteDepuisDetail(detail)).subscribe(() => this.charger());
   }
 
   protected supprimer(detail: AdminDetailResponse): void {
     this.actions
-      .supprimer(detail.admin, detail.nombreGestionnaires)
+      .supprimer(compteDepuisDetail(detail), detail.nombreGestionnaires)
       .subscribe(() => void this.router.navigateByUrl('/super-admin/admins'));
   }
 }

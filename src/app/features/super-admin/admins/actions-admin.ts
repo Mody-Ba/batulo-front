@@ -4,8 +4,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, EMPTY, filter, map, Observable, switchMap, tap } from 'rxjs';
 import { nomComplet } from '../../../core/models/gestionnaire.model';
-import { AdminDetailResponse, MotDePasseTemporaireResponse } from '../../../core/models/super-admin.model';
-import { UtilisateurResponse } from '../../../core/models/utilisateur.model';
+import {
+  AdminDetailResponse,
+  CompteAdmin,
+  compteDepuisDetail,
+  MotDePasseTemporaireResponse,
+} from '../../../core/models/super-admin.model';
 import { SuperAdminService } from '../../../core/services/super-admin.service';
 import { messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
@@ -17,11 +21,6 @@ export function libelleGestionnaires(nombre: number): string {
     return 'aucun gestionnaire';
   }
   return nombre === 1 ? '1 gestionnaire' : `${nombre} gestionnaires`;
-}
-
-/** Nom de l'entreprise d'un admin (toujours présent pour un admin). */
-function entreprise(admin: UtilisateurResponse): string {
-  return admin.entreprise ?? `Entreprise de ${nomComplet(admin)}`;
 }
 
 /**
@@ -36,18 +35,20 @@ export class ActionsAdmin {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dates = new DatePipe(inject(LOCALE_ID));
 
-  creer(): Observable<AdminDetailResponse> {
+  /** Émet le compte créé (pour ouvrir son détail). */
+  creer(): Observable<CompteAdmin> {
     return this.ouvrirFormulaire({}).pipe(
-      tap(({ admin }) =>
+      map(compteDepuisDetail),
+      tap((admin) =>
         this.informer(
-          `${entreprise(admin)} a été créée. Un mot de passe temporaire a été envoyé à ${admin.courriel} ; ` +
+          `${admin.entreprise} a été créée. Un mot de passe temporaire a été envoyé à ${admin.courriel} ; ` +
             'l’abonnement attend le paiement de l’admin.',
         ),
       ),
     );
   }
 
-  modifier(admin: UtilisateurResponse): Observable<AdminDetailResponse> {
+  modifier(admin: CompteAdmin): Observable<AdminDetailResponse> {
     return this.ouvrirFormulaire({ admin }).pipe(tap(() => this.informer('Modifications enregistrées.')));
   }
 
@@ -55,11 +56,11 @@ export class ActionsAdmin {
    * Désactiver demande une confirmation, qui prévient que les gestionnaires seront bloqués ;
    * activer, non. `nombreGestionnaires` : connu sur le détail, inconnu (undefined) sinon.
    */
-  basculerActif(admin: UtilisateurResponse, nombreGestionnaires?: number): Observable<AdminDetailResponse> {
+  basculerActif(admin: CompteAdmin, nombreGestionnaires?: number): Observable<AdminDetailResponse> {
     if (!admin.actif) {
       return this.executer(
         this.service.activerAdmin(admin.id),
-        `${entreprise(admin)} est de nouveau active, avec ses gestionnaires.`,
+        `${admin.entreprise} est de nouveau active, avec ses gestionnaires.`,
       );
     }
     const gestionnaires =
@@ -71,7 +72,7 @@ export class ActionsAdmin {
     return confirmer(this.dialog, {
       titre: 'Désactiver cette entreprise ?',
       message:
-        `${nomComplet(admin)} (${entreprise(admin)}) ne pourra plus se connecter.${gestionnaires} ` +
+        `${nomComplet(admin)} (${admin.entreprise}) ne pourra plus se connecter.${gestionnaires} ` +
         'Les sondages de l’entreprise n’accepteront plus de réponses. Rien n’est supprimé ; vous pourrez la réactiver.',
       action: 'Désactiver',
       destructive: true,
@@ -80,13 +81,13 @@ export class ActionsAdmin {
       switchMap(() =>
         this.executer(
           this.service.desactiverAdmin(admin.id),
-          `${entreprise(admin)} est désactivée, avec ses gestionnaires.`,
+          `${admin.entreprise} est désactivée, avec ses gestionnaires.`,
         ),
       ),
     );
   }
 
-  renvoyerMotDePasse(admin: UtilisateurResponse): Observable<MotDePasseTemporaireResponse> {
+  renvoyerMotDePasse(admin: CompteAdmin): Observable<MotDePasseTemporaireResponse> {
     return confirmer(this.dialog, {
       titre: 'Renvoyer un mot de passe temporaire ?',
       message: `Un nouveau mot de passe, valable 24 heures, sera envoyé à ${admin.courriel}. L’ancien ne fonctionnera plus.`,
@@ -111,8 +112,8 @@ export class ActionsAdmin {
   }
 
   /** Confirmation forte (taper le nom de l'entreprise). Émet true une fois supprimé. */
-  supprimer(admin: UtilisateurResponse, nombreGestionnaires?: number): Observable<true> {
-    const nom = entreprise(admin);
+  supprimer(admin: CompteAdmin, nombreGestionnaires?: number): Observable<true> {
+    const nom = admin.entreprise;
     const gestionnaires =
       nombreGestionnaires === undefined
         ? 'ses gestionnaires'

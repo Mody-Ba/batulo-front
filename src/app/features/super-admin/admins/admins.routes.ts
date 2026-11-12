@@ -3,13 +3,11 @@ import { Routes } from '@angular/router';
 /** /super-admin/admins (garde roleGuard('SUPER_ADMIN') posée sur /super-admin). */
 export const routes: Routes = [
   {
-    // ?statut=&recherche=&page=&taille= : la liste attend la route du backend (filtre et recherche).
+    // ?recherche=&statut=&page=&taille=
     path: '',
     pathMatch: 'full',
     title: 'Admins et entreprises · Batulo',
-    loadComponent: () =>
-      import('../../../shared/components/page-a-venir/page-a-venir').then((m) => m.PageAVenir),
-    data: { titre: 'Admins et entreprises', icone: 'business', etape: 'F3' },
+    loadComponent: () => import('./liste-admins/liste-admins').then((m) => m.ListeAdmins),
   },
   {
     path: ':id',

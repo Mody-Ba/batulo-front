@@ -40,6 +40,28 @@ describe('SuperAdminService et DemandeAbonnementService', () => {
     serveur.expectOne({ method: 'DELETE', url: `${url}/admins/3` });
   });
 
+  it('tableau de bord : GET sans paramètre', () => {
+    TestBed.inject(SuperAdminService).tableauDeBord().subscribe();
+    const requete = serveur.expectOne(`${url}/tableau-de-bord`);
+    expect(requete.request.method).toBe('GET');
+    expect(requete.request.params.keys()).toEqual([]);
+  });
+
+  it('admins : statut et recherche (nettoyée) seulement s’ils sont donnés', () => {
+    const service = TestBed.inject(SuperAdminService);
+    service.listerAdmins({ recherche: '   ' }).subscribe();
+    const sansFiltre = serveur.expectOne((r) => r.url === `${url}/admins`);
+    expect(sansFiltre.request.params.keys().sort()).toEqual(['page', 'taille']);
+    sansFiltre.flush({ contenu: [], page: 0, taille: 20, totalElements: 0, totalPages: 0 });
+
+    service.listerAdmins({ statut: 'EXPIRE_BIENTOT', recherche: ' 50%_sow ', page: 1, taille: 10 }).subscribe();
+    const filtre = serveur.expectOne((r) => r.url === `${url}/admins`);
+    expect(filtre.request.params.get('statut')).toBe('EXPIRE_BIENTOT');
+    expect(filtre.request.params.get('recherche')).toBe('50%_sow');
+    expect(filtre.request.params.get('page')).toBe('1');
+    expect(filtre.request.params.get('taille')).toBe('10');
+  });
+
   it('abonnements : statut seulement s’il est donné', () => {
     const service = TestBed.inject(SuperAdminService);
     service.listerAbonnements().subscribe();

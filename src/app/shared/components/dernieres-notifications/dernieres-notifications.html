@@ -1,0 +1,32 @@
+<div class="entete-section">
+  <h2>Dernières notifications</h2>
+  <a matButton routerLink="/notifications">Tout voir</a>
+</div>
+<div class="zone-progression">
+  @if (chargement()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+  }
+</div>
+<app-message-erreur [erreur]="erreur()" parDefaut="Les notifications n’ont pas pu être chargées.">
+  <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+</app-message-erreur>
+@if (!chargement() && !erreur() && notifications().length === 0) {
+  <p class="etat-vide">Aucune notification.</p>
+}
+<ul class="liste-notifications">
+  @for (n of notifications(); track n.id) {
+    <li [class.non-lue]="!n.lue">
+      <mat-icon [fontIcon]="icones[n.type]" aria-hidden="true" />
+      <div>
+        <p class="titre-notification">
+          @if (!n.lue) {
+            <span class="visuellement-cache">Non lue : </span>
+          }
+          {{ n.titre }}
+        </p>
+        <p class="cellule-secondaire">{{ n.message }}</p>
+        <p class="cellule-secondaire">{{ n.dateCreation | date: 'd MMM, HH:mm' }}</p>
+      </div>
+    </li>
+  }
+</ul>

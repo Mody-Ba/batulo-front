@@ -41,16 +41,19 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
 src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
-                   gestionnaire, sondage, assignation, tableau-de-bord)
+                   gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
-                   abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord)
+                   abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
+                   super-admin, demande-abonnement)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
-    utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend)
+    utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
+                   (?page&taille), recherche.ts (DELAI_RECHERCHE_MS)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle)
-  shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire
+  shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
+                   filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
   testing/         données partagées par les tests unitaires (donnees-test.ts)
 ```
 
@@ -121,6 +124,26 @@ src/app/
 - Boîtes d'assignation : gestionnaires lus avec `actif=true` ; sondages lus avec `derniereVersion=true`
   (l'assignation porte sur la lignée).
 
+## Espace super admin (F3)
+- Routes : `/super-admin` (tableau de bord), `/super-admin/admins[?recherche&statut&page&taille]`,
+  `/super-admin/admins/:id`, `/super-admin/abonnements[?statut&page&taille]`,
+  `/super-admin/demandes-abonnement[?statut&page&taille]` (détail et réponse dans `dialogue-demande`).
+- Tableau de bord : `GET /api/super-admin/tableau-de-bord` (entreprises par statut affiché + total, demandes
+  EN_ATTENTE) ; chaque tuile mène à `/super-admin/admins?statut=` ou `demandes-abonnement?statut=EN_ATTENTE`.
+  Notifications : composant partagé `dernieres-notifications` (5 dernières, tous types), aussi chez l'admin.
+- Deux formes d'admin : `AdminDetailResponse` (détail, `admin` = `UtilisateurResponse`) et `AdminLigneResponse`
+  (liste : `entreprise`, `admin`, `abonnement` résumé, `nombreGestionnaires`). Les actions (`actions-admin.ts`)
+  prennent un `CompteAdmin` (`compteDepuisDetail`, `compteDepuisLigne`). La liste se relit après chaque action
+  (la ligne peut sortir du filtre).
+- Désactiver : confirmation qui annonce le blocage des gestionnaires. Supprimer : confirmation forte
+  (`saisieAttendue` = nom de l'entreprise, espaces ignorés, majuscules respectées).
+- « Expire bientôt » (`expireBientot`) : EXPIRE_BIENTOT, ou ACTIF à 7 jours ou moins ; ligne `en-alerte` et
+  mention « Expire dans N jours » (`echeance-abonnement`).
+- Demande d'augmentation : sans effet sur l'abonnement ; décision explicite (aucune présélection), message
+  obligatoire si REFUSEE (400 `REPONSE_OBLIGATOIRE` côté backend), facultatif si TRAITEE ; 409
+  `DEMANDE_DEJA_TRAITEE` -> la liste est relue.
+- Pastilles de filtre : un nouveau clic sur la pastille choisie la garde sélectionnée (sinon Material la désélectionne).
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
@@ -142,7 +165,9 @@ src/app/
 - [x] **F2 – Abonnement et Stripe** : formules, paiement Stripe Elements, confirmation, rafraîchissement du jeton,
   bandeau d'abonnement de l'admin, page « Mon abonnement » avec l'historique des paiements.
   Reste : demande d'augmentation (`/api/abonnements/demandes`, avec la messagerie en F8).
-- [ ] **F3 – Super admin** : admins et entreprises, abonnements, demandes d'abonnement.
+- [x] **F3 – Super admin** : tableau de bord (compteurs, demandes en attente, notifications), admins et entreprises
+  (recherche, filtre, CRUD, activer/désactiver, suppression confirmée, mot de passe temporaire), abonnements
+  (expirations proches en évidence), demandes d'abonnement (réponse TRAITEE ou REFUSEE).
 - [x] **F4 – Espace admin** : gestionnaires (CRUD, activer/désactiver, permission, mot de passe temporaire,
   recherche et filtre actif, détail + ses sondages), assignations (depuis un sondage ou un gestionnaire), liste
   des sondages (dernière version par défaut, réponses, assignés, nouvelle version en préparation) et détail en

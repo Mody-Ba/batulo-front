@@ -36,18 +36,6 @@
     </span>
   </ng-template>
 
-  <ng-template #expiration let-l>
-    @if (l.abonnement.dateExpiration; as date) {
-      <span>{{ date | date: 'longDate' }}</span>
-      @if (expireBientot(l.abonnement) && l.abonnement.joursRestants !== null) {
-        <span class="alerte-expiration">
-          <mat-icon fontIcon="schedule" aria-hidden="true" />{{ libelleJoursRestants(l.abonnement.joursRestants) }}
-        </span>
-      }
-    } @else {
-      <span class="cellule-secondaire">Jamais payé</span>
-    }
-  </ng-template>
 
   @if (!chargement() && !erreur() && abonnements().length === 0) {
     <p class="etat-vide" role="status">
@@ -71,9 +59,7 @@
                 {{ libelleFormule(l, 'Aucune formule') }}
               </span>
             </div>
-            <div class="expiration">
-              <ng-container *ngTemplateOutlet="expiration; context: { $implicit: l }" />
-            </div>
+            <app-echeance-abonnement [abonnement]="l.abonnement" />
           </li>
         }
       </ul>
@@ -105,8 +91,8 @@
 
           <ng-container matColumnDef="expiration">
             <th mat-header-cell *matHeaderCellDef>Expiration</th>
-            <td mat-cell *matCellDef="let l" class="expiration">
-              <ng-container *ngTemplateOutlet="expiration; context: { $implicit: l }" />
+            <td mat-cell *matCellDef="let l">
+              <app-echeance-abonnement [abonnement]="l.abonnement" />
             </td>
           </ng-container>
 

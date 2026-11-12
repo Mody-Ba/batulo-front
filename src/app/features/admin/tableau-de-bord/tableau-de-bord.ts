@@ -10,17 +10,13 @@ import {
   LIBELLES_FORMULE,
   LIBELLES_STATUT_ABONNEMENT,
 } from '../../../core/models/abonnement.model';
-import { ICONES_NOTIFICATION, NotificationResponse } from '../../../core/models/notification.model';
 import { AbonnementService } from '../../../core/services/abonnement.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { NotificationService } from '../../../core/services/notification.service';
 import { TableauDeBordService } from '../../../core/services/tableau-de-bord.service';
 import { TableauDeBordResponse } from '../../../core/models/tableau-de-bord.model';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
+import { DernieresNotifications } from '../../../shared/components/dernieres-notifications/dernieres-notifications';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
-
-/** Nombre de notifications affichées. */
-export const NOMBRE_NOTIFICATIONS = 5;
 
 /**
  * Tableau de bord de l'admin : chiffres de l'entreprise (GET /api/admin/tableau-de-bord), abonnement et dernières
@@ -37,6 +33,7 @@ export const NOMBRE_NOTIFICATIONS = 5;
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    DernieresNotifications,
     EntetePage,
     MessageErreur,
   ],
@@ -44,14 +41,12 @@ export const NOMBRE_NOTIFICATIONS = 5;
   styleUrl: './tableau-de-bord.scss',
 })
 export class TableauDeBord {
-  private readonly notificationService = inject(NotificationService);
   private readonly tableauDeBordService = inject(TableauDeBordService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
   protected readonly abonnement = inject(AbonnementService).abonnement;
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly libellesStatut = LIBELLES_STATUT_ABONNEMENT;
-  protected readonly icones = ICONES_NOTIFICATION;
 
   protected readonly enAlerte = computed(() => abonnementEnAlerte(this.abonnement()));
   protected readonly expire = computed(() => this.abonnement()?.statut === 'EXPIRE');
@@ -64,14 +59,9 @@ export class TableauDeBord {
   protected readonly chargementChiffres = signal(true);
   protected readonly erreurChiffres = signal<unknown>(null);
 
-  protected readonly notifications = signal<NotificationResponse[]>([]);
-  protected readonly chargementNotifications = signal(true);
-  protected readonly erreurNotifications = signal<unknown>(null);
-
   constructor() {
     // L'abonnement est chargé par la mise en page (signal partagé avec le bandeau).
     this.chargerChiffres();
-    this.chargerNotifications();
   }
 
   protected chargerChiffres(): void {
@@ -88,24 +78,6 @@ export class TableauDeBord {
         error: (erreur: unknown) => {
           this.erreurChiffres.set(erreur);
           this.chargementChiffres.set(false);
-        },
-      });
-  }
-
-  protected chargerNotifications(): void {
-    this.chargementNotifications.set(true);
-    this.erreurNotifications.set(null);
-    this.notificationService
-      .lister(0, NOMBRE_NOTIFICATIONS)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (page) => {
-          this.notifications.set(page.contenu);
-          this.chargementNotifications.set(false);
-        },
-        error: (erreur: unknown) => {
-          this.erreurNotifications.set(erreur);
-          this.chargementNotifications.set(false);
         },
       });
   }

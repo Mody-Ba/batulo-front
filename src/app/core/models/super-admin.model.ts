@@ -1,4 +1,4 @@
-import { AbonnementResponse, JOURS_ALERTE_EXPIRATION, StatutAbonnement } from './abonnement.model';
+import { AbonnementResponse, Formule, JOURS_ALERTE_EXPIRATION, StatutAbonnement } from './abonnement.model';
 import { UtilisateurResponse } from './utilisateur.model';
 
 /** Ordre d'affichage des statuts d'abonnement (filtres et compteurs du super admin). */
@@ -19,7 +19,7 @@ export function statutAbonnementValide(valeur: string | null | undefined): Statu
  * Abonnement qui expire dans 7 jours ou moins (à mettre en évidence). Le statut EXPIRE_BIENTOT du backend suffit
  * en général ; joursRestants couvre un statut pas encore recalculé. Un abonnement expiré ou désactivé n'en fait pas partie.
  */
-export function expireBientot(abonnement: AbonnementResponse): boolean {
+export function expireBientot(abonnement: Pick<AbonnementResponse, 'statut' | 'joursRestants'>): boolean {
   if (abonnement.statut === 'EXPIRE_BIENTOT') {
     return true;
   }
@@ -80,4 +80,103 @@ export interface FiltreAbonnements {
   statut?: StatutAbonnement | null;
   page?: number;
   taille?: number;
+}
+
+/** GET /api/super-admin/admins (du plus récent au plus ancien) : une ligne par admin, donc par entreprise. */
+export interface AdminLigneResponse {
+  entreprise: { id: number; nom: string; actif: boolean };
+  admin: {
+    id: number;
+    prenom: string;
+    nom: string;
+    courriel: string;
+    actif: boolean;
+    /** true : mot de passe généré par le serveur, à changer. */
+    motDePasseTemporaire: boolean;
+    /** Null s'il n'y en a pas. */
+    motDePasseTemporaireExpireLe: string | null;
+    dateCreation: string;
+  };
+  /** Null si l'entreprise n'a pas d'abonnement. */
+  abonnement: {
+    /** Null tant qu'aucune formule n'a été payée. */
+    formule: Formule | null;
+    /** Statut affiché, recalculé à partir des dates. */
+    statut: StatutAbonnement;
+    dateExpiration: string | null;
+    /** Arrondi au jour supérieur, 0 si expiré, null si jamais payé. */
+    joursRestants: number | null;
+  } | null;
+  nombreGestionnaires: number;
+}
+
+/** Filtres combinables de GET /api/super-admin/admins. */
+export interface FiltreAdmins {
+  /** Statut d'abonnement affiché (EXPIRE_BIENTOT compris). */
+  statut?: StatutAbonnement | null;
+  /** Nom de l'entreprise, prénom, nom ou courriel de l'admin, sans majuscules ni accents. */
+  recherche?: string | null;
+  page?: number;
+  taille?: number;
+}
+
+/** GET /api/super-admin/tableau-de-bord (statuts affichés, recalculés à partir des dates). */
+export interface TableauDeBordSuperAdminResponse {
+  entreprises: {
+    total: number;
+    actif: number;
+    expireBientot: number;
+    expire: number;
+    enAttentePaiement: number;
+    desactive: number;
+  };
+  demandesAugmentationEnAttente: number;
+}
+
+/** Compteur du tableau de bord correspondant à chaque statut. */
+export const COMPTEUR_PAR_STATUT: Record<
+  StatutAbonnement,
+  keyof Omit<TableauDeBordSuperAdminResponse['entreprises'], 'total'>
+> = {
+  ACTIF: 'actif',
+  EXPIRE_BIENTOT: 'expireBientot',
+  EXPIRE: 'expire',
+  EN_ATTENTE_PAIEMENT: 'enAttentePaiement',
+  DESACTIVE: 'desactive',
+};
+
+/**
+ * Ce que les actions sur un admin utilisent, commun au détail (AdminDetailResponse) et à la liste
+ * (AdminLigneResponse), dont les formes diffèrent.
+ */
+export interface CompteAdmin {
+  id: number;
+  prenom: string;
+  nom: string;
+  courriel: string;
+  actif: boolean;
+  /** Nom de l'entreprise. */
+  entreprise: string;
+}
+
+export function compteDepuisDetail({ admin }: AdminDetailResponse): CompteAdmin {
+  return {
+    id: admin.id,
+    prenom: admin.prenom,
+    nom: admin.nom,
+    courriel: admin.courriel,
+    actif: admin.actif,
+    entreprise: admin.entreprise ?? `Entreprise de ${admin.prenom} ${admin.nom}`.trim(),
+  };
+}
+
+export function compteDepuisLigne({ admin, entreprise }: AdminLigneResponse): CompteAdmin {
+  return {
+    id: admin.id,
+    prenom: admin.prenom,
+    nom: admin.nom,
+    courriel: admin.courriel,
+    actif: admin.actif,
+    entreprise: entreprise.nom,
+  };
 }
