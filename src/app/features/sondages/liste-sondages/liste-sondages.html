@@ -1,0 +1,209 @@
+<section class="conteneur-page">
+  <app-entete-page
+    [titre]="auth.role() === 'ADMIN' ? 'Sondages de l’entreprise' : 'Mes sondages'"
+    icone="ballot"
+  >
+    @if (peutCreer()) {
+      <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+        <a
+          matButton="filled"
+          routerLink="/sondages/nouveau"
+          [disabled]="auth.lectureSeule()"
+          [attr.aria-disabled]="auth.lectureSeule() || null"
+        >
+          <mat-icon fontIcon="add" aria-hidden="true" />Créer un sondage
+        </a>
+      </span>
+    }
+  </app-entete-page>
+
+  <div class="barre-outils">
+    <mat-button-toggle-group
+      aria-label="Versions affichées"
+      [value]="toutesLesVersions()"
+      (change)="changerVue($event.value)"
+      [hideSingleSelectionIndicator]="true"
+    >
+      <mat-button-toggle [value]="false">Dernière version</mat-button-toggle>
+      <mat-button-toggle [value]="true">Toutes les versions</mat-button-toggle>
+    </mat-button-toggle-group>
+    <mat-chip-listbox
+      aria-label="Filtrer par statut"
+      [value]="statutFiltre()"
+      (change)="filtrer($event.value ?? null)"
+      [hideSingleSelectionIndicator]="true"
+    >
+      <mat-chip-option [value]="null">Tous</mat-chip-option>
+      @for (statut of statuts; track statut) {
+        <mat-chip-option [value]="statut">{{ libellesStatut[statut] }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des sondages" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Les sondages n’ont pas pu être chargés.">
+    <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  <!-- Indication d'une nouvelle version en préparation (tableau et cartes). -->
+  <ng-template #enPreparation let-s>
+    @if (s.brouillonEnPreparation && s.brouillonEnPreparationId) {
+      <a
+        class="en-preparation"
+        [routerLink]="['/sondages', s.brouillonEnPreparationId]"
+        [attr.aria-label]="'Nouvelle version en préparation : ' + s.titre"
+      >
+        <mat-icon fontIcon="edit_note" aria-hidden="true" />Nouvelle version en préparation
+      </a>
+    }
+  </ng-template>
+
+  <ng-template #reponses let-s>
+    <span class="nombre">{{ nombreReponses(s) | number }}</span>
+    @if (aDetailReponses(s)) {
+      &ngsp;<span class="cellule-secondaire">dont {{ s.nombreReponses | number }} pour la v{{ s.version }}</span>
+    }
+  </ng-template>
+
+  <ng-template #assignes let-s>
+    @if (s.gestionnairesAssignes; as liste) {
+      @if (liste.length === 0) {
+        <span class="cellule-secondaire">Aucun</span>
+      } @else {
+        <span class="assignes" [matTooltip]="liste.length > assignesVisibles ? tousLesAssignes(liste) : ''">
+          @for (g of liste.slice(0, assignesVisibles); track g.id; let dernier = $last) {
+            <span [class.assigne-inactif]="!g.actif">{{ libelleAssigne(g) }}</span>{{ dernier ? '' : ', ' }}
+          }
+          @if (liste.length > assignesVisibles) {
+            <span class="autres">
+              +{{ liste.length - assignesVisibles }}
+              <span class="visuellement-cache">: {{ tousLesAssignes(liste.slice(assignesVisibles)) }}</span>
+            </span>
+          }
+        </span>
+      }
+    }
+  </ng-template>
+
+  @if (!chargement() && !erreur() && sondages().length === 0) {
+    <p class="etat-vide">
+      @if (statutFiltre(); as statut) {
+        Aucun sondage « {{ libellesStatut[statut] }} ».
+      } @else {
+        Aucun sondage pour le moment.
+      }
+    </p>
+  } @else if (sondages().length) {
+    @if (petitEcran()) {
+      <ul class="cartes">
+        @for (s of sondages(); track s.id) {
+          <li class="carte">
+            <a class="titre" [routerLink]="['/sondages', s.id]">{{ s.titre }}</a>
+            <span class="ligne">
+              <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+              <span class="cellule-secondaire">Version {{ s.version }}</span>
+            </span>
+            <ng-container *ngTemplateOutlet="enPreparation; context: { $implicit: s }" />
+            <span class="ligne">
+              <span>
+                {{ nombreReponses(s) | number }} réponse{{ nombreReponses(s) > 1 ? 's' : '' }}
+                @if (aDetailReponses(s)) {
+                  <span class="cellule-secondaire en-ligne">
+                    (dont {{ s.nombreReponses | number }} pour la v{{ s.version }})
+                  </span>
+                }
+              </span>
+            </span>
+            @if (voitAssignes()) {
+              <span class="ligne">
+                <span class="cellule-secondaire en-ligne">Assignés :</span>
+                <ng-container *ngTemplateOutlet="assignes; context: { $implicit: s }" />
+              </span>
+            }
+            <span class="cellule-secondaire">
+              @if (s.creePar; as auteur) {
+                Par {{ auteur.prenom }} {{ auteur.nom }} ·
+              }
+              modifié le {{ s.dateModification | date: 'd MMM y' }}
+            </span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="conteneur-tableau">
+        <table mat-table [dataSource]="sondages()" [trackBy]="parId">
+          <caption class="visuellement-cache">Sondages</caption>
+
+          <ng-container matColumnDef="titre">
+            <th mat-header-cell *matHeaderCellDef>Titre</th>
+            <td mat-cell *matCellDef="let s">
+              <a class="titre" [routerLink]="['/sondages', s.id]">{{ s.titre }}</a>
+              @if (s.estModele) {
+                <span class="cellule-secondaire">Modèle</span>
+              }
+              <ng-container *ngTemplateOutlet="enPreparation; context: { $implicit: s }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="etat">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let s">
+              <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="version">
+            <th mat-header-cell *matHeaderCellDef>Version</th>
+            <td mat-cell *matCellDef="let s">{{ s.version }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="reponses">
+            <th mat-header-cell *matHeaderCellDef>Réponses</th>
+            <td mat-cell *matCellDef="let s">
+              <ng-container *ngTemplateOutlet="reponses; context: { $implicit: s }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="assignes">
+            <th mat-header-cell *matHeaderCellDef>Assignés</th>
+            <td mat-cell *matCellDef="let s">
+              <ng-container *ngTemplateOutlet="assignes; context: { $implicit: s }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="auteur">
+            <th mat-header-cell *matHeaderCellDef>Créé par</th>
+            <td mat-cell *matCellDef="let s">
+              @if (s.creePar; as auteur) {
+                {{ auteur.prenom }} {{ auteur.nom }}
+              } @else {
+                —
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="modification">
+            <th mat-header-cell *matHeaderCellDef>Modifié le</th>
+            <td mat-cell *matCellDef="let s">{{ s.dateModification | date: 'd MMM y' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes()"></tr>
+          <tr mat-row *matRowDef="let s; columns: colonnes()"></tr>
+        </table>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="numeroPage()"
+      [pageSize]="taillePage()"
+      [pageSizeOptions]="tailles"
+      (page)="changerPage($event)"
+      aria-label="Pagination des sondages"
+    />
+  }
+</section>

@@ -1,0 +1,64 @@
+.champ-recherche {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.nom {
+  font: var(--mat-sys-title-small);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.pastilles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-1);
+}
+
+.cellule-actions {
+  width: 56px;
+  text-align: end;
+}
+
+tr.inactif .nom {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+// Téléphone : une carte par gestionnaire.
+.cartes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.carte-entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  margin-right: calc(-1 * var(--bt-espace-2));
+}

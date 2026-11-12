@@ -57,6 +57,15 @@ export interface AbonnementResponse {
   devise: string | null;
 }
 
+/** GET /api/abonnements/paiements (paiements réussis seulement, du plus récent au plus ancien) */
+export interface PaiementResponse {
+  id: number;
+  datePaiement: string;
+  formule: Formule;
+  montant: number;
+  devise: string;
+}
+
 /** POST /api/abonnements/paiement/intention */
 export interface IntentionPaiementRequest {
   formule: Formule;

@@ -1,0 +1,31 @@
+.recherche {
+  width: 100%;
+}
+
+.liste {
+  max-height: min(50vh, 420px);
+  overflow-y: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+}
+
+.resultats {
+  margin-bottom: var(--bt-espace-3);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+
+  p,
+  ul {
+    margin: 0 0 var(--bt-espace-1);
+  }
+
+  .succes {
+    font-weight: 500;
+  }
+}
+
+.etat-vide {
+  padding: var(--bt-espace-4);
+}

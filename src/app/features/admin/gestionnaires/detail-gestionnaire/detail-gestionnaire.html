@@ -1,0 +1,147 @@
+<section class="conteneur-page">
+  <a matButton routerLink="/admin/gestionnaires" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Gestionnaires
+  </a>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement du gestionnaire" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Ce gestionnaire n’a pas pu être chargé." />
+
+  @if (gestionnaire(); as g) {
+    <app-entete-page [titre]="nomComplet(g)" [sousTitre]="g.courriel" icone="person">
+      <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+        <button matButton="tonal" type="button" (click)="modifier(g)" [disabled]="auth.lectureSeule()">
+          <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
+        </button>
+      </span>
+    </app-entete-page>
+
+    <div class="grille">
+      <article class="carte-section">
+        <h2>Compte</h2>
+        <dl class="liste-details">
+          <dt>État</dt>
+          <dd>
+            <span class="pastille-statut" [class]="g.actif ? 'compte-actif' : 'compte-desactive'">
+              {{ g.actif ? 'Actif' : 'Désactivé' }}
+            </span>
+          </dd>
+
+          <dt>Mot de passe</dt>
+          <dd>
+            @if (g.motDePasseTemporaire) {
+              <span class="pastille-statut compte-temporaire">Temporaire</span>
+              @if (g.motDePasseTemporaireExpireLe; as expireLe) {
+                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}</span>
+              }
+            } @else {
+              Défini par le gestionnaire
+            }
+          </dd>
+
+          <dt>Création de sondages</dt>
+          <dd>
+            <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+              <mat-slide-toggle
+                [checked]="g.peutCreerSondages"
+                [disabled]="auth.lectureSeule() || permissionEnCours()"
+                (change)="changerPermission(g, $event)"
+              >
+                {{ g.peutCreerSondages ? 'Autorisée' : 'Bloquée' }}
+              </mat-slide-toggle>
+            </span>
+          </dd>
+
+          <dt>Créé le</dt>
+          <dd>{{ g.dateCreation | date: 'longDate' }}</dd>
+        </dl>
+
+        <div class="actions" [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+          <button matButton="outlined" type="button" (click)="renvoyerMotDePasse(g)" [disabled]="auth.lectureSeule() || !g.actif">
+            <mat-icon fontIcon="key" aria-hidden="true" />Renvoyer un mot de passe temporaire
+          </button>
+          <button matButton="outlined" type="button" (click)="basculerActif(g)" [disabled]="auth.lectureSeule()">
+            <mat-icon [fontIcon]="g.actif ? 'person_off' : 'person'" aria-hidden="true" />
+            {{ g.actif ? 'Désactiver' : 'Activer' }}
+          </button>
+          <button matButton type="button" class="action-danger" (click)="supprimer(g)" [disabled]="auth.lectureSeule()">
+            <mat-icon fontIcon="delete" aria-hidden="true" />Supprimer
+          </button>
+        </div>
+      </article>
+
+      <article class="carte-section">
+        <div class="entete-section">
+          <h2>Ses sondages</h2>
+          <span
+            [matTooltip]="
+              auth.lectureSeule() ? messageLectureSeule : !g.actif ? 'Activez d’abord ce gestionnaire.' : ''
+            "
+          >
+            <button
+              matButton="tonal"
+              type="button"
+              (click)="assignerSondages(g)"
+              [disabled]="auth.lectureSeule() || !g.actif"
+            >
+              <mat-icon fontIcon="assignment_ind" aria-hidden="true" />Assigner des sondages
+            </button>
+          </span>
+        </div>
+
+        <div class="zone-progression">
+          @if (chargementSondages()) {
+            <mat-progress-bar mode="indeterminate" aria-label="Chargement de ses sondages" />
+          }
+        </div>
+        <app-message-erreur [erreur]="erreurSondages()" parDefaut="Ses sondages n’ont pas pu être chargés." />
+
+        @if (sondages(); as page) {
+          @if (page.contenu.length === 0) {
+            <p class="etat-vide">Aucun sondage créé ni assigné.</p>
+          } @else {
+            <ul class="sondages">
+              @for (s of page.contenu; track s.id) {
+                <li class="sondage">
+                  <div class="sondage-texte">
+                    <a [routerLink]="['/sondages', s.id]" class="titre">{{ s.titre }}</a>
+                    <span class="cellule-secondaire">
+                      Version {{ s.version }} · {{ libellesRelation[s.relation] }} · modifié le
+                      {{ s.dateModification | date: 'd MMM y' }}
+                    </span>
+                  </div>
+                  <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+                  @if (s.relation === 'ASSIGNE') {
+                    <button
+                      matIconButton
+                      type="button"
+                      (click)="retirerAssignation(g, s)"
+                      [disabled]="auth.lectureSeule()"
+                      [matTooltip]="auth.lectureSeule() ? messageLectureSeule : 'Retirer l’assignation'"
+                      [attr.aria-label]="'Retirer l’assignation de « ' + s.titre + ' »'"
+                    >
+                      <mat-icon fontIcon="link_off" aria-hidden="true" />
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+            @if (page.totalElements > tailleSondages) {
+              <mat-paginator
+                [length]="page.totalElements"
+                [pageIndex]="pageSondages()"
+                [pageSize]="tailleSondages"
+                [hidePageSize]="true"
+                (page)="changerPageSondages($event)"
+                aria-label="Pagination de ses sondages"
+              />
+            }
+          }
+        }
+      </article>
+    </div>
+  }
+</section>
