@@ -1,0 +1,27 @@
+.retour {
+  margin: 0 0 var(--bt-espace-2) calc(-1 * var(--bt-espace-3));
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bt-espace-4);
+
+  @media (min-width: 960px) {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+}
+
+.en-alerte {
+  border-color: var(--bt-attente-texte);
+}
+
+.texte-alerte {
+  color: var(--bt-attente-texte);
+  font-weight: 500;
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+}

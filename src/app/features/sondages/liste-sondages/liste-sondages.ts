@@ -26,8 +26,7 @@ import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../core/services/auth.
 import { FiltreSondages, SondageService } from '../../../core/services/sondage.service';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
-
-const TAILLES = [10, 20, 50];
+import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
 
 /** Assignés affichés en clair dans une ligne ; les autres sont résumés par « +N ». */
 export const ASSIGNES_VISIBLES = 2;
@@ -35,11 +34,6 @@ export const ASSIGNES_VISIBLES = 2;
 /** Nom d'un assigné, avec la mention « désactivé » s'il ne peut plus se connecter. */
 export function libelleAssigne(gestionnaire: GestionnaireAssigneResponse): string {
   return gestionnaire.actif ? nomComplet(gestionnaire) : `${nomComplet(gestionnaire)} (désactivé)`;
-}
-
-function entier(valeur: string | undefined, parDefaut: number, min = 0): number {
-  const nombre = Number(valeur);
-  return Number.isInteger(nombre) && nombre >= min ? nombre : parDefaut;
 }
 
 /**
@@ -78,7 +72,7 @@ export class ListeSondages {
   protected readonly libellesStatut = LIBELLES_STATUT_SONDAGE;
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
-  protected readonly tailles = TAILLES;
+  protected readonly tailles = [...TAILLES_PAGE];
   /** Garde les lignes (et le focus) quand un élément est mis à jour. */
   protected readonly parId = (_index: number, element: SondageResumeResponse) => element.id;
   protected readonly libelleAssigne = libelleAssigne;
@@ -103,11 +97,8 @@ export class ListeSondages {
   });
   /** Par défaut : dernière version de chaque sondage. */
   protected readonly toutesLesVersions = computed(() => this.versions() === 'toutes');
-  protected readonly numeroPage = computed(() => entier(this.page(), 0));
-  protected readonly taillePage = computed(() => {
-    const taille = entier(this.taille(), 20, 1);
-    return TAILLES.includes(taille) ? taille : 20;
-  });
+  protected readonly numeroPage = computed(() => numeroPageUrl(this.page()));
+  protected readonly taillePage = computed(() => taillePageUrl(this.taille()));
 
   protected readonly sondages = signal<SondageResumeResponse[]>([]);
   protected readonly total = signal(0);
@@ -160,7 +151,7 @@ export class ListeSondages {
 
   protected changerPage(evenement: PageEvent): void {
     void this.router.navigate([], {
-      queryParams: { page: evenement.pageIndex || null, taille: evenement.pageSize === 20 ? null : evenement.pageSize },
+      queryParams: parametresPage(evenement.pageIndex, evenement.pageSize),
       queryParamsHandling: 'merge',
     });
   }

@@ -327,6 +327,25 @@ a {
   }
 }
 
+/* ---------- Pastilles de statut d'une demande d'abonnement ---------- */
+
+.pastille-statut {
+  &.demande-EN_ATTENTE {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+  }
+
+  &.demande-TRAITEE {
+    background: var(--bt-succes-fond);
+    color: var(--bt-succes-texte);
+  }
+
+  &.demande-REFUSEE {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+}
+
 /* ---------- Listes (tableau sur ordinateur, cartes sur téléphone) ---------- */
 
 .barre-outils {

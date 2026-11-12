@@ -1,0 +1,128 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Abonnements"
+    icone="card_membership"
+    sousTitre="L’abonnement de chaque entreprise, de l’expiration la plus proche à la plus lointaine ; les jamais payés à la fin."
+  />
+
+  <div class="barre-outils">
+    <app-filtre-statut-abonnement [statut]="filtreStatut()" (changer)="filtrer($event)" />
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des abonnements" />
+    }
+  </div>
+
+  <app-message-erreur [erreur]="erreur()" parDefaut="La liste des abonnements n’a pas pu être chargée.">
+    <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  <ng-template #entreprise let-l>
+    @if (l.adminId) {
+      <a class="nom" [routerLink]="['/super-admin/admins', l.adminId]">{{ l.abonnement.entreprise }}</a>
+    } @else {
+      <span class="nom">{{ l.abonnement.entreprise }}</span>
+    }
+    @if (nomAdmin(l); as nom) {
+      <span class="cellule-secondaire">{{ nom }} · {{ l.adminCourriel }}</span>
+    }
+  </ng-template>
+
+  <ng-template #statutAbonnement let-l>
+    <span class="pastille-statut" [class]="'statut-' + l.abonnement.statut">
+      {{ libelleStatut(l) }}
+    </span>
+  </ng-template>
+
+  <ng-template #expiration let-l>
+    @if (l.abonnement.dateExpiration; as date) {
+      <span>{{ date | date: 'longDate' }}</span>
+      @if (expireBientot(l.abonnement) && l.abonnement.joursRestants !== null) {
+        <span class="alerte-expiration">
+          <mat-icon fontIcon="schedule" aria-hidden="true" />{{ libelleJoursRestants(l.abonnement.joursRestants) }}
+        </span>
+      }
+    } @else {
+      <span class="cellule-secondaire">Jamais payé</span>
+    }
+  </ng-template>
+
+  @if (!chargement() && !erreur() && abonnements().length === 0) {
+    <p class="etat-vide" role="status">
+      @if (filtreStatut(); as s) {
+        Aucun abonnement au statut « {{ libellesStatut[s] }} ».
+      } @else {
+        Aucune entreprise pour le moment.
+      }
+    </p>
+  } @else if (abonnements().length) {
+    @if (petitEcran()) {
+      <ul class="cartes">
+        @for (l of abonnements(); track l.abonnement.id) {
+          <li class="carte" [class.en-alerte]="expireBientot(l.abonnement)">
+            <div>
+              <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: l }" />
+            </div>
+            <div class="ligne-carte">
+              <ng-container *ngTemplateOutlet="statutAbonnement; context: { $implicit: l }" />
+              <span class="cellule-secondaire">
+                {{ libelleFormule(l, 'Aucune formule') }}
+              </span>
+            </div>
+            <div class="expiration">
+              <ng-container *ngTemplateOutlet="expiration; context: { $implicit: l }" />
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="conteneur-tableau">
+        <table mat-table [dataSource]="abonnements()" [trackBy]="parId">
+          <caption class="visuellement-cache">Abonnements des entreprises</caption>
+
+          <ng-container matColumnDef="entreprise">
+            <th mat-header-cell *matHeaderCellDef>Entreprise</th>
+            <td mat-cell *matCellDef="let l">
+              <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let l">
+              <ng-container *ngTemplateOutlet="statutAbonnement; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="formule">
+            <th mat-header-cell *matHeaderCellDef>Formule</th>
+            <td mat-cell *matCellDef="let l">
+              {{ libelleFormule(l, '—') }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="expiration">
+            <th mat-header-cell *matHeaderCellDef>Expiration</th>
+            <td mat-cell *matCellDef="let l" class="expiration">
+              <ng-container *ngTemplateOutlet="expiration; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let l; columns: colonnes" [class.en-alerte]="expireBientot(l.abonnement)"></tr>
+        </table>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="numeroPage()"
+      [pageSize]="taillePage()"
+      [pageSizeOptions]="tailles"
+      (page)="changerPage($event)"
+      aria-label="Pagination des abonnements"
+    />
+  }
+</section>

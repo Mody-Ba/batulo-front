@@ -1,0 +1,39 @@
+.nom {
+  font: var(--mat-sys-title-small);
+  overflow-wrap: anywhere;
+}
+
+.cellule-actions {
+  text-align: end;
+}
+
+// Téléphone : une carte par demande.
+.cartes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.ligne-carte {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+
+  .espace {
+    flex: 1;
+  }
+}

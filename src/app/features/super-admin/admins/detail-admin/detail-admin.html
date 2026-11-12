@@ -1,0 +1,123 @@
+<section class="conteneur-page">
+  <a matButton routerLink="/super-admin/admins" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Admins et entreprises
+  </a>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’admin" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Cet admin n’a pas pu être chargé." />
+
+  @if (detail(); as d) {
+    <app-entete-page
+      [titre]="d.admin.entreprise ?? nomComplet(d.admin)"
+      [sousTitre]="'Admin : ' + nomComplet(d.admin)"
+      icone="business"
+    >
+      <button matButton="tonal" type="button" (click)="modifier(d)">
+        <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
+      </button>
+    </app-entete-page>
+
+    <div class="grille">
+      <article class="carte-section">
+        <h2>Entreprise</h2>
+        <dl class="liste-details">
+          <dt>Nom</dt>
+          <dd>{{ d.admin.entreprise }}</dd>
+
+          <dt>État</dt>
+          <dd>
+            <span class="pastille-statut" [class]="d.admin.actif ? 'compte-actif' : 'compte-desactive'">
+              {{ d.admin.actif ? 'Active' : 'Désactivée' }}
+            </span>
+          </dd>
+
+          <dt>Gestionnaires</dt>
+          <dd>{{ libelleGestionnaires(d.nombreGestionnaires) }}</dd>
+
+          <dt>Créée le</dt>
+          <dd>{{ d.admin.dateCreation | date: 'longDate' }}</dd>
+        </dl>
+      </article>
+
+      <article class="carte-section">
+        <h2>Admin</h2>
+        <dl class="liste-details">
+          <dt>Nom</dt>
+          <dd>{{ nomComplet(d.admin) }}</dd>
+
+          <dt>Courriel</dt>
+          <dd>
+            <a [href]="'mailto:' + d.admin.courriel">{{ d.admin.courriel }}</a>
+          </dd>
+
+          <dt>Mot de passe</dt>
+          <dd>
+            @if (d.admin.motDePasseTemporaire) {
+              <span class="pastille-statut compte-temporaire">Temporaire</span>
+              @if (d.admin.motDePasseTemporaireExpireLe; as expireLe) {
+                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}</span>
+              }
+            } @else {
+              Défini par l’admin
+            }
+          </dd>
+        </dl>
+      </article>
+
+      <article class="carte-section" [class.en-alerte]="enAlerte()">
+        <h2>Abonnement</h2>
+        @if (d.abonnement; as a) {
+          <dl class="liste-details">
+            <dt>Statut</dt>
+            <dd>
+              <span class="pastille-statut" [class]="'statut-' + a.statut">{{ libellesStatut[a.statut] }}</span>
+            </dd>
+
+            <dt>Formule</dt>
+            <dd>{{ a.formule ? libellesFormule[a.formule] : 'Aucune (jamais payé)' }}</dd>
+
+            @if (a.dateExpiration; as expiration) {
+              @if (a.dateDebut; as debut) {
+                <dt>Début</dt>
+                <dd>{{ debut | date: 'longDate' }}</dd>
+              }
+              <dt>Expiration</dt>
+              <dd>
+                {{ expiration | date: 'longDate' }}
+                @if (a.joursRestants !== null && a.statut !== 'EXPIRE' && a.statut !== 'DESACTIVE') {
+                  <span class="cellule-secondaire" [class.texte-alerte]="enAlerte()">
+                    {{ a.joursRestants === 1 ? '1 jour restant' : a.joursRestants + ' jours restants' }}
+                  </span>
+                }
+              </dd>
+            }
+
+            @if (a.montant !== null && a.devise) {
+              <dt>Dernier paiement</dt>
+              <dd>{{ a.montant | currency: (a.devise | uppercase) }}</dd>
+            }
+          </dl>
+        } @else {
+          <p class="texte-aide">Aucun abonnement pour cette entreprise.</p>
+        }
+      </article>
+    </div>
+
+    <div class="actions">
+      <button matButton="outlined" type="button" (click)="renvoyerMotDePasse(d)" [disabled]="!d.admin.actif">
+        <mat-icon fontIcon="key" aria-hidden="true" />Renvoyer un mot de passe temporaire
+      </button>
+      <button matButton="outlined" type="button" (click)="basculerActif(d)">
+        <mat-icon [fontIcon]="d.admin.actif ? 'block' : 'check_circle'" aria-hidden="true" />
+        {{ d.admin.actif ? 'Désactiver l’entreprise' : 'Activer l’entreprise' }}
+      </button>
+      <button matButton type="button" class="action-danger" (click)="supprimer(d)">
+        <mat-icon fontIcon="delete" aria-hidden="true" />Supprimer
+      </button>
+    </div>
+  }
+</section>
