@@ -1,0 +1,170 @@
+<section class="conteneur-page">
+  <app-entete-page [titre]="titre()" [sousTitre]="auth.utilisateur()?.entreprise ?? null" icone="dashboard" />
+
+  <div class="grille">
+    <!-- Chiffres de l'entreprise -->
+    <article class="carte-section chiffres" aria-labelledby="titre-chiffres">
+      <div class="entete-section">
+        <h2 id="titre-chiffres">En chiffres</h2>
+      </div>
+      <div class="zone-progression">
+        @if (chargementChiffres()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Chargement des chiffres" />
+        }
+      </div>
+      <app-message-erreur [erreur]="erreurChiffres()" parDefaut="Les chiffres n’ont pas pu être chargés.">
+        <p><button matButton type="button" (click)="chargerChiffres()">Réessayer</button></p>
+      </app-message-erreur>
+      @if (chiffres(); as c) {
+        <div class="groupes-chiffres">
+          <section class="groupe" aria-labelledby="titre-gestionnaires">
+            <h3 id="titre-gestionnaires">Gestionnaires</h3>
+            <ul class="tuiles">
+              <li>
+                <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: true }">
+                  <span class="valeur">{{ c.gestionnaires.actifs | number }}</span>&ngsp;
+                  <span class="libelle">Actif{{ c.gestionnaires.actifs > 1 ? 's' : '' }}</span>
+                </a>
+              </li>
+              <li>
+                <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: false }">
+                  <span class="valeur">{{ c.gestionnaires.desactives | number }}</span>&ngsp;
+                  <span class="libelle">Désactivé{{ c.gestionnaires.desactives > 1 ? 's' : '' }}</span>
+                </a>
+              </li>
+            </ul>
+          </section>
+          <section class="groupe" aria-labelledby="titre-sondages">
+            <h3 id="titre-sondages">Sondages</h3>
+            <ul class="tuiles">
+              <li>
+                <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'NON_COMMENCE' }">
+                  <span class="valeur">{{ c.sondages.NON_COMMENCE | number }}</span>&ngsp;
+                  <span class="libelle">Non commencés</span>&ngsp;
+                  <span class="precision">brouillons compris</span>
+                </a>
+              </li>
+              <li>
+                <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'EN_COURS' }">
+                  <span class="valeur">{{ c.sondages.EN_COURS | number }}</span>&ngsp;
+                  <span class="libelle">En cours</span>
+                </a>
+              </li>
+              <li>
+                <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'TERMINE' }">
+                  <span class="valeur">{{ c.sondages.TERMINE | number }}</span>&ngsp;
+                  <span class="libelle">Terminés</span>
+                </a>
+              </li>
+            </ul>
+          </section>
+          <section class="groupe" aria-labelledby="titre-reponses">
+            <h3 id="titre-reponses">Réponses</h3>
+            <ul class="tuiles">
+              <li>
+                <span class="tuile">
+                  <span class="valeur">{{ c.nombreTotalReponses | number }}</span>&ngsp;
+                  <span class="libelle">Reçues au total</span>&ngsp;
+                  <span class="precision">toutes versions</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+        </div>
+      }
+    </article>
+
+    <!-- Abonnement -->
+    <article class="carte-section abonnement" [class.alerte]="enAlerte() && !expire()" [class.expire]="expire()">
+      <div class="entete-section">
+        <h2>Abonnement</h2>
+        @if (abonnement(); as a) {
+          <span class="pastille-statut" [class]="'statut-' + a.statut">{{ libellesStatut[a.statut] }}</span>
+        }
+      </div>
+      @if (abonnement(); as a) {
+        @if (a.formule) {
+          <p class="formule">{{ libellesFormule[a.formule] }}</p>
+        }
+        @if (a.joursRestants !== null && !expire()) {
+          <p class="jours">
+            <span class="nombre">{{ a.joursRestants }}</span>
+            jour{{ a.joursRestants > 1 ? 's' : '' }} restant{{ a.joursRestants > 1 ? 's' : '' }}
+          </p>
+        }
+        @if (a.dateExpiration) {
+          <p class="cellule-secondaire">
+            {{ expire() ? 'Expiré le' : 'Expire le' }} {{ a.dateExpiration | date: 'longDate' }}
+            @if (expire()) {
+              : accès en lecture seule.
+            }
+          </p>
+        }
+        @if (a.montant !== null && a.devise) {
+          <p class="cellule-secondaire">Dernier paiement : {{ a.montant | currency: (a.devise | uppercase) }}</p>
+        }
+        <div class="actions">
+          <a
+            [matButton]="enAlerte() ? 'filled' : 'tonal'"
+            routerLink="/admin/abonnement/souscrire"
+            [queryParams]="{ formule: a.formule }"
+          >
+            <mat-icon fontIcon="autorenew" aria-hidden="true" />Renouveler
+          </a>
+          <a matButton routerLink="/admin/abonnement">Voir le détail</a>
+        </div>
+      } @else {
+        <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’abonnement" />
+      }
+    </article>
+
+    <!-- Dernières notifications -->
+    <article class="carte-section notifications">
+      <div class="entete-section">
+        <h2>Dernières notifications</h2>
+        <a matButton routerLink="/notifications">Tout voir</a>
+      </div>
+      <div class="zone-progression">
+        @if (chargementNotifications()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+        }
+      </div>
+      <app-message-erreur [erreur]="erreurNotifications()" parDefaut="Les notifications n’ont pas pu être chargées.">
+        <p><button matButton type="button" (click)="chargerNotifications()">Réessayer</button></p>
+      </app-message-erreur>
+      @if (!chargementNotifications() && !erreurNotifications() && notifications().length === 0) {
+        <p class="etat-vide">Aucune notification.</p>
+      }
+      <ul class="liste-notifications">
+        @for (n of notifications(); track n.id) {
+          <li [class.non-lue]="!n.lue">
+            <mat-icon [fontIcon]="icones[n.type]" aria-hidden="true" />
+            <div>
+              <p class="titre-notification">
+                @if (!n.lue) {
+                  <span class="visuellement-cache">Non lue : </span>
+                }
+                {{ n.titre }}
+              </p>
+              <p class="cellule-secondaire">{{ n.message }}</p>
+              <p class="cellule-secondaire">{{ n.dateCreation | date: 'd MMM, HH:mm' }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+    </article>
+
+    <!-- Accès rapides -->
+    <article class="carte-section raccourcis">
+      <h2>Accès rapides</h2>
+      <div class="liens">
+        <a matButton="outlined" routerLink="/admin/gestionnaires">
+          <mat-icon fontIcon="group" aria-hidden="true" />Gestionnaires
+        </a>
+        <a matButton="outlined" routerLink="/sondages">
+          <mat-icon fontIcon="ballot" aria-hidden="true" />Sondages
+        </a>
+      </div>
+    </article>
+  </div>
+</section>

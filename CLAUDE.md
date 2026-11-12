@@ -40,9 +40,10 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
 ```
 src/app/
   core/
-    models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role)
+    models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
+                   gestionnaire, sondage, assignation, tableau-de-bord)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
-                   abonnement, stripe = chargement de Stripe.js)
+                   abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend)
@@ -88,11 +89,37 @@ src/app/
   par la mise en page pour le rôle ADMIN, mis à jour par `/confirmer`, vidé à la déconnexion. Alerte à 7 jours ou
   moins (`abonnementEnAlerte`), erreur si EXPIRE ; masqué sur `/admin/abonnement/**`.
 - Champs Stripe dans des iframes : les couleurs du thème leur sont passées calculées (`styleStripe()`).
-- **À ajouter au backend** pour l'historique des paiements : `GET /api/abonnements/paiements?page&taille`
-  (ADMIN, entreprise du jeton, plus récents d'abord) -> `PageResponse<PaiementResponse>` avec `id`, `formule`,
-  `montant`, `devise`, `statut` (`EN_ATTENTE|REUSSI|ECHOUE`), `datePaiement`, `periodeDebut`, `periodeFin`.
-  Permise en EN_ATTENTE_PAIEMENT et EXPIRE (déjà le cas pour `/api/abonnements/**`). Côté front : un tableau
-  dans la carte « Paiements » de `mon-abonnement`.
+- Historique des paiements (carte « Paiements » de `mon-abonnement`) : `GET /api/abonnements/paiements?page&taille`
+  -> `PageResponse<PaiementResponse>` (`id`, `datePaiement`, `formule`, `montant`, `devise`), paiements **REUSSI
+  seulement**, plus récents d'abord ; pas de statut ni de période. Pagination locale à la carte (5, 10, 20), le
+  paginateur n'apparaît qu'au-delà de 5 paiements.
+
+## Espace admin (F4)
+- Routes : `/admin` (tableau de bord), `/admin/gestionnaires[?page&taille]`, `/admin/gestionnaires/:id`,
+  `/sondages[?statut&page&taille]` (admin et gestionnaire ; le backend filtre), `/sondages/nouveau` (F5),
+  `/sondages/:id`. Pagination et filtres dans l'URL (retour arrière et rechargement conservés).
+- Actions sur un gestionnaire centralisées dans `features/admin/gestionnaires/actions-gestionnaire.ts`
+  (confirmation, appel, snackbar) ; boîte de confirmation commune `shared/components/dialogue-confirmation`
+  (`confirmer(dialog, {...})`, focus sur « Annuler », bouton rouge si `destructive`).
+- Assignation : porte sur la lignée. Depuis un sondage : un seul POST avec plusieurs `gestionnaireIds`. Depuis
+  un gestionnaire : un POST par sondage, chaque échec affiché sans bloquer les autres.
+- Lecture seule : `AuthService.lectureSeule()` (abonnement EXPIRE, hors super admin) désactive tout bouton
+  d'écriture, avec l'infobulle `MESSAGE_LECTURE_SEULE`.
+- Tableaux Material avec `[trackBy]` (sinon la ligne est recréée et le focus perdu) ; cartes sous 720 px.
+- Paginateur français fourni par les routes chargées à la demande (`fournirPaginateurFrancais()`), pas dans
+  `app.config.ts` : sinon le paginateur et le select de Material entrent dans le bundle initial (budget 500 ko).
+- Tableau de bord : carte « En chiffres » (`GET /api/admin/tableau-de-bord`, `TableauDeBordService`) ; un sondage
+  = une lignée, **brouillons compris dans « Non commencés »** (pas de compteur à part) ; chaque tuile mène à la
+  liste filtrée (`/admin/gestionnaires?actif=`, `/sondages?statut=`). La carte Abonnement garde le signal partagé.
+- Gestionnaires : `?recherche=` (prénom, nom ou courriel, sans majuscules ni accents ; envoyée 300 ms après la
+  dernière frappe) et `?actif=true|false` dans l'URL, transmis tels quels au backend.
+- Sondages : par défaut `derniereVersion=true` (une ligne par lignée : dernière version publiée EN_COURS ou TERMINE,
+  sinon le brouillon) ; `?versions=toutes` pour chaque version. Colonne Réponses : `nombreReponsesLignee` (+ « dont
+  N pour la vX ») en vue dernière version, `nombreReponses` sinon. Colonne Assignés (`gestionnairesAssignes`) pour
+  l'admin seulement (null pour un gestionnaire). « Nouvelle version en préparation » -> `brouillonEnPreparationId`
+  (une version planifiée plus récente n'est pas signalée par le backend).
+- Boîtes d'assignation : gestionnaires lus avec `actif=true` ; sondages lus avec `derniereVersion=true`
+  (l'assignation porte sur la lignée).
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
@@ -113,10 +140,13 @@ src/app/
   changement obligatoire du mot de passe temporaire, intercepteur (jeton, rafraîchissement, déconnexion),
   gardes par rôle et par statut, affichage des erreurs.
 - [x] **F2 – Abonnement et Stripe** : formules, paiement Stripe Elements, confirmation, rafraîchissement du jeton,
-  bandeau d'abonnement de l'admin, page « Mon abonnement » (dernier paiement ; historique en attente du backend).
+  bandeau d'abonnement de l'admin, page « Mon abonnement » avec l'historique des paiements.
   Reste : demande d'augmentation (`/api/abonnements/demandes`, avec la messagerie en F8).
 - [ ] **F3 – Super admin** : admins et entreprises, abonnements, demandes d'abonnement.
-- [ ] **F4 – Admin et gestionnaires** : gestion des gestionnaires (création, activation, permission sondages).
+- [x] **F4 – Espace admin** : gestionnaires (CRUD, activer/désactiver, permission, mot de passe temporaire,
+  recherche et filtre actif, détail + ses sondages), assignations (depuis un sondage ou un gestionnaire), liste
+  des sondages (dernière version par défaut, réponses, assignés, nouvelle version en préparation) et détail en
+  lecture seule, tableau de bord (compteurs, abonnement, notifications), lecture seule si EXPIRE.
 - [ ] **F5 – Éditeur de sondage** : sondages, sections, questions, versions, modèles, assignations, publication.
 - [ ] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée.
 - [ ] **F7 – Statistiques et exports** : statistiques, critères, tableaux croisés, exports CSV/XLSX/PDF.

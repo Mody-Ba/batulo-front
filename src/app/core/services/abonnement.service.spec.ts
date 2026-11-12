@@ -20,6 +20,13 @@ describe('AbonnementService', () => {
 
   afterEach(() => serveur.verify());
 
+  it('lit l’historique des paiements, paginé', () => {
+    service.paiements(1, 5).subscribe();
+    expect(serveur.expectOne(`${URL}/paiements?page=1&taille=5`).request.method).toBe('GET');
+    service.paiements().subscribe();
+    serveur.expectOne(`${URL}/paiements?page=0&taille=10`);
+  });
+
   it('lit les formules', () => {
     service.formules().subscribe();
     expect(serveur.expectOne(`${URL}/formules`).request.method).toBe('GET');

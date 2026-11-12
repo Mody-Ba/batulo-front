@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>{{ gestionnaire ? 'Modifier le gestionnaire' : 'Nouveau gestionnaire' }}</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="enregistrer()" novalidate>
+  <mat-dialog-content>
+    @if (!gestionnaire) {
+      <p class="texte-aide">
+        Un mot de passe temporaire, valable 24 heures, lui sera envoyé par courriel. Il ne pourra pas
+        créer de sondages tant que vous ne l’y autorisez pas.
+      </p>
+    }
+    <app-message-erreur [erreur]="erreur()" />
+
+    <div class="formulaire">
+      <div class="ligne-champs">
+        <mat-form-field>
+          <mat-label>Prénom</mat-label>
+          <input matInput formControlName="prenom" autocomplete="off" required cdkFocusInitial />
+          @if (formulaire.controls.prenom.hasError('required')) {
+            <mat-error>Le prénom est obligatoire.</mat-error>
+          } @else if (formulaire.controls.prenom.hasError('maxlength')) {
+            <mat-error>100 caractères au plus.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom" autocomplete="off" required />
+          @if (formulaire.controls.nom.hasError('required')) {
+            <mat-error>Le nom est obligatoire.</mat-error>
+          } @else if (formulaire.controls.nom.hasError('maxlength')) {
+            <mat-error>100 caractères au plus.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>Courriel</mat-label>
+        <input matInput type="email" formControlName="courriel" autocomplete="off" inputmode="email" required />
+        @if (formulaire.controls.courriel.hasError('required')) {
+          <mat-error>Le courriel est obligatoire.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('email')) {
+          <mat-error>Le courriel n’est pas valide.</mat-error>
+        } @else if (formulaire.controls.courriel.hasError('maxlength')) {
+          <mat-error>255 caractères au plus.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close [disabled]="enCours()">Annuler</button>
+    <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours()">
+      @if (enCours()) {
+        <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+      } @else {
+        {{ gestionnaire ? 'Enregistrer' : 'Créer le gestionnaire' }}
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

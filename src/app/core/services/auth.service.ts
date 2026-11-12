@@ -39,6 +39,7 @@ interface Session {
 }
 
 const CLE_SESSION = 'batulo.session';
+export const MESSAGE_LECTURE_SEULE = 'Abonnement expiré : lecture seule.';
 export const MESSAGE_SESSION_EXPIREE = 'Votre session a expiré. Veuillez vous reconnecter.';
 
 /**
@@ -63,6 +64,13 @@ export class AuthService {
   readonly utilisateur = computed(() => this.session()?.utilisateur ?? null);
   readonly statutAbonnement = computed(() => this.session()?.statutAbonnement ?? null);
   readonly motDePasseTemporaire = computed(() => this.session()?.motDePasseTemporaire ?? false);
+  /**
+   * Abonnement expiré : le backend n'accepte plus que la lecture (GET). Les boutons d'écriture sont
+   * désactivés avec l'infobulle MESSAGE_LECTURE_SEULE.
+   */
+  readonly lectureSeule = computed(
+    () => this.role() !== 'SUPER_ADMIN' && this.statutAbonnement() === 'EXPIRE',
+  );
   readonly nomAffiche = computed(() => {
     const utilisateur = this.utilisateur();
     return utilisateur ? `${utilisateur.prenom} ${utilisateur.nom}`.trim() : '';

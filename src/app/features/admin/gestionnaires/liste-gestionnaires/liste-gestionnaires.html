@@ -1,0 +1,182 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Gestionnaires"
+    icone="group"
+    sousTitre="Les comptes de votre équipe : accès, permission de créer des sondages et assignations."
+  >
+    <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+      <button matButton="filled" type="button" (click)="creer()" [disabled]="auth.lectureSeule()">
+        <mat-icon fontIcon="person_add" aria-hidden="true" />Nouveau gestionnaire
+      </button>
+    </span>
+  </app-entete-page>
+
+  <div class="barre-outils">
+    <mat-form-field class="champ-recherche">
+      <mat-label>Rechercher</mat-label>
+      <mat-icon matPrefix fontIcon="search" aria-hidden="true" />
+      <input matInput type="search" [formControl]="champRecherche" autocomplete="off" maxlength="100" />
+      @if (champRecherche.value) {
+        <button matIconButton matSuffix type="button" (click)="effacerRecherche()" aria-label="Effacer la recherche">
+          <mat-icon fontIcon="close" aria-hidden="true" />
+        </button>
+      }
+      <mat-hint>Prénom, nom ou courriel</mat-hint>
+    </mat-form-field>
+    <mat-chip-listbox
+      aria-label="Filtrer par état"
+      [value]="filtreActif()"
+      (change)="filtrerActif($event.value ?? null)"
+      [hideSingleSelectionIndicator]="true"
+    >
+      <mat-chip-option value="tous">Tous</mat-chip-option>
+      <mat-chip-option value="actifs">Actifs</mat-chip-option>
+      <mat-chip-option value="desactives">Désactivés</mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des gestionnaires" />
+    }
+  </div>
+
+  <app-message-erreur [erreur]="erreur()" parDefaut="La liste des gestionnaires n’a pas pu être chargée.">
+    <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  <!-- Menu d'actions d'une ligne (partagé entre le tableau et les cartes). -->
+  <mat-menu #menuActions="matMenu" xPosition="before">
+    <ng-template matMenuContent let-g>
+      <a mat-menu-item [routerLink]="['/admin/gestionnaires', g.id]">
+        <mat-icon fontIcon="visibility" aria-hidden="true" /><span>Voir le détail</span>
+      </a>
+      <button mat-menu-item type="button" (click)="modifier(g)" [disabled]="auth.lectureSeule()">
+        <mat-icon fontIcon="edit" aria-hidden="true" /><span>Modifier</span>
+      </button>
+      <button mat-menu-item type="button" (click)="renvoyerMotDePasse(g)" [disabled]="auth.lectureSeule() || !g.actif">
+        <mat-icon fontIcon="key" aria-hidden="true" /><span>Renvoyer un mot de passe temporaire</span>
+      </button>
+      <button mat-menu-item type="button" (click)="basculerActif(g)" [disabled]="auth.lectureSeule()">
+        <mat-icon [fontIcon]="g.actif ? 'person_off' : 'person'" aria-hidden="true" />
+        <span>{{ g.actif ? 'Désactiver' : 'Activer' }}</span>
+      </button>
+      <button mat-menu-item type="button" class="action-danger" (click)="supprimer(g)" [disabled]="auth.lectureSeule()">
+        <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer</span>
+      </button>
+    </ng-template>
+  </mat-menu>
+
+  <ng-template #etat let-g>
+    <span class="pastilles">
+      <span class="pastille-statut" [class]="g.actif ? 'compte-actif' : 'compte-desactive'">
+        {{ g.actif ? 'Actif' : 'Désactivé' }}
+      </span>
+      @if (g.motDePasseTemporaire) {
+        <span class="pastille-statut compte-temporaire">Mot de passe temporaire</span>
+      }
+    </span>
+  </ng-template>
+
+  <ng-template #permission let-g>
+    <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+      <mat-slide-toggle
+        [checked]="g.peutCreerSondages"
+        [disabled]="auth.lectureSeule() || permissionsEnCours().has(g.id)"
+        (change)="changerPermission(g, $event)"
+        [aria-label]="'Autoriser ' + nomComplet(g) + ' à créer des sondages'"
+      >
+        <span [class.visuellement-cache]="!petitEcran()">Peut créer des sondages</span>
+      </mat-slide-toggle>
+    </span>
+  </ng-template>
+
+  @if (!chargement() && !erreur() && gestionnaires().length === 0) {
+    <p class="etat-vide" role="status">
+      @if (filtre()) {
+        {{ messageAucunResultat() }}
+      } @else {
+        Aucun gestionnaire pour le moment. Créez-en un pour lui confier des sondages.
+      }
+    </p>
+  } @else if (gestionnaires().length) {
+    @if (petitEcran()) {
+      <ul class="cartes">
+        @for (g of gestionnaires(); track g.id) {
+          <li class="carte">
+            <div class="carte-entete">
+              <a class="nom" [routerLink]="['/admin/gestionnaires', g.id]">{{ nomComplet(g) }}</a>
+              <button
+                matIconButton
+                type="button"
+                [matMenuTriggerFor]="menuActions"
+                [matMenuTriggerData]="{ $implicit: g }"
+                [attr.aria-label]="'Actions pour ' + nomComplet(g)"
+              >
+                <mat-icon fontIcon="more_vert" aria-hidden="true" />
+              </button>
+            </div>
+            <span class="cellule-secondaire">{{ g.courriel }}</span>
+            <ng-container *ngTemplateOutlet="etat; context: { $implicit: g }" />
+            <ng-container *ngTemplateOutlet="permission; context: { $implicit: g }" />
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="conteneur-tableau">
+        <table mat-table [dataSource]="gestionnaires()" [trackBy]="parId">
+          <caption class="visuellement-cache">Gestionnaires de l’entreprise</caption>
+
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Gestionnaire</th>
+            <td mat-cell *matCellDef="let g">
+              <a class="nom" [routerLink]="['/admin/gestionnaires', g.id]">{{ nomComplet(g) }}</a>
+              <span class="cellule-secondaire">{{ g.courriel }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="etat">
+            <th mat-header-cell *matHeaderCellDef>État</th>
+            <td mat-cell *matCellDef="let g">
+              <ng-container *ngTemplateOutlet="etat; context: { $implicit: g }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="permission">
+            <th mat-header-cell *matHeaderCellDef>Création de sondages</th>
+            <td mat-cell *matCellDef="let g">
+              <ng-container *ngTemplateOutlet="permission; context: { $implicit: g }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef><span class="visuellement-cache">Actions</span></th>
+            <td mat-cell *matCellDef="let g" class="cellule-actions">
+              <button
+                matIconButton
+                type="button"
+                [matMenuTriggerFor]="menuActions"
+                [matMenuTriggerData]="{ $implicit: g }"
+                [attr.aria-label]="'Actions pour ' + nomComplet(g)"
+              >
+                <mat-icon fontIcon="more_vert" aria-hidden="true" />
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let g; columns: colonnes" [class.inactif]="!g.actif"></tr>
+        </table>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="numeroPage()"
+      [pageSize]="taillePage()"
+      [pageSizeOptions]="tailles"
+      (page)="changerPage($event)"
+      aria-label="Pagination des gestionnaires"
+    />
+  }
+</section>

@@ -101,10 +101,8 @@ export const routes: Routes = [
       // Rubriques communes à plusieurs rôles, livrées dans les étapes suivantes.
       {
         path: 'sondages',
-        title: 'Sondages · Batulo',
         canActivate: [roleGuard('ADMIN', 'GESTIONNAIRE')],
-        loadComponent: pageAVenir,
-        data: { titre: 'Sondages', icone: 'ballot', etape: 'F5' },
+        loadChildren: () => import('./features/sondages/sondages.routes').then((m) => m.routes),
       },
       {
         path: 'messagerie',

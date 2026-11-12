@@ -1,0 +1,152 @@
+<section class="conteneur-page">
+  <a matButton routerLink="/sondages" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+  </a>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement du sondage" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Ce sondage n’a pas pu être chargé." />
+
+  @if (sondage(); as s) {
+    <app-entete-page [titre]="s.titre" [sousTitre]="s.description" icone="ballot">
+      <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+    </app-entete-page>
+
+    <div class="grille">
+      <article class="carte-section">
+        <h2>Informations</h2>
+        <dl class="liste-details">
+          <dt>Version</dt>
+          <dd>{{ s.version }}@if (s.estModele) { · Modèle }</dd>
+
+          <dt>Créé par</dt>
+          <dd>{{ s.creePar ? nomComplet(s.creePar) : '—' }}, le {{ s.dateCreation | date: 'longDate' }}</dd>
+
+          @if (s.datePublication) {
+            <dt>Ouverture</dt>
+            <dd>{{ s.datePublication | date: 'd MMMM y à HH:mm' }}</dd>
+          }
+          <dt>Fermeture</dt>
+          <dd>
+            @if (s.dateFermeture) {
+              {{ s.dateFermeture | date: 'd MMMM y à HH:mm' }}
+            } @else {
+              Non prévue
+            }
+          </dd>
+
+          <dt>Réponses</dt>
+          <dd>{{ s.reponseUnique ? 'Une seule par appareil' : 'Plusieurs par appareil (collecte terrain)' }}</dd>
+        </dl>
+      </article>
+
+      <article class="carte-section">
+        <h2>Collecte</h2>
+        @if (collecte(); as c) {
+          <p class="nombre">{{ c.nombreReponsesTotal | number }}</p>
+          <p class="cellule-secondaire">
+            réponse{{ c.nombreReponsesTotal > 1 ? 's' : '' }} au total
+            @if (versions().length > 1) {
+              ({{ c.nombreReponses | number }} pour cette version)
+            }
+          </p>
+          <dl class="liste-details collecte">
+            <dt>Collecte</dt>
+            <dd>{{ c.collecteOuverte ? 'Ouverte' : 'Fermée' }}</dd>
+            @if (!c.collecteOuverte && c.raisonFermeture) {
+              <dt>Raison</dt>
+              <dd>{{ c.raisonFermeture }}</dd>
+            }
+            @if (c.derniereReponse) {
+              <dt>Dernière réponse</dt>
+              <dd>{{ c.derniereReponse | date: 'd MMM y à HH:mm' }}</dd>
+            }
+          </dl>
+        } @else {
+          <p class="texte-aide">Suivi de la collecte indisponible.</p>
+        }
+      </article>
+
+      @if (estAdmin()) {
+        <article class="carte-section large">
+          <div class="entete-section">
+            <h2>Gestionnaires assignés</h2>
+            <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+              <button matButton="tonal" type="button" (click)="assigner(s)" [disabled]="auth.lectureSeule()">
+                <mat-icon fontIcon="person_add" aria-hidden="true" />Assigner
+              </button>
+            </span>
+          </div>
+          <div class="zone-progression">
+            @if (chargementAssignations()) {
+              <mat-progress-bar mode="indeterminate" aria-label="Chargement des assignations" />
+            }
+          </div>
+          <app-message-erreur [erreur]="erreurAssignations()" parDefaut="Les assignations n’ont pas pu être chargées." />
+
+          @if (!chargementAssignations() && !erreurAssignations() && assignations().length === 0) {
+            <p class="etat-vide">Aucun gestionnaire assigné.</p>
+          }
+          <ul class="assignations">
+            @for (a of assignations(); track a.gestionnaireId) {
+              <li>
+                <div class="assignation-texte">
+                  <a [routerLink]="['/admin/gestionnaires', a.gestionnaireId]">{{ nomComplet(a) }}</a>
+                  @if (!a.actif) {
+                    <span class="pastille-statut compte-desactive">Désactivé</span>
+                  }
+                  <span class="cellule-secondaire">
+                    {{ a.courriel }} · assigné le {{ a.dateAssignation | date: 'd MMM y' }}
+                    @if (a.assignePar; as par) {
+                      par {{ par.prenom }} {{ par.nom }}
+                    }
+                  </span>
+                </div>
+                <button
+                  matIconButton
+                  type="button"
+                  (click)="retirer(s, a)"
+                  [disabled]="auth.lectureSeule()"
+                  [matTooltip]="auth.lectureSeule() ? messageLectureSeule : 'Retirer l’assignation'"
+                  [attr.aria-label]="'Retirer l’assignation de ' + nomComplet(a)"
+                >
+                  <mat-icon fontIcon="link_off" aria-hidden="true" />
+                </button>
+              </li>
+            }
+          </ul>
+        </article>
+      }
+
+      @if (versions().length > 1) {
+        <article class="carte-section large">
+          <h2>Versions</h2>
+          <ol class="versions">
+            @for (v of versions(); track v.id) {
+              <li [class.courante]="v.id === s.id">
+                @if (v.id === s.id) {
+                  <strong>Version {{ v.version }}</strong> (affichée)
+                } @else {
+                  <a [routerLink]="['/sondages', v.id]">Version {{ v.version }}</a>
+                }
+                <span class="pastille-statut" [class]="classeEtat(v)">{{ libelleEtat(v) }}</span>
+                <span class="cellule-secondaire">
+                  @if (v.datePublication) {
+                    Ouverte le {{ v.datePublication | date: 'd MMM y' }}
+                  } @else {
+                    Créée le {{ v.dateCreation | date: 'd MMM y' }}
+                  }
+                </span>
+              </li>
+            }
+          </ol>
+        </article>
+      }
+    </div>
+
+    <p class="texte-aide note-f5">La modification des questions et la publication arrivent bientôt.</p>
+  }
+</section>

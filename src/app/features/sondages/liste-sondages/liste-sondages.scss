@@ -1,0 +1,64 @@
+.titre {
+  font: var(--mat-sys-title-small);
+  overflow-wrap: anywhere;
+}
+
+.cartes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.ligne {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+}
+
+.en-preparation {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--bt-espace-1);
+  margin-top: var(--bt-espace-1);
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-tertiary);
+
+  .mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.nombre {
+  font-variant-numeric: tabular-nums;
+}
+
+.assigne-inactif {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.autres {
+  margin-left: var(--bt-espace-1);
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.en-ligne {
+  display: inline;
+}

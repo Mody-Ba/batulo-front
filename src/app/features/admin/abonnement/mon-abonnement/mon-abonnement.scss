@@ -49,10 +49,36 @@
   font-weight: 700;
 }
 
-.montant {
-  font: var(--mat-sys-title-large) !important;
-}
-
 .texte-aide {
   margin: 0;
+}
+
+.historique {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--mat-sys-body-medium);
+
+  th,
+  td {
+    padding: var(--bt-espace-2) var(--bt-espace-2) var(--bt-espace-2) 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  th {
+    font: var(--mat-sys-label-large);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .colonne-montant {
+    padding-right: 0;
+    text-align: end;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
 }

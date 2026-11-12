@@ -72,17 +72,49 @@
         </dl>
       </article>
 
-      <article class="carte">
-        <h2>Paiements</h2>
-        @if (abonnement.montant !== null && abonnement.devise) {
-          <dl class="details">
-            <dt>Dernier paiement</dt>
-            <dd class="montant">{{ abonnement.montant | currency: (abonnement.devise | uppercase) }}</dd>
-          </dl>
-        } @else {
+      <article class="carte" aria-labelledby="titre-paiements">
+        <h2 id="titre-paiements">Paiements</h2>
+        <div class="zone-progression">
+          @if (chargementPaiements()) {
+            <mat-progress-bar mode="indeterminate" aria-label="Chargement des paiements" />
+          }
+        </div>
+        <app-message-erreur [erreur]="erreurPaiements()" parDefaut="L’historique des paiements n’a pas pu être chargé.">
+          <p><button matButton type="button" (click)="chargerPaiements()">Réessayer</button></p>
+        </app-message-erreur>
+        @if (!chargementPaiements() && !erreurPaiements() && totalPaiements() === 0) {
           <p class="texte-aide">Aucun paiement pour le moment.</p>
+        } @else if (paiements().length) {
+          <table class="historique">
+            <caption class="visuellement-cache">Historique des paiements, du plus récent au plus ancien</caption>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Formule</th>
+                <th scope="col" class="colonne-montant">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of paiements(); track p.id) {
+                <tr>
+                  <td>{{ p.datePaiement | date: 'd MMM y' }}</td>
+                  <td>{{ libellesFormule[p.formule] }}</td>
+                  <td class="colonne-montant">{{ p.montant | currency: (p.devise | uppercase) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (totalPaiements() > taillesPaiements[0]) {
+            <mat-paginator
+              [length]="totalPaiements()"
+              [pageIndex]="pagePaiements()"
+              [pageSize]="taillePaiements()"
+              [pageSizeOptions]="taillesPaiements"
+              (page)="changerPagePaiements($event)"
+              aria-label="Pagination des paiements"
+            />
+          }
         }
-        <p class="texte-aide">L’historique détaillé des paiements sera bientôt disponible ici.</p>
       </article>
     </div>
 

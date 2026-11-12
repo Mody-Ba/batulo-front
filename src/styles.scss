@@ -292,6 +292,135 @@ a {
   }
 }
 
+/* ---------- Pastilles d'état d'un sondage et d'un compte ---------- */
+
+.pastille-statut {
+  &.sondage-BROUILLON {
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &.sondage-NON_COMMENCE {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  &.sondage-EN_COURS,
+  &.compte-actif {
+    background: var(--bt-succes-fond);
+    color: var(--bt-succes-texte);
+  }
+
+  &.sondage-TERMINE {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &.compte-desactive {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+
+  &.compte-temporaire {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+  }
+}
+
+/* ---------- Listes (tableau sur ordinateur, cartes sur téléphone) ---------- */
+
+.barre-outils {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-3);
+  margin-bottom: var(--bt-espace-3);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.zone-progression {
+  height: 4px;
+  margin-bottom: var(--bt-espace-2);
+}
+
+.conteneur-tableau {
+  overflow-x: auto;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+
+  table {
+    width: 100%;
+  }
+}
+
+.cellule-secondaire {
+  display: block;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.etat-vide {
+  padding: var(--bt-espace-8) var(--bt-espace-4);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+}
+
+.carte-section {
+  padding: var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+
+  > h2 {
+    margin: 0 0 var(--bt-espace-3);
+    font: var(--mat-sys-title-medium);
+  }
+}
+
+.entete-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  margin-bottom: var(--bt-espace-3);
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+  }
+}
+
+.liste-details {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  gap: var(--bt-espace-3) var(--bt-espace-4);
+  align-items: center;
+  margin: 0;
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

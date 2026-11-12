@@ -1,0 +1,83 @@
+<h2 mat-dialog-title>Assigner des sondages</h2>
+
+<mat-dialog-content>
+  <p class="texte-aide">
+    {{ nomComplet(gestionnaire) }} pourra voir ces sondages, suivre leur collecte et consulter leurs
+    statistiques, pour toutes leurs versions. Il recevra une notification et un courriel.
+  </p>
+
+  @if (chargement()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des sondages" />
+  }
+  <app-message-erreur [erreur]="erreurChargement()" parDefaut="Les sondages n’ont pas pu être chargés.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (resultats()) {
+    <div class="resultats" role="alert">
+      @if (reussis()) {
+        <p class="succes">
+          {{ reussis() }} sondage{{ reussis() > 1 ? 's' : '' }} assigné{{ reussis() > 1 ? 's' : '' }}.
+        </p>
+      }
+      <p>Non assignés :</p>
+      <ul>
+        @for (echec of echecs(); track echec.sondage.id) {
+          <li><strong>{{ echec.sondage.titre }}</strong> : {{ echec.erreur }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (!chargement() && !erreurChargement()) {
+    @if (candidats().length === 0) {
+      <p class="etat-vide">Aucun autre sondage à lui assigner.</p>
+    } @else {
+      <mat-form-field class="recherche" subscriptSizing="dynamic">
+        <mat-label>Rechercher un sondage</mat-label>
+        <mat-icon matPrefix fontIcon="search" aria-hidden="true" />
+        <input matInput [ngModel]="recherche()" (ngModelChange)="recherche.set($event)" autocomplete="off" />
+      </mat-form-field>
+
+      <mat-selection-list
+        class="liste"
+        [ngModel]="selection()"
+        (ngModelChange)="selection.set($event)"
+        aria-label="Sondages à assigner"
+        [disabled]="enCours()"
+      >
+        @for (sondage of candidatsFiltres(); track sondage.id) {
+          <mat-list-option [value]="sondage.id" togglePosition="before">
+            <span matListItemTitle>{{ sondage.titre }}</span>
+            <span matListItemLine>Version {{ sondage.version }} · {{ libelleEtat(sondage) }}</span>
+          </mat-list-option>
+        } @empty {
+          <p class="etat-vide">Aucun sondage ne correspond à « {{ recherche() }} ».</p>
+        }
+      </mat-selection-list>
+
+      @if (totalSondages() > limite) {
+        <p class="texte-aide">Seuls les {{ limite }} sondages modifiés le plus récemment sont proposés.</p>
+      }
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton type="button" (click)="fermer()" [disabled]="enCours()">
+    {{ resultats() ? 'Fermer' : 'Annuler' }}
+  </button>
+  <button
+    matButton="filled"
+    type="button"
+    class="bouton-principal"
+    (click)="assigner()"
+    [disabled]="enCours() || selection().length === 0"
+  >
+    @if (enCours()) {
+      <mat-spinner diameter="20" aria-label="Assignation en cours" />
+    } @else {
+      Assigner{{ selection().length ? ' (' + selection().length + ')' : '' }}
+    }
+  </button>
+</mat-dialog-actions>

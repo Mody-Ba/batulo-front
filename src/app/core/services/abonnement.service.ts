@@ -8,7 +8,9 @@ import {
   IntentionPaiementRequest,
   IntentionPaiementResponse,
   PaiementConfirmeResponse,
+  PaiementResponse,
 } from '../models/abonnement.model';
+import { PageResponse } from '../models/page.model';
 
 /**
  * Abonnement de l'entreprise de l'admin connecté et paiement Stripe.
@@ -45,6 +47,11 @@ export class AbonnementService {
   /** À appeler à la déconnexion : le signal ne doit pas passer à un autre compte. */
   oublier(): void {
     this._abonnement.set(null);
+  }
+
+  /** Historique : paiements réussis, du plus récent au plus ancien. */
+  paiements(page = 0, taille = 10): Observable<PageResponse<PaiementResponse>> {
+    return this.http.get<PageResponse<PaiementResponse>>(`${this.url}/paiements`, { params: { page, taille } });
   }
 
   /** Crée un PaymentIntent Stripe ; l'abonnement n'est pas modifié à ce stade. */

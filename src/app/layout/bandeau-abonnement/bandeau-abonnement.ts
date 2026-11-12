@@ -11,7 +11,7 @@ import { AbonnementService } from '../../core/services/abonnement.service';
 /**
  * Bandeau de l'admin, en haut de chaque page : formule, jours restants, date d'expiration et bouton
  * « Renouveler ». Style d'alerte à 7 jours ou moins, d'erreur une fois expiré. Masqué sur les pages
- * d'abonnement (elles affichent déjà tout) et tant qu'aucune formule n'a été payée.
+ * d'abonnement et le tableau de bord (ils affichent déjà tout) et tant qu'aucune formule n'est payée.
  */
 @Component({
   selector: 'app-bandeau-abonnement',
@@ -39,7 +39,9 @@ export class BandeauAbonnement {
       !!abonnement.dateExpiration &&
       abonnement.statut !== 'EN_ATTENTE_PAIEMENT' &&
       abonnement.statut !== 'DESACTIVE' &&
-      !this.url().startsWith('/admin/abonnement')
+      !this.url().startsWith('/admin/abonnement') &&
+      // Le tableau de bord affiche déjà l'abonnement.
+      this.url().split('?')[0] !== '/admin'
     );
   });
 
