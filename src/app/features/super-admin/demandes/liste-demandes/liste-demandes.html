@@ -1,0 +1,149 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Demandes d’abonnement"
+    icone="upgrade"
+    sousTitre="Les demandes d’augmentation envoyées par les admins. Votre réponse n’a aucun effet sur l’abonnement : l’admin paie lui-même la formule."
+  />
+
+  <div class="barre-outils">
+    <mat-chip-listbox
+      aria-label="Filtrer par statut de la demande"
+      [value]="filtreStatut() ?? 'toutes'"
+      (change)="filtrer($event.value)"
+      [hideSingleSelectionIndicator]="true"
+    >
+      <mat-chip-option value="toutes">Toutes</mat-chip-option>
+      @for (s of statuts; track s) {
+        <mat-chip-option [value]="s">{{ libellesFiltre[s] }}</mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des demandes" />
+    }
+  </div>
+
+  <app-message-erreur [erreur]="erreur()" parDefaut="La liste des demandes n’a pas pu être chargée.">
+    <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  <ng-template #entreprise let-d>
+    <span class="nom">{{ d.entreprise }}</span>
+    <span class="cellule-secondaire">{{ d.adminNom }} · {{ d.adminCourriel }}</span>
+  </ng-template>
+
+  <ng-template #formule let-d>
+    <span>{{ libelleFormule(d.formuleSouhaitee) }}</span>
+    <span class="cellule-secondaire">
+      Actuelle : {{ libelleFormule(d.formuleActuelle) }}
+    </span>
+  </ng-template>
+
+  <ng-template #statutDemande let-d>
+    <span class="pastille-statut" [class]="'demande-' + d.statut">{{ libelleStatut(d) }}</span>
+  </ng-template>
+
+  <ng-template #action let-d>
+    <button
+      [matButton]="d.statut === 'EN_ATTENTE' ? 'tonal' : 'text'"
+      type="button"
+      (click)="ouvrir(d)"
+      [attr.aria-label]="(d.statut === 'EN_ATTENTE' ? 'Répondre à la demande de ' : 'Voir la demande de ') + d.entreprise"
+    >
+      {{ d.statut === 'EN_ATTENTE' ? 'Répondre' : 'Voir' }}
+    </button>
+  </ng-template>
+
+  @if (!chargement() && !erreur() && demandes().length === 0) {
+    <p class="etat-vide" role="status">
+      @switch (filtreStatut()) {
+        @case ('EN_ATTENTE') {
+          Aucune demande en attente.
+        }
+        @case ('TRAITEE') {
+          Aucune demande acceptée.
+        }
+        @case ('REFUSEE') {
+          Aucune demande refusée.
+        }
+        @default {
+          Aucune demande pour le moment.
+        }
+      }
+    </p>
+  } @else if (demandes().length) {
+    @if (petitEcran()) {
+      <ul class="cartes">
+        @for (d of demandes(); track d.id) {
+          <li class="carte">
+            <div>
+              <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: d }" />
+            </div>
+            <div>
+              <ng-container *ngTemplateOutlet="formule; context: { $implicit: d }" />
+            </div>
+            <div class="ligne-carte">
+              <ng-container *ngTemplateOutlet="statutDemande; context: { $implicit: d }" />
+              <span class="cellule-secondaire">{{ d.dateDemande | date: 'd MMM y' }}</span>
+              <span class="espace"></span>
+              <ng-container *ngTemplateOutlet="action; context: { $implicit: d }" />
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="conteneur-tableau">
+        <table mat-table [dataSource]="demandes()" [trackBy]="parId">
+          <caption class="visuellement-cache">Demandes d’augmentation d’abonnement</caption>
+
+          <ng-container matColumnDef="entreprise">
+            <th mat-header-cell *matHeaderCellDef>Entreprise</th>
+            <td mat-cell *matCellDef="let d">
+              <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: d }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="formule">
+            <th mat-header-cell *matHeaderCellDef>Formule souhaitée</th>
+            <td mat-cell *matCellDef="let d">
+              <ng-container *ngTemplateOutlet="formule; context: { $implicit: d }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Envoyée le</th>
+            <td mat-cell *matCellDef="let d">{{ d.dateDemande | date: 'd MMM y' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let d">
+              <ng-container *ngTemplateOutlet="statutDemande; context: { $implicit: d }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef><span class="visuellement-cache">Actions</span></th>
+            <td mat-cell *matCellDef="let d" class="cellule-actions">
+              <ng-container *ngTemplateOutlet="action; context: { $implicit: d }" />
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let d; columns: colonnes"></tr>
+        </table>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="numeroPage()"
+      [pageSize]="taillePage()"
+      [pageSizeOptions]="tailles"
+      (page)="changerPage($event)"
+      aria-label="Pagination des demandes"
+    />
+  }
+</section>

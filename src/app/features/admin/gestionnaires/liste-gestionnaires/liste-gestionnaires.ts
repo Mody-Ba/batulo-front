@@ -22,19 +22,12 @@ import { GestionnaireService } from '../../../../core/services/gestionnaire.serv
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { ActionsGestionnaire } from '../actions-gestionnaire';
+import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../../core/utils/pagination-url';
+import { DELAI_RECHERCHE_MS } from '../../../../core/utils/recherche';
 
-const TAILLES = [10, 20, 50];
-
-/** Délai après la dernière frappe avant de lancer la recherche. */
-export const DELAI_RECHERCHE_MS = 300;
 
 /** Filtre d'état : ?actif=true|false dans l'URL, absent pour tous. */
 export type FiltreActif = 'tous' | 'actifs' | 'desactives';
-
-function entier(valeur: string | undefined, parDefaut: number, min = 0): number {
-  const nombre = Number(valeur);
-  return Number.isInteger(nombre) && nombre >= min ? nombre : parDefaut;
-}
 
 /**
  * Gestionnaires de l'entreprise : liste paginée, recherche (prénom, nom, courriel, sans majuscules ni accents) et
@@ -71,7 +64,7 @@ export class ListeGestionnaires {
   protected readonly auth = inject(AuthService);
   protected readonly messageLectureSeule = MESSAGE_LECTURE_SEULE;
   protected readonly nomComplet = nomComplet;
-  protected readonly tailles = TAILLES;
+  protected readonly tailles = [...TAILLES_PAGE];
   /** Garde les lignes (et le focus) quand un élément est mis à jour. */
   protected readonly parId = (_index: number, element: GestionnaireResponse) => element.id;
   protected readonly colonnes = ['nom', 'etat', 'permission', 'actions'];
@@ -98,11 +91,8 @@ export class ListeGestionnaires {
   /** Champ de recherche ; l'URL reste la source de vérité (retour arrière, rechargement). */
   protected readonly champRecherche = new FormControl('', { nonNullable: true });
 
-  protected readonly numeroPage = computed(() => entier(this.page(), 0));
-  protected readonly taillePage = computed(() => {
-    const taille = entier(this.taille(), 20, 1);
-    return TAILLES.includes(taille) ? taille : 20;
-  });
+  protected readonly numeroPage = computed(() => numeroPageUrl(this.page()));
+  protected readonly taillePage = computed(() => taillePageUrl(this.taille()));
 
   protected readonly gestionnaires = signal<GestionnaireResponse[]>([]);
   protected readonly total = signal(0);
@@ -167,7 +157,7 @@ export class ListeGestionnaires {
 
   protected changerPage(evenement: PageEvent): void {
     void this.router.navigate([], {
-      queryParams: { page: evenement.pageIndex || null, taille: evenement.pageSize === 20 ? null : evenement.pageSize },
+      queryParams: parametresPage(evenement.pageIndex, evenement.pageSize),
       queryParamsHandling: 'merge',
     });
   }

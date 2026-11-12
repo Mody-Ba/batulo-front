@@ -1,0 +1,75 @@
+<section class="conteneur-page">
+  <app-entete-page [titre]="titre()" sousTitre="Vue d’ensemble des entreprises clientes de Batulo" icone="dashboard" />
+
+  <div class="grille">
+    <!-- Entreprises par statut d'abonnement -->
+    <article class="carte-section entreprises" aria-labelledby="titre-entreprises">
+      <div class="entete-section">
+        <h2 id="titre-entreprises">Entreprises</h2>
+        <a matButton routerLink="/super-admin/abonnements">Voir les abonnements</a>
+      </div>
+      <div class="zone-progression">
+        @if (chargement()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Chargement des chiffres" />
+        }
+      </div>
+      <app-message-erreur [erreur]="erreur()" parDefaut="Les chiffres n’ont pas pu être chargés.">
+        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      </app-message-erreur>
+      @if (chiffres(); as c) {
+        <ul class="tuiles">
+          <li>
+            <a class="tuile total" routerLink="/super-admin/admins">
+              <span class="valeur">{{ c.entreprises.total | number }}</span>&ngsp;
+              <span class="libelle">Au total</span>
+            </a>
+          </li>
+          @for (t of tuiles(); track t.statut) {
+            <li>
+              <a
+                class="tuile"
+                [class.a-surveiller]="t.aSurveiller && t.nombre > 0"
+                routerLink="/super-admin/admins"
+                [queryParams]="{ statut: t.statut }"
+              >
+                <span class="valeur">{{ t.nombre | number }}</span>&ngsp;
+                <span class="libelle">{{ t.libelle }}</span>
+                @if (t.aSurveiller) {
+                  &ngsp;<span class="precision">7 jours ou moins</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      }
+    </article>
+
+    <!-- Demandes d'augmentation -->
+    <article class="carte-section demandes" aria-labelledby="titre-demandes">
+      <div class="entete-section">
+        <h2 id="titre-demandes">Demandes d’augmentation</h2>
+        <a matButton routerLink="/super-admin/demandes-abonnement">Toutes les demandes</a>
+      </div>
+      @if (chiffres(); as c) {
+        <ul class="tuiles">
+          <li>
+            <a
+              class="tuile"
+              [class.a-surveiller]="c.demandesAugmentationEnAttente > 0"
+              routerLink="/super-admin/demandes-abonnement"
+              [queryParams]="{ statut: 'EN_ATTENTE' }"
+            >
+              <span class="valeur">{{ c.demandesAugmentationEnAttente | number }}</span>&ngsp;
+              <span class="libelle">En attente de réponse</span>
+            </a>
+          </li>
+        </ul>
+      } @else if (chargement()) {
+        <p class="texte-aide">Chargement…</p>
+      }
+    </article>
+
+    <!-- Dernières notifications -->
+    <app-dernieres-notifications class="carte-section notifications" />
+  </div>
+</section>

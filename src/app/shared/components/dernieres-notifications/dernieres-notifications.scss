@@ -1,0 +1,35 @@
+:host {
+  display: block;
+}
+
+.liste-notifications {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: var(--bt-espace-3);
+    padding: var(--bt-espace-2) 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .mat-icon {
+      flex-shrink: 0;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    &.non-lue .titre-notification {
+      font-weight: 700;
+    }
+  }
+}

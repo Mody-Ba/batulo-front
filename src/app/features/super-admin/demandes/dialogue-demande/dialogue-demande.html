@@ -1,0 +1,97 @@
+<h2 mat-dialog-title>Demande de {{ demande.entreprise }}</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="enregistrer()" novalidate>
+  <mat-dialog-content>
+    <dl class="liste-details">
+      <dt>Statut</dt>
+      <dd>
+        <span class="pastille-statut" [class]="'demande-' + demande.statut">{{ libellesStatut[demande.statut] }}</span>
+      </dd>
+
+      <dt>Admin</dt>
+      <dd>
+        <a [routerLink]="['/super-admin/admins', demande.adminId]" mat-dialog-close>{{ demande.adminNom }}</a>
+        <span class="cellule-secondaire">{{ demande.adminCourriel }}</span>
+      </dd>
+
+      <dt>Formule souhaitée</dt>
+      <dd>{{ libellesFormule[demande.formuleSouhaitee] }}</dd>
+
+      <dt>Formule actuelle</dt>
+      <dd>
+        {{ demande.formuleActuelle ? libellesFormule[demande.formuleActuelle] : 'Aucune (jamais payé)' }}
+        <span class="pastille-statut" [class]="'statut-' + demande.statutAbonnement">
+          {{ libellesStatutAbonnement[demande.statutAbonnement] }}
+        </span>
+      </dd>
+
+      <dt>Envoyée le</dt>
+      <dd>{{ demande.dateDemande | date: 'd MMMM y à HH:mm' }}</dd>
+    </dl>
+
+    <h3>Message de l’admin</h3>
+    <p class="message">{{ demande.message }}</p>
+
+    @if (demande.statut !== 'EN_ATTENTE') {
+      <h3>Réponse</h3>
+      @if (demande.reponse) {
+        <p class="message">{{ demande.reponse }}</p>
+      } @else {
+        <p class="texte-aide">Sans message.</p>
+      }
+      <p class="texte-aide">{{ mentionTraitement }}</p>
+    } @else if (!dejaTraitee()) {
+      <h3 id="titre-reponse">Votre réponse</h3>
+      <p class="texte-aide">
+        Accepter n’a aucun effet sur l’abonnement : l’admin choisit et paie lui-même la formule depuis sa page
+        Abonnement. Votre réponse est postée dans sa conversation avec Batulo et l’admin en est notifié.
+      </p>
+
+      <mat-radio-group formControlName="statut" class="decision" aria-labelledby="titre-reponse">
+        <mat-radio-button value="TRAITEE">Accepter</mat-radio-button>
+        <mat-radio-button value="REFUSEE">Refuser</mat-radio-button>
+      </mat-radio-group>
+      @if (formulaire.controls.statut.touched && formulaire.controls.statut.hasError('required')) {
+        <p class="erreur-champ" role="alert">Choisissez d’accepter ou de refuser la demande.</p>
+      }
+
+      <div class="formulaire">
+        <mat-form-field>
+          <mat-label>Message à l’admin</mat-label>
+          <textarea
+            matInput
+            formControlName="reponse"
+            rows="4"
+            [maxlength]="longueurMax"
+            [required]="messageObligatoire()"
+            cdkTextareaAutosize
+          ></textarea>
+          <mat-hint>{{ messageObligatoire() ? 'Obligatoire pour un refus' : 'Facultatif' }}</mat-hint>
+          <mat-hint align="end">{{ formulaire.controls.reponse.value.length }} / {{ longueurMax }}</mat-hint>
+          @if (formulaire.controls.reponse.hasError('required')) {
+            <mat-error>Expliquez à l’admin pourquoi sa demande est refusée.</mat-error>
+          } @else if (formulaire.controls.reponse.hasError('maxlength')) {
+            <mat-error>{{ longueurMax }} caractères au plus.</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    }
+
+    <app-message-erreur [erreur]="erreur()" />
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    @if (demande.statut === 'EN_ATTENTE' && !dejaTraitee()) {
+      <button matButton type="button" (click)="fermer()" [disabled]="enCours()">Annuler</button>
+      <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours()">
+        @if (enCours()) {
+          <mat-spinner diameter="20" aria-label="Envoi de la réponse" />
+        } @else {
+          Envoyer la réponse
+        }
+      </button>
+    } @else {
+      <button matButton="filled" type="button" (click)="fermer()" cdkFocusInitial>Fermer</button>
+    }
+  </mat-dialog-actions>
+</form>

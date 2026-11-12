@@ -1,0 +1,88 @@
+.champ-recherche {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.nom {
+  font: var(--mat-sys-title-small);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.pastilles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-1);
+}
+
+.cellule-nombre {
+  font-variant-numeric: tabular-nums;
+}
+
+.cellule-actions {
+  width: 56px;
+  text-align: end;
+}
+
+tr.inactif .nom {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// 7 jours ou moins avant l'expiration : ligne teintée et filet à gauche, en plus de la mention en clair.
+tr.en-alerte {
+  background: var(--bt-attente-fond);
+
+  td:first-child {
+    box-shadow: inset 4px 0 0 var(--bt-attente-texte);
+  }
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+// Téléphone : une carte par entreprise.
+.cartes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+
+  &.en-alerte {
+    border-color: var(--bt-attente-texte);
+    border-left-width: 4px;
+    background: var(--bt-attente-fond);
+  }
+}
+
+.carte-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  margin-right: calc(-1 * var(--bt-espace-2));
+}
+
+.carte-titre {
+  min-width: 0;
+}

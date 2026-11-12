@@ -1,0 +1,170 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Admins et entreprises"
+    icone="business"
+    sousTitre="Chaque entreprise cliente, son admin, son abonnement et son équipe."
+  >
+    <button matButton="filled" type="button" (click)="creer()">
+      <mat-icon fontIcon="add_business" aria-hidden="true" />Nouvel admin
+    </button>
+  </app-entete-page>
+
+  <div class="barre-outils">
+    <mat-form-field class="champ-recherche">
+      <mat-label>Rechercher</mat-label>
+      <mat-icon matPrefix fontIcon="search" aria-hidden="true" />
+      <input matInput type="search" [formControl]="champRecherche" autocomplete="off" maxlength="100" />
+      @if (champRecherche.value) {
+        <button matIconButton matSuffix type="button" (click)="effacerRecherche()" aria-label="Effacer la recherche">
+          <mat-icon fontIcon="close" aria-hidden="true" />
+        </button>
+      }
+      <mat-hint>Entreprise, prénom, nom ou courriel de l’admin</mat-hint>
+    </mat-form-field>
+    <app-filtre-statut-abonnement [statut]="filtreStatut()" (changer)="filtrer($event)" />
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des entreprises" />
+    }
+  </div>
+
+  <app-message-erreur [erreur]="erreur()" parDefaut="La liste des entreprises n’a pas pu être chargée.">
+    <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  <!-- Menu d'actions d'une ligne (partagé entre le tableau et les cartes). -->
+  <mat-menu #menuActions="matMenu" xPosition="before">
+    <ng-template matMenuContent let-l>
+      <a mat-menu-item [routerLink]="['/super-admin/admins', l.admin.id]">
+        <mat-icon fontIcon="visibility" aria-hidden="true" /><span>Voir le détail</span>
+      </a>
+      <button mat-menu-item type="button" (click)="modifier(l)">
+        <mat-icon fontIcon="edit" aria-hidden="true" /><span>Modifier</span>
+      </button>
+      <button mat-menu-item type="button" (click)="renvoyerMotDePasse(l)" [disabled]="!l.admin.actif">
+        <mat-icon fontIcon="key" aria-hidden="true" /><span>Renvoyer un mot de passe temporaire</span>
+      </button>
+      <button mat-menu-item type="button" (click)="basculerActif(l)">
+        <mat-icon [fontIcon]="l.admin.actif ? 'block' : 'check_circle'" aria-hidden="true" />
+        <span>{{ l.admin.actif ? 'Désactiver l’entreprise' : 'Activer l’entreprise' }}</span>
+      </button>
+      <button mat-menu-item type="button" class="action-danger" (click)="supprimer(l)">
+        <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer</span>
+      </button>
+    </ng-template>
+  </mat-menu>
+
+  <ng-template #entreprise let-l>
+    <a class="nom" [routerLink]="['/super-admin/admins', l.admin.id]">{{ l.entreprise.nom }}</a>
+    <span class="cellule-secondaire">{{ l.admin.prenom }} {{ l.admin.nom }} · {{ l.admin.courriel }}</span>
+  </ng-template>
+
+  <ng-template #statut let-l>
+    <span class="pastilles">
+      <span class="pastille-statut" [class]="l.abonnement ? 'statut-' + l.abonnement.statut : ''">
+        {{ libelleStatut(l) }}
+      </span>
+      @if (l.admin.motDePasseTemporaire) {
+        <span class="pastille-statut compte-temporaire">Mot de passe temporaire</span>
+      }
+    </span>
+  </ng-template>
+
+  <ng-template #boutonActions let-l>
+    <button
+      matIconButton
+      type="button"
+      [matMenuTriggerFor]="menuActions"
+      [matMenuTriggerData]="{ $implicit: l }"
+      [attr.aria-label]="'Actions pour ' + l.entreprise.nom"
+    >
+      <mat-icon fontIcon="more_vert" aria-hidden="true" />
+    </button>
+  </ng-template>
+
+  @if (!chargement() && !erreur() && lignes().length === 0) {
+    <p class="etat-vide" role="status">
+      @if (filtre()) {
+        {{ messageAucunResultat() }}
+      } @else {
+        Aucune entreprise pour le moment. Créez un admin pour ouvrir le compte d’une entreprise.
+      }
+    </p>
+  } @else if (lignes().length) {
+    @if (petitEcran()) {
+      <ul class="cartes">
+        @for (l of lignes(); track l.admin.id) {
+          <li class="carte" [class.en-alerte]="enAlerte(l)">
+            <div class="carte-entete">
+              <div class="carte-titre">
+                <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: l }" />
+              </div>
+              <ng-container *ngTemplateOutlet="boutonActions; context: { $implicit: l }" />
+            </div>
+            <ng-container *ngTemplateOutlet="statut; context: { $implicit: l }" />
+            <app-echeance-abonnement [abonnement]="l.abonnement" />
+            <span class="cellule-secondaire">{{ libelleGestionnaires(l.nombreGestionnaires) }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="conteneur-tableau">
+        <table mat-table [dataSource]="lignes()" [trackBy]="parId">
+          <caption class="visuellement-cache">Admins et entreprises</caption>
+
+          <ng-container matColumnDef="entreprise">
+            <th mat-header-cell *matHeaderCellDef>Entreprise</th>
+            <td mat-cell *matCellDef="let l">
+              <ng-container *ngTemplateOutlet="entreprise; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Abonnement</th>
+            <td mat-cell *matCellDef="let l">
+              <ng-container *ngTemplateOutlet="statut; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="expiration">
+            <th mat-header-cell *matHeaderCellDef>Expiration</th>
+            <td mat-cell *matCellDef="let l">
+              <app-echeance-abonnement [abonnement]="l.abonnement" />
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="gestionnaires">
+            <th mat-header-cell *matHeaderCellDef>Gestionnaires</th>
+            <td mat-cell *matCellDef="let l" class="cellule-nombre">{{ l.nombreGestionnaires }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef><span class="visuellement-cache">Actions</span></th>
+            <td mat-cell *matCellDef="let l" class="cellule-actions">
+              <ng-container *ngTemplateOutlet="boutonActions; context: { $implicit: l }" />
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr
+            mat-row
+            *matRowDef="let l; columns: colonnes"
+            [class.en-alerte]="enAlerte(l)"
+            [class.inactif]="!l.entreprise.actif"
+          ></tr>
+        </table>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="numeroPage()"
+      [pageSize]="taillePage()"
+      [pageSizeOptions]="tailles"
+      (page)="changerPage($event)"
+      aria-label="Pagination des entreprises"
+    />
+  }
+</section>

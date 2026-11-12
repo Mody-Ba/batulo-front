@@ -327,6 +327,75 @@ a {
   }
 }
 
+/* ---------- Pastilles de statut d'une demande d'abonnement ---------- */
+
+.pastille-statut {
+  &.demande-EN_ATTENTE {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+  }
+
+  &.demande-TRAITEE {
+    background: var(--bt-succes-fond);
+    color: var(--bt-succes-texte);
+  }
+
+  &.demande-REFUSEE {
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+/* ---------- Tuiles de chiffres des tableaux de bord (chacune mène à la liste filtrée) ---------- */
+
+.tuiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--bt-espace-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tuile {
+  display: flex;
+  flex-direction: column;
+  min-height: 44px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--bt-espace-3);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+  color: inherit;
+  text-decoration: none;
+
+  .valeur {
+    font: var(--mat-sys-headline-medium);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .libelle {
+    font: var(--mat-sys-label-large);
+  }
+
+  .precision {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+a.tuile {
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
 /* ---------- Listes (tableau sur ordinateur, cartes sur téléphone) ---------- */
 
 .barre-outils {

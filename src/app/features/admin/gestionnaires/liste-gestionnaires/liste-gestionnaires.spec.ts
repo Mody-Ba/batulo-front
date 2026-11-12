@@ -9,7 +9,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { GestionnaireService } from '../../../../core/services/gestionnaire.service';
 import { gestionnaireDeTest } from '../../../../testing/donnees-test';
 import { ActionsGestionnaire } from '../actions-gestionnaire';
-import { DELAI_RECHERCHE_MS, ListeGestionnaires } from './liste-gestionnaires';
+import { DELAI_RECHERCHE_MS } from '../../../../core/utils/recherche';
+import { ListeGestionnaires } from './liste-gestionnaires';
 
 describe('ListeGestionnaires', () => {
   let fixture: ComponentFixture<ListeGestionnaires>;
