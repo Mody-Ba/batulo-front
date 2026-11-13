@@ -1,0 +1,140 @@
+<article
+  class="carte-question"
+  [class.a-corriger]="auto.etat() === 'invalide' || auto.etat() === 'erreur'"
+  [attr.aria-label]="'Question ' + numero()"
+  [formGroup]="formulaire"
+>
+  <div class="entete">
+    @if (store.modifiable() && idQuestion() !== null) {
+      <button
+        matIconButton
+        type="button"
+        class="poignee"
+        cdkDragHandle
+        [attr.aria-label]="'Déplacer la question ' + numero() + ' (glisser, ou menu Monter / Descendre)'"
+      >
+        <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
+      </button>
+    }
+    <span class="numero" aria-hidden="true">{{ numero() }}</span>
+
+    <mat-form-field class="champ-libelle">
+      <mat-label>Question</mat-label>
+      <textarea
+        #champLibelle
+        matInput
+        formControlName="libelle"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="1"
+        [maxlength]="regles.libelleQuestionMax"
+        required
+      ></textarea>
+      @if (formulaire.controls.libelle.hasError('required')) {
+        <mat-error>Le libellé de la question est obligatoire.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="champ-type">
+      <mat-label>Type</mat-label>
+      <mat-select
+        #selecteur
+        [value]="type"
+        [disabled]="!store.modifiable()"
+        (selectionChange)="choisirType($event.value, selecteur)"
+      >
+        <mat-select-trigger>
+          <span class="type-choisi">
+            <mat-icon [fontIcon]="iconesType[type]" aria-hidden="true" />{{ libellesType[type] }}
+          </span>
+        </mat-select-trigger>
+        @for (t of types; track t) {
+          <mat-option [value]="t">
+            <mat-icon [fontIcon]="iconesType[t]" aria-hidden="true" />{{ libellesType[t] }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field class="champ-aide">
+    <mat-label>Aide (facultative)</mat-label>
+    <input matInput formControlName="aide" [maxlength]="regles.aideMax" autocomplete="off" />
+    <mat-hint>Affichée sous la question, pour préciser ce qui est attendu.</mat-hint>
+  </mat-form-field>
+
+  <div class="configuration">
+    @switch (type) {
+      @case ('CHOIX_UNIQUE') {
+        <app-question-choix-unique [options]="formulaire.controls.options" />
+      }
+      @case ('CHOIX_MULTIPLE') {
+        <app-question-choix-multiple [options]="formulaire.controls.options" />
+      }
+      @case ('CLASSEMENT') {
+        <app-question-classement [options]="formulaire.controls.options" />
+      }
+      @case ('OUI_NON') {
+        <app-question-oui-non />
+      }
+      @case ('TEXTE_COURT') {
+        <app-question-texte-court [configuration]="formulaire.controls.configuration" />
+      }
+      @case ('TEXTE_LONG') {
+        <app-question-texte-long [configuration]="formulaire.controls.configuration" />
+      }
+      @case ('ECHELLE') {
+        <app-question-echelle [configuration]="formulaire.controls.configuration" />
+      }
+      @case ('NUMERIQUE') {
+        <app-question-numerique [configuration]="formulaire.controls.configuration" />
+      }
+      @case ('DATE') {
+        <app-question-date [configuration]="formulaire.controls.configuration" />
+      }
+      @case ('MATRICE') {
+        <app-question-matrice [configuration]="formulaire.controls.configuration" />
+      }
+    }
+  </div>
+
+  <app-message-erreur
+    [erreur]="auto.erreur()"
+    [titre]="'La question ' + numero() + ' n’a pas été enregistrée'"
+    parDefaut="Cette question n’a pas pu être enregistrée."
+  />
+
+  <div class="pied">
+    <mat-slide-toggle formControlName="obligatoire">Obligatoire</mat-slide-toggle>
+    <span class="espace"></span>
+    <app-etat-enregistrement [etat]="auto.etat()" (reessayer)="reessayer()" />
+    <button
+      matIconButton
+      type="button"
+      [matMenuTriggerFor]="menu"
+      [disabled]="!store.modifiable()"
+      [attr.aria-label]="'Actions de la question ' + numero()"
+    >
+      <mat-icon fontIcon="more_vert" aria-hidden="true" />
+    </button>
+  </div>
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    @if (idQuestion() !== null) {
+      <button mat-menu-item type="button" (click)="monter()" [disabled]="position() === 0">
+        <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>Monter</span>
+      </button>
+      <button mat-menu-item type="button" (click)="descendre()" [disabled]="position() >= nombreEnregistrees() - 1">
+        <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre</span>
+      </button>
+    }
+    <button
+      mat-menu-item
+      type="button"
+      class="action-danger"
+      (click)="supprimer()"
+      [disabled]="auto.etat() === 'enregistrement'"
+    >
+      <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la question</span>
+    </button>
+  </mat-menu>
+</article>

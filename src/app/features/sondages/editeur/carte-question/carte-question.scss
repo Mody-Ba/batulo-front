@@ -1,0 +1,109 @@
+:host {
+  display: block;
+}
+
+.carte-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  padding: var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-left: 4px solid var(--mat-sys-primary);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+
+  &.a-corriger {
+    border-left-color: var(--mat-sys-error);
+  }
+}
+
+.entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+}
+
+.poignee {
+  margin-top: 4px;
+  cursor: grab;
+}
+
+.numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-top: 10px;
+  border-radius: 50%;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font: var(--mat-sys-label-large);
+}
+
+.champ-libelle {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.champ-type {
+  flex: 0 1 220px;
+  min-width: 180px;
+}
+
+.type-choisi,
+mat-option {
+  .mat-icon {
+    margin-right: var(--bt-espace-2);
+    vertical-align: middle;
+  }
+}
+
+.type-choisi {
+  display: inline-flex;
+  align-items: center;
+}
+
+.champ-aide {
+  width: 100%;
+}
+
+.configuration {
+  padding: var(--bt-espace-3);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.pied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+  padding-top: var(--bt-espace-2);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+// Téléphone : le type passe sous le libellé, sur toute la largeur.
+@media (max-width: 599.98px) {
+  .carte-question {
+    padding: var(--bt-espace-3);
+  }
+
+  .champ-type {
+    flex-basis: 100%;
+  }
+}

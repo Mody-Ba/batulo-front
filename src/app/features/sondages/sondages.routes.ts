@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
 import { fournirPaginateurFrancais } from '../../core/utils/paginateur-francais';
+import { quitterEditeurGuard } from './editeur/quitter-editeur.guard';
 
 /**
  * /sondages (garde roleGuard('ADMIN', 'GESTIONNAIRE') posée dans app.routes.ts ; le backend
- * filtre selon le rôle). Lecture seule en F4 ; l'éditeur arrive en F5.
+ * filtre selon le rôle). Création et éditeur du brouillon en F5a.
  */
 export const routes: Routes = [
   {
@@ -20,9 +21,14 @@ export const routes: Routes = [
       {
         path: 'nouveau',
         title: 'Nouveau sondage · Batulo',
-        loadComponent: () =>
-          import('../../shared/components/page-a-venir/page-a-venir').then((m) => m.PageAVenir),
-        data: { titre: 'Nouveau sondage', icone: 'add', etape: 'F5' },
+        loadComponent: () => import('./creation-sondage/creation-sondage').then((m) => m.CreationSondage),
+      },
+      {
+        // Lecture seule si le sondage est publié ou fermé, l'abonnement expiré, ou sans droit de modification.
+        path: ':id/modifier',
+        title: 'Modifier le sondage · Batulo',
+        canDeactivate: [quitterEditeurGuard],
+        loadComponent: () => import('./editeur/editeur-sondage').then((m) => m.EditeurSondage),
       },
       {
         path: ':id',

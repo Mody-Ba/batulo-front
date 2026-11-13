@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.carte-section-editeur {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  padding: var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-top: 6px solid var(--mat-sys-primary);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.entete-section-editeur {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+}
+
+.ligne-titre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.rang-section {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-large);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.poignee {
+  cursor: grab;
+}
+
+.champ-titre input {
+  font: var(--mat-sys-title-large);
+}
+
+.champ-titre,
+.champ-description {
+  width: 100%;
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  min-height: 8px;
+}
+
+.actions-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-3);
+}
+
+.etat-vide {
+  margin: 0;
+  padding: var(--bt-espace-4);
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .carte-section-editeur {
+    padding: var(--bt-espace-3) var(--bt-espace-2);
+  }
+}
+
+// Glisser-déposer : les autres éléments glissent pour laisser la place.
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+    transition: none;
+  }
+}

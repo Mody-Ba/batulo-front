@@ -72,7 +72,7 @@ describe('DetailSondage', () => {
           },
         },
         { provide: AssignationService, useValue: assignations },
-        { provide: AuthService, useValue: { role, lectureSeule } },
+        { provide: AuthService, useValue: { role, lectureSeule, utilisateur: signal({ id: 1, peutCreerSondages: true }) } },
         { provide: MatDialog, useValue: { open: () => ({ afterClosed: () => of(reponseDialogue) }) } },
         { provide: MatSnackBar, useValue: { open: vi.fn() } },
       ],
@@ -115,5 +115,16 @@ describe('DetailSondage', () => {
     const assigner = Array.from(element.querySelectorAll('button')).find((b) => b.textContent?.includes('Assigner'))!;
     expect(assigner.disabled).toBe(true);
     expect(element.querySelector<HTMLButtonElement>('button[aria-label^="Retirer l’assignation"]')!.disabled).toBe(true);
+  });
+
+  it('publié : « Voir le contenu » ; brouillon modifiable : « Modifier », vers l’éditeur', async () => {
+    let element = await creer();
+    let lien = Array.from(element.querySelectorAll('a')).find((a) => a.textContent?.includes('Voir le contenu'));
+    expect(lien?.getAttribute('href')).toBe('/sondages/3/modifier');
+
+    TestBed.inject(SondageService).detail = vi.fn(() => of({ ...SONDAGE, publie: false, statut: 'NON_COMMENCE' })) as never;
+    element = await creer();
+    lien = Array.from(element.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
+    expect(lien?.getAttribute('href')).toBe('/sondages/3/modifier');
   });
 });

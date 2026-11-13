@@ -1,0 +1,41 @@
+.retour {
+  margin: 0 0 var(--bt-espace-2) calc(-1 * var(--bt-espace-3));
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+}
+
+.choix-mode {
+  align-self: flex-start;
+  max-width: 100%;
+
+  .mat-icon {
+    margin-right: var(--bt-espace-2);
+    vertical-align: middle;
+  }
+}
+
+.formulaire {
+  margin-top: 0;
+}
+
+.actions {
+  margin-top: 0;
+}
+
+// Téléphone : les deux choix l'un sous l'autre, sur toute la largeur.
+@media (max-width: 599.98px) {
+  .choix-mode {
+    align-self: stretch;
+    flex-direction: column;
+  }
+}
+
+.erreur-config {
+  margin: var(--bt-espace-2) 0 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}

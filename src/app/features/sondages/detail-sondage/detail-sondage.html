@@ -13,6 +13,15 @@
   @if (sondage(); as s) {
     <app-entete-page [titre]="s.titre" [sousTitre]="s.description" icone="ballot">
       <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+      @if (contenuModifiable()) {
+        <a matButton="filled" [routerLink]="['/sondages', s.id, 'modifier']">
+          <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
+        </a>
+      } @else {
+        <a matButton="outlined" [routerLink]="['/sondages', s.id, 'modifier']">
+          <mat-icon fontIcon="visibility" aria-hidden="true" />Voir le contenu
+        </a>
+      }
     </app-entete-page>
 
     <div class="grille">
@@ -147,6 +156,5 @@
       }
     </div>
 
-    <p class="texte-aide note-f5">La modification des questions et la publication arrivent bientôt.</p>
   }
 </section>
