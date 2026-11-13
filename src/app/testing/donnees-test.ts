@@ -1,7 +1,12 @@
 import { AbonnementResponse } from '../core/models/abonnement.model';
 import { DemandeAbonnementResponse } from '../core/models/demande-abonnement.model';
 import { GestionnaireResponse } from '../core/models/gestionnaire.model';
-import { SondageResumeResponse } from '../core/models/sondage.model';
+import {
+  QuestionResponse,
+  SectionResponse,
+  SondageResponse,
+  SondageResumeResponse,
+} from '../core/models/sondage.model';
 import {
   AbonnementAdminResponse,
   AdminDetailResponse,
@@ -173,6 +178,52 @@ export function tableauDeBordSuperAdminDeTest(
   return {
     entreprises: { total: 12, actif: 6, expireBientot: 2, expire: 1, enAttentePaiement: 2, desactive: 1 },
     demandesAugmentationEnAttente: 3,
+    ...modifs,
+  };
+}
+
+export function questionDeTest(modifs: Partial<QuestionResponse> = {}): QuestionResponse {
+  return {
+    id: 101,
+    libelle: 'Votre secteur ?',
+    aide: null,
+    type: 'CHOIX_UNIQUE',
+    obligatoire: false,
+    ordre: 1,
+    configuration: {},
+    options: [
+      { id: 1001, libelle: 'Agriculture', valeur: 'agriculture', ordre: 1 },
+      { id: 1002, libelle: 'Commerce', valeur: 'commerce', ordre: 2 },
+    ],
+    estCritere: false,
+    critereConfig: null,
+    ...modifs,
+  };
+}
+
+export function sectionDeTest(modifs: Partial<SectionResponse> = {}): SectionResponse {
+  return { id: 10, titre: 'Profil', description: null, ordre: 1, questions: [], ...modifs };
+}
+
+/** Brouillon complet (GET /api/sondages/{id}), créé par l'utilisateur 1. */
+export function sondageDeTest(modifs: Partial<SondageResponse> = {}): SondageResponse {
+  return {
+    id: 3,
+    entrepriseId: 1,
+    titre: 'Satisfaction 2026',
+    description: null,
+    statut: 'NON_COMMENCE',
+    publie: false,
+    datePublication: null,
+    dateFermeture: null,
+    version: 1,
+    sondageOrigineId: null,
+    estModele: false,
+    reponseUnique: true,
+    creePar: { id: 1, prenom: 'Awa', nom: 'Diop' },
+    dateCreation: '2026-11-01T12:00:00Z',
+    dateModification: '2026-11-01T12:00:00Z',
+    sections: [sectionDeTest()],
     ...modifs,
   };
 }

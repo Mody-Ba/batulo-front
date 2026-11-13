@@ -25,14 +25,15 @@ import { messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { raisonLectureSeule } from '../droits-sondage';
 import {
   DialogueAssignerGestionnaires,
   DonneesAssignerGestionnaires,
 } from '../dialogue-assigner-gestionnaires/dialogue-assigner-gestionnaires';
 
 /**
- * Détail d'un sondage en lecture seule (l'édition arrive en F5) : informations, collecte, versions
- * et, pour l'admin, les gestionnaires assignés (assigner, retirer).
+ * Fiche d'un sondage : informations, collecte, versions et, pour l'admin, les gestionnaires assignés (assigner,
+ * retirer). Le contenu s'ouvre dans l'éditeur (/sondages/:id/modifier), modifiable ou en lecture seule.
  */
 @Component({
   selector: 'app-detail-sondage',
@@ -69,6 +70,18 @@ export class DetailSondage {
   protected readonly estAdmin = computed(() => this.auth.role() === 'ADMIN');
 
   protected readonly sondage = signal<SondageResponse | null>(null);
+  /** Le contenu est-il modifiable par l'utilisateur ? (bouton « Modifier » ou « Voir le contenu ») */
+  protected readonly contenuModifiable = computed(() => {
+    const sondage = this.sondage();
+    return (
+      !!sondage &&
+      raisonLectureSeule(sondage, {
+        role: this.auth.role(),
+        utilisateur: this.auth.utilisateur(),
+        lectureSeule: this.auth.lectureSeule(),
+      }) === null
+    );
+  });
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
   protected readonly collecte = signal<SuiviCollecteResponse | null>(null);

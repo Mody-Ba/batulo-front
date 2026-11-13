@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+}
+
+.option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-1) var(--bt-espace-2);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+}
+
+.champ-libelle {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.champ-valeur {
+  flex: 0 1 180px;
+  min-width: 140px;
+}
+
+.marqueur,
+.rang {
+  flex-shrink: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.rang {
+  width: 24px;
+  text-align: center;
+  font: var(--mat-sys-label-large);
+}
+
+.poignee {
+  cursor: grab;
+}
+
+.actions-liste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  margin-top: var(--bt-espace-2);
+}
+
+.erreur-liste {
+  margin: var(--bt-espace-2) 0 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+// Téléphone : la valeur passe sous le libellé.
+@media (max-width: 599.98px) {
+  .champ-valeur {
+    flex-basis: 100%;
+    margin-left: 48px;
+  }
+}
+
+// Glisser-déposer : les autres éléments glissent pour laisser la place.
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+    transition: none;
+  }
+}

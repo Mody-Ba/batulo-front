@@ -144,6 +144,28 @@ src/app/
   `DEMANDE_DEJA_TRAITEE` -> la liste est relue.
 - Pastilles de filtre : un nouveau clic sur la pastille choisie la garde sélectionnée (sinon Material la désélectionne).
 
+## Éditeur de sondage (F5a)
+- Routes : `/sondages/nouveau` (vide ou à partir d'un formulaire, `GET /api/sondages/formulaires?modelesSeulement`)
+  et `/sondages/:id/modifier` (garde `quitterEditeurGuard` si quelque chose n'est pas enregistré). La fiche
+  `/sondages/:id` propose « Modifier » ou « Voir le contenu ».
+- Droits (affichage) : `raisonLectureSeule()` (`features/sondages/droits-sondage.ts`) : brouillon, abonnement non
+  expiré, admin ou gestionnaire créateur avec la permission ; sinon lecture seule avec un bandeau. Un refus du
+  serveur (SONDAGE_PUBLIE, PERMISSION_SONDAGES_REQUISE, ACTION_RESERVEE_CREATEUR, ABONNEMENT_EXPIRE) verrouille l'éditeur.
+- `EditeurSondageStore` (fourni par la page) : toutes les écritures passent par une file, l'une après l'autre (pas de
+  verrouillage optimiste côté backend) ; chaque réponse remplace le sondage, les formulaires des cartes ne sont jamais
+  recréés. Questions pas encore créées gardées à part (clé stable `nouvelle-N`).
+- Enregistrement automatique (`EnregistrementAuto`) : 800 ms après la dernière frappe ou à la sortie du champ ; une
+  saisie invalide n'est pas envoyée (erreurs affichées) ; erreur du serveur affichée sur la carte, avec « Réessayer ».
+- Un composant par type dans `editeur/types/` ; formulaires, valeurs par défaut et conversion en `QuestionRequest`
+  dans `formulaires-types.ts` ; règles du backend dans `core/utils/regles-question.ts`. `estCritere` n'est jamais envoyé.
+- Glisser-déposer (CDK) des sections, et des questions **à l'intérieur de leur section seulement** : le déplacement
+  d'une question vers une autre section viendra plus tard (il faut une route au backend). Monter/Descendre au clavier
+  dans les menus.
+- Budget initial porté à 520 ko (avertissement), **provisoirement** : `MAT_FORM_FIELD_DEFAULT_OPTIONS` dans
+  `app.config.ts` place `@angular/forms` et le champ Material (environ 128 ko) dans le bundle initial, qui grossit avec
+  chaque usage des formulaires. **À optimiser avant la mise en ligne** (sortir ces paquets du bundle initial sans
+  perdre l'apparence des champs dans les boîtes de dialogue), puis revenir à 500 ko.
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
@@ -172,7 +194,9 @@ src/app/
   recherche et filtre actif, détail + ses sondages), assignations (depuis un sondage ou un gestionnaire), liste
   des sondages (dernière version par défaut, réponses, assignés, nouvelle version en préparation) et détail en
   lecture seule, tableau de bord (compteurs, abonnement, notifications), lecture seule si EXPIRE.
-- [ ] **F5 – Éditeur de sondage** : sondages, sections, questions, versions, modèles, assignations, publication.
+- [ ] **F5 – Éditeur de sondage** : F5a fait (création, sections, questions des 10 types, glisser-déposer,
+  enregistrement automatique, lecture seule). Reste F5b : prévisualisation, publication, versions, duplication,
+  modèles, critères, lien et QR, déplacement d'une question entre sections.
 - [ ] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée.
 - [ ] **F7 – Statistiques et exports** : statistiques, critères, tableaux croisés, exports CSV/XLSX/PDF.
 - [ ] **F8 – Messagerie et notifications** : conversations, page complète des notifications.

@@ -1,0 +1,117 @@
+<section class="conteneur-page etroit editeur">
+  <div class="barre-editeur">
+    <a matButton [routerLink]="['/sondages', id()]" class="retour">
+      <mat-icon fontIcon="arrow_back" aria-hidden="true" />Fiche du sondage
+    </a>
+    <span class="espace"></span>
+    @if (store.sondage() && store.modifiable()) {
+      <app-etat-enregistrement [etat]="etatGlobal()" libelleEnregistre="Tout est enregistré" />
+    }
+  </div>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement du sondage" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Ce sondage n’a pas pu être chargé.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (store.sondage(); as s) {
+    @if (store.raisonLectureSeule(); as raison) {
+      <app-encadre type="info" icone="lock" titre="Lecture seule" role="status" class="bandeau-lecture-seule">
+        <p>{{ raison }}</p>
+      </app-encadre>
+    }
+
+    <!-- En-tête du sondage -->
+    <header class="carte-entete" [formGroup]="formulaire" (focusout)="sortieEnTete()">
+      <div class="ligne-entete">
+        <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+        <span class="texte-aide">Version {{ s.version }}</span>
+        <span class="espace"></span>
+        @if (enTete(); as e) {
+          @if (store.modifiable()) {
+            <app-etat-enregistrement [etat]="e.etat()" (reessayer)="e.maintenant()" />
+          }
+        }
+        @if (store.modifiable()) {
+          <button matIconButton type="button" [matMenuTriggerFor]="menuSondage" aria-label="Actions du sondage">
+            <mat-icon fontIcon="more_vert" aria-hidden="true" />
+          </button>
+          <mat-menu #menuSondage="matMenu" xPosition="before">
+            <button mat-menu-item type="button" class="action-danger" (click)="supprimerBrouillon(s)">
+              <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer le brouillon</span>
+            </button>
+          </mat-menu>
+        }
+      </div>
+
+      <h1 class="visuellement-cache">Modifier « {{ s.titre }} »</h1>
+      <mat-form-field class="champ-titre-sondage">
+        <mat-label>Titre du sondage</mat-label>
+        <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required />
+        @if (formulaire.controls.titre.hasError('required')) {
+          <mat-error>Le titre est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field class="champ-description-sondage">
+        <mat-label>Description (facultative)</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          cdkTextareaAutosize
+          cdkAutosizeMinRows="2"
+          [maxlength]="regles.descriptionMax"
+        ></textarea>
+        <mat-hint>Présentée aux répondants au début du sondage.</mat-hint>
+      </mat-form-field>
+      <mat-checkbox formControlName="reponseUnique">
+        Une seule réponse par appareil
+        <span class="cellule-secondaire">
+          Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.
+        </span>
+      </mat-checkbox>
+      @if (enTete(); as e) {
+        <app-message-erreur [erreur]="e.erreur()" parDefaut="L’en-tête n’a pas pu être enregistré." />
+      }
+    </header>
+
+    <!-- Sections -->
+    @if (sections().length === 0) {
+      <div class="vide" role="status">
+        <p>Ce sondage n’a pas encore de section. Les questions se rangent dans des sections.</p>
+      </div>
+    }
+
+    <div class="sections" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!store.modifiable()" (cdkDropListDropped)="deposerSection($event)">
+      @for (section of sections(); track section.id; let i = $index) {
+        <app-carte-section
+          cdkDrag
+          [cdkDragDisabled]="!store.modifiable()"
+          [section]="section"
+          [position]="i"
+          [nombreSections]="sections().length"
+        />
+      }
+    </div>
+
+    @if (store.modifiable()) {
+      <div class="ajout-section">
+        <button
+          [matButton]="sections().length === 0 ? 'filled' : 'outlined'"
+          type="button"
+          (click)="ajouterSection()"
+          [disabled]="ajoutSectionEnCours() || limiteSections()"
+        >
+          <mat-icon fontIcon="playlist_add" aria-hidden="true" />
+          {{ sections().length === 0 ? 'Ajouter une première section' : 'Ajouter une section' }}
+        </button>
+        @if (limiteSections()) {
+          <span class="texte-aide">{{ regles.sectionsMax }} sections au plus.</span>
+        }
+      </div>
+    }
+  }
+</section>

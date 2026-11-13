@@ -1,0 +1,75 @@
+<div
+  class="liste"
+  cdkDropList
+  [cdkDropListDisabled]="options().disabled"
+  (cdkDropListDropped)="deposer($event)"
+  role="list"
+  aria-label="Options"
+>
+  @for (option of options().controls; track option; let i = $index) {
+    <div class="option" cdkDrag cdkDragLockAxis="y" role="listitem" [formGroup]="option">
+      <button
+        matIconButton
+        type="button"
+        class="poignee"
+        cdkDragHandle
+        [disabled]="options().disabled"
+        [attr.aria-label]="'Déplacer l’option ' + (i + 1) + ' (ou Alt + flèches)'"
+        (keydown.alt.arrowup)="$event.preventDefault(); deplacer(i, i - 1)"
+        (keydown.alt.arrowdown)="$event.preventDefault(); deplacer(i, i + 1)"
+      >
+        <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
+      </button>
+      @if (marqueur() === 'rang') {
+        <span class="rang" aria-hidden="true">{{ i + 1 }}</span>
+      } @else {
+        <mat-icon class="marqueur" [fontIcon]="icones[marqueur() === 'case' ? 'case' : 'rond']" aria-hidden="true" />
+      }
+      <mat-form-field class="champ-libelle">
+        <mat-label>Option {{ i + 1 }}</mat-label>
+        <input
+          #champLibelle
+          matInput
+          formControlName="libelle"
+          [maxlength]="regles.libelleOptionMax"
+          autocomplete="off"
+          (keydown.enter)="entree($event, i)"
+        />
+        @if (option.controls.libelle.hasError('required')) {
+          <mat-error>Le libellé est obligatoire.</mat-error>
+        }
+      </mat-form-field>
+      @if (afficherValeurs()) {
+        <mat-form-field class="champ-valeur">
+          <mat-label>Valeur</mat-label>
+          <input matInput formControlName="valeur" [maxlength]="regles.valeurOptionMax" autocomplete="off" spellcheck="false" />
+          @if (!option.controls.id.value && !option.controls.valeur.value) {
+            <mat-hint>Générée depuis le libellé</mat-hint>
+          }
+        </mat-form-field>
+      }
+      <button
+        matIconButton
+        type="button"
+        (click)="supprimer(i)"
+        [disabled]="options().disabled"
+        [attr.aria-label]="'Supprimer l’option ' + (i + 1)"
+      >
+        <mat-icon fontIcon="close" aria-hidden="true" />
+      </button>
+    </div>
+  }
+</div>
+
+@if (erreurListe(); as message) {
+  <p class="erreur-liste" role="alert">{{ message }}</p>
+}
+
+<div class="actions-liste">
+  <button matButton type="button" (click)="ajouter()" [disabled]="options().disabled">
+    <mat-icon fontIcon="add" aria-hidden="true" />Ajouter une option
+  </button>
+  <mat-slide-toggle [checked]="afficherValeurs()" (change)="afficherValeurs.set($event.checked)">
+    Valeurs pour les statistiques
+  </mat-slide-toggle>
+</div>

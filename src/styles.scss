@@ -498,3 +498,16 @@ a.tuile {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Glisser-déposer (CDK) : l'aperçu est ajouté au <body>, hors des styles des composants ---------- */
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: var(--bt-rayon);
+  box-shadow: var(--mat-sys-level3);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.4;
+}
+

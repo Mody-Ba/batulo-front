@@ -1,0 +1,104 @@
+<section class="carte-section-editeur" [attr.aria-labelledby]="'titre-section-' + section().id">
+  <div class="entete-section-editeur" [formGroup]="formulaire">
+    <div class="ligne-titre">
+      @if (store.modifiable()) {
+        <button
+          matIconButton
+          type="button"
+          class="poignee"
+          cdkDragHandle
+          [attr.aria-label]="'Déplacer la section ' + (position() + 1) + ' (glisser, ou menu Monter / Descendre)'"
+        >
+          <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
+        </button>
+      }
+      <h2 class="rang-section" [id]="'titre-section-' + section().id">
+        Section {{ position() + 1 }} sur {{ nombreSections() }}
+      </h2>
+      <span class="espace"></span>
+      <app-etat-enregistrement [etat]="auto.etat()" (reessayer)="auto.maintenant()" />
+      <button
+        matIconButton
+        type="button"
+        [matMenuTriggerFor]="menu"
+        [disabled]="!store.modifiable()"
+        [attr.aria-label]="'Actions de la section ' + (position() + 1)"
+      >
+        <mat-icon fontIcon="more_vert" aria-hidden="true" />
+      </button>
+    </div>
+
+    <mat-form-field class="champ-titre">
+      <mat-label>Titre de la section</mat-label>
+      <input matInput formControlName="titre" [maxlength]="regles.titreSectionMax" autocomplete="off" required />
+      @if (formulaire.controls.titre.hasError('required')) {
+        <mat-error>Le titre de la section est obligatoire.</mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field class="champ-description">
+      <mat-label>Description (facultative)</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="1"
+        [maxlength]="regles.descriptionMax"
+      ></textarea>
+    </mat-form-field>
+    <app-message-erreur [erreur]="auto.erreur()" parDefaut="La section n’a pas pu être enregistrée." />
+  </div>
+
+  @if (elements().length === 0) {
+    <p class="etat-vide">Aucune question dans cette section.</p>
+  }
+
+  <div
+    class="questions"
+    cdkDropList
+    cdkDropListLockAxis="y"
+    [cdkDropListDisabled]="!store.modifiable()"
+    [cdkDropListSortPredicate]="positionAutorisee"
+    (cdkDropListDropped)="deposer($event)"
+  >
+    @for (element of elements(); track element.cle; let i = $index) {
+      <app-carte-question
+        cdkDrag
+        [cdkDragDisabled]="!store.modifiable() || element.question === null"
+        [question]="element.question"
+        [cle]="element.cle"
+        [sectionId]="section().id"
+        [numero]="i + 1"
+        [position]="i"
+        [nombreEnregistrees]="nombreEnregistrees()"
+      />
+    }
+  </div>
+
+  @if (store.modifiable()) {
+    <div class="actions-section">
+      <button matButton="tonal" type="button" (click)="ajouterQuestion()" [disabled]="limiteAtteinte()">
+        <mat-icon fontIcon="add_circle" aria-hidden="true" />Ajouter une question
+      </button>
+      @if (limiteAtteinte()) {
+        <span class="texte-aide">{{ regles.questionsMaxParSection }} questions au plus par section.</span>
+      }
+    </div>
+  }
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item type="button" (click)="deplacerSection(position() - 1)" [disabled]="position() === 0">
+      <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>Monter la section</span>
+    </button>
+    <button
+      mat-menu-item
+      type="button"
+      (click)="deplacerSection(position() + 1)"
+      [disabled]="position() >= nombreSections() - 1"
+    >
+      <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre la section</span>
+    </button>
+    <button mat-menu-item type="button" class="action-danger" (click)="supprimer()">
+      <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la section</span>
+    </button>
+  </mat-menu>
+</section>

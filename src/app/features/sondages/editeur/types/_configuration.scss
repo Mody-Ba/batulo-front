@@ -1,0 +1,74 @@
+// Styles partagés par les composants de type de question (@use dans chacun) : hors de styles.scss pour ne pas
+// alourdir le bundle initial.
+
+// Configuration d'une question : champs côte à côte, une colonne sur téléphone.
+.ligne-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-3);
+
+  mat-form-field {
+    flex: 0 1 240px;
+  }
+}
+
+.grille-config {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bt-espace-3);
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.erreur-config {
+  margin: var(--bt-espace-2) 0 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+// Aperçu de ce que verra le répondant (décoratif).
+.apercu-reponse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-4);
+  margin-top: var(--bt-espace-3);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-espace-1);
+  }
+
+  .faux-champ {
+    min-width: 200px;
+    padding: var(--bt-espace-2) 0;
+    border-bottom: 1px dotted var(--mat-sys-outline);
+
+    &.long {
+      min-width: min(100%, 360px);
+      padding-bottom: var(--bt-espace-6);
+    }
+
+    &.court {
+      min-width: 96px;
+    }
+  }
+
+  &.echelle {
+    gap: var(--bt-espace-2);
+  }
+
+  .cran {
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 50%;
+  }
+}
+

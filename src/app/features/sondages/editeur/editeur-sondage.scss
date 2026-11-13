@@ -1,0 +1,112 @@
+.editeur {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+}
+
+.conteneur-page.etroit.editeur {
+  max-width: 880px;
+}
+
+// Barre du haut collée en défilant : l'état global d'enregistrement reste visible.
+.barre-editeur {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  margin: calc(-1 * var(--bt-espace-2)) 0 0;
+  padding: var(--bt-espace-2) 0;
+  background: var(--mat-sys-surface);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.retour {
+  margin-left: calc(-1 * var(--bt-espace-3));
+}
+
+.zone-progression {
+  margin: 0;
+}
+
+.carte-entete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-top: 8px solid var(--mat-sys-primary);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.ligne-entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.champ-titre-sondage input {
+  font: var(--mat-sys-headline-small);
+}
+
+.champ-titre-sondage,
+.champ-description-sondage {
+  width: 100%;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+}
+
+.vide {
+  padding: var(--bt-espace-6) var(--bt-espace-4);
+  border: 1px dashed var(--mat-sys-outline);
+  border-radius: var(--bt-rayon);
+  color: var(--mat-sys-on-surface-variant);
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.ajout-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-3);
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+// Glisser-déposer : les autres éléments glissent pour laisser la place.
+.cdk-drag-animating,
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+    transition: none;
+  }
+}
