@@ -1,0 +1,167 @@
+:host {
+  display: block;
+  container-type: inline-size;
+  container-name: carte-stat;
+}
+
+.carte-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  padding: var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+}
+
+.entete {
+  h3 {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+    overflow-wrap: anywhere;
+  }
+
+  .numero {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.effectifs,
+.note,
+.vide {
+  margin: var(--bt-espace-1) 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.avertissement {
+  margin: var(--bt-espace-2) 0 0;
+  padding: var(--bt-espace-2) var(--bt-espace-3);
+  border-radius: 8px;
+  background: var(--bt-attente-fond);
+  color: var(--bt-attente-texte);
+  font: var(--mat-sys-body-small);
+}
+
+.indicateurs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--bt-espace-2);
+  margin: 0;
+
+  div {
+    padding: var(--bt-espace-2);
+    border-radius: 8px;
+    background: var(--mat-sys-surface-container-low);
+  }
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-small);
+  }
+
+  dd {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.defilement {
+  overflow-x: auto;
+}
+
+.matrice {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+  font: var(--mat-sys-body-small);
+
+  th {
+    padding: var(--bt-espace-1) var(--bt-espace-2);
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+    text-align: center;
+  }
+
+  tbody th {
+    color: var(--mat-sys-on-surface);
+    text-align: left;
+  }
+
+  td {
+    min-width: 64px;
+    padding: var(--bt-espace-1) var(--bt-espace-2);
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .part {
+    display: block;
+    font: var(--mat-sys-label-large);
+  }
+
+  .effectif {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.textes {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: var(--bt-espace-2) 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  p {
+    margin: 0;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .date {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+}
+
+.pagination-textes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  font: var(--mat-sys-body-small);
+
+  button {
+    min-height: 44px;
+    padding: 0 var(--bt-espace-3);
+    border: 1px solid var(--mat-sys-outline);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.38;
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+    }
+  }
+}
+
+@container carte-stat (max-width: 480px) {
+  .indicateurs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

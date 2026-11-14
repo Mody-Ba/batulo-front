@@ -1,0 +1,64 @@
+.choix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+
+  mat-form-field {
+    width: 260px;
+  }
+}
+
+.defilement {
+  overflow-x: auto;
+}
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--mat-sys-body-medium);
+
+  th,
+  td {
+    padding: var(--bt-espace-2) var(--bt-espace-3);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+    vertical-align: bottom;
+  }
+
+  tbody th {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .effectif-colonne {
+    display: block;
+    font: var(--mat-sys-label-small);
+  }
+
+  .total {
+    font-weight: 500;
+  }
+
+  // Petit effectif : fond d'attente + symbole ⚠ (jamais la couleur seule).
+  .petit {
+    background: var(--bt-attente-fond);
+    color: var(--bt-attente-texte);
+  }
+}
+
+.legende {
+  margin: var(--bt-espace-2) 0 0;
+}
+
+@media (max-width: 599.98px) {
+  .choix mat-form-field {
+    width: 100%;
+  }
+}

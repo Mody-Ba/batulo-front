@@ -28,6 +28,7 @@ import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { ActionsSondage } from '../cycle-de-vie/actions-sondage';
 import { situationVersions } from '../cycle-de-vie/versions';
+import { OngletsSondage } from '../onglets-sondage/onglets-sondage';
 import { droitsSondage, raisonLectureSeule } from '../droits-sondage';
 import {
   DialogueAssignerGestionnaires,
@@ -51,6 +52,7 @@ import {
     MatTooltipModule,
     EntetePage,
     MessageErreur,
+    OngletsSondage,
   ],
   templateUrl: './detail-sondage.html',
   styleUrl: './detail-sondage.scss',

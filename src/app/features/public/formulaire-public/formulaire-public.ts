@@ -126,16 +126,21 @@ export class FormulairePublic {
   }
 
   protected charger(jeton = this.jeton()): void {
-    if (memoireRepondant.dejaRepondu(jeton)) {
-      this.afficherIndisponible('deja-repondu', null);
-      return;
-    }
     this.etat.set({ type: 'chargement' });
     this.service
-      .lire(jeton)
+      // Le jeton de l'appareil, s'il existe déjà, permet au serveur de dire « déjà répondu » avant la saisie.
+      .lire(jeton, memoireRepondant.jetonExistant(jeton))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (formulaire) => {
+          if (formulaire.reponseUnique && formulaire.dejaRepondu) {
+            memoireRepondant.marquerRepondu(jeton);
+            memoireRepondant.effacerBrouillon(jeton);
+            this.afficherIndisponible('deja-repondu', null);
+            return;
+          }
+          // Le serveur fait foi : pas encore répondu (ou collecte terrain) -> le drapeau local est oublié.
+          memoireRepondant.oublierRepondu(jeton);
           this.titre.setTitle(`${formulaire.titre} · Batulo`);
           const brouillon = memoireRepondant.lireBrouillon(jeton);
           this.reponsesInitiales.set(brouillon?.reponses ?? null);
@@ -147,6 +152,11 @@ export class FormulairePublic {
         },
         error: (erreur: unknown) => {
           const raison = raisonSelonErreur(erreur, true) ?? 'inattendu';
+          // Serveur injoignable mais envoi déjà fait depuis cet appareil : on le dit plutôt que « connexion impossible ».
+          if (raison === 'injoignable' && memoireRepondant.dejaRepondu(jeton)) {
+            this.afficherIndisponible('deja-repondu', null);
+            return;
+          }
           this.afficherIndisponible(raison, corpsErreur(erreur)?.message ?? null);
         },
       });

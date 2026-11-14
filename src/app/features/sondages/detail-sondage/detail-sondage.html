@@ -17,6 +17,7 @@
         <span class="pastille-statut etiquette-modele">Modèle</span>
       }
     </app-entete-page>
+    <app-onglets-sondage [id]="s.id" />
 
     @if (droits(); as d) {
       <div class="barre-actions" role="toolbar" aria-label="Actions du sondage">

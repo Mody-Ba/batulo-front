@@ -1,0 +1,130 @@
+<section class="carte-section croisement" aria-labelledby="titre-croisement">
+  <div class="entete-section">
+    <h2 id="titre-croisement">Tableau croisé</h2>
+    @if (croisement()) {
+      <button matButton="outlined" type="button" [matMenuTriggerFor]="menuExport" [disabled]="exportEnCours()">
+        {{ exportEnCours() ? 'Export en cours…' : 'Exporter le tableau' }}
+      </button>
+      <mat-menu #menuExport="matMenu">
+        <button mat-menu-item type="button" (click)="exporter('PDF')">PDF</button>
+        <button mat-menu-item type="button" (click)="exporter('XLSX')">Excel (XLSX)</button>
+      </mat-menu>
+    }
+  </div>
+
+  @if (croisables().length === 0 || criteres().length === 0) {
+    <p class="texte-aide">
+      Le tableau croisé demande une question à choix, oui / non, échelle ou nombre, et au moins un critère d’analyse
+      (à définir sur une question dans l’éditeur du sondage).
+    </p>
+  } @else {
+    <div class="choix">
+      <mat-form-field>
+        <mat-label>Question</mat-label>
+        <mat-select [value]="cleQuestion()" (selectionChange)="cleQuestion.set($event.value)">
+          @for (q of croisables(); track q.cle) {
+            <mat-option [value]="q.cle">{{ q.libelle }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Par (critère)</mat-label>
+        <mat-select [value]="clePar()" (selectionChange)="clePar.set($event.value)">
+          @for (c of criteres(); track c.cle) {
+            <mat-option [value]="c.cle">{{ c.libelle }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      @if (croisement()?.lignes) {
+        <mat-button-toggle-group
+          aria-label="Valeurs affichées"
+          [value]="mode()"
+          (change)="mode.set($event.value)"
+          [hideSingleSelectionIndicator]="true"
+        >
+          <mat-button-toggle value="nombres">Nombres</mat-button-toggle>
+          <mat-button-toggle value="ligne">% ligne</mat-button-toggle>
+          <mat-button-toggle value="colonne">% colonne</mat-button-toggle>
+        </mat-button-toggle-group>
+      }
+    </div>
+
+    <div class="zone-progression">
+      @if (chargement()) {
+        <mat-progress-bar mode="indeterminate" aria-label="Calcul du tableau croisé" />
+      }
+    </div>
+    <app-message-erreur [erreur]="erreur()" parDefaut="Le tableau croisé n’a pas pu être calculé.">
+      <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+    </app-message-erreur>
+
+    @if (croisement(); as x) {
+      @if (x.lignes; as lignes) {
+        <div class="defilement">
+          <table class="tableau">
+            <caption class="visuellement-cache">
+              « {{ x.question.libelle }} » par « {{ x.par.libelle }} » :
+              {{ mode() === 'nombres' ? 'nombres de répondants' : mode() === 'ligne' ? 'pourcentages de ligne' : 'pourcentages de colonne' }}
+            </caption>
+            <thead>
+              <tr>
+                <td></td>
+                @for (c of x.colonnes; track $index) {
+                  <th scope="col" [class.petit]="c.petitEffectif">
+                    {{ c.libelle }}
+                    <span class="effectif-colonne">{{ nombre(c.nombreRepondants) }} rép.@if (c.petitEffectif) { ⚠}</span>
+                  </th>
+                }
+                <th scope="col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of lignes; track l.valeur) {
+                <tr>
+                  <th scope="row">{{ l.libelle }}</th>
+                  @for (cel of l.cellules; track $index) {
+                    <td [class.petit]="cel.petitEffectif" [attr.title]="cel.petitEffectif ? 'Petit effectif : à interpréter avec prudence' : null">
+                      {{ valeur(cel) }}@if (cel.petitEffectif) {<span class="visuellement-cache"> (petit effectif)</span>}
+                    </td>
+                  }
+                  <td class="total">{{ nombre(l.total) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      @if (x.numerique; as colonnes) {
+        <div class="defilement">
+          <table class="tableau">
+            <caption class="visuellement-cache">Statistiques de « {{ x.question.libelle }} » par « {{ x.par.libelle }} »</caption>
+            <thead>
+              <tr>
+                <th scope="col">{{ x.par.libelle }}</th>
+                <th scope="col">Répondants</th>
+                <th scope="col">Moyenne</th>
+                <th scope="col">Médiane</th>
+                <th scope="col">Min</th>
+                <th scope="col">Max</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (n of colonnes; track $index) {
+                <tr [class.petit]="n.petitEffectif">
+                  <th scope="row">{{ libelleColonne(x, n.colonne) }}@if (n.petitEffectif) { ⚠}</th>
+                  <td>{{ nombre(n.nombre) }}</td>
+                  <td>{{ decimal(n.moyenne) }}</td>
+                  <td>{{ decimal(n.mediane) }}</td>
+                  <td>{{ decimal(n.min) }}</td>
+                  <td>{{ decimal(n.max) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <p class="texte-aide legende">⚠ Moins de 5 répondants : résultats à interpréter avec prudence.</p>
+    }
+  }
+</section>

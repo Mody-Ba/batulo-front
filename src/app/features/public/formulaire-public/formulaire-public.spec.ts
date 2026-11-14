@@ -73,7 +73,8 @@ describe('FormulairePublic (/s/:jeton)', () => {
 
   it('affiche le formulaire, sa fermeture prévue et le titre de la page ; aucun Angular Material', async () => {
     const element = await creer();
-    expect(service.lire).toHaveBeenCalledWith('Ab3x');
+    // Premier passage : pas encore de jeton sur l'appareil, rien n'est envoyé.
+    expect(service.lire).toHaveBeenCalledWith('Ab3x', null);
     expect(element.querySelector('h1')!.textContent).toContain('Malnutrition');
     expect(element.textContent).toContain('Ce sondage ferme le');
     expect(element.textContent).toContain('Section 1 sur 2');
@@ -98,11 +99,36 @@ describe('FormulairePublic (/s/:jeton)', () => {
     expect(memoireRepondant.lireBrouillon('Ab3x')).toBeNull();
     expect(memoireRepondant.dejaRepondu('Ab3x')).toBe(true);
 
-    // Revenir sur le lien : l'écran « déjà répondu », sans recharger le formulaire.
-    service.lire.mockClear();
+    // Revenir sur le lien : le jeton est envoyé, le serveur répond dejaRepondu.
+    service.lire.mockReturnValue(of({ ...FORMULAIRE, dejaRepondu: true }));
     const retour = await creer();
+    expect(service.lire).toHaveBeenLastCalledWith('Ab3x', memoireRepondant.jetonRepondant('Ab3x'));
     expect(retour.textContent).toContain('Vous avez déjà répondu');
-    expect(service.lire).not.toHaveBeenCalled();
+  });
+
+  it('dejaRepondu du serveur : écran dédié avant la saisie, brouillon effacé', async () => {
+    const jeton = memoireRepondant.jetonRepondant('Ab3x');
+    memoireRepondant.ecrireBrouillon('Ab3x', 0, { 1: true });
+    service.lire.mockReturnValue(of({ ...FORMULAIRE, dejaRepondu: true }));
+    const element = await creer();
+    expect(service.lire).toHaveBeenCalledWith('Ab3x', jeton);
+    expect(element.querySelector('h1')!.textContent).toContain('Vous avez déjà répondu');
+    expect(element.querySelector('app-formulaire-sondage')).toBeNull();
+    expect(memoireRepondant.dejaRepondu('Ab3x')).toBe(true);
+    expect(memoireRepondant.lireBrouillon('Ab3x')).toBeNull();
+  });
+
+  it('le serveur fait foi : drapeau local oublié si dejaRepondu = false ; gardé en repli si le serveur est injoignable', async () => {
+    memoireRepondant.marquerRepondu('Ab3x');
+    service.lire.mockReturnValue(of({ ...FORMULAIRE, dejaRepondu: false }));
+    let element = await creer();
+    expect(element.textContent).toContain('Section 1 sur 2');
+    expect(memoireRepondant.dejaRepondu('Ab3x')).toBe(false);
+
+    memoireRepondant.marquerRepondu('Ab3x');
+    service.lire.mockReturnValue(throwError(() => erreurHttp(0)));
+    element = await creer();
+    expect(element.querySelector('h1')!.textContent).toContain('Vous avez déjà répondu');
   });
 
   it('collecte terrain : sans jetonRepondant, puis « Nouvelle réponse » vide le formulaire', async () => {

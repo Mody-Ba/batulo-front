@@ -5,8 +5,8 @@ import {
   ConfigurationMatrice,
   ConfigurationNumerique,
   ConfigurationTexte,
-  QuestionResponse,
-  SectionResponse,
+  QuestionAffichee,
+  SectionAffichee,
 } from '../../core/models/sondage.model';
 
 /**
@@ -26,7 +26,7 @@ export interface ReponseQuestionRequest {
 }
 
 /** Nom du contrôle d'une question dans le formulaire des réponses. */
-export function cleReponse(question: Pick<QuestionResponse, 'id'>): string {
+export function cleReponse(question: Pick<QuestionAffichee, 'id'>): string {
   return `q${question.id}`;
 }
 
@@ -104,7 +104,7 @@ function matriceComplete(config: Partial<ConfigurationMatrice>): ValidatorFn {
 }
 
 /** Règles de saisie d'une question. */
-export function validateursReponse(question: QuestionResponse): ValidatorFn[] {
+export function validateursReponse(question: QuestionAffichee): ValidatorFn[] {
   const validateurs: ValidatorFn[] = question.obligatoire ? [requise] : [];
   switch (question.type) {
     case 'TEXTE_COURT':
@@ -134,7 +134,7 @@ export function validateursReponse(question: QuestionResponse): ValidatorFn[] {
 }
 
 /** Un contrôle par question, sans réponse au départ. */
-export function creerFormulaireReponses(sections: readonly SectionResponse[]): FormulaireReponses {
+export function creerFormulaireReponses(sections: readonly SectionAffichee[]): FormulaireReponses {
   const controles: Record<string, FormControl<ValeurReponse>> = {};
   for (const question of sections.flatMap((s) => s.questions)) {
     controles[cleReponse(question)] = new FormControl<ValeurReponse>(null, validateursReponse(question));
@@ -144,7 +144,7 @@ export function creerFormulaireReponses(sections: readonly SectionResponse[]): F
 
 /** Réponses à envoyer : les questions répondues seulement, textes nettoyés. */
 export function reponsesAEnvoyer(
-  sections: readonly SectionResponse[],
+  sections: readonly SectionAffichee[],
   formulaire: FormulaireReponses,
 ): ReponseQuestionRequest[] {
   return sections

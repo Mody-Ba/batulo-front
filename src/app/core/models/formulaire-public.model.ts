@@ -1,4 +1,4 @@
-import { SectionResponse } from './sondage.model';
+import { SectionAffichee } from './sondage.model';
 import { ReponseQuestionRequest } from '../../shared/formulaire/reponses';
 
 /**
@@ -12,7 +12,13 @@ export interface FormulairePublicResponse {
   reponseUnique: boolean;
   /** Fermeture prévue ; null si aucune. */
   dateFermeture: string | null;
-  sections: SectionResponse[];
+  /** SectionPubliqueResponse : sans réglages d'analyse internes. */
+  sections: SectionAffichee[];
+  /**
+   * Seulement si reponseUnique : true si l'appareil (en-tête X-Jeton-Repondant) a déjà répondu à l'une des versions ;
+   * false sans jeton ou avec un jeton mal formé. Absent sinon.
+   */
+  dejaRepondu?: boolean;
 }
 
 /**

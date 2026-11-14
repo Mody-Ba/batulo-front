@@ -272,6 +272,21 @@ export interface QuestionResponse {
   critereConfig: unknown;
 }
 
+/**
+ * Question telle qu'affichée au répondant (aperçu et formulaire public, QuestionPubliqueResponse du backend) : sans
+ * les réglages d'analyse internes.
+ */
+export type QuestionAffichee = Omit<QuestionResponse, 'estCritere' | 'critereConfig'>;
+
+/** Section telle qu'affichée au répondant (SectionPubliqueResponse) ; une SectionResponse en est une. */
+export interface SectionAffichee {
+  id: number;
+  titre: string;
+  description: string | null;
+  ordre: number;
+  questions: QuestionAffichee[];
+}
+
 export interface SectionResponse {
   id: number;
   titre: string;

@@ -42,6 +42,18 @@ export const routes: Routes = [
         loadComponent: () => import('./diffuser-sondage/diffuser-sondage').then((m) => m.DiffuserSondage),
       },
       {
+        // ?page=&taille=
+        path: ':id/reponses',
+        title: 'Réponses du sondage · Batulo',
+        loadComponent: () => import('./reponses/liste-reponses').then((m) => m.ListeReponses),
+      },
+      {
+        // ?lignee=&du=&au=&granularite=&critere=cle:valeur (répété)
+        path: ':id/statistiques',
+        title: 'Statistiques du sondage · Batulo',
+        loadComponent: () => import('./statistiques/page-statistiques').then((m) => m.PageStatistiques),
+      },
+      {
         path: ':id',
         title: 'Sondage · Batulo',
         loadComponent: () => import('./detail-sondage/detail-sondage').then((m) => m.DetailSondage),
