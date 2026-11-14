@@ -1,42 +1,37 @@
-import { Component, input } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
-import { OptionResponse, QuestionResponse } from '../../../core/models/sondage.model';
-import { ValeurReponse } from '../reponses';
+import { Component } from '@angular/core';
+import { OptionResponse } from '../../../core/models/sondage.model';
+import { ChampBase } from './champ-base';
 
-/** CHOIX_MULTIPLE : une ou plusieurs options ; la réponse est la liste des valeurs, dans l'ordre des options. */
+/** CHOIX_MULTIPLE : cases à cocher natives ; la réponse est la liste des valeurs, dans l'ordre des options. */
 @Component({
   selector: 'app-champ-choix-multiple',
-  imports: [MatCheckboxModule],
   template: `
-    <div class="liste-choix" role="group" [attr.aria-labelledby]="idLibelle()">
+    <div class="liste-choix" role="group" [attr.aria-labelledby]="idLibelle" [attr.aria-describedby]="decrit()">
       @for (option of question().options; track option.id) {
-        <mat-checkbox
-          [checked]="coche(option)"
-          [disabled]="controle().disabled"
-          (change)="basculer(option, $event)"
-          (blur)="controle().markAsTouched()"
-        >
-          {{ option.libelle }}
-        </mat-checkbox>
+        <label class="choix">
+          <input
+            type="checkbox"
+            [checked]="coche(option)"
+            [disabled]="controle().disabled"
+            [attr.aria-invalid]="invalide() || null"
+            (change)="basculer(option, $any($event.target).checked)"
+            (blur)="controle().markAsTouched()"
+          />
+          <span>{{ option.libelle }}</span>
+        </label>
       }
     </div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampChoixMultiple {
-  readonly question = input.required<QuestionResponse>();
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-
+export class ChampChoixMultiple extends ChampBase {
   protected coche(option: OptionResponse): boolean {
     const valeur = this.controle().value;
     return Array.isArray(valeur) && valeur.includes(option.valeur);
   }
 
-  protected basculer(option: OptionResponse, evenement: MatCheckboxChange): void {
+  protected basculer(option: OptionResponse, coche: boolean): void {
     const choisies = new Set(Array.isArray(this.controle().value) ? (this.controle().value as string[]) : []);
-    if (evenement.checked) {
+    if (coche) {
       choisies.add(option.valeur);
     } else {
       choisies.delete(option.valeur);

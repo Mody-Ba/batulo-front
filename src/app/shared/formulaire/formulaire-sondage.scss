@@ -1,111 +1,209 @@
 // Les champs s'adaptent à la largeur de ce conteneur (@container formulaire), pas à celle de l'écran.
-:host {
+// Sans Angular Material : boutons et encarts natifs, couleurs du thème (variables --mat-sys-*).
+app-formulaire-sondage {
   display: block;
   container-type: inline-size;
   container-name: formulaire;
-}
 
-.formulaire-sondage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bt-espace-4);
-}
-
-.entete {
-  padding: var(--bt-espace-4);
-  border: 1px solid var(--mat-sys-outline-variant);
-  border-top: 8px solid var(--mat-sys-primary);
-  border-radius: var(--bt-rayon);
-  background: var(--mat-sys-surface);
-}
-
-.titre {
-  margin: 0;
-  font: var(--mat-sys-headline-small);
-  overflow-wrap: anywhere;
-}
-
-.description {
-  margin: var(--bt-espace-2) 0 0;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.legende {
-  margin: var(--bt-espace-3) 0 0;
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-body-small);
-}
-
-.obligatoire,
-.a-corriger {
-  color: var(--mat-sys-error);
-}
-
-.progression {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bt-espace-1);
-  color: var(--mat-sys-on-surface-variant);
-  font: var(--mat-sys-label-medium);
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bt-espace-3);
-}
-
-.titre-section {
-  margin: 0;
-  font: var(--mat-sys-title-large);
-  outline: none;
-}
-
-.questions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--bt-espace-3);
-}
-
-.a-corriger {
-  margin: 0;
-  font: var(--mat-sys-body-medium);
-}
-
-.navigation {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--bt-espace-3);
-
-  .espace {
-    flex: 1;
-  }
-
-  button {
-    min-height: 44px;
-  }
-}
-
-.note-apercu {
-  margin: 0;
-}
-
-// Formulaire étroit (téléphone) : boutons sur toute la largeur.
-@container formulaire (max-width: 480px) {
-  .navigation {
-    flex-direction: column-reverse;
-
-    .espace {
-      display: none;
-    }
-
-    button {
-      width: 100%;
-    }
+  .formulaire-sondage {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-espace-4);
   }
 
   .entete {
-    padding: var(--bt-espace-3);
+    padding: var(--bt-espace-4);
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-top: 8px solid var(--mat-sys-primary);
+    border-radius: var(--bt-rayon);
+    background: var(--mat-sys-surface);
+  }
+
+  .titre {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+    overflow-wrap: anywhere;
+  }
+
+  .description {
+    margin: var(--bt-espace-2) 0 0;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .legende {
+    margin: var(--bt-espace-3) 0 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+
+  .obligatoire,
+  .a-corriger {
+    color: var(--mat-sys-error);
+  }
+
+  .progression {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-espace-1);
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+
+    progress {
+      width: 100%;
+      height: 8px;
+      border: 0;
+      border-radius: 4px;
+      background: var(--mat-sys-surface-container-highest);
+      accent-color: var(--mat-sys-primary);
+      appearance: none;
+      overflow: hidden;
+
+      &::-webkit-progress-bar {
+        background: var(--mat-sys-surface-container-highest);
+      }
+
+      &::-webkit-progress-value {
+        background: var(--mat-sys-primary);
+      }
+
+      &::-moz-progress-bar {
+        background: var(--mat-sys-primary);
+      }
+    }
+  }
+
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-espace-3);
+  }
+
+  .titre-section {
+    margin: 0;
+    font: var(--mat-sys-title-large);
+
+    &:focus {
+      outline: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+      outline-offset: 4px;
+    }
+  }
+
+  .questions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bt-espace-3);
+  }
+
+  .a-corriger {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+  }
+
+  .encart {
+    margin: 0;
+    padding: var(--bt-espace-3) var(--bt-espace-4);
+    border-radius: var(--bt-rayon);
+    outline: none;
+
+    p {
+      margin: 0;
+    }
+
+    &.info {
+      background: var(--mat-sys-surface-container-high);
+    }
+
+    &.succes {
+      background: var(--bt-succes-fond);
+      color: var(--bt-succes-texte);
+    }
+
+    &.erreur {
+      background: var(--mat-sys-error-container);
+      color: var(--mat-sys-on-error-container);
+    }
+  }
+
+  .navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bt-espace-3);
+
+    .espace {
+      flex: 1;
+    }
+  }
+
+  .bouton {
+    min-height: 48px;
+    padding: 0 var(--bt-espace-6);
+    border-radius: 24px;
+    font: var(--mat-sys-label-large);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+
+    &.principal {
+      border: 0;
+      background: var(--mat-sys-primary);
+      color: var(--mat-sys-on-primary);
+    }
+
+    &.secondaire {
+      border: 1px solid var(--mat-sys-outline);
+      background: transparent;
+      color: var(--mat-sys-primary);
+    }
+
+    &.lien {
+      min-height: 44px;
+      padding: 0 var(--bt-espace-2);
+      border: 0;
+      background: transparent;
+      color: var(--mat-sys-primary);
+      text-decoration: underline;
+    }
+  }
+
+  .note-apercu {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+  }
+
+  // Formulaire étroit (téléphone) : boutons sur toute la largeur, « Suivant » en premier sous le pouce.
+  @container formulaire (max-width: 480px) {
+    .navigation {
+      flex-direction: column-reverse;
+
+      .espace {
+        display: none;
+      }
+
+      .bouton {
+        width: 100%;
+      }
+    }
+
+    .entete {
+      padding: var(--bt-espace-3);
+    }
+
+    .question {
+      padding: var(--bt-espace-3);
+    }
   }
 }

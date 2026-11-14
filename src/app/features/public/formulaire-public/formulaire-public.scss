@@ -1,0 +1,148 @@
+// Page publique, mobile d'abord, sans Angular Material : éléments natifs et couleurs du thème.
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface);
+}
+
+.page-publique {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--bt-espace-4) var(--bt-espace-4) var(--bt-espace-8);
+}
+
+.chargement {
+  padding: var(--bt-espace-8) 0;
+  text-align: center;
+}
+
+.fermeture {
+  margin: var(--bt-espace-2) 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.encart-public {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  outline: none;
+
+  p {
+    margin: 0;
+  }
+
+  &.info {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  &.erreur {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
+.carte-etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bt-espace-3);
+  margin-top: var(--bt-espace-6);
+  padding: var(--bt-espace-6) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    font: var(--mat-sys-headline-small);
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  p {
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .secondaire {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-medium);
+  }
+
+  .icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    font-size: 28px;
+  }
+
+  &.succes .icone,
+  &.raison-deja-repondu .icone {
+    background: var(--bt-succes-fond);
+    color: var(--bt-succes-texte);
+  }
+}
+
+.bouton-public {
+  min-height: 48px;
+  padding: 0 var(--bt-espace-6);
+  border: 0;
+  border-radius: 24px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-label-large);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.bouton-lien {
+  min-height: 44px;
+  padding: 0 var(--bt-espace-2);
+  border: 0;
+  background: transparent;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+  }
+}
+
+.pied {
+  margin-top: auto;
+  padding-top: var(--bt-espace-6);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .page-publique {
+    padding-top: var(--bt-espace-8);
+  }
+}

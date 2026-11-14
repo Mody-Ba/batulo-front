@@ -1,31 +1,28 @@
-import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, computed, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { ConfigurationTexte, QuestionResponse } from '../../../core/models/sondage.model';
-import { ValeurReponse } from '../reponses';
+import { Component, computed } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ConfigurationTexte } from '../../../core/models/sondage.model';
+import { ChampBase } from './champ-base';
 
-/** TEXTE_LONG : réponse sur plusieurs lignes, jusqu'à longueurMax caractères. */
+/** TEXTE_LONG : zone de texte native sur plusieurs lignes, jusqu'à longueurMax caractères. */
 @Component({
   selector: 'app-champ-texte-long',
-  imports: [TextFieldModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule],
   template: `
-    <mat-form-field class="champ-texte">
-      <textarea matInput [formControl]="$any(controle())" cdkTextareaAutosize cdkAutosizeMinRows="3" [attr.aria-labelledby]="idLibelle()" [attr.maxlength]="longueurMax()"></textarea>
-      <mat-hint align="end">{{ longueur() }} / {{ longueurMax() }}</mat-hint>
-    </mat-form-field>
+    <textarea class="champ-saisie" [id]="idChamp" [formControl]="$any(controle())" rows="4" [attr.maxlength]="longueurMax()" [attr.aria-describedby]="idsDescription()" [attr.aria-invalid]="invalide() || null"></textarea>
+    <div class="indication">
+      <span></span>
+      <span [id]="idBase() + '-compteur'">{{ longueur() }} / {{ longueurMax() }} caractères</span>
+    </div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampTexteLong {
-  readonly question = input.required<QuestionResponse>();
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-
+export class ChampTexteLong extends ChampBase {
   protected readonly longueurMax = computed(
     () => (this.question().configuration as Partial<ConfigurationTexte>).longueurMax ?? 5000,
   );
+
+  protected idsDescription(): string {
+    return [this.decrit(), `${this.idBase()}-compteur`].filter(Boolean).join(' ');
+  }
 
   protected longueur(): number {
     const valeur = this.controle().value;

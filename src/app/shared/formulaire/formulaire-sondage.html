@@ -4,16 +4,19 @@
     @if (contenu().description) {
       <p class="description">{{ contenu().description }}</p>
     }
+    <ng-content select="[entete]" />
     <p class="legende"><span class="obligatoire" aria-hidden="true">*</span> Réponse obligatoire</p>
   </header>
 
+  <ng-content />
+
   @if (sections().length === 0) {
-    <app-encadre type="info" role="status"><p>Ce formulaire n’a encore aucune question.</p></app-encadre>
+    <p class="encart info" role="status">Ce formulaire n’a encore aucune question.</p>
   } @else if (section(); as s) {
     @if (sections().length > 1) {
       <div class="progression">
-        <span>Section {{ indexSection() + 1 }} sur {{ sections().length }}</span>
-        <mat-progress-bar mode="determinate" [value]="progression()" aria-hidden="true" />
+        <label [for]="'progression-' + s.id">Section {{ indexSection() + 1 }} sur {{ sections().length }}</label>
+        <progress [id]="'progression-' + s.id" [max]="sections().length" [value]="indexSection() + 1"></progress>
       </div>
     }
 
@@ -29,36 +32,43 @@
       </div>
     </section>
 
+    @if (erreursGenerales().length) {
+      <div class="encart erreur erreurs-generales" role="alert" tabindex="-1">
+        @for (message of erreursGenerales(); track $index) {
+          <p>{{ message }}</p>
+        }
+      </div>
+    }
     @if (aCorriger()) {
       <p class="a-corriger" role="alert">Certaines réponses sont à corriger avant de continuer.</p>
     }
     @if (verifie()) {
-      <app-encadre type="succes" role="status" titre="Aperçu">
-        <p>Vos réponses sont valides. Rien n’a été envoyé : c’est un aperçu.</p>
-      </app-encadre>
+      <p class="encart succes" role="status">Vos réponses sont valides. Rien n’a été envoyé : c’est un aperçu.</p>
     }
 
     <div class="navigation">
       @if (indexSection() > 0) {
-        <button matButton="outlined" type="button" (click)="precedent()">
-          <mat-icon fontIcon="arrow_back" aria-hidden="true" />Précédent
+        <button type="button" class="bouton secondaire" (click)="precedent()" [disabled]="envoiEnCours()">
+          <span aria-hidden="true">←</span> Précédent
         </button>
       }
       <span class="espace"></span>
       @if (derniere()) {
-        <button matButton="filled" type="button" (click)="terminer()">
-          {{ mode() === 'apercu' ? 'Vérifier (aperçu, rien n’est envoyé)' : 'Envoyer' }}
+        <button type="button" class="bouton principal" (click)="terminer()" [disabled]="envoiEnCours()" [attr.aria-busy]="envoiEnCours() || null">
+          @if (envoiEnCours()) {
+            Envoi en cours…
+          } @else {
+            {{ mode() === 'apercu' ? 'Vérifier (aperçu, rien n’est envoyé)' : 'Envoyer mes réponses' }}
+          }
         </button>
       } @else {
-        <button matButton="filled" type="button" (click)="suivant()">
-          Suivant<mat-icon iconPositionEnd fontIcon="arrow_forward" aria-hidden="true" />
-        </button>
+        <button type="button" class="bouton principal" (click)="suivant()">Suivant <span aria-hidden="true">→</span></button>
       }
     </div>
     @if (mode() === 'apercu') {
-      <p class="texte-aide note-apercu">
+      <p class="note-apercu">
         Aperçu : vous pouvez répondre pour essayer le formulaire ; rien n’est enregistré.
-        <button matButton type="button" (click)="recommencer()">Recommencer</button>
+        <button type="button" class="bouton lien" (click)="recommencer()">Recommencer</button>
       </p>
     }
   }

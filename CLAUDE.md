@@ -41,17 +41,19 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
 src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
-                   gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement)
+                   gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
+                   formulaire-public)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
-                   super-admin, demande-abonnement)
+                   super-admin, demande-abonnement, formulaire-public)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
-                   (?page&taille), recherche.ts (DELAI_RECHERCHE_MS)
+                   (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
-  features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle)
+  features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
+                   public/ (formulaire du répondant, sans compte)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
                    filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
@@ -193,6 +195,30 @@ src/app/
   (`QuestionRepondant`) : sinon il n'est pas rafraîchi.
 - Liste des versions de la fiche : statut et `nombreReponses` (réponses de cette version) pour chaque version publiée.
 
+## Formulaire public (F6)
+- `/s/:jeton` (`features/public/formulaire-public`) : sans compte, sans garde, hors de la mise en page connectée.
+  `FormulairePublicService` envoie ses requêtes avec `SANS_AUTHENTIFICATION` (aucun jeton, pas de rafraîchissement ni
+  de redirection, même connecté).
+- Écrans : chargement, formulaire, confirmation (message et date ; « Nouvelle réponse » si `reponseUnique` = false),
+  indisponible : non ouvert (403 SONDAGE_NON_OUVERT, message du serveur avec la date), fermé (410), déjà répondu (409
+  ou drapeau local), lien introuvable (404), trop de requêtes (429), serveur injoignable. À l'envoi, 429 et erreurs
+  réseau gardent le formulaire et les réponses ; 400 REPONSES_INVALIDES pose chaque `erreurs[].message` sur sa
+  question (section concernée affichée, focus) ; les erreurs sans question sont résumées en haut.
+- Mémoire du navigateur (`memoire-repondant.ts`, via `stockage-local.ts`) : `batulo.repondant.{jeton}` (UUID v4, un
+  par lignée, jamais partagé entre sondages, envoyé seulement si `reponseUnique`), `batulo.brouillon.{jeton}`
+  (réponses par questionId et section, écrit 500 ms après la dernière saisie, repris avec un bandeau « Tout effacer »,
+  questions inconnues ignorées, oublié après 30 jours, effacé après l'envoi), `batulo.repondu.{jeton}` (drapeau
+  après un envoi à réponse unique ; le 409 DEJA_REPONDU du serveur reste la règle).
+- Léger : `shared/formulaire/` est en éléments natifs, sans Angular Material ni drag-drop du CDK (classement par
+  Monter / Descendre, déplacement annoncé). Styles des champs en une seule copie (`champs/champs-*.scss`, chargés par
+  `FormulaireSondage` en `ViewEncapsulation.None`, limités à `app-formulaire-sondage`). Chunk à la demande de
+  `/s/:jeton` : environ 56 ko bruts ; la page charge en plus le bundle initial commun (voir le budget de F5a).
+- Accessibilité : choix en `fieldset`/`legend`, saisie avec `label for` ; aide et erreur reliées par
+  `aria-describedby`, `aria-invalid` ; focus sur le titre de section, la première question à corriger ou le titre
+  de l'écran d'état ; boutons natifs de 48 px.
+- À proposer au backend : connaître « déjà répondu » avant la saisie (`jetonRepondant` accepté par le GET public) ;
+  un DTO public de question sans `estCritere` ni `critereConfig` (réglages internes aujourd'hui exposés).
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
@@ -224,7 +250,8 @@ src/app/
 - [x] **F5 – Éditeur de sondage** : F5a (création, sections, questions des 10 types, glisser-déposer, enregistrement
   automatique, lecture seule) et F5b (aperçu, publication et dates, fermeture, nouvelle version, duplication,
   modèles, critères, lien et QR), déplacement d'une question vers une autre section, réponses par version.
-- [ ] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée.
+- [x] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée, sections, brouillon
+  local, confirmation et collecte terrain, écrans d'état, erreurs du serveur par question, sans Angular Material.
 - [ ] **F7 – Statistiques et exports** : statistiques, critères, tableaux croisés, exports CSV/XLSX/PDF.
 - [ ] **F8 – Messagerie et notifications** : conversations, page complète des notifications.
 

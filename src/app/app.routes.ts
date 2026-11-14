@@ -60,6 +60,15 @@ export const routes: Routes = [
       ),
   },
 
+  // ---------- Formulaire public du répondant (sans compte, hors mise en page) ----------
+  {
+    // Lien public d'un sondage (PUBLIC_FORM_URL du backend) : le même pour toutes les versions.
+    path: 's/:jeton',
+    title: 'Répondre au sondage · Batulo',
+    loadComponent: () =>
+      import('./features/public/formulaire-public/formulaire-public').then((m) => m.FormulairePublic),
+  },
+
   // ---------- Pages connectées (barre du haut + menu latéral) ----------
   {
     path: '',
