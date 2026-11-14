@@ -8,14 +8,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
-import { catchError, EMPTY, switchMap, timer } from 'rxjs';
+import { catchError, EMPTY, merge, switchMap } from 'rxjs';
 import { ICONES_NOTIFICATION, NotificationResponse } from '../../core/models/notification.model';
+import { MessagerieService } from '../../core/services/messagerie.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { interrogationPeriodique } from '../../core/utils/interrogation';
 import { messageErreur } from '../../core/utils/erreur-http';
 
 /** Intervalle de mise à jour de la pastille. */
 const INTERVALLE_MS = 60_000;
-/** Nombre de notifications montrées dans le menu (la liste complète arrive en F8). */
+/** Nombre de notifications montrées dans le menu (la liste complète : /notifications). */
 const TAILLE_APERCU = 10;
 
 @Component({
@@ -38,7 +40,8 @@ export class ClocheNotifications {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly icones = ICONES_NOTIFICATION;
-  protected readonly nonLues = signal(0);
+  private readonly messagerie = inject(MessagerieService);
+  protected readonly nonLues = this.service.nombreNonLues;
   protected readonly notifications = signal<NotificationResponse[]>([]);
   protected readonly chargement = signal(false);
   protected readonly erreur = signal<string | null>(null);
@@ -51,13 +54,20 @@ export class ClocheNotifications {
   });
 
   constructor() {
-    // Erreurs ignorées : la pastille garde sa dernière valeur (l'intercepteur gère le 401).
-    timer(0, INTERVALLE_MS)
+    // Compteurs partagés (cloche, page des notifications, badge « Messagerie » du menu), relus toutes les minutes
+    // quand l'onglet est visible. La cloche n'existe que si les notifications sont permises (pas de page imposée).
+    // Erreurs ignorées : les compteurs gardent leur dernière valeur (l'intercepteur gère le 401).
+    interrogationPeriodique(INTERVALLE_MS)
       .pipe(
-        switchMap(() => this.service.nombreNonLues().pipe(catchError(() => EMPTY))),
+        switchMap(() =>
+          merge(
+            this.service.actualiserNombre().pipe(catchError(() => EMPTY)),
+            this.messagerie.actualiserNombre().pipe(catchError(() => EMPTY)),
+          ),
+        ),
         takeUntilDestroyed(),
       )
-      .subscribe((reponse) => this.nonLues.set(reponse.nonLues));
+      .subscribe();
   }
 
   /** À l'ouverture du menu : les plus récentes. */
@@ -88,7 +98,6 @@ export class ClocheNotifications {
         this.notifications.update((liste) =>
           liste.map((n) => (n.id === miseAJour.id ? miseAJour : n)),
         );
-        this.nonLues.update((nombre) => Math.max(nombre - 1, 0));
       },
       error: (erreur: unknown) => this.erreur.set(messageErreur(erreur)),
     });
@@ -98,7 +107,6 @@ export class ClocheNotifications {
     this.service.toutMarquerLu().subscribe({
       next: () => {
         this.notifications.update((liste) => liste.map((n) => ({ ...n, lue: true })));
-        this.nonLues.set(0);
       },
       error: (erreur: unknown) => this.erreur.set(messageErreur(erreur)),
     });

@@ -1,0 +1,81 @@
+<section class="conteneur-page">
+  <app-entete-page titre="Notifications" icone="notifications">
+    <button
+      matButton="tonal"
+      type="button"
+      (click)="toutMarquerLu()"
+      [disabled]="nonLues() === 0 || marquageEnCours()"
+    >
+      <mat-icon fontIcon="done_all" aria-hidden="true" />Tout marquer comme lu
+    </button>
+  </app-entete-page>
+
+  <p class="texte-aide" role="status">
+    @if (nonLues() === 0) {
+      Aucune notification non lue.
+    } @else {
+      {{ nonLues() }} notification{{ nonLues() > 1 ? 's' : '' }} non lue{{ nonLues() > 1 ? 's' : '' }}.
+    }
+  </p>
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Les notifications n’ont pas pu être chargées.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (page(); as p) {
+    @if (p.contenu.length === 0) {
+      <p class="etat-vide" role="status">Aucune notification pour le moment.</p>
+    } @else {
+      <ul class="notifications">
+        @for (n of p.contenu; track n.id) {
+          <li class="notification" [class.non-lue]="!n.lue">
+            <mat-icon class="icone" [fontIcon]="icones[n.type]" aria-hidden="true" />
+            <div class="texte">
+              <p class="titre">
+                @if (!n.lue) {
+                  <span class="point" aria-hidden="true"></span>
+                  <span class="visuellement-cache">Non lue : </span>
+                }
+                {{ n.titre }}
+              </p>
+              <p class="message">{{ n.message }}</p>
+              <p class="date">
+                <time [attr.datetime]="n.dateCreation">{{ n.dateCreation | date: 'd MMM y, HH:mm' }}</time>
+              </p>
+            </div>
+            <div class="actions">
+              @if (lien(n); as l) {
+                <button matButton type="button" (click)="ouvrir(n, l)">
+                  {{ l.libelle }}<mat-icon iconPositionEnd fontIcon="arrow_forward" aria-hidden="true" />
+                </button>
+              }
+              @if (!n.lue) {
+                <button
+                  matIconButton
+                  type="button"
+                  (click)="marquerLue(n)"
+                  [attr.aria-label]="'Marquer « ' + n.titre + ' » comme lue'"
+                >
+                  <mat-icon fontIcon="mark_email_read" aria-hidden="true" />
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+      <mat-paginator
+        [length]="p.totalElements"
+        [pageIndex]="numeroPage()"
+        [pageSize]="taillePage()"
+        [pageSizeOptions]="tailles"
+        (page)="changerPage($event)"
+        aria-label="Pagination des notifications"
+      />
+    }
+  }
+</section>

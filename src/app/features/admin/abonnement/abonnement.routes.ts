@@ -21,6 +21,13 @@ export const routes: Routes = [
     loadComponent: () => import('./mon-abonnement/mon-abonnement').then((m) => m.MonAbonnement),
   },
   {
+    // Demandes d'augmentation (permises abonnement expiré). En attente de paiement, la mise en page n'y mène pas.
+    path: 'demandes',
+    title: 'Demandes d’augmentation · Batulo',
+    canActivate: [enAttenteVersSouscrire],
+    loadComponent: () => import('./demandes/demandes-abonnement').then((m) => m.DemandesAbonnement),
+  },
+  {
     // ?formule=MENSUEL|ANNUEL pour présélectionner (bouton « Renouveler »).
     path: 'souscrire',
     title: 'S’abonner · Batulo',

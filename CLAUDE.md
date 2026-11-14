@@ -42,14 +42,15 @@ src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
                    gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
-                   formulaire-public, statistiques)
+                   formulaire-public, statistiques, messagerie)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
-                   super-admin, demande-abonnement, formulaire-public, statistiques, export)
+                   super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
-                   (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch)
+                   (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch),
+                   interrogation.ts (interrogation périodique arrêtée onglet caché)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
@@ -254,6 +255,37 @@ src/app/
   - une route pour relire un envoi de statistiques seul (`GET /api/statistiques-recues/{id}` ne renvoie que les
     statistiques : expéditeur et commentaire sont perdus après un rechargement de la page).
 
+## Messagerie et notifications (F8)
+- Routes : `/messagerie` (liste + panneau vide) et `/messagerie/:id` (fil, route enfant : la liste reste à côté sur
+  ordinateur ; sous 840 px, la liste ou le fil, avec « Retour aux conversations »), `/notifications[?page&taille]`,
+  `/admin/abonnement/demandes` (demandes d'augmentation de l'admin), `/gestionnaire/statistiques-envoyees[?page&taille]`.
+- Droits (le backend décide) : super admin <-> admins (boîte « Batulo » partagée) ; admin <-> ses gestionnaires et
+  Batulo (interlocuteur `{ id: null, prenom: "Batulo", role: SUPER_ADMIN }`, `estConversationBatulo`) ; gestionnaire
+  <-> son admin. « Nouvelle conversation » : `POST /conversations` ouvre ou retrouve ; admin : Batulo + ses
+  gestionnaires, super admin : les admins (`dialogue-nouvelle-conversation`) ; gestionnaire : « Écrire à mon admin »,
+  corps vide, sans dialogue.
+- Interrogation périodique (`interrogationPeriodique`, pas de WebSocket), rien quand l'onglet est caché, battement
+  immédiat au retour : fil 10 s (page 0 fusionnée par id), liste 30 s, compteurs 60 s (relus par la cloche, qui
+  n'existe pas tant qu'une page est imposée). `EtatMessagerie` (fourni par la page) partage conversations et
+  conversation active entre la liste et le fil.
+- Fil : plus récents d'abord côté serveur, affichés du plus ancien au plus récent ; « Messages plus anciens » (page
+  suivante, position de lecture gardée) ; `role="log"` ; marquée lue (`POST .../lu`) dès qu'un reçu non lu arrive ;
+  Ctrl / Cmd + Entrée envoie (5000 car.).
+- Lecture seule : abonnement expiré (`lectureSeule()`) ou 403 ABONNEMENT_EXPIRE -> la conversation admin ↔
+  gestionnaire n'a plus de saisie ; la conversation Batulo et la demande d'augmentation restent possibles.
+- Messages automatiques (`type` != TEXTE) : carte distincte « Message automatique · … » et lien (`liens-messages.ts`) :
+  STATISTIQUES -> `/admin/statistiques-recues/{referenceId}` (admin) ou « Statistiques envoyées » (gestionnaire) ;
+  DEMANDE_ABONNEMENT / REPONSE_DEMANDE -> « Mes demandes » (admin) ou la liste des demandes (super admin).
+- Compteurs partagés : `NotificationService.nombreNonLues` (cloche, page des notifications, menu) et
+  `MessagerieService.nombreNonLus` (badge « Messagerie » du menu) ; marquer lu les diminue, la relecture les remet.
+- Liens des notifications par type et par rôle (`liens-notifications.ts`), vers la page de la rubrique.
+- Demandes d'augmentation (admin) : formule choisie explicitement + message (2000 car.) ; une seule EN_ATTENTE (le
+  formulaire est alors remplacé par un rappel ; 409 DEMANDE_EN_COURS -> liste relue) ; rappel : acceptée, l'admin
+  paie lui-même par carte (« Payer la formule … » -> `/admin/abonnement/souscrire?formule=`).
+- En attente du backend (ajouts annoncés) : `?lue=true|false` sur `GET /api/notifications` (filtre lues / non lues),
+  `referenceId` et `conversationId` dans `NotificationResponse` (lien vers l'élément précis), et
+  `GET /api/super-admin/demandes-abonnement/{id}` (ouvrir la demande précise depuis un message ou une notification).
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
@@ -274,7 +306,7 @@ src/app/
   gardes par rôle et par statut, affichage des erreurs.
 - [x] **F2 – Abonnement et Stripe** : formules, paiement Stripe Elements, confirmation, rafraîchissement du jeton,
   bandeau d'abonnement de l'admin, page « Mon abonnement » avec l'historique des paiements.
-  Reste : demande d'augmentation (`/api/abonnements/demandes`, avec la messagerie en F8).
+  Demande d'augmentation : faite en F8 (`/admin/abonnement/demandes`).
 - [x] **F3 – Super admin** : tableau de bord (compteurs, demandes en attente, notifications), admins et entreprises
   (recherche, filtre, CRUD, activer/désactiver, suppression confirmée, mot de passe temporaire), abonnements
   (expirations proches en évidence), demandes d'abonnement (réponse TRAITEE ou REFUSEE).
@@ -289,7 +321,9 @@ src/app/
   local, confirmation et collecte terrain, écrans d'état, erreurs du serveur par question, sans Angular Material.
 - [x] **F7 – Statistiques et exports** : réponses (version ou toute la lignée) et leur détail, statistiques par type,
   filtres et critères, tableau croisé, exports CSV/XLSX/PDF, envoi à l'admin, statistiques reçues.
-- [ ] **F8 – Messagerie et notifications** : conversations, page complète des notifications.
+- [ ] **F8 – Messagerie et notifications** : conversations, fil, nouvelle conversation, messages automatiques,
+  demandes d'augmentation de l'admin, statistiques envoyées du gestionnaire, page des notifications, compteurs.
+  Reste : filtre lues / non lues, liens précis des notifications et demande précise côté super admin (backend).
 
-Les rubriques des étapes à venir existent déjà dans le menu (`layout/menu-lateral/liens-navigation.ts`) et mènent
-à `PageAVenir` : remplacer la route correspondante par la vraie page.
+Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
+disponible pour une future rubrique.

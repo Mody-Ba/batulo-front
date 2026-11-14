@@ -3,9 +3,6 @@ import { Routes } from '@angular/router';
 import { authGuard, connecteGuard, inviteGuard, roleGuard } from './core/guards/auth.guards';
 import { AuthService } from './core/services/auth.service';
 
-const pageAVenir = () =>
-  import('./shared/components/page-a-venir/page-a-venir').then((m) => m.PageAVenir);
-
 /*
  * Les gardes ne font que choisir la page affichée : le serveur vérifie le jeton, le rôle et
  * l'abonnement à chaque appel, c'est lui seul qui protège les données.
@@ -107,7 +104,7 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/gestionnaire/gestionnaire.routes').then((m) => m.routes),
       },
-      // Rubriques communes à plusieurs rôles, livrées dans les étapes suivantes.
+      // Rubriques communes à plusieurs rôles.
       {
         path: 'sondages',
         canActivate: [roleGuard('ADMIN', 'GESTIONNAIRE')],
@@ -115,17 +112,13 @@ export const routes: Routes = [
       },
       {
         path: 'messagerie',
-        title: 'Messagerie · Batulo',
         canActivate: [authGuard],
-        loadComponent: pageAVenir,
-        data: { titre: 'Messagerie', icone: 'forum', etape: 'F8' },
+        loadChildren: () => import('./features/messagerie/messagerie.routes').then((m) => m.routes),
       },
       {
         path: 'notifications',
-        title: 'Notifications · Batulo',
         canActivate: [authGuard],
-        loadComponent: pageAVenir,
-        data: { titre: 'Notifications', icone: 'notifications', etape: 'F8' },
+        loadChildren: () => import('./features/notifications/notifications.routes').then((m) => m.routes),
       },
     ],
   },

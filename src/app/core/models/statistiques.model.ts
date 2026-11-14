@@ -233,3 +233,15 @@ export interface EnvoiStatistiqueResponse {
 export type FormatExport = 'CSV' | 'XLSX' | 'PDF';
 export type ValeursExport = 'LIBELLES' | 'CODES';
 export type SeparateurDecimal = 'VIRGULE' | 'POINT';
+
+/** Période d'un envoi en clair. */
+export function resumeEnvoi(envoi: EnvoiStatistiqueResponse): string {
+  const parties = [envoi.lignee ? 'toutes les versions' : `version ${envoi.version}`];
+  if (envoi.du || envoi.au) {
+    parties.push(`du ${envoi.du ?? 'début'} au ${envoi.au ?? 'dernier jour'}`);
+  }
+  if (envoi.criteres.length) {
+    parties.push(`${envoi.criteres.length} critère${envoi.criteres.length > 1 ? 's' : ''}`);
+  }
+  return parties.join(' · ');
+}

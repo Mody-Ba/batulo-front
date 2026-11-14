@@ -7,23 +7,12 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router } from '@angular/router';
 import { PageResponse } from '../../../core/models/page.model';
-import { EnvoiStatistiqueResponse } from '../../../core/models/statistiques.model';
+import { EnvoiStatistiqueResponse, resumeEnvoi } from '../../../core/models/statistiques.model';
 import { StatistiquesService } from '../../../core/services/statistiques.service';
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 
-/** Période d'un envoi en clair. */
-export function resumeEnvoi(envoi: EnvoiStatistiqueResponse): string {
-  const parties = [envoi.lignee ? 'toutes les versions' : `version ${envoi.version}`];
-  if (envoi.du || envoi.au) {
-    parties.push(`du ${envoi.du ?? 'début'} au ${envoi.au ?? 'dernier jour'}`);
-  }
-  if (envoi.criteres.length) {
-    parties.push(`${envoi.criteres.length} critère${envoi.criteres.length > 1 ? 's' : ''}`);
-  }
-  return parties.join(' · ');
-}
 
 /**
  * Admin : statistiques envoyées par ses gestionnaires (sondages terminés), les plus récentes d'abord ; « Nouveau » tant
