@@ -1,0 +1,65 @@
+.retour {
+  margin: 0 0 var(--bt-espace-2) calc(-1 * var(--bt-espace-3));
+}
+
+.carte-section + .carte-section {
+  margin-top: var(--bt-espace-4);
+}
+
+.ligne-lien {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+
+  a,
+  button {
+    min-height: 44px;
+  }
+}
+
+.champ-lien {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.qr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--bt-espace-4);
+}
+
+.image-qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 240px;
+  height: 240px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: #ffffff;
+
+  img {
+    display: block;
+    width: 224px;
+    height: 224px;
+  }
+
+  mat-progress-bar {
+    width: 160px;
+  }
+}
+
+.reglages-qr {
+  display: flex;
+  flex: 1 1 240px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--bt-espace-3);
+}
+
+.desactive {
+  pointer-events: none;
+  opacity: 0.38;
+}

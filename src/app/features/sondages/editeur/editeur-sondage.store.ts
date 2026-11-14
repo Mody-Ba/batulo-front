@@ -3,17 +3,21 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, concatMap, EMPTY, finalize, map, Observable, ReplaySubject, Subject, tap } from 'rxjs';
 import {
+  CritereRequest,
   QuestionRequest,
   QuestionResponse,
   SectionRequest,
   SectionResponse,
   SondageRequest,
   SondageResponse,
+  VersionResponse,
 } from '../../../core/models/sondage.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { SondageService } from '../../../core/services/sondage.service';
 import { aLeCode, messageErreur } from '../../../core/utils/erreur-http';
-import { raisonLectureSeule } from '../droits-sondage';
+import { REGLES_SONDAGE } from '../../../core/utils/regles-question';
+import { situationVersions } from '../cycle-de-vie/versions';
+import { droitsSondage, raisonLectureSeule } from '../droits-sondage';
 import { EtatEnregistrement } from './enregistrement-auto';
 
 /** Refus du serveur qui rendent tout l'éditeur en lecture seule. */
@@ -68,6 +72,28 @@ export class EditeurSondageStore {
     );
   });
   readonly modifiable = computed(() => !!this.sondage() && this.raisonLectureSeule() === null);
+
+  /** Droits du cycle de vie (publier, fermer, nouvelle version, critères), indépendants du statut. */
+  readonly droits = computed(() => {
+    const sondage = this.sondage();
+    return sondage
+      ? droitsSondage(sondage, {
+          role: this.auth.role(),
+          utilisateur: this.auth.utilisateur(),
+          lectureSeule: this.auth.lectureSeule(),
+        })
+      : null;
+  });
+  /**
+   * Critères d'analyse : réglables même sondage publié, par qui gère le sondage. Un refus de droits par le serveur
+   * (autre que « sondage publié », qui ne concerne que le contenu) les bloque aussi.
+   */
+  readonly criteresModifiables = computed(() => !!this.droits()?.gerer && !this.verrouDroits());
+  private readonly verrouDroits = signal(false);
+
+  /** Versions de la lignée (pour « Nouvelle version » / « Ouvrir la version en préparation »). */
+  readonly versions = signal<VersionResponse[]>([]);
+  readonly situation = computed(() => situationVersions(this.sondage()?.id ?? 0, this.versions()));
 
   /** Questions locales par section (clés, dans l'ordre d'ajout). */
   private readonly locales = signal<ReadonlyMap<number, readonly string[]>>(new Map());
@@ -126,6 +152,9 @@ export class EditeurSondageStore {
                 if (CODES_VERROU.some((code) => aLeCode(erreur, code))) {
                   this.verrou.set(messageErreur(erreur));
                 }
+                if (CODES_VERROU.some((code) => code !== 'SONDAGE_PUBLIE' && aLeCode(erreur, code))) {
+                  this.verrouDroits.set(true);
+                }
                 resultat.error(erreur);
               },
             }),
@@ -141,7 +170,33 @@ export class EditeurSondageStore {
   // ---------------------------------------------------------------- Chargement et états
 
   charger(id: number): Observable<SondageResponse> {
-    return this.service.detail(id).pipe(tap((sondage) => this.sondage.set(sondage)));
+    return this.service.detail(id).pipe(
+      tap((sondage) => {
+        this.sondage.set(sondage);
+        this.chargerVersions(sondage.id);
+      }),
+    );
+  }
+
+  /** Les versions servent seulement à proposer une action : une erreur les laisse vides. */
+  chargerVersions(id = this.sondage()?.id): void {
+    if (id) {
+      this.service.versions(id).subscribe({ next: (v) => this.versions.set(v), error: () => this.versions.set([]) });
+    }
+  }
+
+  /** Après une action du cycle de vie (publication, dates...) : le sondage à jour remplace l'ancien. */
+  remplacer(sondage: SondageResponse): void {
+    this.verrou.set(null);
+    this.sondage.set(sondage);
+    this.chargerVersions(sondage.id);
+  }
+
+  /** Question telle qu'enregistrée sur le serveur (type, critère), ou undefined. */
+  questionEnregistree(questionId: number | null): QuestionResponse | undefined {
+    return questionId === null
+      ? undefined
+      : this.sondage()?.sections.flatMap((s) => s.questions).find((q) => q.id === questionId);
   }
 
   /** Relit le sondage (après un échec de réordonnancement : l'écran revient à l'ordre du serveur). */
@@ -302,6 +357,59 @@ export class EditeurSondageStore {
     });
     const ids = questions.map((q) => q.id);
     return this.executer(() => this.service.ordonnerQuestions(sondage.id, sectionId, { ids }));
+  }
+
+  /** Critère d'analyse d'une question (PUT .../critere), permis même sondage publié. */
+  definirCritere(questionId: number, critere: CritereRequest): Observable<SondageResponse> {
+    const id = this.id;
+    return this.executer(() => this.service.definirCritere(id, questionId, critere));
+  }
+
+  /**
+   * Une question peut changer de section si elle est enregistrée sans modification en attente : sa carte est
+   * recréée dans la section d'arrivée, une saisie non envoyée serait perdue.
+   */
+  peutChangerDeSection(questionId: number | null): boolean {
+    if (questionId === null || !this.modifiable()) {
+      return false;
+    }
+    const etat = this.etats().get(this.cleQuestion(questionId));
+    return etat === undefined || etat === 'enregistre';
+  }
+
+  /** La section peut-elle recevoir une question de plus ? */
+  sectionPleine(sectionId: number): boolean {
+    return (this.elements().get(sectionId)?.length ?? 0) >= REGLES_SONDAGE.questionsMaxParSection;
+  }
+
+  /**
+   * Déplace une question enregistrée vers une autre section, à la position `index` parmi ses questions enregistrées
+   * (à la fin par défaut) : tout de suite à l'écran, puis sur le serveur (PUT .../section). Brouillon seulement.
+   */
+  changerDeSection(questionId: number, versSectionId: number, index?: number): Observable<SondageResponse> {
+    const sondage = this.sondage();
+    const depart = sondage?.sections.find((s) => s.questions.some((q) => q.id === questionId));
+    const arrivee = this.section(versSectionId);
+    if (!sondage || !depart || !arrivee || depart.id === versSectionId) {
+      return EMPTY;
+    }
+    const question = depart.questions.find((q) => q.id === questionId)!;
+    const rang = Math.min(Math.max(index ?? arrivee.questions.length, 0), arrivee.questions.length);
+    const questionsArrivee = [...arrivee.questions];
+    questionsArrivee.splice(rang, 0, question);
+    this.sondage.set({
+      ...sondage,
+      sections: sondage.sections.map((s) =>
+        s.id === depart.id
+          ? { ...s, questions: s.questions.filter((q) => q.id !== questionId) }
+          : s.id === versSectionId
+            ? { ...s, questions: questionsArrivee }
+            : s,
+      ),
+    });
+    return this.executer(() =>
+      this.service.deplacerQuestion(sondage.id, questionId, { sectionId: versSectionId, position: rang + 1 }),
+    );
   }
 
   private section(sectionId: number): SectionResponse | undefined {

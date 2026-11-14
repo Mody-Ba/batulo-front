@@ -1,0 +1,94 @@
+<section class="critere" [formGroup]="formulaire" [attr.aria-label]="'Critère d’analyse de la question'">
+  <div class="ligne">
+    <mat-slide-toggle formControlName="estCritere" (change)="changementImmediat()">
+      Critère d’analyse
+    </mat-slide-toggle>
+    <span class="espace"></span>
+    @if (store.criteresModifiables()) {
+      <app-etat-enregistrement [etat]="auto.etat()" (reessayer)="auto.maintenant()" />
+    }
+  </div>
+  <p class="texte-aide">
+    Permet de comparer les statistiques selon les réponses à cette question (ex. par région). Jamais montré au
+    répondant ; modifiable même après publication. Un critère sensible (sexe, âge…) devrait être une question facultative.
+  </p>
+
+  @if (actif()) {
+    @switch (question().type) {
+      @case ('NUMERIQUE') {
+        <div class="reglage">
+          <span id="mode-tranches">Tranches</span>
+          <mat-button-toggle-group
+            aria-labelledby="mode-tranches"
+            [value]="formulaire.controls.modeTranches.value"
+            [disabled]="formulaire.disabled"
+            (change)="passerAuxBornes($event.value)"
+            [hideSingleSelectionIndicator]="true"
+          >
+            <mat-button-toggle value="egales">5 tranches égales</mat-button-toggle>
+            <mat-button-toggle value="personnalisees">Bornes personnalisées</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        @if (!personnalisees() && sansBornesQuestion()) {
+          <p class="erreur" role="alert">
+            Les tranches égales se calculent entre le minimum et le maximum de la question, qui n’en a pas : définissez-les,
+            ou choisissez des bornes personnalisées.
+          </p>
+        }
+        @if (personnalisees()) {
+          <div class="bornes" formArrayName="bornes">
+            @for (borne of formulaire.controls.bornes.controls; track borne; let i = $index) {
+              <div class="borne">
+                <mat-form-field>
+                  <mat-label>Borne {{ i + 1 }}</mat-label>
+                  <input matInput type="number" inputmode="decimal" [formControlName]="i" />
+                  @if (borne.hasError('required')) {
+                    <mat-error>La borne est obligatoire.</mat-error>
+                  }
+                </mat-form-field>
+                <button
+                  matIconButton
+                  type="button"
+                  (click)="supprimerBorne(i)"
+                  [disabled]="formulaire.disabled"
+                  [attr.aria-label]="'Supprimer la borne ' + (i + 1)"
+                >
+                  <mat-icon fontIcon="close" aria-hidden="true" />
+                </button>
+              </div>
+            }
+            <button
+              matButton
+              type="button"
+              (click)="ajouterBorne()"
+              [disabled]="formulaire.disabled || formulaire.controls.bornes.length >= tranchesMax"
+            >
+              <mat-icon fontIcon="add" aria-hidden="true" />Ajouter une borne
+            </button>
+          </div>
+          @if (erreurBornes(); as message) {
+            <p class="erreur" role="alert">{{ message }}</p>
+          } @else if (apercuTranches(); as tranches) {
+            <p class="texte-aide">Tranches : {{ tranches }}.</p>
+          }
+        }
+      }
+      @case ('DATE') {
+        <div class="reglage">
+          <span id="granularite">Regrouper par</span>
+          <mat-button-toggle-group
+            aria-labelledby="granularite"
+            formControlName="granularite"
+            (change)="changementImmediat()"
+            [hideSingleSelectionIndicator]="true"
+          >
+            <mat-button-toggle value="MOIS">Mois</mat-button-toggle>
+            <mat-button-toggle value="ANNEE">Année</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      }
+    }
+  }
+
+  <app-message-erreur [erreur]="auto.erreur()" parDefaut="Le critère n’a pas pu être enregistré." />
+</section>

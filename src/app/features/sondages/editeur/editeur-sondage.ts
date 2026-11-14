@@ -28,6 +28,7 @@ import { nonVide } from '../../../core/utils/validateurs';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { ActionsSondage } from '../cycle-de-vie/actions-sondage';
 import { CarteSection } from './carte-section/carte-section';
 import { EditeurSondageStore } from './editeur-sondage.store';
 import { EnregistrementAuto, EtatEnregistrement } from './enregistrement-auto';
@@ -74,6 +75,7 @@ export class EditeurSondage implements PeutQuitter {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
+  private readonly actions = inject(ActionsSondage);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly regles = REGLES_SONDAGE;
   protected readonly libelleEtat = libelleEtatSondage;
@@ -154,6 +156,29 @@ export class EditeurSondage implements PeutQuitter {
           this.chargement.set(false);
         },
       });
+  }
+
+  /** Publication : tout doit être enregistré d'abord (la publication fige le contenu enregistré). */
+  protected publier(sondage: SondageResponse): void {
+    if (this.store.modificationsEnAttente()) {
+      this.snackBar.open(
+        'Des modifications ne sont pas encore enregistrées : corrigez-les ou attendez « Tout est enregistré ».',
+        'Fermer',
+        { duration: 6000 },
+      );
+      return;
+    }
+    this.actions
+      .publier(sondage, (brouillon) => {
+        // Réglage enregistré par le dialogue : l'en-tête suit, sinon sa prochaine sauvegarde rétablirait l'ancien.
+        this.store.remplacer(brouillon);
+        this.formulaire.controls.reponseUnique.setValue(brouillon.reponseUnique, { emitEvent: false });
+      })
+      .subscribe((publie) => this.store.remplacer(publie));
+  }
+
+  protected nouvelleVersion(sondage: SondageResponse): void {
+    this.actions.nouvelleVersion(sondage).subscribe();
   }
 
   protected sortieEnTete(): void {

@@ -13,16 +13,79 @@
   @if (sondage(); as s) {
     <app-entete-page [titre]="s.titre" [sousTitre]="s.description" icone="ballot">
       <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
-      @if (contenuModifiable()) {
-        <a matButton="filled" [routerLink]="['/sondages', s.id, 'modifier']">
-          <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
-        </a>
-      } @else {
-        <a matButton="outlined" [routerLink]="['/sondages', s.id, 'modifier']">
-          <mat-icon fontIcon="visibility" aria-hidden="true" />Voir le contenu
-        </a>
+      @if (s.estModele) {
+        <span class="pastille-statut etiquette-modele">Modèle</span>
       }
     </app-entete-page>
+
+    @if (droits(); as d) {
+      <div class="barre-actions" role="toolbar" aria-label="Actions du sondage">
+        @if (contenuModifiable()) {
+          <a matButton="tonal" [routerLink]="['/sondages', s.id, 'modifier']">
+            <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
+          </a>
+        } @else {
+          <a matButton="outlined" [routerLink]="['/sondages', s.id, 'modifier']">
+            <mat-icon fontIcon="visibility" aria-hidden="true" />Voir le contenu
+          </a>
+        }
+        <a matButton="outlined" [routerLink]="['/sondages', s.id, 'apercu']">
+          <mat-icon fontIcon="preview" aria-hidden="true" />Prévisualiser
+        </a>
+        @if (!s.publie && d.gerer) {
+          <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+            <button matButton="filled" type="button" (click)="publier(s)" [disabled]="auth.lectureSeule()">
+              <mat-icon fontIcon="publish" aria-hidden="true" />Publier
+            </button>
+          </span>
+        }
+        @if (d.diffuser) {
+          <a matButton="filled" [routerLink]="['/sondages', s.id, 'diffuser']">
+            <mat-icon fontIcon="share" aria-hidden="true" />Diffuser
+          </a>
+        }
+        @if (d.gerer || d.dupliquer) {
+          <button matIconButton type="button" [matMenuTriggerFor]="menuActions" aria-label="Autres actions">
+            <mat-icon fontIcon="more_vert" aria-hidden="true" />
+          </button>
+        }
+      </div>
+
+      <mat-menu #menuActions="matMenu" xPosition="before">
+        @if (d.gerer && ouvertOuPlanifie()) {
+          <button mat-menu-item type="button" (click)="modifierDates(s)" [disabled]="auth.lectureSeule()">
+            <mat-icon fontIcon="event" aria-hidden="true" /><span>Modifier les dates</span>
+          </button>
+        }
+        @if (d.gerer && s.publie && situation().derniereVersionPubliee) {
+          @if (situation().brouillon; as b) {
+            <a mat-menu-item [routerLink]="['/sondages', b.id, 'modifier']">
+              <mat-icon fontIcon="edit_note" aria-hidden="true" /><span>Ouvrir la version {{ b.version }} en préparation</span>
+            </a>
+          } @else {
+            <button mat-menu-item type="button" (click)="nouvelleVersion(s)" [disabled]="auth.lectureSeule()">
+              <mat-icon fontIcon="difference" aria-hidden="true" /><span>Créer une nouvelle version</span>
+            </button>
+          }
+        }
+        @if (d.dupliquer) {
+          <button mat-menu-item type="button" (click)="dupliquer(s)" [disabled]="auth.lectureSeule()">
+            <mat-icon fontIcon="content_copy" aria-hidden="true" /><span>Dupliquer</span>
+          </button>
+        }
+        @if (d.gerer) {
+          <button mat-menu-item type="button" (click)="basculerModele(s)" [disabled]="auth.lectureSeule()">
+            <mat-icon [fontIcon]="s.estModele ? 'bookmark_remove' : 'bookmark_add'" aria-hidden="true" />
+            <span>{{ s.estModele ? 'Retirer des modèles' : 'Marquer comme modèle' }}</span>
+          </button>
+        }
+        @if (d.gerer && ouvertOuPlanifie()) {
+          <button mat-menu-item type="button" class="action-danger" (click)="fermer(s)" [disabled]="auth.lectureSeule()">
+            <mat-icon fontIcon="lock" aria-hidden="true" /><span>Fermer le sondage</span>
+          </button>
+        }
+      </mat-menu>
+    }
 
     <div class="grille">
       <article class="carte-section">
@@ -59,23 +122,24 @@
           <p class="cellule-secondaire">
             réponse{{ c.nombreReponsesTotal > 1 ? 's' : '' }} au total
             @if (versions().length > 1) {
-              ({{ c.nombreReponses | number }} pour cette version)
+              , dont {{ c.nombreReponses | number }} pour la version {{ c.version }}
             }
           </p>
-          <dl class="liste-details collecte">
-            <dt>Collecte</dt>
-            <dd>{{ c.collecteOuverte ? 'Ouverte' : 'Fermée' }}</dd>
-            @if (!c.collecteOuverte && c.raisonFermeture) {
-              <dt>Raison</dt>
-              <dd>{{ c.raisonFermeture }}</dd>
+          <p class="collecte">
+            @if (c.collecteOuverte) {
+              <span class="pastille-statut sondage-EN_COURS">Collecte ouverte</span>
+            } @else {
+              <span class="pastille-statut sondage-TERMINE">Collecte fermée</span>
             }
-            @if (c.derniereReponse) {
-              <dt>Dernière réponse</dt>
-              <dd>{{ c.derniereReponse | date: 'd MMM y à HH:mm' }}</dd>
-            }
-          </dl>
+          </p>
+          @if (c.raisonFermeture) {
+            <p class="texte-aide">{{ c.raisonFermeture }}</p>
+          }
+          @if (c.derniereReponse) {
+            <p class="cellule-secondaire">Dernière réponse le {{ c.derniereReponse | date: 'd MMMM y à HH:mm' }}</p>
+          }
         } @else {
-          <p class="texte-aide">Suivi de la collecte indisponible.</p>
+          <p class="texte-aide">Le suivi de la collecte n’est pas disponible pour le moment.</p>
         }
       </article>
 
@@ -85,48 +149,56 @@
             <h2>Gestionnaires assignés</h2>
             <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
               <button matButton="tonal" type="button" (click)="assigner(s)" [disabled]="auth.lectureSeule()">
-                <mat-icon fontIcon="person_add" aria-hidden="true" />Assigner
+                <mat-icon fontIcon="assignment_ind" aria-hidden="true" />Assigner des gestionnaires
               </button>
             </span>
           </div>
+          <p class="texte-aide">L’assignation porte sur le sondage et toutes ses versions.</p>
+
           <div class="zone-progression">
             @if (chargementAssignations()) {
-              <mat-progress-bar mode="indeterminate" aria-label="Chargement des assignations" />
+              <mat-progress-bar mode="indeterminate" aria-label="Chargement des gestionnaires assignés" />
             }
           </div>
-          <app-message-erreur [erreur]="erreurAssignations()" parDefaut="Les assignations n’ont pas pu être chargées." />
+          <app-message-erreur
+            [erreur]="erreurAssignations()"
+            parDefaut="Les gestionnaires assignés n’ont pas pu être chargés."
+          >
+            <p><button matButton type="button" (click)="chargerAssignations()">Réessayer</button></p>
+          </app-message-erreur>
 
           @if (!chargementAssignations() && !erreurAssignations() && assignations().length === 0) {
             <p class="etat-vide">Aucun gestionnaire assigné.</p>
-          }
-          <ul class="assignations">
-            @for (a of assignations(); track a.gestionnaireId) {
-              <li>
-                <div class="assignation-texte">
-                  <a [routerLink]="['/admin/gestionnaires', a.gestionnaireId]">{{ nomComplet(a) }}</a>
-                  @if (!a.actif) {
-                    <span class="pastille-statut compte-desactive">Désactivé</span>
-                  }
-                  <span class="cellule-secondaire">
-                    {{ a.courriel }} · assigné le {{ a.dateAssignation | date: 'd MMM y' }}
-                    @if (a.assignePar; as par) {
-                      par {{ par.prenom }} {{ par.nom }}
+          } @else if (assignations().length) {
+            <ul class="assignations">
+              @for (a of assignations(); track a.gestionnaireId) {
+                <li>
+                  <div class="assignation-texte">
+                    <a [routerLink]="['/admin/gestionnaires', a.gestionnaireId]">{{ nomComplet(a) }}</a>
+                    @if (!a.actif) {
+                      <span class="pastille-statut compte-desactive">Désactivé</span>
                     }
-                  </span>
-                </div>
-                <button
-                  matIconButton
-                  type="button"
-                  (click)="retirer(s, a)"
-                  [disabled]="auth.lectureSeule()"
-                  [matTooltip]="auth.lectureSeule() ? messageLectureSeule : 'Retirer l’assignation'"
-                  [attr.aria-label]="'Retirer l’assignation de ' + nomComplet(a)"
-                >
-                  <mat-icon fontIcon="link_off" aria-hidden="true" />
-                </button>
-              </li>
-            }
-          </ul>
+                    <span class="cellule-secondaire">
+                      {{ a.courriel }} · assigné le {{ a.dateAssignation | date: 'd MMM y' }}
+                      @if (a.assignePar; as par) {
+                        par {{ par.prenom }} {{ par.nom }}
+                      }
+                    </span>
+                  </div>
+                  <button
+                    matIconButton
+                    type="button"
+                    (click)="retirer(s, a)"
+                    [disabled]="auth.lectureSeule()"
+                    [matTooltip]="auth.lectureSeule() ? messageLectureSeule : 'Retirer l’assignation'"
+                    [attr.aria-label]="'Retirer l’assignation de ' + nomComplet(a)"
+                  >
+                    <mat-icon fontIcon="link_off" aria-hidden="true" />
+                  </button>
+                </li>
+              }
+            </ul>
+          }
         </article>
       }
 
@@ -142,13 +214,24 @@
                   <a [routerLink]="['/sondages', v.id]">Version {{ v.version }}</a>
                 }
                 <span class="pastille-statut" [class]="classeEtat(v)">{{ libelleEtat(v) }}</span>
+                @if (v.publie) {
+                  <span class="nombre-reponses">
+                    {{ v.nombreReponses | number }} réponse{{ v.nombreReponses > 1 ? 's' : '' }}
+                  </span>
+                }
                 <span class="cellule-secondaire">
                   @if (v.datePublication) {
-                    Ouverte le {{ v.datePublication | date: 'd MMM y' }}
+                    {{ v.statut === 'NON_COMMENCE' ? 'Ouvrira le' : 'Ouverte le' }} {{ v.datePublication | date: 'd MMM y' }}
+                    @if (v.dateFermeture) {
+                      · {{ v.statut === 'TERMINE' ? 'fermée le' : 'fermeture le' }} {{ v.dateFermeture | date: 'd MMM y' }}
+                    }
                   } @else {
                     Créée le {{ v.dateCreation | date: 'd MMM y' }}
                   }
                 </span>
+                @if (!v.publie) {
+                  <a matButton [routerLink]="['/sondages', v.id, 'modifier']">Ouvrir le brouillon</a>
+                }
               </li>
             }
           </ol>

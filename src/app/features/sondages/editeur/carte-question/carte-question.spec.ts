@@ -7,7 +7,7 @@ import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of, throwError } from 'rxjs';
 import { QuestionResponse } from '../../../../core/models/sondage.model';
-import { questionDeTest } from '../../../../testing/donnees-test';
+import { questionDeTest, sectionDeTest, sondageDeTest } from '../../../../testing/donnees-test';
 import { EditeurSondageStore } from '../editeur-sondage.store';
 import { DELAI_ENREGISTREMENT_MS } from '../enregistrement-auto';
 import { CarteQuestion } from './carte-question';
@@ -50,11 +50,28 @@ describe('CarteQuestion', () => {
       retirerQuestionLocale: vi.fn(),
       deplacerQuestion: vi.fn(() => of({})),
       recharger: vi.fn(),
+      questionEnregistree: vi.fn(() => undefined),
+      definirCritere: vi.fn(() => of({})),
+      peutChangerDeSection: vi.fn(() => true),
+      sectionPleine: vi.fn(() => false),
+      changerDeSection: vi.fn(() => of({})),
     };
     TestBed.configureTestingModule({
       imports: [CarteQuestion],
       providers: [
-        { provide: EditeurSondageStore, useValue: { ...store, modifiable } },
+        {
+          provide: EditeurSondageStore,
+          useValue: {
+            ...store,
+            modifiable,
+            criteresModifiables: signal(true),
+            sondage: signal(
+              sondageDeTest({
+                sections: [sectionDeTest({ id: 10, titre: 'Profil' }), sectionDeTest({ id: 20, titre: 'Avis' })],
+              }),
+            ),
+          },
+        },
         { provide: MatDialog, useValue: dialog },
         { provide: MatSnackBar, useValue: { open: vi.fn() } },
       ],
@@ -214,5 +231,27 @@ describe('CarteQuestion', () => {
     (fixture.componentInstance as unknown as { supprimer(): void }).supprimer();
     expect(dialog.open).not.toHaveBeenCalled();
     expect(store['retirerQuestionLocale']).toHaveBeenCalledWith(10, 'nouvelle-1');
+  });
+
+  it('question enregistrée d’un type compatible : réglage du critère d’analyse affiché', async () => {
+    const question = questionDeTest();
+    store['questionEnregistree'].mockReturnValue(question);
+    const element = await creer(question);
+    expect(element.querySelector('app-critere-question')).not.toBeNull();
+
+    store['questionEnregistree'].mockReturnValue(questionDeTest({ type: 'TEXTE_COURT', options: [] }));
+    const autre = await creer(questionDeTest({ type: 'TEXTE_COURT', options: [], configuration: { longueurMax: 255 } }));
+    expect(autre.querySelector('app-critere-question')).toBeNull();
+  });
+
+  it('menu : « Déplacer vers une autre section » propose les autres sections et déplace à la fin', async () => {
+    await creer(questionDeTest());
+    const carte = fixture.componentInstance as unknown as {
+      autresSections(): { section: { id: number }; numero: number }[];
+      changerDeSection(id: number): void;
+    };
+    expect(carte.autresSections().map((a) => [a.section.id, a.numero])).toEqual([[20, 2]]);
+    carte.changerDeSection(20);
+    expect(store['changerDeSection']).toHaveBeenCalledWith(101, 20);
   });
 });

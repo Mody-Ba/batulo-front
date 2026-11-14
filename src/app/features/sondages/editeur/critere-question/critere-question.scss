@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.critere {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3);
+  border: 1px dashed var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+}
+
+.ligne,
+.reglage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.texte-aide {
+  margin: 0;
+}
+
+.bornes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+}
+
+.borne {
+  display: flex;
+  align-items: center;
+
+  mat-form-field {
+    width: 120px;
+  }
+}
+
+.erreur {
+  margin: 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}

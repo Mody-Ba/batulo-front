@@ -7,6 +7,16 @@
     @if (store.sondage() && store.modifiable()) {
       <app-etat-enregistrement [etat]="etatGlobal()" libelleEnregistre="Tout est enregistré" />
     }
+    @if (store.sondage(); as s) {
+      <a matButton="outlined" [routerLink]="['/sondages', s.id, 'apercu']">
+        <mat-icon fontIcon="preview" aria-hidden="true" />Prévisualiser
+      </a>
+      @if (!s.publie && store.droits()?.gerer) {
+        <button matButton="filled" type="button" (click)="publier(s)">
+          <mat-icon fontIcon="publish" aria-hidden="true" />Publier
+        </button>
+      }
+    }
   </div>
 
   <div class="zone-progression">
@@ -22,6 +32,22 @@
     @if (store.raisonLectureSeule(); as raison) {
       <app-encadre type="info" icone="lock" titre="Lecture seule" role="status" class="bandeau-lecture-seule">
         <p>{{ raison }}</p>
+        @if (s.publie && store.droits()?.gerer && store.situation().derniereVersionPubliee) {
+          <p>
+            @if (store.situation().brouillon; as b) {
+              <a matButton="filled" [routerLink]="['/sondages', b.id, 'modifier']">
+                <mat-icon fontIcon="edit_note" aria-hidden="true" />Ouvrir la version {{ b.version }} en préparation
+              </a>
+            } @else {
+              <button matButton="filled" type="button" (click)="nouvelleVersion(s)">
+                <mat-icon fontIcon="difference" aria-hidden="true" />Créer une nouvelle version
+              </button>
+            }
+          </p>
+        }
+        @if (s.publie && store.criteresModifiables()) {
+          <p class="cellule-secondaire">Les critères d’analyse des questions restent modifiables.</p>
+        }
       </app-encadre>
     }
 

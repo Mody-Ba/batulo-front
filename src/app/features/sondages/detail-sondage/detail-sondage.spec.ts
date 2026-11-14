@@ -127,4 +127,38 @@ describe('DetailSondage', () => {
     lien = Array.from(element.querySelectorAll('a')).find((a) => a.textContent?.includes('Modifier'));
     expect(lien?.getAttribute('href')).toBe('/sondages/3/modifier');
   });
+
+  it('actions selon le statut : publié = Prévisualiser, Diffuser ; brouillon = Publier, pas Diffuser', async () => {
+    let element = await creer();
+    const textes = () => Array.from(element.querySelectorAll('.barre-actions a, .barre-actions button')).map((b) => b.textContent?.trim());
+    expect(textes()).toEqual(expect.arrayContaining(['Prévisualiser', 'Diffuser']));
+    expect(textes().some((t) => t?.includes('Publier'))).toBe(false);
+
+    TestBed.inject(SondageService).detail = vi.fn(() => of({ ...SONDAGE, publie: false, statut: 'NON_COMMENCE' })) as never;
+    element = await creer();
+    expect(textes().some((t) => t?.includes('Publier'))).toBe(true);
+    expect(textes()).not.toContain('Diffuser');
+  });
+
+  it('état « Planifié » pour un sondage publié pas encore ouvert', async () => {
+    TestBed.inject(SondageService).detail = vi.fn(() => of({ ...SONDAGE, statut: 'NON_COMMENCE' })) as never;
+    const element = await creer();
+    expect(element.querySelector('.pastille-statut')!.textContent).toContain('Planifié');
+  });
+
+  it('versions : statut et nombre de réponses de chaque version publiée', async () => {
+    TestBed.inject(SondageService).versions = vi.fn(() =>
+      of([
+        { id: 2, version: 1, titre: 'S', statut: 'TERMINE', publie: true, datePublication: '2026-01-01T12:00:00Z', dateFermeture: '2026-06-01T12:00:00Z', dateCreation: '2026-01-01T12:00:00Z', nombreReponses: 140 },
+        { id: 3, version: 2, titre: 'S', statut: 'EN_COURS', publie: true, datePublication: '2026-06-01T12:00:00Z', dateFermeture: null, dateCreation: '2026-05-01T12:00:00Z', nombreReponses: 1 },
+        { id: 4, version: 3, titre: 'S', statut: 'NON_COMMENCE', publie: false, datePublication: null, dateFermeture: null, dateCreation: '2026-11-01T12:00:00Z', nombreReponses: 0 },
+      ]),
+    ) as never;
+    const element = await creer();
+    const lignes = Array.from(element.querySelectorAll('.versions li')).map((l) => l.textContent?.replace(/\s+/g, ' '));
+    expect(lignes[0]).toContain('140 réponses');
+    expect(lignes[1]).toContain('1 réponse');
+    expect(lignes[2]).not.toContain('réponse');
+    expect(lignes[2]).toContain('Ouvrir le brouillon');
+  });
 });

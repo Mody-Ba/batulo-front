@@ -60,3 +60,29 @@
     flex-basis: 100%;
   }
 }
+
+.barre-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  margin: 0 0 var(--bt-espace-4);
+
+  a,
+  button {
+    min-height: 44px;
+  }
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+
+  .mat-icon {
+    color: currentColor;
+  }
+}
+
+.nombre-reponses {
+  font: var(--mat-sys-label-large);
+  font-variant-numeric: tabular-nums;
+}

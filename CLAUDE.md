@@ -54,6 +54,7 @@ src/app/
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
                    filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
+  shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
   testing/         données partagées par les tests unitaires (donnees-test.ts)
 ```
 
@@ -158,13 +159,39 @@ src/app/
   saisie invalide n'est pas envoyée (erreurs affichées) ; erreur du serveur affichée sur la carte, avec « Réessayer ».
 - Un composant par type dans `editeur/types/` ; formulaires, valeurs par défaut et conversion en `QuestionRequest`
   dans `formulaires-types.ts` ; règles du backend dans `core/utils/regles-question.ts`. `estCritere` n'est jamais envoyé.
-- Glisser-déposer (CDK) des sections, et des questions **à l'intérieur de leur section seulement** : le déplacement
-  d'une question vers une autre section viendra plus tard (il faut une route au backend). Monter/Descendre au clavier
-  dans les menus.
+- Glisser-déposer (CDK) des sections, et des questions dans leur section (PUT .../questions/ordre) ou vers une autre
+  section (PUT .../questions/{id}/section { sectionId, position à partir de 1 }), brouillon seulement. Listes des
+  sections reliées par id (`questions-section-{id}`, pas de cdkDropListGroup : la liste des sections serait reliée
+  aussi). Seule une question enregistrée sans modification en attente change de section (`peutChangerDeSection` :
+  sa carte est recréée dans la section d'arrivée). Au clavier : Monter/Descendre et « Déplacer vers une autre
+  section » dans le menu de la question.
 - Budget initial porté à 520 ko (avertissement), **provisoirement** : `MAT_FORM_FIELD_DEFAULT_OPTIONS` dans
   `app.config.ts` place `@angular/forms` et le champ Material (environ 128 ko) dans le bundle initial, qui grossit avec
   chaque usage des formulaires. **À optimiser avant la mise en ligne** (sortir ces paquets du bundle initial sans
   perdre l'apparence des champs dans les boîtes de dialogue), puis revenir à 500 ko.
+
+## Cycle de vie d'un sondage (F5b)
+- États affichés (`etatSondage`, `libelleEtatSondage`) : Brouillon (jamais publié), Planifié (publié, NON_COMMENCE),
+  En cours, Terminé ; pastilles `sondage-BROUILLON|PLANIFIE|EN_COURS|TERMINE`.
+- Routes : `/sondages/:id/apercu` (sélecteur ordinateur / téléphone) et `/sondages/:id/diffuser` (lien, copier, QR
+  code en blob via HttpClient, PNG 300/600/1000 ; 409 SONDAGE_BROUILLON = jamais publié). La fiche a une barre
+  d'actions ; l'éditeur a Prévisualiser / Publier, et « Créer une nouvelle version » dans le bandeau de lecture seule.
+- `cycle-de-vie/actions-sondage.ts` : publier et modifier les dates (`dialogue-publication` : ouverture maintenant ou
+  planifiée, fermeture facultative, « une réponse par appareil » enregistré par PUT du brouillon juste avant
+  `POST .../publier` s'il a changé), fermer (confirmation : définitif), nouvelle version (BROUILLON_EXISTANT : la
+  version en préparation s'ouvre), dupliquer (la copie s'ouvre dans l'éditeur), modèle.
+- Droits (`droitsSondage`) : gérer (publier, fermer, dates, nouvelle version, modèle, critères) = admin ou gestionnaire
+  créateur avec la permission ; dupliquer = admin ou gestionnaire avec la permission qui voit le sondage, même
+  seulement assigné (comme le backend) ; prévisualiser et diffuser (si publié) = tous ceux qui le voient.
+- Critères d'analyse (`editeur/critere-question`) : PUT .../critere, à part du contenu, donc réglables sondage publié ;
+  NUMERIQUE : 5 tranches égales (exige min et max) ou bornes strictement croissantes (1 à 19) ; DATE : MOIS ou ANNEE.
+- `shared/formulaire/` : `formulaire-sondage` (une section par page, « Suivant » vérifie la section, numérotation
+  continue ; en aperçu rien n'est envoyé), `reponses.ts` (règles de ValidateurReponse, `reponsesAEnvoyer` au format
+  ReponseQuestionRequest), un champ par type dans `champs/`. Mise en page selon la largeur du formulaire (container
+  queries `@container formulaire`), pour que l'aperçu « téléphone » soit fidèle.
+- Un composant qui affiche l'état d'un contrôle modifié par son parent (touché par « Suivant ») suit `controle.events`
+  (`QuestionRepondant`) : sinon il n'est pas rafraîchi.
+- Liste des versions de la fiche : statut et `nombreReponses` (réponses de cette version) pour chaque version publiée.
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
@@ -194,9 +221,9 @@ src/app/
   recherche et filtre actif, détail + ses sondages), assignations (depuis un sondage ou un gestionnaire), liste
   des sondages (dernière version par défaut, réponses, assignés, nouvelle version en préparation) et détail en
   lecture seule, tableau de bord (compteurs, abonnement, notifications), lecture seule si EXPIRE.
-- [ ] **F5 – Éditeur de sondage** : F5a fait (création, sections, questions des 10 types, glisser-déposer,
-  enregistrement automatique, lecture seule). Reste F5b : prévisualisation, publication, versions, duplication,
-  modèles, critères, lien et QR, déplacement d'une question entre sections.
+- [x] **F5 – Éditeur de sondage** : F5a (création, sections, questions des 10 types, glisser-déposer, enregistrement
+  automatique, lecture seule) et F5b (aperçu, publication et dates, fermeture, nouvelle version, duplication,
+  modèles, critères, lien et QR), déplacement d'une question vers une autre section, réponses par version.
 - [ ] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée.
 - [ ] **F7 – Statistiques et exports** : statistiques, critères, tableaux croisés, exports CSV/XLSX/PDF.
 - [ ] **F8 – Messagerie et notifications** : conversations, page complète des notifications.

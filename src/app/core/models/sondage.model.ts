@@ -9,14 +9,31 @@ export const LIBELLES_STATUT_SONDAGE: Record<StatutSondage, string> = {
   TERMINE: 'Terminé',
 };
 
-/** Libellé affiché : un sondage jamais publié est un brouillon, quel que soit son statut. */
+/** État affiché d'un sondage : son statut, plus le brouillon (jamais publié) et le planifié (publié, pas ouvert). */
+export type EtatSondage = 'BROUILLON' | 'PLANIFIE' | 'EN_COURS' | 'TERMINE';
+
+export const LIBELLES_ETAT_SONDAGE: Record<EtatSondage, string> = {
+  BROUILLON: 'Brouillon',
+  PLANIFIE: 'Planifié',
+  EN_COURS: 'En cours',
+  TERMINE: 'Terminé',
+};
+
+export function etatSondage(sondage: { statut: StatutSondage; publie: boolean }): EtatSondage {
+  if (!sondage.publie) {
+    return 'BROUILLON';
+  }
+  return sondage.statut === 'NON_COMMENCE' ? 'PLANIFIE' : sondage.statut;
+}
+
+/** Libellé affiché partout : Brouillon, Planifié, En cours, Terminé. */
 export function libelleEtatSondage(sondage: { statut: StatutSondage; publie: boolean }): string {
-  return sondage.publie ? LIBELLES_STATUT_SONDAGE[sondage.statut] : 'Brouillon';
+  return LIBELLES_ETAT_SONDAGE[etatSondage(sondage)];
 }
 
 /** Classe CSS de la pastille d'état. */
 export function classeEtatSondage(sondage: { statut: StatutSondage; publie: boolean }): string {
-  return sondage.publie ? `sondage-${sondage.statut}` : 'sondage-BROUILLON';
+  return `sondage-${etatSondage(sondage)}`;
 }
 
 /** AuteurResponse */
@@ -110,6 +127,8 @@ export interface VersionResponse {
   datePublication: string | null;
   dateFermeture: string | null;
   dateCreation: string;
+  /** Réponses reçues par cette version (pas par toute la lignée). */
+  nombreReponses: number;
 }
 
 /** GET /api/sondages/{id}/collecte */
@@ -300,6 +319,15 @@ export interface SectionRequest {
   description: string | null;
 }
 
+/**
+ * PUT .../questions/{questionId}/section : vers une section du même sondage (brouillon seulement). Position à partir de
+ * 1 dans la section d'arrivée, à la fin si absente. La question garde son id, ses options et son critère.
+ */
+export interface DeplacementQuestionRequest {
+  sectionId: number;
+  position?: number;
+}
+
 /** PUT .../sections/ordre et .../sections/{id}/questions/ordre : exactement tous les ids, une fois chacun. */
 export interface OrdreRequest {
   ids: number[];
@@ -315,4 +343,56 @@ export interface FormulaireResponse {
   nombreQuestions: number;
   dateCreation: string;
   dateModification: string;
+}
+
+// ---------------------------------------------------------------- Cycle de vie (F5b)
+
+/** POST .../publier (ouverture absente = maintenant) et PUT .../dates (ouverture absente = inchangée). */
+export interface DatesSondageRequest {
+  datePublication?: string | null;
+  /** Absente : pas de fermeture prévue (fermeture manuelle). */
+  dateFermeture?: string | null;
+}
+
+/** PUT .../modele */
+export interface ModeleRequest {
+  estModele: boolean;
+}
+
+/** Découpage d'un critère : NUMERIQUE { tranches } (absent : 5 tranches égales entre min et max) ; DATE { granularite }. */
+export type GranulariteCritere = 'MOIS' | 'ANNEE';
+export interface ConfigurationCritere {
+  tranches?: number[];
+  granularite?: GranulariteCritere;
+}
+
+/** Types qui peuvent être un critère d'analyse. */
+export const TYPES_CRITERE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>([
+  'CHOIX_UNIQUE',
+  'OUI_NON',
+  'NUMERIQUE',
+  'DATE',
+]);
+
+/** PUT .../questions/{questionId}/critere : permis quel que soit le statut, même après publication. */
+export interface CritereRequest {
+  estCritere: boolean;
+  /** Vide pour CHOIX_UNIQUE et OUI_NON. */
+  critereConfig: ConfigurationCritere | null;
+}
+
+/** GET .../lien : le même pour toutes les versions (409 SONDAGE_BROUILLON avant la première publication). */
+export interface LienSondageResponse {
+  jeton: string;
+  url: string;
+}
+
+/** GET .../apercu : le formulaire tel que le verra le répondant (brouillon compris). */
+export interface ApercuResponse {
+  id: number;
+  titre: string;
+  description: string | null;
+  version: number;
+  statut: StatutSondage;
+  sections: SectionResponse[];
 }
