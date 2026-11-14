@@ -224,9 +224,12 @@ describe('Messagerie', () => {
     const stats = message({ type: 'STATISTIQUES', referenceId: 12 });
     const demande = message({ type: 'DEMANDE_ABONNEMENT', referenceId: 3 });
     expect(lienMessage(stats, 'ADMIN')!.commandes).toEqual(['/admin/statistiques-recues', 12]);
-    expect(lienMessage(stats, 'GESTIONNAIRE')!.commandes).toEqual(['/gestionnaire/statistiques-envoyees']);
-    expect(lienMessage(demande, 'ADMIN')!.commandes).toEqual(['/admin/abonnement/demandes']);
-    expect(lienMessage(message({ type: 'REPONSE_DEMANDE' }), 'SUPER_ADMIN')!.commandes).toEqual(['/super-admin/demandes-abonnement']);
+    expect(lienMessage(stats, 'GESTIONNAIRE')!.commandes).toEqual(['/gestionnaire/statistiques-envoyees', 12]);
+    expect(lienMessage(message({ type: 'STATISTIQUES' }), 'GESTIONNAIRE')!.commandes).toEqual(['/gestionnaire/statistiques-envoyees']);
+    expect(lienMessage(demande, 'ADMIN')).toEqual(expect.objectContaining({ commandes: ['/admin/abonnement/demandes'], queryParams: { demande: '3' } }));
+    expect(lienMessage(message({ type: 'REPONSE_DEMANDE', referenceId: 3 }), 'SUPER_ADMIN')).toEqual(
+      expect.objectContaining({ commandes: ['/super-admin/demandes-abonnement'], queryParams: { demande: '3' } }),
+    );
     expect(lienMessage(message(), 'ADMIN')).toBeNull();
   });
 

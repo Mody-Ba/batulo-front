@@ -24,7 +24,7 @@ import { resumeFiltres } from '../../sondages/statistiques/resume-filtres';
 /**
  * Admin : statistiques reçues, recalculées avec les filtres de l'envoi (GET /api/statistiques-recues/{id}, qui les
  * marque comme consultées), et leur rapport PDF. L'expéditeur et le commentaire viennent de la liste (état de
- * navigation) ; après un rechargement de la page, seules les statistiques sont relues.
+ * navigation), sinon (rechargement, lien d'un message ou d'une notification) de GET /api/envois-statistiques/{id}.
  */
 @Component({
   selector: 'app-statistiques-recues',
@@ -130,7 +130,7 @@ export class StatistiquesRecues {
 
   /** Paramètre de route :envoiId. */
   readonly envoiId = input.required<string>();
-  /** Envoi passé par la liste (absent après un rechargement). */
+  /** Envoi passé par la liste, sinon relu seul. */
   protected readonly envoi = signal<EnvoiStatistiqueResponse | null>(
     (inject(Router).currentNavigation()?.extras.state?.['envoi'] as EnvoiStatistiqueResponse | undefined) ??
       (history.state?.envoi as EnvoiStatistiqueResponse | undefined) ??
@@ -163,8 +163,22 @@ export class StatistiquesRecues {
   constructor() {
     effect(() => {
       const id = Number(this.envoiId());
-      untracked(() => this.charger(id));
+      untracked(() => {
+        this.charger(id);
+        if (this.envoi()?.id !== id) {
+          this.envoi.set(null);
+          this.lireEnvoi(id);
+        }
+      });
     });
+  }
+
+  /** Expéditeur et commentaire : une erreur ici n'empêche pas d'afficher les statistiques. */
+  private lireEnvoi(id: number): void {
+    this.service
+      .envoi(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (envoi) => this.envoi.set(envoi), error: () => undefined });
   }
 
   protected charger(id = Number(this.envoiId())): void {

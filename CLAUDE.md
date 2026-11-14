@@ -232,8 +232,7 @@ src/app/
   `critere=cle:valeur` répété (OU dans une clé, ET entre clés), valeurs proposées par `GET .../statistiques/criteres`
   (qui dépend de la portée version / lignée).
 - JSON du backend : les blocs et champs vides sont ABSENTS (JsonInclude NON_NULL) : tester avec `!= null`. Le
-  tableau croisé a sa propre cellule (`pourcentageLigne`, `pourcentageColonne`, `petitEffectif`) que l'OpenAPI
-  confond avec celle de la matrice : se fier aux records `CroisementResponse` / `StatistiquesResponse`.
+  tableau croisé a sa propre cellule (`CelluleCroisement` : `pourcentageLigne`, `pourcentageColonne`, `petitEffectif`).
 - Graphiques maison en HTML/CSS (`statistiques/graphiques/`), sans bibliothèque : barres horizontales (choix, oui/non,
   rang moyen du classement) et colonnes (distribution d'un nombre ou d'une échelle, dates par jour ou mois). Une
   seule série, couleur primaire du thème, valeurs écrites en clair, résumé accessible et bouton « Voir le tableau ».
@@ -244,21 +243,20 @@ src/app/
 - « Envoyer les statistiques à l'admin » : gestionnaire, sondage publié et TERMINE (409 SONDAGE_NON_TERMINE affiché),
   commentaire facultatif (2000 car.) et filtres en cours.
 - Admin : `/admin/statistiques-recues` (liste, « Nouveau » si pas encore ouvert) et `/admin/statistiques-recues/:id`
-  (statistiques recalculées, rapport PDF). L'expéditeur et le commentaire viennent de la liste (état de navigation) :
-  il n'existe pas de route qui relise un envoi seul ; après un rechargement, seules les statistiques s'affichent.
+  (statistiques recalculées, rapport PDF). L'expéditeur et le commentaire viennent de la liste (état de navigation),
+  sinon (rechargement, lien d'un message ou d'une notification) de `GET /api/envois-statistiques/{id}`.
 - Onglet Réponses : « Version N / Toutes les versions » (`?lignee=true`, choix affiché s'il y a plusieurs versions) ;
   chaque réponse porte `sondageId` (sa version) et `version`. Le détail est lu avec le contenu de SA version (relu
   par GET /api/sondages/{sondageId} au besoin et gardé en mémoire), pour retrouver les libellés des options.
-- Ajouts backend à prévoir plus tard :
-  - un nom de schéma OpenAPI distinct pour la cellule du tableau croisé (aujourd'hui « Cellule », confondue avec celle
-    de la matrice : l'OpenAPI n'affiche pas `pourcentageLigne`, `pourcentageColonne`, `petitEffectif`) ;
-  - une route pour relire un envoi de statistiques seul (`GET /api/statistiques-recues/{id}` ne renvoie que les
-    statistiques : expéditeur et commentaire sont perdus après un rechargement de la page).
+- Schémas OpenAPI distincts : `CelluleCroisement` (tableau croisé) et `AbonnementLigneAdmin` (ligne d'un admin).
 
 ## Messagerie et notifications (F8)
 - Routes : `/messagerie` (liste + panneau vide) et `/messagerie/:id` (fil, route enfant : la liste reste à côté sur
-  ordinateur ; sous 840 px, la liste ou le fil, avec « Retour aux conversations »), `/notifications[?page&taille]`,
-  `/admin/abonnement/demandes` (demandes d'augmentation de l'admin), `/gestionnaire/statistiques-envoyees[?page&taille]`.
+  ordinateur ; sous 840 px, la liste ou le fil, avec « Retour aux conversations »),
+  `/notifications[?lue=true|false&page&taille]`, `/admin/abonnement/demandes[?demande=]` (demandes d'augmentation de
+  l'admin), `/gestionnaire/statistiques-envoyees[?page&taille]` et `/gestionnaire/statistiques-envoyees/:envoiId` (un
+  envoi, « Voir ces statistiques » avec ses filtres), `/super-admin/demandes-abonnement?demande={id}` (détail relu par
+  `GET .../demandes-abonnement/{id}`, ouvert dans `dialogue-demande`, paramètre retiré à la fermeture).
 - Droits (le backend décide) : super admin <-> admins (boîte « Batulo » partagée) ; admin <-> ses gestionnaires et
   Batulo (interlocuteur `{ id: null, prenom: "Batulo", role: SUPER_ADMIN }`, `estConversationBatulo`) ; gestionnaire
   <-> son admin. « Nouvelle conversation » : `POST /conversations` ouvre ou retrouve ; admin : Batulo + ses
@@ -273,18 +271,19 @@ src/app/
   Ctrl / Cmd + Entrée envoie (5000 car.).
 - Lecture seule : abonnement expiré (`lectureSeule()`) ou 403 ABONNEMENT_EXPIRE -> la conversation admin ↔
   gestionnaire n'a plus de saisie ; la conversation Batulo et la demande d'augmentation restent possibles.
-- Messages automatiques (`type` != TEXTE) : carte distincte « Message automatique · … » et lien (`liens-messages.ts`) :
-  STATISTIQUES -> `/admin/statistiques-recues/{referenceId}` (admin) ou « Statistiques envoyées » (gestionnaire) ;
-  DEMANDE_ABONNEMENT / REPONSE_DEMANDE -> « Mes demandes » (admin) ou la liste des demandes (super admin).
+- Messages automatiques (`type` != TEXTE) : carte distincte « Message automatique · … » et lien (`liens-messages.ts`,
+  `referenceId`) : STATISTIQUES -> `/admin/statistiques-recues/{id}` (admin) ou `/gestionnaire/statistiques-envoyees/{id}`
+  (gestionnaire) ; DEMANDE_ABONNEMENT / REPONSE_DEMANDE -> `?demande={id}` sur « Mes demandes » (admin, mise en
+  évidence et focus) ou sur la liste des demandes (super admin, détail ouvert).
 - Compteurs partagés : `NotificationService.nombreNonLues` (cloche, page des notifications, menu) et
   `MessagerieService.nombreNonLus` (badge « Messagerie » du menu) ; marquer lu les diminue, la relecture les remet.
-- Liens des notifications par type et par rôle (`liens-notifications.ts`), vers la page de la rubrique.
+- Liens des notifications (`liens-notifications.ts`, page et cloche : un clic marque lue et ouvre) : élément précis par
+  `referenceId` / `conversationId` (conversation, statistiques reçues, sondage assigné, demande), sinon la rubrique
+  (anciennes notifications, désassignation, abonnements : pas de page par abonnement). Filtre `?lue=` : sous un
+  filtre, « Tout marquer comme lu » relit la liste.
 - Demandes d'augmentation (admin) : formule choisie explicitement + message (2000 car.) ; une seule EN_ATTENTE (le
   formulaire est alors remplacé par un rappel ; 409 DEMANDE_EN_COURS -> liste relue) ; rappel : acceptée, l'admin
   paie lui-même par carte (« Payer la formule … » -> `/admin/abonnement/souscrire?formule=`).
-- En attente du backend (ajouts annoncés) : `?lue=true|false` sur `GET /api/notifications` (filtre lues / non lues),
-  `referenceId` et `conversationId` dans `NotificationResponse` (lien vers l'élément précis), et
-  `GET /api/super-admin/demandes-abonnement/{id}` (ouvrir la demande précise depuis un message ou une notification).
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
@@ -321,9 +320,9 @@ src/app/
   local, confirmation et collecte terrain, écrans d'état, erreurs du serveur par question, sans Angular Material.
 - [x] **F7 – Statistiques et exports** : réponses (version ou toute la lignée) et leur détail, statistiques par type,
   filtres et critères, tableau croisé, exports CSV/XLSX/PDF, envoi à l'admin, statistiques reçues.
-- [ ] **F8 – Messagerie et notifications** : conversations, fil, nouvelle conversation, messages automatiques,
-  demandes d'augmentation de l'admin, statistiques envoyées du gestionnaire, page des notifications, compteurs.
-  Reste : filtre lues / non lues, liens précis des notifications et demande précise côté super admin (backend).
+- [x] **F8 – Messagerie et notifications** : conversations, fil, nouvelle conversation, messages automatiques et leurs
+  liens, demandes d'augmentation de l'admin, statistiques envoyées du gestionnaire (liste et détail), page des
+  notifications (filtre lues / non lues, liens précis), compteurs partagés, détail d'une demande côté super admin.
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

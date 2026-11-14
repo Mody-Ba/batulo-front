@@ -22,9 +22,10 @@ export class NotificationService {
   readonly nombreNonLues = signal(0);
 
   /** Les plus récentes d'abord ; taille entre 1 et 100. */
-  lister(page = 0, taille = 20): Observable<PageResponse<NotificationResponse>> {
+  /** lue : true (lues), false (non lues), null (toutes). */
+  lister(page = 0, taille = 20, lue: boolean | null = null): Observable<PageResponse<NotificationResponse>> {
     return this.http.get<PageResponse<NotificationResponse>>(this.url, {
-      params: { page, taille },
+      params: lue === null ? { page, taille } : { page, taille, lue },
     });
   }
 

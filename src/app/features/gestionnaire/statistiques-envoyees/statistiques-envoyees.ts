@@ -46,7 +46,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
             @for (e of p.contenu; track e.id) {
               <li class="envoi">
                 <p class="titre">
-                  <a [routerLink]="['/sondages', e.sondageId, 'statistiques']">{{ e.sondageTitre }}</a>
+                  <a [routerLink]="['/gestionnaire/statistiques-envoyees', e.id]">{{ e.sondageTitre }}</a>
                   <span class="pastille-statut" [class.compte-temporaire]="!e.consulteLe">
                     {{ e.consulteLe ? 'Consulté' : 'Pas encore consulté' }}
                   </span>

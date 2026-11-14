@@ -70,7 +70,13 @@
         } @else {
           <ul class="demandes">
             @for (d of liste; track d.id) {
-              <li class="demande">
+              <li
+                class="demande"
+                [id]="'demande-' + d.id"
+                [class.en-evidence]="d.id === demandeEnEvidence()"
+                [attr.tabindex]="d.id === demandeEnEvidence() ? -1 : null"
+                [attr.aria-current]="d.id === demandeEnEvidence() ? 'true' : null"
+              >
                 <p class="ligne">
                   <span class="formule">{{ libellesFormule[d.formuleSouhaitee] }}</span>
                   <span class="pastille-statut demande-{{ d.statut }}">{{ libellesStatut[d.statut] }}</span>

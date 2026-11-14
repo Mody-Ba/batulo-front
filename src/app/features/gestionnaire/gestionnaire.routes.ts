@@ -15,9 +15,15 @@ export const routes: Routes = [
   {
     // ?page=&taille=
     path: 'statistiques-envoyees',
+    pathMatch: 'full',
     title: 'Statistiques envoyées · Batulo',
     providers: [fournirPaginateurFrancais()],
     loadComponent: () =>
       import('./statistiques-envoyees/statistiques-envoyees').then((m) => m.StatistiquesEnvoyees),
+  },
+  {
+    path: 'statistiques-envoyees/:envoiId',
+    title: 'Statistiques envoyées · Batulo',
+    loadComponent: () => import('./statistiques-envoyees/envoi-statistiques').then((m) => m.EnvoiStatistiques),
   },
 ];

@@ -9,9 +9,9 @@ export interface LienMessage {
 }
 
 /**
- * STATISTIQUES (referenceId = envoi) : l'admin ouvre les statistiques reçues ; le gestionnaire, ses envois.
- * DEMANDE_ABONNEMENT, REPONSE_DEMANDE (referenceId = demande) : l'admin, ses demandes ; le super admin, les demandes
- * en attente (la demande précise s'ouvrira quand le backend aura GET /api/super-admin/demandes-abonnement/{id}).
+ * STATISTIQUES (referenceId = envoi) : l'admin ouvre les statistiques reçues, le gestionnaire son envoi.
+ * DEMANDE_ABONNEMENT, REPONSE_DEMANDE (referenceId = demande) : l'admin voit la demande dans « Mes demandes », le
+ * super admin ouvre son détail (?demande= sur la liste des demandes).
  */
 export function lienMessage(message: MessageInterneResponse, role: Role | null): LienMessage | null {
   switch (message.type) {
@@ -19,17 +19,22 @@ export function lienMessage(message: MessageInterneResponse, role: Role | null):
       if (role === 'ADMIN' && message.referenceId !== null) {
         return { commandes: ['/admin/statistiques-recues', message.referenceId], libelle: 'Ouvrir les statistiques' };
       }
-      return role === 'GESTIONNAIRE'
-        ? { commandes: ['/gestionnaire/statistiques-envoyees'], libelle: 'Voir mes envois' }
-        : null;
+      if (role === 'GESTIONNAIRE') {
+        return message.referenceId !== null
+          ? { commandes: ['/gestionnaire/statistiques-envoyees', message.referenceId], libelle: 'Voir mon envoi' }
+          : { commandes: ['/gestionnaire/statistiques-envoyees'], libelle: 'Voir mes envois' };
+      }
+      return null;
     case 'DEMANDE_ABONNEMENT':
-    case 'REPONSE_DEMANDE':
+    case 'REPONSE_DEMANDE': {
+      const demande = message.referenceId !== null ? { demande: String(message.referenceId) } : undefined;
       if (role === 'ADMIN') {
-        return { commandes: ['/admin/abonnement/demandes'], libelle: 'Voir mes demandes' };
+        return { commandes: ['/admin/abonnement/demandes'], queryParams: demande, libelle: 'Voir la demande' };
       }
       return role === 'SUPER_ADMIN'
-        ? { commandes: ['/super-admin/demandes-abonnement'], libelle: 'Voir les demandes d’abonnement' }
+        ? { commandes: ['/super-admin/demandes-abonnement'], queryParams: demande, libelle: 'Ouvrir la demande' }
         : null;
+    }
     default:
       return null;
   }

@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -18,12 +19,12 @@ import { MessageErreur } from '../../shared/components/message-erreur/message-er
 import { lienNotification, LienNotification } from './liens-notifications';
 
 /**
- * Toutes les notifications, les plus récentes d'abord (?page=&taille= dans l'URL) : marquer une ou toutes comme lues,
- * ouvrir la page concernée. Le nombre de non lues est partagé avec la cloche de la barre du haut.
+ * Notifications, les plus récentes d'abord, toutes ou filtrées (?lue=true|false&page=&taille= dans l'URL) : marquer
+ * une ou toutes comme lues, ouvrir l'élément concerné. Le nombre de non lues est partagé avec la cloche de la barre du haut.
  */
 @Component({
   selector: 'app-page-notifications',
-  imports: [DatePipe, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DatePipe, MatButtonModule, MatButtonToggleModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   templateUrl: './page-notifications.html',
   styleUrl: './page-notifications.scss',
 })
@@ -39,6 +40,19 @@ export class PageNotifications {
 
   readonly pageUrl = input<string | undefined>(undefined, { alias: 'page' });
   readonly taille = input<string | undefined>(undefined);
+  readonly lue = input<string | undefined>(undefined);
+  /** true : lues ; false : non lues ; null : toutes. */
+  protected readonly filtreLue = computed(() => (this.lue() === 'true' ? true : this.lue() === 'false' ? false : null));
+  protected readonly etatVide = computed(() => {
+    switch (this.filtreLue()) {
+      case true:
+        return 'Aucune notification lue.';
+      case false:
+        return 'Aucune notification non lue.';
+      default:
+        return 'Aucune notification pour le moment.';
+    }
+  });
   protected readonly numeroPage = computed(() => numeroPageUrl(this.pageUrl()));
   protected readonly taillePage = computed(() => taillePageUrl(this.taille()));
 
@@ -51,6 +65,7 @@ export class PageNotifications {
     effect(() => {
       const page = this.numeroPage();
       const taille = this.taillePage();
+      this.filtreLue();
       untracked(() => this.charger(page, taille));
     });
   }
@@ -59,7 +74,7 @@ export class PageNotifications {
     this.chargement.set(true);
     this.erreur.set(null);
     this.service
-      .lister(page, taille)
+      .lister(page, taille, this.filtreLue())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resultat) => {
@@ -77,6 +92,11 @@ export class PageNotifications {
 
   protected lien(notification: NotificationResponse): LienNotification | null {
     return lienNotification(notification, this.role());
+  }
+
+  protected filtrer(valeur: 'toutes' | 'non-lues' | 'lues'): void {
+    const lue = valeur === 'toutes' ? null : valeur === 'lues' ? 'true' : 'false';
+    void this.router.navigate([], { queryParams: { lue, page: null }, queryParamsHandling: 'merge' });
   }
 
   protected changerPage(evenement: PageEvent): void {
@@ -104,7 +124,12 @@ export class PageNotifications {
     this.service.toutMarquerLu().subscribe({
       next: (r) => {
         this.marquageEnCours.set(false);
-        this.page.update((p) => (p ? { ...p, contenu: p.contenu.map((n) => ({ ...n, lue: true })) } : p));
+        if (this.filtreLue() === null) {
+          this.page.update((p) => (p ? { ...p, contenu: p.contenu.map((n) => ({ ...n, lue: true })) } : p));
+        } else {
+          // Filtrées, les listes changent (plus aucune non lue) : relues depuis la première page.
+          this.charger(0, this.taillePage());
+        }
         this.snackBar.open(
           r.nombreMarquees > 1 ? `${r.nombreMarquees} notifications marquées comme lues.` : 'Notifications marquées comme lues.',
           'Fermer',

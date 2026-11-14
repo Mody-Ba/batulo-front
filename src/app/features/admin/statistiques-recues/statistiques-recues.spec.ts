@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideRouter, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { EnvoiStatistiqueResponse, StatistiquesResponse } from '../../../core/models/statistiques.model';
 import { ExportService } from '../../../core/services/export.service';
 import { StatistiquesService } from '../../../core/services/statistiques.service';
@@ -43,7 +43,7 @@ describe('Statistiques reçues (admin)', () => {
   let exports: Record<string, ReturnType<typeof vi.fn>>;
 
   beforeEach(() => {
-    service = { recues: vi.fn(() => of({ contenu: [ENVOI], page: 0, taille: 20, totalElements: 1, totalPages: 1 })), recue: vi.fn(() => of(STATS)), textes: vi.fn() };
+    service = { recues: vi.fn(() => of({ contenu: [ENVOI], page: 0, taille: 20, totalElements: 1, totalPages: 1 })), recue: vi.fn(() => of(STATS)), envoi: vi.fn(() => of(ENVOI)), textes: vi.fn() };
     exports = { statistiquesRecues: vi.fn(() => of({ nom: 'malnutrition_statistiques.pdf', contenu: new Blob() })), enregistrer: vi.fn() };
     TestBed.configureTestingModule({
       providers: [
@@ -87,8 +87,22 @@ describe('Statistiques reçues (admin)', () => {
     history.replaceState(null, '');
   });
 
-  it('après un rechargement (sans l’envoi) : les statistiques s’affichent quand même', async () => {
+  it('sans état de navigation (rechargement, lien d’un message) : l’envoi est relu seul, expéditeur et commentaire affichés', async () => {
     history.replaceState(null, '');
+    const f = TestBed.createComponent(StatistiquesRecues);
+    f.componentRef.setInput('envoiId', '7');
+    await f.whenStable();
+    f.detectChanges();
+    expect(service['envoi']).toHaveBeenCalledWith(7);
+    const texte = (f.nativeElement as HTMLElement).textContent?.replace(/\s+/g, ' ');
+    expect(texte).toContain('42 réponses');
+    expect(texte).toContain('Envoyées par Moussa Kane');
+    expect(texte).toContain('Résultats de Kayes');
+  });
+
+  it('envoi illisible : les statistiques s’affichent quand même', async () => {
+    history.replaceState(null, '');
+    service['envoi'].mockReturnValue(throwError(() => new Error('404')));
     const f = TestBed.createComponent(StatistiquesRecues);
     f.componentRef.setInput('envoiId', '7');
     await f.whenStable();

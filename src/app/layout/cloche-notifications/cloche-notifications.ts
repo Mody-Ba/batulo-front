@@ -7,13 +7,15 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, merge, switchMap } from 'rxjs';
 import { ICONES_NOTIFICATION, NotificationResponse } from '../../core/models/notification.model';
+import { AuthService } from '../../core/services/auth.service';
 import { MessagerieService } from '../../core/services/messagerie.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { interrogationPeriodique } from '../../core/utils/interrogation';
 import { messageErreur } from '../../core/utils/erreur-http';
+import { lienNotification } from '../../features/notifications/liens-notifications';
 
 /** Intervalle de mise à jour de la pastille. */
 const INTERVALLE_MS = 60_000;
@@ -41,6 +43,8 @@ export class ClocheNotifications {
 
   protected readonly icones = ICONES_NOTIFICATION;
   private readonly messagerie = inject(MessagerieService);
+  private readonly router = inject(Router);
+  private readonly role = inject(AuthService).role;
   protected readonly nonLues = this.service.nombreNonLues;
   protected readonly notifications = signal<NotificationResponse[]>([]);
   protected readonly chargement = signal(false);
@@ -87,6 +91,20 @@ export class ClocheNotifications {
           this.chargement.set(false);
         },
       });
+  }
+
+  /**
+   * Clic sur une notification : marquée lue ; si elle mène à un élément, le menu se ferme et la page s'ouvre, sinon le
+   * menu reste ouvert.
+   */
+  protected ouvrir(notification: NotificationResponse, evenement: Event): void {
+    this.marquerLue(notification);
+    const lien = lienNotification(notification, this.role());
+    if (lien) {
+      void this.router.navigate(lien.commandes, { queryParams: lien.queryParams });
+    } else {
+      evenement.stopPropagation();
+    }
   }
 
   protected marquerLue(notification: NotificationResponse): void {

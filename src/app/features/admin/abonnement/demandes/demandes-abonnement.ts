@@ -1,5 +1,5 @@
 import { DatePipe, LowerCasePipe } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, Injector, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +29,7 @@ const TAILLE = 20;
  * Admin : demande d'augmentation d'abonnement (formule souhaitée + message), postée dans la conversation avec Batulo,
  * et liste de ses demandes avec leur statut et la réponse. Purement informative : acceptée, l'admin paie lui-même la
  * formule par carte (aucun abonnement manuel). Permise abonnement expiré ; une seule demande en attente à la fois.
+ * ?demande={id} (lien d'une notification ou d'un message automatique) met cette demande en évidence.
  */
 @Component({
   selector: 'app-demandes-abonnement',
@@ -54,6 +55,12 @@ export class DemandesAbonnement {
   private readonly service = inject(DemandeAbonnementService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
+  private readonly hote = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** Paramètre d'URL ?demande=. */
+  readonly demande = input<string | undefined>(undefined);
+  protected readonly demandeEnEvidence = computed(() => Number(this.demande()) || null);
   protected readonly formules = FORMULES;
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly libellesStatut = LIBELLES_STATUT_DEMANDE;
@@ -91,12 +98,21 @@ export class DemandesAbonnement {
           this.demandes.set(page.contenu);
           this.total.set(page.totalElements);
           this.chargement.set(false);
+          afterNextRender(() => this.montrerDemande(), { injector: this.injector });
         },
         error: (erreur: unknown) => {
           this.erreur.set(erreur);
           this.chargement.set(false);
         },
       });
+  }
+
+  /** Demande désignée par l'URL : focus et défilement jusqu'à elle. */
+  private montrerDemande(): void {
+    const id = this.demandeEnEvidence();
+    const element = id ? this.hote.nativeElement.querySelector<HTMLElement>(`#demande-${id}`) : null;
+    element?.focus();
+    element?.scrollIntoView?.({ block: 'center' });
   }
 
   protected envoyer(): void {

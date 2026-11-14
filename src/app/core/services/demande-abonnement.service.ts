@@ -20,6 +20,11 @@ export class DemandeAbonnementService {
   private readonly url = `${environment.apiUrl}/api/super-admin/demandes-abonnement`;
   private readonly urlAdmin = `${environment.apiUrl}/api/abonnements/demandes`;
 
+  /** Super admin : une demande (404 DEMANDE_INTROUVABLE). */
+  detail(id: number): Observable<DemandeAbonnementResponse> {
+    return this.http.get<DemandeAbonnementResponse>(`${this.url}/${id}`);
+  }
+
   /** Admin : ses demandes, les plus récentes d'abord. */
   mesDemandes(page = 0, taille = 10): Observable<PageResponse<DemandeAbonnementResponse>> {
     return this.http.get<PageResponse<DemandeAbonnementResponse>>(this.urlAdmin, { params: { page, taille } });

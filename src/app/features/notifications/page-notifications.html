@@ -10,6 +10,18 @@
     </button>
   </app-entete-page>
 
+  <mat-button-toggle-group
+    class="filtre"
+    aria-label="Notifications affichées"
+    [value]="filtreLue() === null ? 'toutes' : filtreLue() ? 'lues' : 'non-lues'"
+    (change)="filtrer($event.value)"
+    [hideSingleSelectionIndicator]="true"
+  >
+    <mat-button-toggle value="toutes">Toutes</mat-button-toggle>
+    <mat-button-toggle value="non-lues">Non lues</mat-button-toggle>
+    <mat-button-toggle value="lues">Lues</mat-button-toggle>
+  </mat-button-toggle-group>
+
   <p class="texte-aide" role="status">
     @if (nonLues() === 0) {
       Aucune notification non lue.
@@ -29,7 +41,7 @@
 
   @if (page(); as p) {
     @if (p.contenu.length === 0) {
-      <p class="etat-vide" role="status">Aucune notification pour le moment.</p>
+      <p class="etat-vide" role="status">{{ etatVide() }}</p>
     } @else {
       <ul class="notifications">
         @for (n of p.contenu; track n.id) {

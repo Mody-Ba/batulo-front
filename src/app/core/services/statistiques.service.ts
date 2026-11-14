@@ -87,6 +87,11 @@ export class StatistiquesService {
   }
 
   /** Admin : statistiques recalculées avec les filtres de l'envoi (marque l'envoi comme consulté). */
+  /** Un envoi seul (expéditeur, commentaire, filtres) : admin destinataire ou gestionnaire expéditeur ; ne le marque pas consulté. */
+  envoi(envoiId: number): Observable<EnvoiStatistiqueResponse> {
+    return this.http.get<EnvoiStatistiqueResponse>(`${this.url}/api/envois-statistiques/${envoiId}`);
+  }
+
   recue(envoiId: number): Observable<StatistiquesResponse> {
     return this.http.get<StatistiquesResponse>(`${this.url}/api/statistiques-recues/${envoiId}`);
   }

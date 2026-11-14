@@ -155,7 +155,7 @@ export const TYPES_CROISABLES: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>
   'NUMERIQUE',
 ]);
 
-/** Cellule d'un tableau croisé (record CroisementResponse.Cellule : l'OpenAPI la confond avec celle de la matrice). */
+/** Cellule d'un tableau croisé (schéma OpenAPI CelluleCroisement). */
 export interface CelluleCroisement {
   /** null : colonne « Non renseigné ». */
   colonne: string | null;

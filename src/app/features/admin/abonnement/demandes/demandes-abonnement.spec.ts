@@ -70,4 +70,15 @@ describe('Demandes d’augmentation (admin)', () => {
     f.detectChanges();
     expect(service['mesDemandes']).toHaveBeenCalledTimes(2);
   });
+
+  it('?demande={id} : la demande est mise en évidence et reçoit le focus', async () => {
+    const f = TestBed.createComponent(DemandesAbonnement);
+    f.componentRef.setInput('demande', '1');
+    await f.whenStable();
+    f.detectChanges();
+    await f.whenStable();
+    const ligne = (f.nativeElement as HTMLElement).querySelector('#demande-1')!;
+    expect(ligne.classList).toContain('en-evidence');
+    expect(ligne.getAttribute('aria-current')).toBe('true');
+  });
 });
