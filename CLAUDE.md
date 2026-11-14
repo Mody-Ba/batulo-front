@@ -42,10 +42,10 @@ src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
                    gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
-                   formulaire-public)
+                   formulaire-public, statistiques)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
-                   super-admin, demande-abonnement, formulaire-public)
+                   super-admin, demande-abonnement, formulaire-public, statistiques, export)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
@@ -200,15 +200,21 @@ src/app/
   `FormulairePublicService` envoie ses requêtes avec `SANS_AUTHENTIFICATION` (aucun jeton, pas de rafraîchissement ni
   de redirection, même connecté).
 - Écrans : chargement, formulaire, confirmation (message et date ; « Nouvelle réponse » si `reponseUnique` = false),
-  indisponible : non ouvert (403 SONDAGE_NON_OUVERT, message du serveur avec la date), fermé (410), déjà répondu (409
-  ou drapeau local), lien introuvable (404), trop de requêtes (429), serveur injoignable. À l'envoi, 429 et erreurs
+  indisponible : non ouvert (403 SONDAGE_NON_OUVERT, message du serveur avec la date), fermé (410), déjà répondu
+  (`dejaRepondu` du GET ou 409 à l'envoi), lien introuvable (404), trop de requêtes (429), serveur injoignable. À l'envoi, 429 et erreurs
   réseau gardent le formulaire et les réponses ; 400 REPONSES_INVALIDES pose chaque `erreurs[].message` sur sa
   question (section concernée affichée, focus) ; les erreurs sans question sont résumées en haut.
 - Mémoire du navigateur (`memoire-repondant.ts`, via `stockage-local.ts`) : `batulo.repondant.{jeton}` (UUID v4, un
   par lignée, jamais partagé entre sondages, envoyé seulement si `reponseUnique`), `batulo.brouillon.{jeton}`
   (réponses par questionId et section, écrit 500 ms après la dernière saisie, repris avec un bandeau « Tout effacer »,
   questions inconnues ignorées, oublié après 30 jours, effacé après l'envoi), `batulo.repondu.{jeton}` (drapeau
-  après un envoi à réponse unique ; le 409 DEJA_REPONDU du serveur reste la règle).
+  après un envoi à réponse unique, utilisé seulement en repli si le serveur est injoignable).
+- « Déjà répondu » avant la saisie : le GET public envoie le jeton de l'appareil, s'il existe déjà (jamais créé pour
+  demander), dans l'en-tête `X-Jeton-Repondant` (jamais dans l'URL) ; `dejaRepondu` (présent seulement si
+  `reponseUnique`) fait foi : true -> écran « déjà répondu » et brouillon effacé ; sinon le drapeau local est oublié.
+  Le 409 DEJA_REPONDU reste la règle à l'envoi.
+- Le formulaire public reçoit des DTO publics (SectionPubliqueResponse, QuestionPubliqueResponse) sans réglages
+  d'analyse ; côté front, `shared/formulaire/` travaille sur `SectionAffichee` / `QuestionAffichee` (sondage.model).
 - Léger : `shared/formulaire/` est en éléments natifs, sans Angular Material ni drag-drop du CDK (classement par
   Monter / Descendre, déplacement annoncé). Styles des champs en une seule copie (`champs/champs-*.scss`, chargés par
   `FormulaireSondage` en `ViewEncapsulation.None`, limités à `app-formulaire-sondage`). Chunk à la demande de
@@ -216,8 +222,37 @@ src/app/
 - Accessibilité : choix en `fieldset`/`legend`, saisie avec `label for` ; aide et erreur reliées par
   `aria-describedby`, `aria-invalid` ; focus sur le titre de section, la première question à corriger ou le titre
   de l'écran d'état ; boutons natifs de 48 px.
-- À proposer au backend : connaître « déjà répondu » avant la saisie (`jetonRepondant` accepté par le GET public) ;
-  un DTO public de question sans `estCritere` ni `critereConfig` (réglages internes aujourd'hui exposés).
+
+## Réponses, statistiques et exports (F7)
+- Fiche d'un sondage en trois onglets, une adresse chacun (`onglets-sondage`) : `/sondages/:id`,
+  `/sondages/:id/reponses[?page&taille]` (détail d'une réponse en dialogue, libellés retrouvés depuis les codes avec
+  le contenu du sondage : `formater-reponse.ts`), `/sondages/:id/statistiques[?lignee&du&au&granularite&critere]`.
+- Filtres (`filtres-url.ts`) dans l'URL, appliqués partout (statistiques, textes, tableau croisé, exports, envoi) :
+  `critere=cle:valeur` répété (OU dans une clé, ET entre clés), valeurs proposées par `GET .../statistiques/criteres`
+  (qui dépend de la portée version / lignée).
+- JSON du backend : les blocs et champs vides sont ABSENTS (JsonInclude NON_NULL) : tester avec `!= null`. Le
+  tableau croisé a sa propre cellule (`pourcentageLigne`, `pourcentageColonne`, `petitEffectif`) que l'OpenAPI
+  confond avec celle de la matrice : se fier aux records `CroisementResponse` / `StatistiquesResponse`.
+- Graphiques maison en HTML/CSS (`statistiques/graphiques/`), sans bibliothèque : barres horizontales (choix, oui/non,
+  rang moyen du classement) et colonnes (distribution d'un nombre ou d'une échelle, dates par jour ou mois). Une
+  seule série, couleur primaire du thème, valeurs écrites en clair, résumé accessible et bouton « Voir le tableau ».
+  Matrice en tableau (intensité de la même teinte), textes paginés. Petit effectif (moins de 5) signalé en texte.
+- Exports (`ExportService`) : téléchargés par HttpClient (jeton), en Blob ; nom lu dans Content-Disposition
+  (exposé par le CORS du backend), sinon nom neutre ; une erreur en Blob est relue en JSON (`erreurLisible`) pour
+  afficher son message. CSV : LIBELLES ou CODES, VIRGULE (Excel) ou POINT (Python, R).
+- « Envoyer les statistiques à l'admin » : gestionnaire, sondage publié et TERMINE (409 SONDAGE_NON_TERMINE affiché),
+  commentaire facultatif (2000 car.) et filtres en cours.
+- Admin : `/admin/statistiques-recues` (liste, « Nouveau » si pas encore ouvert) et `/admin/statistiques-recues/:id`
+  (statistiques recalculées, rapport PDF). L'expéditeur et le commentaire viennent de la liste (état de navigation) :
+  il n'existe pas de route qui relise un envoi seul ; après un rechargement, seules les statistiques s'affichent.
+- Onglet Réponses : « Version N / Toutes les versions » (`?lignee=true`, choix affiché s'il y a plusieurs versions) ;
+  chaque réponse porte `sondageId` (sa version) et `version`. Le détail est lu avec le contenu de SA version (relu
+  par GET /api/sondages/{sondageId} au besoin et gardé en mémoire), pour retrouver les libellés des options.
+- Ajouts backend à prévoir plus tard :
+  - un nom de schéma OpenAPI distinct pour la cellule du tableau croisé (aujourd'hui « Cellule », confondue avec celle
+    de la matrice : l'OpenAPI n'affiche pas `pourcentageLigne`, `pourcentageColonne`, `petitEffectif`) ;
+  - une route pour relire un envoi de statistiques seul (`GET /api/statistiques-recues/{id}` ne renvoie que les
+    statistiques : expéditeur et commentaire sont perdus après un rechargement de la page).
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
@@ -252,7 +287,8 @@ src/app/
   modèles, critères, lien et QR), déplacement d'une question vers une autre section, réponses par version.
 - [x] **F6 – Formulaire public** (mobile d'abord) : `/s/:jeton`, hors mise en page connectée, sections, brouillon
   local, confirmation et collecte terrain, écrans d'état, erreurs du serveur par question, sans Angular Material.
-- [ ] **F7 – Statistiques et exports** : statistiques, critères, tableaux croisés, exports CSV/XLSX/PDF.
+- [x] **F7 – Statistiques et exports** : réponses (version ou toute la lignée) et leur détail, statistiques par type,
+  filtres et critères, tableau croisé, exports CSV/XLSX/PDF, envoi à l'admin, statistiques reçues.
 - [ ] **F8 – Messagerie et notifications** : conversations, page complète des notifications.
 
 Les rubriques des étapes à venir existent déjà dans le menu (`layout/menu-lateral/liens-navigation.ts`) et mènent

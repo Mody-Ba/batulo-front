@@ -3,7 +3,7 @@ import { Component, computed, input } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { startWith, switchMap } from 'rxjs';
-import { QuestionResponse, TypeQuestion } from '../../core/models/sondage.model';
+import { QuestionAffichee, TypeQuestion } from '../../core/models/sondage.model';
 import { ChampChoixMultiple } from './champs/champ-choix-multiple';
 import { ChampChoixUnique } from './champs/champ-choix-unique';
 import { ChampClassement } from './champs/champ-classement';
@@ -159,7 +159,7 @@ const TYPES_SAISIE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>(['TEXTE_CO
   `,
 })
 export class QuestionRepondant {
-  readonly question = input.required<QuestionResponse>();
+  readonly question = input.required<QuestionAffichee>();
   readonly controle = input.required<FormControl<ValeurReponse>>();
   readonly numero = input.required<number>();
 

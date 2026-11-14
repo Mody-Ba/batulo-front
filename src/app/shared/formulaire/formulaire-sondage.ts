@@ -14,7 +14,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ErreurQuestion } from '../../core/models/erreur.model';
-import { SectionResponse } from '../../core/models/sondage.model';
+import { SectionAffichee } from '../../core/models/sondage.model';
 import { QuestionRepondant } from './question-repondant';
 import {
   cleReponse,
@@ -29,7 +29,7 @@ import {
 export interface ContenuFormulaire {
   titre: string;
   description: string | null;
-  sections: SectionResponse[];
+  sections: SectionAffichee[];
 }
 
 /** Réponses en cours, par id de question (brouillon du navigateur). */

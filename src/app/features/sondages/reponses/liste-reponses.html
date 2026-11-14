@@ -1,0 +1,68 @@
+<section class="conteneur-page">
+  <a matButton routerLink="/sondages" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+  </a>
+
+  @if (sondage(); as s) {
+    <app-entete-page [titre]="s.titre" icone="ballot">
+      <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
+    </app-entete-page>
+  }
+  <app-onglets-sondage [id]="id()" />
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement des réponses" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Les réponses n’ont pas pu être chargées.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (sondage(); as s) {
+    @if (reponses(); as page) {
+      <div class="barre-outils">
+        @if (versions().length > 1) {
+          <mat-button-toggle-group
+            aria-label="Réponses affichées"
+            [value]="toutesVersions()"
+            (change)="changerPortee($event.value)"
+            [hideSingleSelectionIndicator]="true"
+          >
+            <mat-button-toggle [value]="false">Version {{ s.version }}</mat-button-toggle>
+            <mat-button-toggle [value]="true">Toutes les versions</mat-button-toggle>
+          </mat-button-toggle-group>
+        }
+        <p class="texte-aide" role="status">
+          {{ page.totalElements }} réponse{{ page.totalElements > 1 ? 's' : '' }}
+          {{ toutesVersions() ? 'pour toutes les versions' : 'pour la version ' + s.version }}, les plus récentes d’abord.
+        </p>
+      </div>
+      @if (page.contenu.length === 0) {
+        <p class="etat-vide" role="status">Aucune réponse pour le moment.</p>
+      } @else {
+        <ul class="reponses">
+          @for (r of page.contenu; track r.id) {
+            <li>
+              <button type="button" class="reponse" (click)="ouvrir(r)">
+                <span class="numero">N° {{ r.id }}</span>
+                <span class="date">{{ r.dateSoumission | date: 'd MMM y, HH:mm' }}</span>
+                <span class="version">Version {{ r.version }}</span>
+                <span class="cellule-secondaire resume">{{ resume(r, s) }}</span>
+                <mat-icon fontIcon="chevron_right" aria-hidden="true" />
+              </button>
+            </li>
+          }
+        </ul>
+        <mat-paginator
+          [length]="page.totalElements"
+          [pageIndex]="numeroPage()"
+          [pageSize]="taillePage()"
+          [pageSizeOptions]="tailles"
+          (page)="changerPage($event)"
+          aria-label="Pagination des réponses"
+        />
+      }
+    }
+  }
+</section>

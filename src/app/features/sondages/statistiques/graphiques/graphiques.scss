@@ -1,0 +1,166 @@
+// Graphiques maison (HTML et CSS, sans bibliothèque) : une seule série, couleur primaire du thème (mode sombre
+// compris) ; textes en couleurs de texte, jamais en couleur de série ; grille et axes discrets.
+:host {
+  display: block;
+}
+
+.barres {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barre {
+  display: grid;
+  grid-template-columns: minmax(96px, 30%) 1fr;
+  align-items: center;
+  gap: var(--bt-espace-3);
+}
+
+.libelle {
+  overflow-wrap: anywhere;
+  font: var(--mat-sys-body-medium);
+}
+
+.piste {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  min-width: 0;
+}
+
+.remplissage {
+  flex-shrink: 0;
+  height: 20px;
+  max-width: calc(100% - 110px);
+  border-radius: 0 4px 4px 0;
+  background: var(--mat-sys-primary);
+}
+
+.valeur {
+  flex-shrink: 0;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-label-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.barre:hover .remplissage {
+  background: color-mix(in srgb, var(--mat-sys-primary) 80%, var(--mat-sys-on-surface));
+}
+
+// Colonnes
+.colonnes {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--bt-espace-2);
+  height: 180px;
+}
+
+.axe-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 22px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-small);
+  text-align: right;
+}
+
+.trace {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: linear-gradient(to bottom, var(--mat-sys-outline-variant) 1px, transparent 1px) 0 0 / 100% 100%
+    no-repeat;
+  padding-bottom: 22px;
+  position: relative;
+}
+
+.colonne {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 48px;
+  min-width: 0;
+}
+
+.barre-colonne {
+  display: block;
+  width: 100%;
+  max-width: 24px;
+  margin: 0 auto;
+  border-radius: 4px 4px 0 0;
+  background: var(--mat-sys-primary);
+}
+
+.colonne:hover .barre-colonne {
+  background: color-mix(in srgb, var(--mat-sys-primary) 80%, var(--mat-sys-on-surface));
+}
+
+.etiquette {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-small);
+  white-space: nowrap;
+
+  &.masquee {
+    visibility: hidden;
+  }
+}
+
+// Vue tableau et bascule
+.tableau-graphique {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--mat-sys-body-medium);
+
+  th,
+  td {
+    padding: var(--bt-espace-2);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    text-align: left;
+  }
+
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  thead th {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+  }
+}
+
+.bascule {
+  min-height: 44px;
+  margin-top: var(--bt-espace-2);
+  padding: 0 var(--bt-espace-2);
+  border: 0;
+  background: transparent;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+  }
+}
+
+@container carte-stat (max-width: 480px) {
+  .barre {
+    grid-template-columns: 1fr;
+    gap: var(--bt-espace-1);
+  }
+}

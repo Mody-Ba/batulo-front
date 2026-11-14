@@ -1,0 +1,65 @@
+<section class="filtres" aria-label="Filtres des statistiques">
+  <div class="ligne">
+    @if (plusieursVersions()) {
+      <mat-button-toggle-group
+        aria-label="Portée"
+        [value]="filtres().lignee"
+        (change)="changerPortee($event.value)"
+        [hideSingleSelectionIndicator]="true"
+      >
+        <mat-button-toggle [value]="false">Version {{ version() }}</mat-button-toggle>
+        <mat-button-toggle [value]="true">Toutes les versions</mat-button-toggle>
+      </mat-button-toggle-group>
+    }
+
+    <mat-form-field class="champ-date">
+      <mat-label>Du</mat-label>
+      <input matInput type="date" [value]="filtres().du ?? ''" [max]="filtres().au ?? null" (change)="changerDate('du', $any($event.target).value)" />
+    </mat-form-field>
+    <mat-form-field class="champ-date">
+      <mat-label>Au</mat-label>
+      <input matInput type="date" [value]="filtres().au ?? ''" [min]="filtres().du ?? null" (change)="changerDate('au', $any($event.target).value)" />
+    </mat-form-field>
+
+    @for (c of criteres(); track c.cle) {
+      <mat-form-field class="champ-critere">
+        <mat-label>{{ c.libelle }}</mat-label>
+        <mat-select multiple [value]="valeursChoisies(c.cle)" (selectionChange)="changerCritere(c.cle, $event.value)">
+          @for (v of c.valeurs; track v.valeur) {
+            <mat-option [value]="v.valeur">{{ v.libelle }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
+    <mat-form-field class="champ-granularite">
+      <mat-label>Dates par</mat-label>
+      <mat-select [value]="filtres().granularite" (selectionChange)="changerGranularite($event.value)">
+        <mat-option [value]="null">Automatique</mat-option>
+        <mat-option value="JOUR">Jour</mat-option>
+        <mat-option value="MOIS">Mois</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (actifs()) {
+    <div class="actifs" role="status">
+      <span class="texte-aide">Filtres :</span>
+      @if (filtres().lignee) {
+        <span class="pastille-filtre">Toutes les versions</span>
+      }
+      @if (filtres().du || filtres().au) {
+        <span class="pastille-filtre">Période {{ filtres().du ?? '…' }} → {{ filtres().au ?? '…' }}</span>
+      }
+      @for (p of pastilles(); track p.critere) {
+        <span class="pastille-filtre">
+          {{ p.texte }}
+          <button type="button" class="retirer" (click)="retirer(p.critere)" [attr.aria-label]="'Retirer le filtre ' + p.texte">
+            <mat-icon fontIcon="close" aria-hidden="true" />
+          </button>
+        </span>
+      }
+      <button matButton type="button" (click)="toutEffacer()">Tout effacer</button>
+    </div>
+  }
+</section>

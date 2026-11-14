@@ -1,6 +1,6 @@
 import { Directive, input } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { QuestionResponse } from '../../../core/models/sondage.model';
+import { QuestionAffichee } from '../../../core/models/sondage.model';
 import { ValeurReponse } from '../reponses';
 
 /**
@@ -9,7 +9,7 @@ import { ValeurReponse } from '../reponses';
  */
 @Directive()
 export abstract class ChampBase {
-  readonly question = input.required<QuestionResponse>();
+  readonly question = input.required<QuestionAffichee>();
   readonly controle = input.required<FormControl<ValeurReponse>>();
   /** Préfixe des id de la question (ex. « question-12 »). */
   readonly idBase = input.required<string>();

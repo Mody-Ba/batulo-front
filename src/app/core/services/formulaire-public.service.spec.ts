@@ -48,6 +48,15 @@ describe('FormulairePublicService', () => {
     expect(erreur).toHaveBeenCalled();
   });
 
+  it('jeton de l’appareil dans l’en-tête X-Jeton-Repondant (jamais dans l’adresse), seulement s’il est donné', () => {
+    service.lire('Ab3x', '3f6c2a1e-8b1d-4c3e-9a77-2f0e5b4d9c11').subscribe();
+    const avec = serveur.expectOne(`${environment.apiUrl}/api/public/sondages/Ab3x`);
+    expect(avec.request.headers.get('X-Jeton-Repondant')).toBe('3f6c2a1e-8b1d-4c3e-9a77-2f0e5b4d9c11');
+    expect(avec.request.urlWithParams).not.toContain('3f6c2a1e');
+    service.lire('Ab3x', null).subscribe();
+    expect(serveur.expectOne(`${environment.apiUrl}/api/public/sondages/Ab3x`).request.headers.has('X-Jeton-Repondant')).toBe(false);
+  });
+
   it('jeton du lien encodé dans l’adresse', () => {
     service.lire('a/b c').subscribe();
     serveur.expectOne(`${environment.apiUrl}/api/public/sondages/a%2Fb%20c`);

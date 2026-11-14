@@ -39,6 +39,11 @@ export const memoireRepondant = {
     return uuid;
   },
 
+  /** Jeton déjà tiré sur cet appareil pour ce sondage, sans en créer (pour demander « déjà répondu ? »). */
+  jetonExistant(jeton: string): string | null {
+    return lireLocal<string>(cle('repondant', jeton)) ?? jetonsEnMemoire.get(jeton) ?? null;
+  },
+
   lireBrouillon(jeton: string, maintenant = Date.now()): BrouillonReponses | null {
     const brouillon = lireLocal<BrouillonReponses>(cle('brouillon', jeton));
     if (!brouillon || typeof brouillon.reponses !== 'object' || brouillon.reponses === null) {
@@ -65,12 +70,20 @@ export const memoireRepondant = {
     effacerLocal(cle('brouillon', jeton));
   },
 
-  /** Sondage à réponse unique déjà envoyé depuis ce navigateur (le 409 DEJA_REPONDU du serveur reste la règle). */
+  /**
+   * Sondage à réponse unique déjà envoyé depuis ce navigateur. Repli quand le serveur ne peut pas être joint : sinon
+   * c'est `dejaRepondu` du GET public qui décide, et le 409 DEJA_REPONDU reste la règle à l'envoi.
+   */
   dejaRepondu(jeton: string): boolean {
     return lireLocal<{ le: string }>(cle('repondu', jeton)) !== null;
   },
 
   marquerRepondu(jeton: string): void {
     ecrireLocal(cle('repondu', jeton), { le: new Date().toISOString() });
+  },
+
+  /** Le serveur dit que cet appareil n'a pas répondu (ou que le sondage accepte plusieurs réponses) : on le croit. */
+  oublierRepondu(jeton: string): void {
+    effacerLocal(cle('repondu', jeton));
   },
 };

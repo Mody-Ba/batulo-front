@@ -1,0 +1,121 @@
+<article class="carte-stat" [attr.aria-labelledby]="'stat-' + question().questionId">
+  <header class="entete">
+    <h3 [id]="'stat-' + question().questionId"><span class="numero">{{ numero() }}.</span> {{ question().libelle }}</h3>
+    <p class="effectifs">
+      {{ nombre(question().nombreRepondants) }} répondant{{ question().nombreRepondants > 1 ? 's' : '' }}
+      · {{ nombre(question().sansReponse) }} sans réponse
+    </p>
+    @if (question().petitEffectif && question().nombreRepondants > 0) {
+      <p class="avertissement" role="note">
+        <span aria-hidden="true">⚠</span> Moins de 5 répondants : résultats à interpréter avec prudence.
+      </p>
+    }
+  </header>
+
+  @if (question().nombreRepondants === 0) {
+    <p class="vide">Aucune réponse à cette question avec ces filtres.</p>
+  } @else {
+    @switch (question().type) {
+      @case ('CHOIX_UNIQUE') {
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+      }
+      @case ('OUI_NON') {
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+      }
+      @case ('CHOIX_MULTIPLE') {
+        <p class="note">Plusieurs choix possibles : les parts dépassent 100 % au total.</p>
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+      }
+      @case ('CLASSEMENT') {
+        <p class="note">Du mieux classé au moins bien classé (rang moyen : 1 = toujours premier).</p>
+        <app-barres-horizontales
+          [barres]="barresClassement()"
+          [titre]="'Classement de « ' + question().libelle + ' »'"
+          enteteLibelle="Option"
+          enteteValeur="Rang moyen et nombre de premières places"
+        />
+      }
+      @case ('ECHELLE') {
+        <ng-container *ngTemplateOutlet="indicateurs" />
+        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'Notes données à « ' + question().libelle + ' »'" enteteLibelle="Note" />
+      }
+      @case ('NUMERIQUE') {
+        <ng-container *ngTemplateOutlet="indicateurs" />
+        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'Distribution de « ' + question().libelle + ' »'" />
+      }
+      @case ('DATE') {
+        @if (question().dates; as d) {
+          <p class="note">
+            Du {{ d.min | date: 'd MMMM y' }} au {{ d.max | date: 'd MMMM y' }}, par {{ d.granularite === 'JOUR' ? 'jour' : 'mois' }}.
+          </p>
+        }
+        <app-colonnes [colonnes]="colonnesDates()" [titre]="'Dates données à « ' + question().libelle + ' »'" enteteLibelle="Période" />
+      }
+      @case ('MATRICE') {
+        @if (question().matrice; as m) {
+          <div class="defilement">
+            <table class="matrice">
+              <caption class="visuellement-cache">Réponses par ligne à « {{ question().libelle }} » (nombre et part de la ligne)</caption>
+              <thead>
+                <tr>
+                  <td></td>
+                  @for (c of m.colonnes; track c) {
+                    <th scope="col">{{ c }}</th>
+                  }
+                  <th scope="col">Répondants</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (l of m.lignes; track l.ligne) {
+                  <tr>
+                    <th scope="row">{{ l.ligne }}</th>
+                    @for (cel of l.cellules; track cel.colonne) {
+                      <td [style.background]="fond(cel.pourcentage)">
+                        <span class="part">{{ pourcentage(cel.pourcentage) }}</span>
+                        {{ ' ' }}<span class="effectif">({{ nombre(cel.nombre) }})</span>
+                      </td>
+                    }
+                    <td>{{ nombre(l.nombre) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+      @default {
+        @if (textes(); as page) {
+          <ul class="textes" [attr.aria-busy]="chargementTextes() || null">
+            @for (t of page.contenu; track $index) {
+              <li>
+                <p>{{ t.texte }}</p>
+                <span class="date">{{ t.dateSoumission | date: 'd MMM y, HH:mm' }}</span>
+              </li>
+            }
+          </ul>
+          @if (erreurTextes(); as message) {
+            <p class="avertissement" role="alert">{{ message }}</p>
+          }
+          @if (page.totalPages > 1) {
+            <div class="pagination-textes">
+              <button type="button" (click)="changerPageTextes(page.page - 1)" [disabled]="page.page === 0 || chargementTextes()">Précédents</button>
+              <span role="status">Page {{ page.page + 1 }} sur {{ page.totalPages }} ({{ nombre(page.totalElements) }} textes)</span>
+              <button type="button" (click)="changerPageTextes(page.page + 1)" [disabled]="page.page >= page.totalPages - 1 || chargementTextes()">Suivants</button>
+            </div>
+          }
+        }
+      }
+    }
+  }
+
+  <ng-template #indicateurs>
+    @if (question().numerique; as n) {
+      <dl class="indicateurs">
+        <div><dt>Moyenne</dt><dd>{{ decimal(n.moyenne) }}</dd></div>
+        <div><dt>Médiane</dt><dd>{{ decimal(n.mediane) }}</dd></div>
+        <div><dt>Minimum</dt><dd>{{ decimal(n.min) }}</dd></div>
+        <div><dt>Maximum</dt><dd>{{ decimal(n.max) }}</dd></div>
+      </dl>
+    }
+  </ng-template>
+</article>
