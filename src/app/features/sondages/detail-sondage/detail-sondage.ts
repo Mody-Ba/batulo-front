@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,7 +26,9 @@ import { messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
-import { raisonLectureSeule } from '../droits-sondage';
+import { ActionsSondage } from '../cycle-de-vie/actions-sondage';
+import { situationVersions } from '../cycle-de-vie/versions';
+import { droitsSondage, raisonLectureSeule } from '../droits-sondage';
 import {
   DialogueAssignerGestionnaires,
   DonneesAssignerGestionnaires,
@@ -43,6 +46,7 @@ import {
     RouterLink,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressBarModule,
     MatTooltipModule,
     EntetePage,
@@ -69,7 +73,25 @@ export class DetailSondage {
 
   protected readonly estAdmin = computed(() => this.auth.role() === 'ADMIN');
 
+  private readonly actions = inject(ActionsSondage);
+
   protected readonly sondage = signal<SondageResponse | null>(null);
+  /**
+   * Actions proposées selon le rôle (abonnement expiré compris : elles restent visibles, désactivées avec
+   * l'infobulle de lecture seule).
+   */
+  protected readonly droits = computed(() => {
+    const sondage = this.sondage();
+    return sondage
+      ? droitsSondage(sondage, { role: this.auth.role(), utilisateur: this.auth.utilisateur(), lectureSeule: false })
+      : null;
+  });
+  protected readonly situation = computed(() => situationVersions(this.identifiant(), this.versions()));
+  /** Publié et pas encore terminé : dates ajustables, fermeture possible. */
+  protected readonly ouvertOuPlanifie = computed(() => {
+    const sondage = this.sondage();
+    return !!sondage && sondage.publie && sondage.statut !== 'TERMINE';
+  });
   /** Le contenu est-il modifiable par l'utilisateur ? (bouton « Modifier » ou « Voir le contenu ») */
   protected readonly contenuModifiable = computed(() => {
     const sondage = this.sondage();
@@ -128,6 +150,30 @@ export class DetailSondage {
     if (this.estAdmin()) {
       this.chargerAssignations(id);
     }
+  }
+
+  protected publier(sondage: SondageResponse): void {
+    this.actions.publier(sondage).subscribe(() => this.charger());
+  }
+
+  protected modifierDates(sondage: SondageResponse): void {
+    this.actions.modifierDates(sondage).subscribe(() => this.charger());
+  }
+
+  protected fermer(sondage: SondageResponse): void {
+    this.actions.fermer(sondage).subscribe(() => this.charger());
+  }
+
+  protected nouvelleVersion(sondage: SondageResponse): void {
+    this.actions.nouvelleVersion(sondage).subscribe();
+  }
+
+  protected dupliquer(sondage: SondageResponse): void {
+    this.actions.dupliquer(sondage).subscribe();
+  }
+
+  protected basculerModele(sondage: SondageResponse): void {
+    this.actions.basculerModele(sondage).subscribe((maj) => this.sondage.set(maj));
   }
 
   protected chargerAssignations(id = this.identifiant()): void {

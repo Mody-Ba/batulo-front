@@ -31,6 +31,17 @@ export const routes: Routes = [
         loadComponent: () => import('./editeur/editeur-sondage').then((m) => m.EditeurSondage),
       },
       {
+        path: ':id/apercu',
+        title: 'Aperçu du sondage · Batulo',
+        loadComponent: () => import('./apercu-sondage/apercu-sondage').then((m) => m.ApercuSondage),
+      },
+      {
+        // Lien public et QR code (sondage publié).
+        path: ':id/diffuser',
+        title: 'Diffuser le sondage · Batulo',
+        loadComponent: () => import('./diffuser-sondage/diffuser-sondage').then((m) => m.DiffuserSondage),
+      },
+      {
         path: ':id',
         title: 'Sondage · Batulo',
         loadComponent: () => import('./detail-sondage/detail-sondage').then((m) => m.DetailSondage),

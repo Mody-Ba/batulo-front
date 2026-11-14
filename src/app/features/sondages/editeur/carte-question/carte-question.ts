@@ -29,6 +29,7 @@ import {
   LIBELLES_TYPE_QUESTION,
   QuestionRequest,
   QuestionResponse,
+  TYPES_CRITERE,
   TYPES_QUESTION,
   TypeQuestion,
 } from '../../../../core/models/sondage.model';
@@ -36,6 +37,7 @@ import { messageErreur } from '../../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../../core/utils/regles-question';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { CritereQuestion } from '../critere-question/critere-question';
 import { EditeurSondageStore } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
 import { EtatEnregistrementIndicateur } from '../etat-enregistrement/etat-enregistrement';
@@ -79,6 +81,7 @@ import { QuestionTexteLong } from '../types/question-texte-long/question-texte-l
     MatSlideToggleModule,
     MessageErreur,
     EtatEnregistrementIndicateur,
+    CritereQuestion,
     QuestionChoixUnique,
     QuestionChoixMultiple,
     QuestionClassement,
@@ -153,6 +156,16 @@ export class CarteQuestion implements OnInit {
     }
   }
 
+  /**
+   * Critère d'analyse : pour une question enregistrée d'un type compatible, tant que son type n'a pas changé sans
+   * être enregistré (le backend retire le critère quand le type change). Liste de 0 ou 1 élément, recréée si le
+   * type enregistré change.
+   */
+  protected critere(): QuestionResponse[] {
+    const enregistree = this.store.questionEnregistree(this.idQuestion());
+    return enregistree && TYPES_CRITERE.has(enregistree.type) && enregistree.type === this.type ? [enregistree] : [];
+  }
+
   protected get type(): TypeQuestion {
     return this.formulaire.controls.type.value;
   }
@@ -196,6 +209,28 @@ export class CarteQuestion implements OnInit {
       } else {
         selecteur.value = ancien;
       }
+    });
+  }
+
+  /** Autres sections du sondage (menu « Déplacer vers une autre section »). */
+  protected autresSections() {
+    return (this.store.sondage()?.sections ?? [])
+      .map((section, index) => ({ section, numero: index + 1 }))
+      .filter(({ section }) => section.id !== this.sectionId());
+  }
+
+  /** Vers la fin d'une autre section (alternative au glisser-déposer, au clavier). */
+  protected changerDeSection(sectionId: number): void {
+    const id = this.idQuestion();
+    if (id === null) {
+      return;
+    }
+    this.store.changerDeSection(id, sectionId).subscribe({
+      next: () => this.snackBar.open('Question déplacée.', 'Fermer', { duration: 4000 }),
+      error: (erreur: unknown) => {
+        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.store.recharger();
+      },
     });
   }
 

@@ -1,0 +1,98 @@
+<h2 mat-dialog-title>{{ publier ? 'Publier « ' + sondage.titre + ' »' : 'Dates du sondage' }}</h2>
+
+<form [formGroup]="formulaire" (ngSubmit)="valider()" novalidate>
+  <mat-dialog-content>
+    <!-- En haut : toujours visible, même quand le contenu défile. -->
+    <div #zoneErreur class="zone-erreur" tabindex="-1">
+      <app-message-erreur
+        [erreur]="erreur()"
+        [titre]="titreErreur()"
+        [parDefaut]="publier ? 'Le sondage n’a pas pu être publié.' : 'Les dates n’ont pas pu être enregistrées.'"
+      />
+      @if (invalideSansDetail()) {
+        <app-encadre type="erreur" role="alert" titre="Vérifiez le formulaire">
+          <p>Certaines informations ne sont pas valides : vérifiez les dates indiquées.</p>
+        </app-encadre>
+      }
+    </div>
+    @if (incomplet) {
+      <app-encadre type="erreur" role="alert" titre="Le sondage ne peut pas encore être publié">
+        <p>{{ incomplet }}</p>
+      </app-encadre>
+    } @else if (publier) {
+      <app-encadre type="avertissement" titre="Le contenu ne sera plus modifiable">
+        <p>
+          Une fois publié, les sections, les questions et les options sont figées pour ne pas fausser les réponses.
+          Pour les changer, il faudra créer une nouvelle version. Les critères d’analyse resteront modifiables.
+        </p>
+      </app-encadre>
+    }
+
+    <fieldset class="groupe">
+      <legend>Ouverture</legend>
+      @if (dejaOuvert) {
+        <p class="texte-aide">Ouvert depuis le {{ sondage.datePublication | date: 'd MMMM y à HH:mm' }} : l’ouverture ne se modifie plus.</p>
+      } @else {
+        <mat-radio-group formControlName="ouverture" class="choix" aria-label="Ouverture">
+          <mat-radio-button value="maintenant">{{ publier ? 'Maintenant' : 'Ouvrir maintenant' }}</mat-radio-button>
+          <mat-radio-button value="planifiee">À une date planifiée</mat-radio-button>
+        </mat-radio-group>
+        @if (planifiee()) {
+          <mat-form-field class="champ-date">
+            <mat-label>Date et heure d’ouverture</mat-label>
+            <input matInput type="datetime-local" formControlName="dateOuverture" [min]="minimum" required />
+          </mat-form-field>
+          @if (aErreur('ouvertureManquante')) {
+            <p class="erreur" role="alert">Indiquez la date et l’heure d’ouverture.</p>
+          } @else if (aErreur('ouverturePassee')) {
+            <p class="erreur" role="alert">L’ouverture planifiée doit être dans le futur.</p>
+          }
+        }
+      }
+    </fieldset>
+
+    <fieldset class="groupe">
+      <legend>Fermeture</legend>
+      <mat-checkbox formControlName="avecFermeture">Prévoir une date de fermeture</mat-checkbox>
+      @if (avecFermeture()) {
+        <mat-form-field class="champ-date">
+          <mat-label>Date et heure de fermeture</mat-label>
+          <input matInput type="datetime-local" formControlName="dateFermeture" [min]="minimum" required />
+        </mat-form-field>
+        @if (aErreur('fermetureManquante')) {
+          <p class="erreur" role="alert">Indiquez la date et l’heure de fermeture.</p>
+        } @else if (aErreur('fermetureAvantOuverture')) {
+          <p class="erreur" role="alert">La fermeture doit venir après l’ouverture et après maintenant.</p>
+        }
+      } @else {
+        <p class="texte-aide">Sans date, le sondage reste ouvert jusqu’à ce que vous le fermiez.</p>
+      }
+    </fieldset>
+
+    @if (publier) {
+      <fieldset class="groupe">
+        <legend>Réponses</legend>
+        <mat-checkbox formControlName="reponseUnique">
+          Une seule réponse par appareil
+          <span class="cellule-secondaire">
+            Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.
+          </span>
+        </mat-checkbox>
+      </fieldset>
+    }
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close [disabled]="enCours()" cdkFocusInitial>Annuler</button>
+    <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours() || !!incomplet">
+      @if (enCours()) {
+        <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+      } @else if (publier) {
+        {{ planifiee() ? 'Planifier la publication' : 'Publier maintenant' }}
+      } @else {
+        Enregistrer les dates
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -21,9 +21,14 @@ import { EditeurSondageStore, ElementQuestion } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
 import { EtatEnregistrementIndicateur } from '../etat-enregistrement/etat-enregistrement';
 
+/** Identifiant de la liste des questions d'une section (glisser-déposer entre sections). */
+export function idListeQuestions(sectionId: number): string {
+  return `questions-section-${sectionId}`;
+}
+
 /**
- * Une section : titre et description (enregistrés automatiquement), ses questions (glisser-déposer à l'intérieur de
- * la section seulement en F5a : pas de route pour changer une question de section) et ses actions.
+ * Une section : titre et description (enregistrés automatiquement), ses questions (glisser-déposer dans la section
+ * ou vers une autre section, brouillon seulement) et ses actions.
  */
 @Component({
   selector: 'app-carte-section',
@@ -66,8 +71,22 @@ export class CarteSection implements OnInit {
   protected readonly limiteAtteinte = computed(
     () => this.elements().length >= REGLES_SONDAGE.questionsMaxParSection,
   );
-  /** Les questions locales restent à la fin : on ne dépose pas une question enregistrée parmi elles. */
-  protected readonly positionAutorisee = (index: number) => index < this.nombreEnregistrees();
+  /** Identifiant de la liste des questions (pour relier les listes de toutes les sections). */
+  protected readonly idListe = computed(() => idListeQuestions(this.section().id));
+  /** Listes des autres sections, vers lesquelles une question peut être glissée (brouillon seulement). */
+  protected readonly listesConnectees = computed(() =>
+    (this.store.sondage()?.sections ?? []).filter((s) => s.id !== this.section().id).map((s) => idListeQuestions(s.id)),
+  );
+  /**
+   * Les questions locales restent à la fin : on ne dépose pas une question enregistrée parmi elles. Venue d'une autre
+   * section, elle peut aussi se placer juste après la dernière question enregistrée.
+   */
+  protected readonly positionAutorisee = (index: number, drag: CdkDrag, liste: CdkDropList) =>
+    drag.dropContainer === liste ? index < this.nombreEnregistrees() : index <= this.nombreEnregistrees();
+  /** Venue d'une autre section : question enregistrée sans modification en attente, et section pas pleine. */
+  protected readonly entreeAutorisee = (drag: CdkDrag<number | null>, liste: CdkDropList) =>
+    drag.dropContainer === liste ||
+    (this.store.peutChangerDeSection(drag.data) && !this.store.sectionPleine(this.section().id));
   protected readonly parCle = (_index: number, element: ElementQuestion) => element.cle;
 
   protected readonly formulaire = new FormGroup({
@@ -119,8 +138,17 @@ export class CarteSection implements OnInit {
     this.store.ajouterQuestionLocale(this.section().id);
   }
 
-  protected deposer(evenement: CdkDragDrop<unknown>): void {
-    this.deplacerQuestion(evenement.previousIndex, evenement.currentIndex);
+  protected deposer(evenement: CdkDragDrop<number, number, number | null>): void {
+    if (evenement.previousContainer === evenement.container) {
+      this.deplacerQuestion(evenement.previousIndex, evenement.currentIndex);
+      return;
+    }
+    const questionId = evenement.item.data;
+    if (questionId !== null) {
+      this.store
+        .changerDeSection(questionId, this.section().id, evenement.currentIndex)
+        .subscribe({ error: (e: unknown) => this.echecOrdre(e) });
+    }
   }
 
   protected deplacerSection(vers: number): void {

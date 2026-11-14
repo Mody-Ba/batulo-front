@@ -35,6 +35,9 @@ describe('EditeurSondageStore', () => {
       modifierQuestion: vi.fn(),
       ordonnerQuestions: vi.fn(),
       ordonnerSections: vi.fn(),
+      versions: vi.fn(() => of([])),
+      deplacerQuestion: vi.fn(),
+      definirCritere: vi.fn(),
     };
     TestBed.configureTestingModule({
       providers: [
@@ -172,5 +175,75 @@ describe('EditeurSondageStore', () => {
     store.oublierEtat('question-2');
     store.signalerEtat('question-1', 'enregistre');
     expect(store.modificationsEnAttente()).toBe(false);
+  });
+
+  it('sondage publié : contenu figé, mais critères réglables par qui gère le sondage', () => {
+    store.sondage.set(sondageDeTest({ publie: true, statut: 'EN_COURS' }));
+    expect(store.modifiable()).toBe(false);
+    expect(store.criteresModifiables()).toBe(true);
+    service['definirCritere'].mockReturnValue(of(sondageDeTest({ publie: true, statut: 'EN_COURS' })));
+    store.definirCritere(101, { estCritere: true, critereConfig: null }).subscribe();
+    expect(service['definirCritere']).toHaveBeenCalledWith(3, 101, { estCritere: true, critereConfig: null });
+  });
+
+  it('refus de permission du serveur : critères bloqués aussi ; « sondage publié » ne les bloque pas', () => {
+    service['modifierQuestion'].mockReturnValue(throwError(() => erreur('SONDAGE_PUBLIE')));
+    store.modifierQuestion(101, DEMANDE).subscribe({ error: () => undefined });
+    expect(store.criteresModifiables()).toBe(true);
+    service['modifierQuestion'].mockReturnValue(throwError(() => erreur('PERMISSION_SONDAGES_REQUISE', 403)));
+    store.modifierQuestion(101, DEMANDE).subscribe({ error: () => undefined });
+    expect(store.criteresModifiables()).toBe(false);
+  });
+
+  it('après une publication : le sondage publié remplace le brouillon, les versions sont relues', () => {
+    service['versions'].mockClear();
+    store.remplacer(sondageDeTest({ publie: true, statut: 'EN_COURS' }));
+    expect(store.modifiable()).toBe(false);
+    expect(service['versions']).toHaveBeenCalledWith(3);
+  });
+
+  it('changer de section : tout de suite à l’écran, puis PUT avec la position (à partir de 1)', () => {
+    const q1 = questionDeTest({ id: 1 });
+    const q2 = questionDeTest({ id: 2 });
+    const q3 = questionDeTest({ id: 3 });
+    store.sondage.set(
+      sondageDeTest({
+        sections: [sectionDeTest({ id: 10, questions: [q1, q2] }), sectionDeTest({ id: 20, questions: [q3] })],
+      }),
+    );
+    service['deplacerQuestion'].mockReturnValue(new Subject());
+    store.changerDeSection(2, 20, 0).subscribe();
+    expect(store.sondage()?.sections.map((s) => s.questions.map((q) => q.id))).toEqual([[1], [2, 3]]);
+    expect(service['deplacerQuestion']).toHaveBeenCalledWith(3, 2, { sectionId: 20, position: 1 });
+    expect(store.elements().get(20)?.map((e) => e.cle)).toEqual(['question-2', 'question-3']);
+  });
+
+  it('changer de section : à la fin par défaut ; refusé en cas d’échec, recharger rend l’état du serveur', () => {
+    const serveur = sondageDeTest({
+      sections: [
+        sectionDeTest({ id: 10, questions: [questionDeTest({ id: 1 })] }),
+        sectionDeTest({ id: 20, questions: [questionDeTest({ id: 3 })] }),
+      ],
+    });
+    store.sondage.set(serveur);
+    service['deplacerQuestion'].mockReturnValue(throwError(() => erreur('LIMITE_ATTEINTE', 400)));
+    service['detail'].mockReturnValue(of(serveur));
+    const echec = vi.fn();
+    store.changerDeSection(1, 20).subscribe({ error: echec });
+    expect(service['deplacerQuestion']).toHaveBeenCalledWith(3, 1, { sectionId: 20, position: 2 });
+    expect(echec).toHaveBeenCalled();
+    store.recharger();
+    expect(store.sondage()?.sections.map((s) => s.questions.map((q) => q.id))).toEqual([[1], [3]]);
+  });
+
+  it('changer de section : seulement une question enregistrée sans modification, dans un brouillon', () => {
+    store.sondage.set(sondageDeTest({ sections: [sectionDeTest({ id: 10, questions: [questionDeTest({ id: 1 })] })] }));
+    expect(store.peutChangerDeSection(1)).toBe(true);
+    store.signalerEtat('question-1', 'modifie');
+    expect(store.peutChangerDeSection(1)).toBe(false);
+    store.signalerEtat('question-1', 'enregistre');
+    expect(store.peutChangerDeSection(null)).toBe(false);
+    store.sondage.set(sondageDeTest({ publie: true, statut: 'EN_COURS' }));
+    expect(store.peutChangerDeSection(1)).toBe(false);
   });
 });

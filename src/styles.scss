@@ -300,7 +300,8 @@ a {
     color: var(--mat-sys-on-surface-variant);
   }
 
-  &.sondage-NON_COMMENCE {
+  &.sondage-PLANIFIE,
+  &.etiquette-modele {
     background: var(--mat-sys-secondary-container);
     color: var(--mat-sys-on-secondary-container);
   }

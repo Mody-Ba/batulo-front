@@ -1,0 +1,85 @@
+<section class="conteneur-page etroit">
+  <a matButton [routerLink]="['/sondages', id()]" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Fiche du sondage
+  </a>
+
+  <app-entete-page
+    titre="Diffuser le sondage"
+    icone="share"
+    sousTitre="Partagez le lien ou le QR code : il mène toujours à la version ouverte du sondage."
+  />
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement du lien" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="Le lien n’a pas pu être chargé.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (brouillon()) {
+    <app-encadre type="info" role="status" titre="Pas encore de lien">
+      <p>Ce sondage n’a jamais été publié : son lien et son QR code seront créés à la publication.</p>
+      <p><a matButton [routerLink]="['/sondages', id()]">Retour à la fiche</a></p>
+    </app-encadre>
+  }
+
+  @if (lien(); as l) {
+    <section class="carte-section" aria-labelledby="titre-lien">
+      <h2 id="titre-lien">Lien public</h2>
+      <div class="ligne-lien">
+        <mat-form-field class="champ-lien">
+          <mat-label>Adresse du formulaire</mat-label>
+          <input matInput [value]="l.url" readonly (focus)="$any($event.target).select()" />
+        </mat-form-field>
+        <button matButton="filled" type="button" (click)="copier(l)">
+          <mat-icon fontIcon="content_copy" aria-hidden="true" />Copier
+        </button>
+        <a matButton="outlined" [href]="l.url" target="_blank" rel="noopener">
+          <mat-icon fontIcon="open_in_new" aria-hidden="true" />Ouvrir
+        </a>
+      </div>
+      <p class="texte-aide">Le même lien pour toutes les versions ; les réponses ne sont acceptées que si le sondage est ouvert.</p>
+    </section>
+
+    <section class="carte-section" aria-labelledby="titre-qr">
+      <h2 id="titre-qr">QR code</h2>
+      <div class="qr">
+        <div class="image-qr">
+          @if (urlQr(); as url) {
+            <img [src]="url" [alt]="'QR code du lien ' + l.url" width="240" height="240" />
+          } @else if (chargementQr()) {
+            <mat-progress-bar mode="indeterminate" aria-label="Chargement du QR code" />
+          }
+        </div>
+        <div class="reglages-qr">
+          <span id="taille-qr">Taille du fichier</span>
+          <mat-button-toggle-group
+            aria-labelledby="taille-qr"
+            [value]="taille()"
+            (change)="changerTaille($event.value)"
+            [hideSingleSelectionIndicator]="true"
+          >
+            @for (t of tailles; track t) {
+              <mat-button-toggle [value]="t">{{ t }} px</mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+          <a
+            matButton="filled"
+            [attr.href]="urlQr()"
+            [attr.download]="nomFichier()"
+            [class.desactive]="!urlQr()"
+            [attr.aria-disabled]="!urlQr() || null"
+          >
+            <mat-icon fontIcon="download" aria-hidden="true" />Télécharger le PNG
+          </a>
+          <p class="texte-aide">À imprimer sur une affiche ou un flyer : 1000 px pour une grande affiche.</p>
+        </div>
+      </div>
+      <app-message-erreur [erreur]="erreurQr()" parDefaut="Le QR code n’a pas pu être chargé.">
+        <p><button matButton type="button" (click)="chargerQr()">Réessayer</button></p>
+      </app-message-erreur>
+    </section>
+  }
+</section>

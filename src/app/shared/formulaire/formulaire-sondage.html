@@ -1,0 +1,65 @@
+<article class="formulaire-sondage">
+  <header class="entete">
+    <h2 class="titre">{{ contenu().titre }}</h2>
+    @if (contenu().description) {
+      <p class="description">{{ contenu().description }}</p>
+    }
+    <p class="legende"><span class="obligatoire" aria-hidden="true">*</span> Réponse obligatoire</p>
+  </header>
+
+  @if (sections().length === 0) {
+    <app-encadre type="info" role="status"><p>Ce formulaire n’a encore aucune question.</p></app-encadre>
+  } @else if (section(); as s) {
+    @if (sections().length > 1) {
+      <div class="progression">
+        <span>Section {{ indexSection() + 1 }} sur {{ sections().length }}</span>
+        <mat-progress-bar mode="determinate" [value]="progression()" aria-hidden="true" />
+      </div>
+    }
+
+    <section class="section" [attr.aria-labelledby]="'titre-section-' + s.id">
+      <h3 class="titre-section" tabindex="-1" [id]="'titre-section-' + s.id">{{ s.titre }}</h3>
+      @if (s.description) {
+        <p class="description">{{ s.description }}</p>
+      }
+      <div class="questions">
+        @for (q of s.questions; track q.id; let i = $index) {
+          <app-question-repondant [question]="q" [controle]="controle(cleReponse(q))" [numero]="premierNumero()[indexSection()] + i" />
+        }
+      </div>
+    </section>
+
+    @if (aCorriger()) {
+      <p class="a-corriger" role="alert">Certaines réponses sont à corriger avant de continuer.</p>
+    }
+    @if (verifie()) {
+      <app-encadre type="succes" role="status" titre="Aperçu">
+        <p>Vos réponses sont valides. Rien n’a été envoyé : c’est un aperçu.</p>
+      </app-encadre>
+    }
+
+    <div class="navigation">
+      @if (indexSection() > 0) {
+        <button matButton="outlined" type="button" (click)="precedent()">
+          <mat-icon fontIcon="arrow_back" aria-hidden="true" />Précédent
+        </button>
+      }
+      <span class="espace"></span>
+      @if (derniere()) {
+        <button matButton="filled" type="button" (click)="terminer()">
+          {{ mode() === 'apercu' ? 'Vérifier (aperçu, rien n’est envoyé)' : 'Envoyer' }}
+        </button>
+      } @else {
+        <button matButton="filled" type="button" (click)="suivant()">
+          Suivant<mat-icon iconPositionEnd fontIcon="arrow_forward" aria-hidden="true" />
+        </button>
+      }
+    </div>
+    @if (mode() === 'apercu') {
+      <p class="texte-aide note-apercu">
+        Aperçu : vous pouvez répondre pour essayer le formulaire ; rien n’est enregistré.
+        <button matButton type="button" (click)="recommencer()">Recommencer</button>
+      </p>
+    }
+  }
+</article>

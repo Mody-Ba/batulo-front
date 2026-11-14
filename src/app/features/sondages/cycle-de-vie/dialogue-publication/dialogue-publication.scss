@@ -1,0 +1,47 @@
+form {
+  display: contents;
+}
+
+.groupe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  margin: var(--bt-espace-4) 0 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: var(--bt-espace-2);
+    padding: 0;
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.choix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-1) var(--bt-espace-4);
+
+  mat-radio-button {
+    min-height: 44px;
+  }
+}
+
+.champ-date {
+  width: 100%;
+  max-width: 320px;
+}
+
+.erreur {
+  margin: 0;
+  color: var(--mat-sys-error);
+  font: var(--mat-sys-body-small);
+}
+
+.zone-erreur {
+  outline: none;
+
+  &:not(:empty) {
+    margin-bottom: var(--bt-espace-3);
+  }
+}

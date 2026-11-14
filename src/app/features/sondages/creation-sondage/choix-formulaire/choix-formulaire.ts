@@ -61,7 +61,7 @@ export const TAILLE_FORMULAIRES = 10;
             <span class="titre">
               {{ f.titre }}
               @if (f.estModele) {
-                <span class="pastille-statut sondage-NON_COMMENCE">Modèle</span>
+                <span class="pastille-statut etiquette-modele">Modèle</span>
               }
             </span>
             <span class="cellule-secondaire">

@@ -97,6 +97,10 @@
     }
   </div>
 
+  @for (q of critere(); track q.id + '-' + q.type) {
+    <app-critere-question [question]="q" />
+  }
+
   <app-message-erreur
     [erreur]="auto.erreur()"
     [titre]="'La question ' + numero() + ' n’a pas été enregistrée'"
@@ -126,6 +130,16 @@
       <button mat-menu-item type="button" (click)="descendre()" [disabled]="position() >= nombreEnregistrees() - 1">
         <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre</span>
       </button>
+      @if (autresSections().length) {
+        <button
+          mat-menu-item
+          type="button"
+          [matMenuTriggerFor]="menuSections"
+          [disabled]="!store.peutChangerDeSection(idQuestion())"
+        >
+          <mat-icon fontIcon="drive_file_move" aria-hidden="true" /><span>Déplacer vers une autre section</span>
+        </button>
+      }
     }
     <button
       mat-menu-item
@@ -136,5 +150,18 @@
     >
       <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la question</span>
     </button>
+  </mat-menu>
+
+  <mat-menu #menuSections="matMenu">
+    @for (autre of autresSections(); track autre.section.id) {
+      <button
+        mat-menu-item
+        type="button"
+        (click)="changerDeSection(autre.section.id)"
+        [disabled]="store.sectionPleine(autre.section.id)"
+      >
+        <span>Section {{ autre.numero }} : {{ autre.section.titre }}</span>
+      </button>
+    }
   </mat-menu>
 </article>

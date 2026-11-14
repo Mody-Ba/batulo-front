@@ -56,13 +56,18 @@
     class="questions"
     cdkDropList
     cdkDropListLockAxis="y"
+    [id]="idListe()"
+    [cdkDropListData]="section().id"
+    [cdkDropListConnectedTo]="listesConnectees()"
     [cdkDropListDisabled]="!store.modifiable()"
     [cdkDropListSortPredicate]="positionAutorisee"
+    [cdkDropListEnterPredicate]="entreeAutorisee"
     (cdkDropListDropped)="deposer($event)"
   >
     @for (element of elements(); track element.cle; let i = $index) {
       <app-carte-question
         cdkDrag
+        [cdkDragData]="element.question?.id ?? null"
         [cdkDragDisabled]="!store.modifiable() || element.question === null"
         [question]="element.question"
         [cle]="element.cle"

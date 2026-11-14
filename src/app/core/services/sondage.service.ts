@@ -4,7 +4,12 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PageResponse } from '../models/page.model';
 import {
+  ApercuResponse,
   CreationSondageRequest,
+  CritereRequest,
+  DatesSondageRequest,
+  DeplacementQuestionRequest,
+  LienSondageResponse,
   FormulaireResponse,
   OrdreRequest,
   QuestionRequest,
@@ -121,8 +126,63 @@ export class SondageService {
     return this.http.delete<SondageResponse>(`${this.url}/${id}/questions/${questionId}`);
   }
 
-  /** Questions d'une section seulement (pas de déplacement entre sections en F5a). */
+  /** Vers une autre section (ou une autre position dans la même) ; 400 POSITION_INVALIDE, LIMITE_ATTEINTE. */
+  deplacerQuestion(id: number, questionId: number, deplacement: DeplacementQuestionRequest): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/questions/${questionId}/section`, deplacement);
+  }
+
+  /** Réordonne les questions d'une section (tous ses ids). */
   ordonnerQuestions(id: number, sectionId: number, ordre: OrdreRequest): Observable<SondageResponse> {
     return this.http.put<SondageResponse>(`${this.url}/${id}/sections/${sectionId}/questions/ordre`, ordre);
+  }
+
+  // ---------------------------------------------------------------- Cycle de vie (F5b)
+
+  /** Le formulaire tel que le verra le répondant (brouillon compris). */
+  apercu(id: number): Observable<ApercuResponse> {
+    return this.http.get<ApercuResponse>(`${this.url}/${id}/apercu`);
+  }
+
+  /** Brouillon -> publié ; contenu gelé ensuite. 400 SONDAGE_INCOMPLET ou DATES_INVALIDES. */
+  publier(id: number, dates: DatesSondageRequest): Observable<SondageResponse> {
+    return this.http.post<SondageResponse>(`${this.url}/${id}/publier`, dates);
+  }
+
+  /** Sondage publié, pas terminé : ouverture (avant qu'elle n'ait lieu) et fermeture prévue. */
+  modifierDates(id: number, dates: DatesSondageRequest): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/dates`, dates);
+  }
+
+  /** Définitif : TERMINE tout de suite. */
+  fermer(id: number): Observable<SondageResponse> {
+    return this.http.post<SondageResponse>(`${this.url}/${id}/fermer`, null);
+  }
+
+  /** Brouillon de la version N+1 (dernière version publiée seulement). 409 BROUILLON_EXISTANT, VERSION_OBSOLETE. */
+  nouvelleVersion(id: number): Observable<SondageResponse> {
+    return this.http.post<SondageResponse>(`${this.url}/${id}/nouvelle-version`, null);
+  }
+
+  /** Nouveau brouillon indépendant « Copie de ... » (version 1). */
+  dupliquer(id: number): Observable<SondageResponse> {
+    return this.http.post<SondageResponse>(`${this.url}/${id}/dupliquer`, null);
+  }
+
+  marquerModele(id: number, estModele: boolean): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/modele`, { estModele });
+  }
+
+  /** Réglage d'analyse : permis même après publication. */
+  definirCritere(id: number, questionId: number, critere: CritereRequest): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/questions/${questionId}/critere`, critere);
+  }
+
+  lien(id: number): Observable<LienSondageResponse> {
+    return this.http.get<LienSondageResponse>(`${this.url}/${id}/lien`);
+  }
+
+  /** Image PNG du QR code du lien public (de 100 à 1000 pixels). */
+  qrCode(id: number, taille = 300): Observable<Blob> {
+    return this.http.get(`${this.url}/${id}/qr-code`, { params: { taille }, responseType: 'blob' });
   }
 }
