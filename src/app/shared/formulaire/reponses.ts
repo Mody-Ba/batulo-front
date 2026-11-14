@@ -191,6 +191,10 @@ export function messageReponse(controle: AbstractControl): string | null {
   if (e['matriceIncomplete']) {
     return 'Choisissez une réponse pour chaque ligne.';
   }
+  if (e['serveur']) {
+    // Refus du serveur (REPONSES_INVALIDES) : son message, en français.
+    return String(e['serveur']);
+  }
   return null;
 }
 

@@ -1,21 +1,22 @@
-import { Component, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatRadioModule } from '@angular/material/radio';
-import { ValeurReponse } from '../reponses';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ChampBase } from './champ-base';
 
-/** OUI_NON : la réponse est true (oui) ou false (non). */
+/** OUI_NON : deux boutons radio natifs ; la réponse est true (oui) ou false (non). */
 @Component({
   selector: 'app-champ-oui-non',
-  imports: [ReactiveFormsModule, MatRadioModule],
+  imports: [ReactiveFormsModule],
   template: `
-    <mat-radio-group class="liste-choix en-ligne" [formControl]="controle()" [attr.aria-labelledby]="idLibelle()">
-      <mat-radio-button [value]="true">Oui</mat-radio-button>
-      <mat-radio-button [value]="false">Non</mat-radio-button>
-    </mat-radio-group>
+    <div class="liste-choix en-ligne" role="radiogroup" [attr.aria-labelledby]="idLibelle" [attr.aria-describedby]="decrit()" [attr.aria-invalid]="invalide() || null">
+      <label class="choix">
+        <input type="radio" [name]="idBase()" [attr.name]="idBase()" [value]="true" [formControl]="$any(controle())" />
+        <span>Oui</span>
+      </label>
+      <label class="choix">
+        <input type="radio" [name]="idBase()" [attr.name]="idBase()" [value]="false" [formControl]="$any(controle())" />
+        <span>Non</span>
+      </label>
+    </div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampOuiNon {
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-}
+export class ChampOuiNon extends ChampBase {}

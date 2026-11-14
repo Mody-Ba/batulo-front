@@ -1,0 +1,99 @@
+<main class="page-publique" id="contenu">
+  @switch (etat().type) {
+    @case ('chargement') {
+      <p class="chargement" role="status" aria-live="polite">Chargement du sondage…</p>
+    }
+
+    @case ('formulaire') {
+      @if (etat(); as e) {
+        @if (e.type === 'formulaire') {
+          <h1 class="visuellement-cache" tabindex="-1">{{ e.formulaire.titre }}</h1>
+          <app-formulaire-sondage
+            [contenu]="e.formulaire"
+            mode="reponse"
+            [reponsesInitiales]="reponsesInitiales()"
+            [sectionInitiale]="sectionInitiale()"
+            [envoiEnCours]="envoiEnCours()"
+            [erreursServeur]="erreursServeur()"
+            (reponsesModifiees)="surSaisie($event)"
+            (sectionChangee)="surSection($event)"
+            (envoyer)="envoyer(e.formulaire, $event)"
+          >
+            @if (e.formulaire.dateFermeture) {
+              <p entete class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | date: 'd MMMM y à HH:mm' }}.</p>
+            }
+            @if (brouillonRepris()) {
+              <div class="encart-public info" role="status">
+                <p>Vos réponses en cours ont été reprises.</p>
+                <button type="button" class="bouton-lien" (click)="effacerBrouillon()">Tout effacer et recommencer</button>
+              </div>
+            }
+            @if (erreurEnvoi(); as message) {
+              <div class="encart-public erreur erreur-envoi" role="alert" tabindex="-1">
+                <p>{{ message }}</p>
+              </div>
+            }
+          </app-formulaire-sondage>
+        }
+      }
+    }
+
+    @case ('confirmation') {
+      @if (etat(); as e) {
+        @if (e.type === 'confirmation') {
+          <section class="carte-etat succes" aria-labelledby="titre-etat">
+            <span class="icone" aria-hidden="true">✓</span>
+            <h1 id="titre-etat" tabindex="-1">Merci !</h1>
+            <p role="status">{{ e.confirmation.message }}</p>
+            <p class="secondaire">Envoyé le {{ e.confirmation.dateSoumission | date: 'd MMMM y à HH:mm' }}.</p>
+            @if (!e.formulaire.reponseUnique) {
+              <button type="button" class="bouton-public" (click)="nouvelleReponse(e.formulaire)">Nouvelle réponse</button>
+              <p class="secondaire">Collecte terrain : le formulaire repart vide pour la personne suivante.</p>
+            } @else {
+              <p class="secondaire">Vous pouvez fermer cette page.</p>
+            }
+          </section>
+        }
+      }
+    }
+
+    @case ('indisponible') {
+      @if (etat(); as e) {
+        @if (e.type === 'indisponible') {
+          <section class="carte-etat" [class]="'raison-' + e.raison" aria-labelledby="titre-etat">
+            <span class="icone" aria-hidden="true">{{ e.raison === 'deja-repondu' ? '✓' : 'ⓘ' }}</span>
+            <h1 id="titre-etat" tabindex="-1">{{ titres[e.raison] }}</h1>
+            @switch (e.raison) {
+              @case ('non-ouvert') {
+                <p>{{ e.message ?? 'Il n’accepte pas encore de réponses.' }} Revenez à ce moment-là avec le même lien.</p>
+              }
+              @case ('ferme') {
+                <p>Il n’accepte plus de réponses. Merci de votre intérêt.</p>
+              }
+              @case ('deja-repondu') {
+                <p>Vos réponses ont déjà été envoyées depuis cet appareil. Ce sondage n’accepte qu’une réponse par appareil.</p>
+              }
+              @case ('introuvable') {
+                <p>Ce lien ne correspond à aucun sondage. Vérifiez qu’il est complet, ou demandez-le à nouveau à la personne qui vous l’a envoyé.</p>
+              }
+              @case ('trop-de-requetes') {
+                <p>{{ e.message ?? 'Trop de demandes depuis votre connexion.' }}</p>
+                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+              }
+              @case ('injoignable') {
+                <p>Le sondage n’a pas pu être chargé. Vérifiez votre connexion à Internet.</p>
+                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+              }
+              @default {
+                <p>{{ e.message ?? 'Une erreur inattendue est survenue.' }}</p>
+                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+              }
+            }
+          </section>
+        }
+      }
+    }
+  }
+
+  <footer class="pied">Sondage réalisé avec Batulo</footer>
+</main>

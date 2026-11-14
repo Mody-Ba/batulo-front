@@ -1,24 +1,20 @@
-import { Component, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatRadioModule } from '@angular/material/radio';
-import { QuestionResponse } from '../../../core/models/sondage.model';
-import { ValeurReponse } from '../reponses';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ChampBase } from './champ-base';
 
-/** CHOIX_UNIQUE : une option ; la réponse est la valeur de l'option. */
+/** CHOIX_UNIQUE : boutons radio natifs ; la réponse est la valeur de l'option. */
 @Component({
   selector: 'app-champ-choix-unique',
-  imports: [ReactiveFormsModule, MatRadioModule],
+  imports: [ReactiveFormsModule],
   template: `
-    <mat-radio-group class="liste-choix" [formControl]="controle()" [attr.aria-labelledby]="idLibelle()">
+    <div class="liste-choix" role="radiogroup" [attr.aria-labelledby]="idLibelle" [attr.aria-describedby]="decrit()" [attr.aria-invalid]="invalide() || null">
       @for (option of question().options; track option.id) {
-        <mat-radio-button [value]="option.valeur">{{ option.libelle }}</mat-radio-button>
+        <label class="choix">
+          <input type="radio" [name]="idBase()" [attr.name]="idBase()" [value]="option.valeur" [formControl]="$any(controle())" />
+          <span>{{ option.libelle }}</span>
+        </label>
       }
-    </mat-radio-group>
+    </div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampChoixUnique {
-  readonly question = input.required<QuestionResponse>();
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-}
+export class ChampChoixUnique extends ChampBase {}

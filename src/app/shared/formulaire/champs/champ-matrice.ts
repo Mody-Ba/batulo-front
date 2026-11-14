@@ -1,53 +1,49 @@
-import { Component, computed, input } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
-import { ConfigurationMatrice, QuestionResponse } from '../../../core/models/sondage.model';
-import { ValeurReponse } from '../reponses';
+import { Component, computed } from '@angular/core';
+import { ConfigurationMatrice } from '../../../core/models/sondage.model';
+import { ChampBase } from './champ-base';
 
 /**
- * MATRICE : une colonne pour chaque ligne (une grille commencée doit être complète). Tableau sur un conteneur large,
- * une carte par ligne sur un conteneur étroit (container query) ; chaque ligne est un groupe de boutons radio.
+ * MATRICE : une colonne pour chaque ligne (une grille commencée doit être complète). Une carte par ligne sur un
+ * formulaire étroit, un tableau sur un formulaire large (container query) ; chaque ligne est un groupe de boutons
+ * radio natifs.
  */
 @Component({
   selector: 'app-champ-matrice',
-  imports: [MatRadioModule],
   template: `
-    <div class="matrice" role="group" [attr.aria-labelledby]="idLibelle()" [style.--bt-colonnes]="colonnes().length">
+    <div class="matrice" role="group" [attr.aria-labelledby]="idLibelle" [attr.aria-describedby]="decrit()" [style.--bt-colonnes]="colonnes().length">
       <div class="matrice-entete" aria-hidden="true">
         <span></span>
         @for (colonne of colonnes(); track colonne) {
-          <span class="matrice-colonne">{{ colonne }}</span>
+          <span>{{ colonne }}</span>
         }
       </div>
       @for (ligne of lignes(); track ligne; let i = $index) {
-        <div class="matrice-ligne">
-          <span class="matrice-libelle" [id]="idLibelle() + '-ligne-' + i">{{ ligne }}</span>
-          <mat-radio-group
-            class="matrice-choix"
-            [value]="reponse()[ligne] ?? null"
-            [disabled]="controle().disabled"
-            (change)="choisir(ligne, $event)"
-            [attr.aria-labelledby]="idLibelle() + '-ligne-' + i"
-          >
+        <div class="matrice-ligne" role="radiogroup" [attr.aria-labelledby]="idBase() + '-ligne-' + i">
+          <span class="matrice-libelle" [id]="idBase() + '-ligne-' + i">{{ ligne }}</span>
+          <div class="matrice-choix">
             @for (colonne of colonnes(); track colonne) {
-              <mat-radio-button [value]="colonne">
+              <label class="choix">
+                <input
+                  type="radio"
+                  [attr.name]="idBase() + '-ligne-' + i"
+                  [checked]="reponse()[ligne] === colonne"
+                  [disabled]="controle().disabled"
+                  (change)="choisir(ligne, colonne)"
+                />
                 <span class="matrice-colonne-etroit">{{ colonne }}</span>
                 <span class="visuellement-cache matrice-colonne-large">{{ colonne }}</span>
-              </mat-radio-button>
+              </label>
             }
-          </mat-radio-group>
+          </div>
         </div>
       }
     </div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampMatrice {
-  readonly question = input.required<QuestionResponse>();
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-
-  protected readonly lignes = computed(() => (this.question().configuration as Partial<ConfigurationMatrice>).lignes ?? []);
+export class ChampMatrice extends ChampBase {
+  protected readonly lignes = computed(
+    () => (this.question().configuration as Partial<ConfigurationMatrice>).lignes ?? [],
+  );
   protected readonly colonnes = computed(
     () => (this.question().configuration as Partial<ConfigurationMatrice>).colonnes ?? [],
   );
@@ -57,8 +53,8 @@ export class ChampMatrice {
     return valeur && typeof valeur === 'object' && !Array.isArray(valeur) ? valeur : {};
   }
 
-  protected choisir(ligne: string, evenement: MatRadioChange): void {
-    this.controle().setValue({ ...this.reponse(), [ligne]: evenement.value });
+  protected choisir(ligne: string, colonne: string): void {
+    this.controle().setValue({ ...this.reponse(), [ligne]: colonne });
     this.controle().markAsTouched();
   }
 }

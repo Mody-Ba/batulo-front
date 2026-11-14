@@ -1,38 +1,29 @@
-import { Component, computed, input } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { ConfigurationNumerique, QuestionResponse } from '../../../core/models/sondage.model';
-import { ValeurReponse } from '../reponses';
+import { Component, computed } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ConfigurationNumerique } from '../../../core/models/sondage.model';
+import { ChampBase } from './champ-base';
 
-/** NUMERIQUE : un nombre, entre min et max s'ils sont définis, avec au plus `decimales` décimales. */
+/** NUMERIQUE : champ nombre natif (clavier numérique sur téléphone), bornes et décimales de la question. */
 @Component({
   selector: 'app-champ-numerique',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule],
   template: `
-    <mat-form-field class="champ-court">
-      <input
-        matInput
-        type="number"
-        [inputMode]="config().decimales ? 'decimal' : 'numeric'"
-        [formControl]="$any(controle())"
-        [attr.min]="config().min ?? null"
-        [attr.max]="config().max ?? null"
-        [step]="pas()"
-        [attr.aria-labelledby]="idLibelle()"
-      />
-      @if (indication(); as texte) {
-        <mat-hint>{{ texte }}</mat-hint>
-      }
-    </mat-form-field>
+    <input
+      class="champ-saisie court"
+      type="number"
+      [id]="idChamp"
+      [inputMode]="config().decimales ? 'decimal' : 'numeric'"
+      [formControl]="$any(controle())"
+      [attr.min]="config().min ?? null"
+      [attr.max]="config().max ?? null"
+      [step]="pas()"
+      [attr.aria-describedby]="idsDescription()"
+      [attr.aria-invalid]="invalide() || null"
+    />
+    <div class="indication"><span [id]="idBase() + '-format'">{{ indication() }}</span></div>
   `,
-  styleUrl: './champs.scss',
 })
-export class ChampNumerique {
-  readonly question = input.required<QuestionResponse>();
-  readonly controle = input.required<FormControl<ValeurReponse>>();
-  readonly idLibelle = input.required<string>();
-
+export class ChampNumerique extends ChampBase {
   protected readonly config = computed(() => this.question().configuration as Partial<ConfigurationNumerique>);
   protected readonly pas = computed(() => (this.config().decimales ? 10 ** -(this.config().decimales ?? 0) : 1));
   protected readonly indication = computed(() => {
@@ -48,4 +39,8 @@ export class ChampNumerique {
     const precision = decimales ? `${decimales} décimale${decimales > 1 ? 's' : ''} au plus` : 'Nombre entier';
     return bornes ? `${bornes} · ${precision}` : precision;
   });
+
+  protected idsDescription(): string {
+    return [this.decrit(), `${this.idBase()}-format`].filter(Boolean).join(' ');
+  }
 }
