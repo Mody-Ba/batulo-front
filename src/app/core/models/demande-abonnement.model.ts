@@ -49,6 +49,15 @@ export interface TraitementDemandeRequest {
   reponse: string | null;
 }
 
+/** POST /api/abonnements/demandes (admin) : postée dans la conversation avec Batulo, super admins notifiés. */
+export interface DemandeAbonnementRequest {
+  formuleSouhaitee: Formule;
+  message: string;
+}
+
+/** Longueur maximale du message d'une demande et de la réponse (records du backend). */
+export const LONGUEUR_MAX_MESSAGE_DEMANDE = 2000;
+
 /** Longueur maximale de la réponse (TraitementDemandeRequest du backend). */
 export const LONGUEUR_MAX_REPONSE_DEMANDE = 2000;
 

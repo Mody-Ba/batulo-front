@@ -1,0 +1,147 @@
+.messagerie {
+  display: flex;
+  flex-direction: column;
+}
+
+.disposition {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: var(--bt-espace-4);
+  height: calc(100dvh - 220px);
+  min-height: 420px;
+}
+
+.liste,
+.fil {
+  min-height: 0;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+
+  .zone-progression {
+    margin: 0;
+  }
+}
+
+.fil {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.conversations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversation {
+  display: flex;
+  gap: var(--bt-espace-3);
+  padding: var(--bt-espace-3);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--mat-sys-surface-container);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+
+  &.active {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+
+  &.non-lue .nom,
+  &.non-lue .extrait {
+    font-weight: 700;
+  }
+}
+
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font: var(--mat-sys-label-large);
+  text-transform: uppercase;
+}
+
+.texte {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ligne {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bt-espace-2);
+}
+
+.nom {
+  overflow: hidden;
+  font: var(--mat-sys-title-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date,
+.entreprise {
+  flex-shrink: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-small);
+}
+
+.extrait {
+  overflow: hidden;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pastille-non-lus {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--mat-sys-error);
+  color: var(--mat-sys-on-error);
+  font: var(--mat-sys-label-small);
+  line-height: 20px;
+  text-align: center;
+}
+
+// Téléphone et tablette étroite : la liste, ou le fil ouvert, jamais les deux.
+@media (max-width: 839.98px) {
+  .disposition {
+    grid-template-columns: 1fr;
+    height: calc(100dvh - 180px);
+  }
+
+  .messagerie:not(.fil-ouvert) .fil,
+  .messagerie.fil-ouvert .liste,
+  .messagerie.fil-ouvert .entete {
+    display: none;
+  }
+}

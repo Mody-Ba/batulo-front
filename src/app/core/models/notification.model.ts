@@ -33,6 +33,13 @@ export interface NotificationResponse {
   message: string;
   lue: boolean;
   dateCreation: string;
+  /**
+   * Élément concerné, selon le type : abonnement (inscription, paiement, expiration), sondage (lignée, assignation),
+   * message (nouveau message), envoi (statistiques reçues), demande (demandes d'abonnement). Absent pour les anciennes.
+   */
+  referenceId?: number | null;
+  /** Conversation à ouvrir (nouveau message, statistiques reçues, demandes d'abonnement) ; absent sinon. */
+  conversationId?: number | null;
 }
 
 /** GET /api/notifications/non-lues/nombre */

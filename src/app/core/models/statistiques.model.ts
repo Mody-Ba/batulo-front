@@ -155,7 +155,7 @@ export const TYPES_CROISABLES: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>
   'NUMERIQUE',
 ]);
 
-/** Cellule d'un tableau croisé (record CroisementResponse.Cellule : l'OpenAPI la confond avec celle de la matrice). */
+/** Cellule d'un tableau croisé (schéma OpenAPI CelluleCroisement). */
 export interface CelluleCroisement {
   /** null : colonne « Non renseigné ». */
   colonne: string | null;
@@ -233,3 +233,15 @@ export interface EnvoiStatistiqueResponse {
 export type FormatExport = 'CSV' | 'XLSX' | 'PDF';
 export type ValeursExport = 'LIBELLES' | 'CODES';
 export type SeparateurDecimal = 'VIRGULE' | 'POINT';
+
+/** Période d'un envoi en clair. */
+export function resumeEnvoi(envoi: EnvoiStatistiqueResponse): string {
+  const parties = [envoi.lignee ? 'toutes les versions' : `version ${envoi.version}`];
+  if (envoi.du || envoi.au) {
+    parties.push(`du ${envoi.du ?? 'début'} au ${envoi.au ?? 'dernier jour'}`);
+  }
+  if (envoi.criteres.length) {
+    parties.push(`${envoi.criteres.length} critère${envoi.criteres.length > 1 ? 's' : ''}`);
+  }
+  return parties.join(' · ');
+}

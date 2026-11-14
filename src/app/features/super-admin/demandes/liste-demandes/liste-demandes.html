@@ -25,6 +25,7 @@
     }
   </div>
 
+  <app-message-erreur [erreur]="erreurDemande()" parDefaut="Cette demande n’a pas pu être ouverte." />
   <app-message-erreur [erreur]="erreur()" parDefaut="La liste des demandes n’a pas pu être chargée.">
     <p><button matButton type="button" (click)="recharger()">Réessayer</button></p>
   </app-message-erreur>

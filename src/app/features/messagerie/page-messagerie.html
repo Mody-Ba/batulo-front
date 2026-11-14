@@ -1,0 +1,77 @@
+<section class="conteneur-page messagerie" [class.fil-ouvert]="etat.conversationActive() !== null">
+  <app-entete-page titre="Messagerie" icone="forum" class="entete">
+    <button matButton="filled" type="button" (click)="nouvelleConversation()" [disabled]="ouvertureEnCours()">
+      <mat-icon fontIcon="edit_square" aria-hidden="true" />{{ titreNouvelle() }}
+    </button>
+  </app-entete-page>
+
+  <div class="disposition">
+    <aside class="liste" aria-labelledby="titre-conversations">
+      <h2 id="titre-conversations" class="visuellement-cache">Conversations</h2>
+      <div class="zone-progression">
+        @if (chargement()) {
+          <mat-progress-bar mode="indeterminate" aria-label="Chargement des conversations" />
+        }
+      </div>
+      <app-message-erreur [erreur]="erreur()" parDefaut="Les conversations n’ont pas pu être chargées.">
+        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      </app-message-erreur>
+
+      @if (!chargement() && !erreur() && etat.conversations().length === 0) {
+        <p class="etat-vide" role="status">Aucune conversation pour le moment.</p>
+      }
+      <ul class="conversations">
+        @for (c of etat.conversations(); track c.id) {
+          <li>
+            <a
+              class="conversation"
+              [routerLink]="['/messagerie', c.id]"
+              [class.active]="c.id === etat.conversationActive()"
+              [class.non-lue]="c.nonLus > 0"
+              [attr.aria-current]="c.id === etat.conversationActive() ? 'page' : null"
+              [attr.aria-label]="resume(c)"
+            >
+              <span class="avatar" aria-hidden="true">
+                @if (c.interlocuteur.role === 'SUPER_ADMIN') {
+                  <mat-icon fontIcon="support_agent" />
+                } @else {
+                  {{ c.interlocuteur.prenom.charAt(0) }}{{ c.interlocuteur.nom.charAt(0) }}
+                }
+              </span>
+              <span class="texte" aria-hidden="true">
+                <span class="ligne">
+                  <span class="nom">{{ nom(c.interlocuteur) }}</span>
+                  @if (c.dernierMessageLe) {
+                    <span class="date">{{ c.dernierMessageLe | date: 'd MMM, HH:mm' }}</span>
+                  }
+                </span>
+                @if (c.interlocuteur.entreprise && auth.role() === 'SUPER_ADMIN') {
+                  <span class="entreprise">{{ c.interlocuteur.entreprise }}</span>
+                }
+                <span class="ligne">
+                  <span class="extrait">
+                    @if (c.dernierMessage; as d) {
+                      @if (!d.recu) {
+                        Vous :
+                      }
+                      {{ d.extrait }}
+                    } @else {
+                      Aucun message
+                    }
+                  </span>
+                  @if (c.nonLus > 0) {
+                    <span class="pastille-non-lus">{{ c.nonLus > 99 ? '99+' : c.nonLus }}</span>
+                  }
+                </span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </aside>
+
+    <div class="fil">
+      <router-outlet />
+    </div>
+  </div>
+</section>

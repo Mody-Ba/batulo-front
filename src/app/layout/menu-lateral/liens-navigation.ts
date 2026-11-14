@@ -7,11 +7,13 @@ export interface LienNavigation {
   icone: string;
   /** Actif seulement sur cette adresse exacte (pas sur ses sous-pages). */
   exact?: boolean;
+  /** Compteur affiché à côté du libellé (messages non lus, notifications non lues). */
+  compteur?: 'messagerie' | 'notifications';
 }
 
 /**
  * Entrées du menu latéral par rôle (affichage seulement : le serveur protège les données).
- * Les rubriques des étapes suivantes mènent à une page « Bientôt disponible ».
+ * Toutes les rubriques mènent à leur page (F8 : messagerie et notifications).
  */
 export const LIENS_PAR_ROLE: Record<Role, readonly LienNavigation[]> = {
   SUPER_ADMIN: [
@@ -19,8 +21,8 @@ export const LIENS_PAR_ROLE: Record<Role, readonly LienNavigation[]> = {
     { libelle: 'Admins et entreprises', lien: '/super-admin/admins', icone: 'business' },
     { libelle: 'Abonnements', lien: '/super-admin/abonnements', icone: 'card_membership' },
     { libelle: 'Demandes d’abonnement', lien: '/super-admin/demandes-abonnement', icone: 'upgrade' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications' },
+    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
   ADMIN: [
     { libelle: 'Tableau de bord', lien: '/admin', icone: 'dashboard', exact: true },
@@ -28,13 +30,14 @@ export const LIENS_PAR_ROLE: Record<Role, readonly LienNavigation[]> = {
     { libelle: 'Gestionnaires', lien: '/admin/gestionnaires', icone: 'group' },
     { libelle: 'Sondages', lien: '/sondages', icone: 'ballot' },
     { libelle: 'Statistiques reçues', lien: '/admin/statistiques-recues', icone: 'insights' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications' },
+    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
   GESTIONNAIRE: [
     { libelle: 'Tableau de bord', lien: '/gestionnaire', icone: 'dashboard', exact: true },
     { libelle: 'Mes sondages', lien: '/sondages', icone: 'ballot' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications' },
+    { libelle: 'Statistiques envoyées', lien: '/gestionnaire/statistiques-envoyees', icone: 'outbox' },
+    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
 };

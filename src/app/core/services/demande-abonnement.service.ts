@@ -3,17 +3,37 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  DemandeAbonnementRequest,
   DemandeAbonnementResponse,
   FiltreDemandes,
   TraitementDemandeRequest,
 } from '../models/demande-abonnement.model';
 import { PageResponse } from '../models/page.model';
 
-/** Demandes d'augmentation d'abonnement reçues par le super admin (SA-07). */
+/**
+ * Demandes d'augmentation d'abonnement : reçues et traitées par le super admin (SA-07), envoyées par l'admin (AD-05).
+ * Purement informatives (RG-09) : acceptée, l'admin paie lui-même la formule par carte.
+ */
 @Injectable({ providedIn: 'root' })
 export class DemandeAbonnementService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/api/super-admin/demandes-abonnement`;
+  private readonly urlAdmin = `${environment.apiUrl}/api/abonnements/demandes`;
+
+  /** Super admin : une demande (404 DEMANDE_INTROUVABLE). */
+  detail(id: number): Observable<DemandeAbonnementResponse> {
+    return this.http.get<DemandeAbonnementResponse>(`${this.url}/${id}`);
+  }
+
+  /** Admin : ses demandes, les plus récentes d'abord. */
+  mesDemandes(page = 0, taille = 10): Observable<PageResponse<DemandeAbonnementResponse>> {
+    return this.http.get<PageResponse<DemandeAbonnementResponse>>(this.urlAdmin, { params: { page, taille } });
+  }
+
+  /** Admin : une seule demande en attente à la fois (409 DEMANDE_EN_COURS) ; permis abonnement expiré. */
+  demander(demande: DemandeAbonnementRequest): Observable<DemandeAbonnementResponse> {
+    return this.http.post<DemandeAbonnementResponse>(this.urlAdmin, demande);
+  }
 
   /** Toutes, ou filtrées par statut. */
   lister(filtre: FiltreDemandes = {}): Observable<PageResponse<DemandeAbonnementResponse>> {

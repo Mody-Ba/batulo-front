@@ -44,7 +44,8 @@ const LIBELLES_FILTRE: Record<StatutDemande, string> = {
 
 /**
  * Demandes d'augmentation d'abonnement reçues (SA-07), les plus récentes d'abord. Filtre de statut et page dans
- * l'URL (?statut=&page=&taille=). Le détail et la réponse s'ouvrent dans une boîte de dialogue.
+ * l'URL (?statut=&page=&taille=). Le détail et la réponse s'ouvrent dans une boîte de dialogue ; ?demande={id} (lien
+ * d'une notification ou d'un message automatique) relit cette demande (GET .../{id}) et ouvre son détail.
  */
 @Component({
   selector: 'app-liste-demandes',
@@ -80,6 +81,8 @@ export class ListeDemandes {
   readonly statut = input<string | undefined>(undefined);
   readonly page = input<string | undefined>(undefined);
   readonly taille = input<string | undefined>(undefined);
+  readonly demande = input<string | undefined>(undefined);
+  protected readonly erreurDemande = signal<unknown>(null);
 
   protected readonly filtreStatut = computed(() => statutDemandeValide(this.statut()));
   protected readonly numeroPage = computed(() => numeroPageUrl(this.page()));
@@ -106,6 +109,24 @@ export class ListeDemandes {
       const taille = this.taillePage();
       untracked(() => this.charger(statut, page, taille));
     });
+    effect(() => {
+      const id = Number(this.demande());
+      if (Number.isInteger(id) && id > 0) {
+        untracked(() => this.ouvrirParId(id));
+      }
+    });
+  }
+
+  /** Demande désignée par l'URL : relue seule, puis ?demande= retiré quand la boîte se ferme. */
+  private ouvrirParId(id: number): void {
+    this.erreurDemande.set(null);
+    this.service
+      .detail(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (demande) => this.ouvrir(demande, true),
+        error: (erreur: unknown) => this.erreurDemande.set(erreur),
+      });
   }
 
   protected recharger(): void {
@@ -139,15 +160,19 @@ export class ListeDemandes {
     return formule ? LIBELLES_FORMULE[formule] : 'aucune';
   }
 
-  protected ouvrir(demande: DemandeAbonnementResponse): void {
-    this.dialog
+  protected ouvrir(demande: DemandeAbonnementResponse, depuisUrl = false): void {
+    const reference = this.dialog
       .open<DialogueDemande, DonneesDialogueDemande, ResultatDialogueDemande>(DialogueDemande, {
         data: { demande },
         width: '600px',
         maxWidth: 'calc(100vw - 32px)',
-      })
+      });
+    reference
       .afterClosed()
       .subscribe((resultat) => {
+        if (depuisUrl) {
+          void this.router.navigate([], { queryParams: { demande: null }, queryParamsHandling: 'merge', replaceUrl: true });
+        }
         if (!resultat) {
           return;
         }

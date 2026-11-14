@@ -1,0 +1,97 @@
+:host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.entete-fil {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-2) var(--bt-espace-3);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+
+  h2 {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+  }
+
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-body-small);
+  }
+}
+
+.zone-progression {
+  margin: 0;
+}
+
+.zone-messages {
+  flex: 1;
+  min-height: 0;
+  padding: var(--bt-espace-3);
+  overflow-y: auto;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -2px;
+  }
+}
+
+.plus-anciens {
+  margin: 0 0 var(--bt-espace-3);
+  text-align: center;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.saisie {
+  padding: var(--bt-espace-3);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.formulaire {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bt-espace-2);
+}
+
+.champ {
+  flex: 1;
+}
+
+.envoyer {
+  min-height: 48px;
+  margin-top: 4px;
+}
+
+.lecture-seule {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Sur ordinateur, la liste reste à côté : pas de bouton retour.
+@media (min-width: 840px) {
+  .retour {
+    display: none;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .formulaire {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

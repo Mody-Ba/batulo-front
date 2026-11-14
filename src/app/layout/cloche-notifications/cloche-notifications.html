@@ -39,7 +39,7 @@
       type="button"
       class="notification"
       [class.non-lue]="!notification.lue"
-      (click)="marquerLue(notification); $event.stopPropagation()"
+      (click)="ouvrir(notification, $event)"
     >
       <mat-icon [fontIcon]="icones[notification.type]" aria-hidden="true" />
       <span class="texte">

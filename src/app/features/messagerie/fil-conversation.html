@@ -1,0 +1,74 @@
+<header class="entete-fil">
+  <a matIconButton routerLink="/messagerie" class="retour" aria-label="Retour aux conversations">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />
+  </a>
+  <div class="identite">
+    <h2 id="titre-fil">{{ titre() }}</h2>
+    @if (conversation()?.interlocuteur?.entreprise; as entreprise) {
+      <p>{{ entreprise }}</p>
+    } @else if (conversation()?.interlocuteur?.role === 'SUPER_ADMIN') {
+      <p>Équipe Batulo</p>
+    }
+  </div>
+</header>
+
+<div class="zone-progression">
+  @if (chargement() || chargementAnciens()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Chargement des messages" />
+  }
+</div>
+
+<div class="zone-messages" #zone tabindex="0" aria-labelledby="titre-fil">
+  <app-message-erreur [erreur]="erreur()" parDefaut="Les messages n’ont pas pu être chargés.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (plusAnciens()) {
+    <p class="plus-anciens">
+      <button matButton type="button" (click)="chargerPlusAnciens()" [disabled]="chargementAnciens()">
+        <mat-icon fontIcon="expand_less" aria-hidden="true" />Messages plus anciens
+      </button>
+    </p>
+  }
+  @if (!chargement() && !erreur() && messages().length === 0) {
+    <p class="etat-vide" role="status">Aucun message. Écrivez le premier.</p>
+  }
+  <ol class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Messages">
+    @for (m of messages(); track m.id) {
+      <li><app-message-conversation [message]="m" /></li>
+    }
+  </ol>
+</div>
+
+<footer class="saisie">
+  @if (lectureSeule()) {
+    <p class="lecture-seule" role="status">
+      <mat-icon fontIcon="lock" aria-hidden="true" />{{ messageLectureSeule }}
+    </p>
+  } @else {
+    <app-message-erreur [erreur]="erreurEnvoi()" parDefaut="Le message n’a pas pu être envoyé." />
+    <form [formGroup]="formulaire" (ngSubmit)="envoyer()" class="formulaire">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ">
+        <mat-label>Votre message</mat-label>
+        <textarea
+          matInput
+          formControlName="contenu"
+          rows="2"
+          [maxlength]="max"
+          (keydown)="toucheSaisie($event)"
+          aria-describedby="aide-saisie"
+        ></textarea>
+        <mat-hint id="aide-saisie">Ctrl + Entrée (ou ⌘ + Entrée) pour envoyer</mat-hint>
+        @if (formulaire.controls.contenu.value.length > max - 200) {
+          <mat-hint align="end">{{ formulaire.controls.contenu.value.length }} / {{ max }}</mat-hint>
+        }
+        @if (formulaire.controls.contenu.touched && formulaire.controls.contenu.invalid) {
+          <mat-error>Écrivez un message.</mat-error>
+        }
+      </mat-form-field>
+      <button matButton="filled" type="submit" class="envoyer" [disabled]="envoiEnCours()" [attr.aria-busy]="envoiEnCours()">
+        <mat-icon fontIcon="send" aria-hidden="true" />{{ envoiEnCours() ? 'Envoi…' : 'Envoyer' }}
+      </button>
+    </form>
+  }
+</footer>
