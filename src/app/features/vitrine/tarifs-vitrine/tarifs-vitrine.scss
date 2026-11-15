@@ -1,0 +1,136 @@
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 360px));
+  justify-content: center;
+  gap: var(--bt-espace-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  padding: var(--bt-espace-6);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 20px;
+  background: var(--mat-sys-surface);
+
+  &.en-avant {
+    border: 2px solid var(--mat-sys-primary);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 10%);
+  }
+
+  &.emplacement {
+    min-height: 320px;
+    background: var(--mat-sys-surface-container);
+  }
+
+  h3,
+  p {
+    margin: 0;
+  }
+
+  h3 {
+    font: var(--mat-sys-title-large);
+  }
+}
+
+.pastille {
+  position: absolute;
+  top: -14px;
+  left: var(--bt-espace-6);
+  padding: 4px 12px;
+  border-radius: 14px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-label-medium);
+}
+
+.prix {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--bt-espace-2);
+}
+
+.montant {
+  font: var(--mat-sys-display-small);
+  font-weight: 700;
+}
+
+.devise {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.inclus {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  margin: var(--bt-espace-2) 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: var(--bt-espace-2);
+  }
+
+  .material-icons {
+    color: var(--mat-sys-primary);
+    font-size: 20px;
+  }
+}
+
+.erreur {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  text-align: center;
+
+  p {
+    margin: 0 0 var(--bt-espace-3);
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--bt-espace-2);
+}
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--bt-espace-6);
+  border: 0;
+  border-radius: 24px;
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+  cursor: pointer;
+
+  &.plein {
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+
+  &.contour {
+    border: 1px solid var(--mat-sys-outline);
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-primary);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}

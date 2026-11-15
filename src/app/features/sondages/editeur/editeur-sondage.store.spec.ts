@@ -17,6 +17,9 @@ const DEMANDE: QuestionRequest = {
   options: [],
 };
 
+/** Page d'accueil vide (champs du PUT du brouillon). */
+const ACCUEIL_VIDE = { objetEnquete: null, texteConfidentialite: null, consentementRequis: false, texteConsentement: null };
+
 describe('EditeurSondageStore', () => {
   let store: EditeurSondageStore;
   let service: Record<string, ReturnType<typeof vi.fn>>;
@@ -59,8 +62,8 @@ describe('EditeurSondageStore', () => {
     service['modifier'].mockReturnValueOnce(premiere).mockReturnValueOnce(seconde);
 
     const resultats: string[] = [];
-    store.modifierEnTete({ titre: 'Un', description: null, reponseUnique: true }).subscribe((s) => resultats.push(s.titre));
-    store.modifierEnTete({ titre: 'Deux', description: null, reponseUnique: true }).subscribe((s) => resultats.push(s.titre));
+    store.modifierEnTete({ titre: 'Un', description: null, reponseUnique: true, ...ACCUEIL_VIDE }).subscribe((s) => resultats.push(s.titre));
+    store.modifierEnTete({ titre: 'Deux', description: null, reponseUnique: true, ...ACCUEIL_VIDE }).subscribe((s) => resultats.push(s.titre));
     expect(service['modifier']).toHaveBeenCalledTimes(1);
     expect(store.etatGlobal()).toBe('enregistrement');
 
@@ -81,8 +84,8 @@ describe('EditeurSondageStore', () => {
       .mockReturnValueOnce(throwError(() => erreur('VALIDATION', 400)))
       .mockReturnValueOnce(of(sondageDeTest({ titre: 'Après' })));
     const echec = vi.fn();
-    store.modifierEnTete({ titre: 'X', description: null, reponseUnique: true }).subscribe({ error: echec });
-    store.modifierEnTete({ titre: 'Après', description: null, reponseUnique: true }).subscribe();
+    store.modifierEnTete({ titre: 'X', description: null, reponseUnique: true, ...ACCUEIL_VIDE }).subscribe({ error: echec });
+    store.modifierEnTete({ titre: 'Après', description: null, reponseUnique: true, ...ACCUEIL_VIDE }).subscribe();
     expect(echec).toHaveBeenCalled();
     expect(store.sondage()?.titre).toBe('Après');
     expect(store.modifiable()).toBe(true);

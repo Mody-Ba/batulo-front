@@ -1,0 +1,31 @@
+<header class="barre">
+  <div class="interieur">
+    <a class="marque" href="#haut" (click)="choisir($event, 'haut')" aria-label="Batulo, haut de la page">
+      <span class="material-icons logo" aria-hidden="true">ballot</span>
+      <span>Batulo</span>
+    </a>
+
+    <button
+      type="button"
+      class="bouton-menu"
+      [attr.aria-expanded]="menuOuvert()"
+      aria-controls="menu-vitrine"
+      (click)="basculer()"
+    >
+      <span class="material-icons" aria-hidden="true">{{ menuOuvert() ? 'close' : 'menu' }}</span>
+      <span class="visuellement-cache">Menu</span>
+    </button>
+
+    <nav id="menu-vitrine" class="menu" [class.ouvert]="menuOuvert()" aria-label="Sections de la page">
+      <ul class="liens">
+        @for (s of sections; track s.id) {
+          <li><a [href]="'#' + s.id" (click)="choisir($event, s.id)">{{ s.libelle }}</a></li>
+        }
+      </ul>
+      <div class="actions">
+        <a class="bouton contour" routerLink="/connexion">Connexion</a>
+        <a class="bouton plein" routerLink="/inscription">Créer un compte</a>
+      </div>
+    </nav>
+  </div>
+</header>

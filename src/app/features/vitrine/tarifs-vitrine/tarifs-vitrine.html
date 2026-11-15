@@ -1,0 +1,37 @@
+@if (chargement()) {
+  <div class="grille" role="status" aria-label="Chargement des tarifs">
+    <div class="carte emplacement" aria-hidden="true"></div>
+    <div class="carte emplacement" aria-hidden="true"></div>
+  </div>
+} @else if (erreur()) {
+  <div class="erreur" role="alert">
+    <p>Les tarifs n’ont pas pu être chargés.</p>
+    <div class="actions">
+      <button type="button" class="bouton contour" (click)="charger()">Réessayer</button>
+      <a class="bouton plein" routerLink="/inscription">Créer un compte</a>
+    </div>
+  </div>
+} @else if (formules(); as liste) {
+  <ul class="grille">
+    @for (f of liste; track f.formule) {
+      <li class="carte" [class.en-avant]="f.formule === 'ANNUEL' && annuelAvantageux()">
+        @if (f.formule === 'ANNUEL' && annuelAvantageux()) {
+          <p class="pastille">Le plus avantageux</p>
+        }
+        <h3>{{ f.libelle }}</h3>
+        <p class="prix">
+          <span class="montant">{{ prix(f) }}</span>
+          <span class="devise">{{ f.devise }} / {{ f.duree }}</span>
+        </p>
+        <ul class="inclus">
+          <li><span class="material-icons" aria-hidden="true">check</span>Toutes les fonctionnalités</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>Gestionnaires de votre entreprise</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>Paiement par carte, sans renouvellement automatique</li>
+        </ul>
+        <a class="bouton" [class.plein]="f.formule === 'ANNUEL'" [class.contour]="f.formule !== 'ANNUEL'" routerLink="/inscription">
+          Commencer
+        </a>
+      </li>
+    }
+  </ul>
+}

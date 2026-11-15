@@ -54,7 +54,7 @@ src/app/
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
-                   public/ (formulaire du répondant, sans compte)
+                   public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
                    filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
@@ -284,6 +284,47 @@ src/app/
 - Demandes d'augmentation (admin) : formule choisie explicitement + message (2000 car.) ; une seule EN_ATTENTE (le
   formulaire est alors remplacé par un rappel ; 409 DEMANDE_EN_COURS -> liste relue) ; rappel : acceptée, l'admin
   paie lui-même par carte (« Payer la formule … » -> `/admin/abonnement/souscrire?formule=`).
+
+## Page d'accueil du sondage (en cours)
+- Champs du sondage (`PageAccueil`, sondage.model) : `objetEnquete`, `texteConfidentialite`, `consentementRequis`,
+  `texteConsentement` ; dans `SondageResponse`, `ApercuResponse`, `FormulairePublicResponse`, et dans le PUT du brouillon
+  (`SondageRequest`, tout l'en-tête). Tout PUT du brouillon passe par `requeteSondage(sondage, modifs)` (dialogue de
+  publication) ou par l'en-tête de l'éditeur : jamais un corps partiel, qui effacerait la page d'accueil.
+- Éditeur : carte « Page d'accueil » sous l'en-tête, dans le même formulaire et le même enregistrement automatique ;
+  texte de la case obligatoire si le consentement est exigé (erreur dans l'éditeur ; le backend renvoie aussi 400
+  TEXTE_CONSENTEMENT_REQUIS, affiché sur la carte) ; lecture seule comme le reste.
+- `shared/formulaire/accueil/accueil-sondage` (éléments natifs) : titre, description, objet, confidentialité, case de
+  consentement ; « Commencer le questionnaire » désactivé tant qu'elle n'est pas cochée ; avec un brouillon, « Reprendre »
+  ou « Recommencer à zéro » (efface le brouillon). Sautée si `accueilNecessaire()` est faux (ni objet, ni
+  confidentialité, ni consentement ; la description seule ne suffit pas).
+- Formulaire public : chargement -> accueil -> questionnaire -> confirmation. Le consentement n'est jamais gardé dans le
+  brouillon : il est redonné à chaque visite (case à recocher pour reprendre) ; `consentement: true` dans le corps de
+  l'envoi si exigé. Refus faute de consentement -> retour à l'accueil avec le message, réponses gardées. « Nouvelle
+  réponse » (collecte terrain) -> accueil, case décochée.
+- Aperçu : l'accueil d'abord, « Recommencer » y ramène (sortie `recommence` de FormulaireSondage).
+- À vérifier dans l'OpenAPI quand le backend sera sur 8090 : emplacement exact des champs (dont `ApercuResponse`),
+  longueurs maximales (`REGLES_SONDAGE.objetEnqueteMax`, `texteConfidentialiteMax`, `texteConsentementMax`,
+  provisoires), code d'erreur du consentement manquant à l'envoi (`estRefusConsentement` accepte pour l'instant tout
+  code contenant CONSENTEMENT), puis afficher la date du consentement dans le détail d'une réponse (champ de
+  `ReponseResponse` à connaître).
+
+## Vitrine publique
+- « / » : `features/vitrine` (chargée à la demande, `inviteGuard`) pour un visiteur ; un compte connecté est renvoyé
+  par `inviteGuard` vers `urlAccueil()` (tableau de bord du rôle ou page imposée), comme sur `/connexion` et
+  `/inscription`. Adresse inconnue (`**` -> `''`) : la vitrine pour un visiteur. Déconnexion et session expirée mènent
+  toujours à `/connexion`.
+- Éléments natifs, sans Angular Material (chunk d'environ 27 ko, bundle initial inchangé) ; icônes par la classe
+  globale `.material-icons`. Découpée en `barre-vitrine` (collée en haut, menu hamburger sous 840 px : aria-expanded,
+  Échap, clic ailleurs), `heros-vitrine` (illustration HTML/CSS décorative), `tarifs-vitrine` et la page (budget de
+  4 ko de styles par composant).
+- Textes dans `contenu-vitrine.ts` (fonctionnalités, étapes, FAQ, `COURRIEL_CONTACT` = contact@batulo.example à
+  remplacer avant la mise en ligne) : ne décrire que ce que Batulo fait (pas de renouvellement automatique, envoi
+  qui demande une connexion, etc.).
+- Tarifs : jamais écrits dans le front, lus dans `GET /api/abonnements/formules` (route publique), formatés par
+  `Intl.NumberFormat('fr-CA')` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
+- Liens de section (`href="#id"`) gérés par la page : défilement (doux sauf `prefers-reduced-motion`), focus sur le
+  titre, `scroll-margin-top` sous la barre ; un lien partagé `/#tarifs` y mène au chargement. Lien d'évitement
+  « Aller au contenu ».
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).

@@ -1,0 +1,69 @@
+<article class="accueil-sondage" aria-labelledby="titre-accueil">
+  @if (niveauTitre() === 1) {
+    <h1 id="titre-accueil" class="titre" tabindex="-1">{{ contenu().titre }}</h1>
+  } @else {
+    <h2 id="titre-accueil" class="titre" tabindex="-1">{{ contenu().titre }}</h2>
+  }
+  @if (contenu().description) {
+    <p class="description">{{ contenu().description }}</p>
+  }
+  <ng-content />
+
+  @if (erreur(); as message) {
+    <div class="encart erreur" role="alert">
+      <p>{{ message }}</p>
+    </div>
+  }
+
+  @if (objet(); as texte) {
+    <section class="bloc" aria-labelledby="accueil-objet">
+      <h3 id="accueil-objet">Objet de l’enquête</h3>
+      <p class="texte">{{ texte }}</p>
+    </section>
+  }
+  @if (confidentialite(); as texte) {
+    <section class="bloc" aria-labelledby="accueil-confidentialite">
+      <h3 id="accueil-confidentialite">Confidentialité des réponses</h3>
+      <p class="texte">{{ texte }}</p>
+    </section>
+  }
+
+  @if (contenu().consentementRequis) {
+    <fieldset class="consentement">
+      <legend>Consentement</legend>
+      <label class="case">
+        <input type="checkbox" [checked]="coche()" (change)="cocher($event)" aria-describedby="aide-consentement" />
+        <span>{{ contenu().texteConsentement || 'J’accepte de participer à cette enquête.' }}</span>
+      </label>
+    </fieldset>
+  }
+
+  <div class="actions">
+    @if (reprise(); as r) {
+      <button type="button" class="bouton principal" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(true)">
+        Reprendre le questionnaire
+        @if (r.nombreSections > 1) {
+          <span class="detail">(section {{ r.section + 1 }} sur {{ r.nombreSections }})</span>
+        }
+      </button>
+      <button type="button" class="bouton secondaire" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(false)">
+        Recommencer à zéro
+      </button>
+    } @else {
+      <button type="button" class="bouton principal" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(false)">
+        Commencer le questionnaire
+      </button>
+    }
+  </div>
+  @if (contenu().consentementRequis) {
+    <p id="aide-consentement" class="aide" [class.visuellement-cache]="!bloque()">
+      Cochez la case de consentement pour commencer.
+    </p>
+  }
+  @if (reprise()) {
+    <p class="aide">Vos réponses en cours sont gardées sur cet appareil. « Recommencer à zéro » les efface.</p>
+  }
+  @if (mode() === 'apercu') {
+    <p class="aide">Aperçu de la page d’accueil : rien n’est enregistré.</p>
+  }
+</article>

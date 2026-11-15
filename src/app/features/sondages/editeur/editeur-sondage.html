@@ -99,10 +99,49 @@
           Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.
         </span>
       </mat-checkbox>
-      @if (enTete(); as e) {
-        <app-message-erreur [erreur]="e.erreur()" parDefaut="L’en-tête n’a pas pu être enregistré." />
-      }
+      <app-message-erreur [erreur]="erreurEnTete()" parDefaut="L’en-tête n’a pas pu être enregistré." />
     </header>
+
+    <!-- Page d'accueil du formulaire du répondant (même enregistrement automatique que l'en-tête) -->
+    <section class="carte-entete carte-accueil" [formGroup]="formulaire" (focusout)="sortieEnTete()" aria-labelledby="titre-accueil-editeur">
+      <div class="ligne-entete">
+        <h2 id="titre-accueil-editeur" class="titre-carte">Page d’accueil</h2>
+        <span class="espace"></span>
+        @if (enTete(); as e) {
+          @if (store.modifiable()) {
+            <app-etat-enregistrement [etat]="e.etat()" (reessayer)="e.maintenant()" />
+          }
+        }
+      </div>
+      <p class="texte-aide">
+        Présentée au répondant avant les questions. Laissée vide et sans consentement, le questionnaire s’ouvre directement.
+      </p>
+      <mat-form-field>
+        <mat-label>Objet de l’enquête (facultatif)</mat-label>
+        <textarea matInput formControlName="objetEnquete" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.objetEnqueteMax"></textarea>
+        <mat-hint>Pourquoi cette enquête, à quoi serviront les réponses.</mat-hint>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Confidentialité des réponses (facultatif)</mat-label>
+        <textarea matInput formControlName="texteConfidentialite" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConfidentialiteMax"></textarea>
+        <mat-hint>Anonymat, conservation et usage des données.</mat-hint>
+      </mat-form-field>
+      <mat-checkbox formControlName="consentementRequis">
+        Exiger le consentement du répondant
+        <span class="cellule-secondaire">Le répondant coche une case avant de commencer ; la date est gardée avec sa réponse.</span>
+      </mat-checkbox>
+      @if (formulaire.controls.consentementRequis.value) {
+        <mat-form-field>
+          <mat-label>Texte de la case de consentement</mat-label>
+          <textarea matInput formControlName="texteConsentement" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConsentementMax" required></textarea>
+          <mat-hint>Par exemple : « J’ai lu ces informations et j’accepte de participer. »</mat-hint>
+          @if (formulaire.controls.texteConsentement.hasError('texteConsentementRequis')) {
+            <mat-error>Écrivez le texte de la case de consentement.</mat-error>
+          }
+        </mat-form-field>
+      }
+      <app-message-erreur [erreur]="erreurAccueil()" parDefaut="La page d’accueil n’a pas pu être enregistrée." />
+    </section>
 
     <!-- Sections -->
     @if (sections().length === 0) {

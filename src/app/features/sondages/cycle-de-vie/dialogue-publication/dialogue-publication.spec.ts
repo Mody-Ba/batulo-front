@@ -99,14 +99,19 @@ describe('DialoguePublication', () => {
     expect(new Date(dates.dateFermeture).getTime()).toBeGreaterThan(new Date(dates.datePublication).getTime());
   });
 
-  it('« une réponse par appareil » changé : enregistré dans le brouillon juste avant la publication', () => {
-    const element = creer({ sondage: complet, mode: 'publier' });
+  it('« une réponse par appareil » changé : enregistré dans le brouillon juste avant la publication, page d’accueil gardée', () => {
+    const avecAccueil = { ...complet, objetEnquete: 'Mieux vous servir', consentementRequis: true, texteConsentement: 'J’accepte' };
+    const element = creer({ sondage: avecAccueil, mode: 'publier' });
     cocher(element, 'reponseUnique');
     envoyer(element);
     expect(service['modifier']).toHaveBeenCalledWith(3, {
       titre: 'Satisfaction 2026',
       description: null,
       reponseUnique: false,
+      objetEnquete: 'Mieux vous servir',
+      texteConfidentialite: null,
+      consentementRequis: true,
+      texteConsentement: 'J’accepte',
     });
     expect(service['publier']).toHaveBeenCalled();
   });

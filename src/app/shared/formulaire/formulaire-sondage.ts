@@ -76,6 +76,8 @@ export class FormulaireSondage {
   /** Chaque modification des réponses (pour le brouillon du navigateur). */
   readonly reponsesModifiees = output<ReponsesParQuestion>();
   readonly sectionChangee = output<number>();
+  /** Aperçu : « Recommencer » (la page revient à l'accueil s'il y en a un). */
+  readonly recommence = output<void>();
 
   protected readonly reponses = signal<FormulaireReponses>(creerFormulaireReponses([]));
   protected readonly indexSection = signal(0);

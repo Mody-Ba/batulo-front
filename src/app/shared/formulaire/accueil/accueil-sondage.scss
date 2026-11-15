@@ -1,0 +1,159 @@
+// Page d'accueil du répondant : éléments natifs, couleurs du thème, mobile d'abord.
+:host {
+  display: block;
+  container: accueil / inline-size;
+}
+
+.accueil-sondage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+  padding: var(--bt-espace-6) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-top: 6px solid var(--mat-sys-primary);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+
+  p {
+    margin: 0;
+  }
+}
+
+.titre {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  overflow-wrap: anywhere;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.description,
+.texte {
+  font: var(--mat-sys-body-large);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.bloc {
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-left: 4px solid var(--mat-sys-primary);
+  border-radius: 4px;
+  background: var(--mat-sys-surface-container-low);
+
+  h3 {
+    margin: 0 0 var(--bt-espace-1);
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.consentement {
+  margin: 0;
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: var(--bt-rayon);
+
+  legend {
+    padding: 0 var(--bt-espace-1);
+    font: var(--mat-sys-label-large);
+  }
+}
+
+.case {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bt-espace-3);
+  min-height: 44px;
+  cursor: pointer;
+  font: var(--mat-sys-body-large);
+
+  input {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin: 2px 0 0;
+    accent-color: var(--mat-sys-primary);
+    cursor: pointer;
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-2);
+}
+
+.bouton {
+  min-height: 48px;
+  padding: var(--bt-espace-2) var(--bt-espace-6);
+  border-radius: 24px;
+  font: var(--mat-sys-label-large);
+  cursor: pointer;
+
+  &.principal {
+    border: 0;
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+
+  &.secondaire {
+    border: 1px solid var(--mat-sys-outline);
+    background: transparent;
+    color: var(--mat-sys-primary);
+  }
+
+  &:disabled {
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface-variant);
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+
+  .detail {
+    font-weight: 400;
+  }
+}
+
+.aide {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.encart.erreur {
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+// Formulaire étroit (téléphone, aperçu « téléphone ») : boutons sur toute la largeur, sous le pouce.
+@container accueil (max-width: 480px) {
+  .accueil-sondage {
+    padding: var(--bt-espace-4) var(--bt-espace-3);
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .bouton {
+    width: 100%;
+  }
+}

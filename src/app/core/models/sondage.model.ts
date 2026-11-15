@@ -111,6 +111,11 @@ export interface SondageResponse {
   sondageOrigineId: number | null;
   estModele: boolean;
   reponseUnique: boolean;
+  /** Page d'accueil du formulaire (absents si vides : JsonInclude NON_NULL). */
+  objetEnquete?: string | null;
+  texteConfidentialite?: string | null;
+  consentementRequis?: boolean;
+  texteConsentement?: string | null;
   creePar: AuteurResponse | null;
   dateCreation: string;
   dateModification: string;
@@ -320,12 +325,47 @@ export interface CreationSondageRequest {
   reponseUnique?: boolean;
 }
 
-/** PUT /api/sondages/{id} (brouillon seulement). */
+/** PUT /api/sondages/{id} (brouillon seulement) : tout l'en-tête, page d'accueil comprise. */
 export interface SondageRequest {
   titre: string;
   description: string | null;
   /** true : une réponse par appareil (en ligne) ; false : collecte terrain. */
   reponseUnique: boolean;
+  objetEnquete: string | null;
+  texteConfidentialite: string | null;
+  /** true : le répondant coche la case avant de commencer ; texteConsentement est alors obligatoire (400 TEXTE_CONSENTEMENT_REQUIS). */
+  consentementRequis: boolean;
+  texteConsentement: string | null;
+}
+
+/**
+ * Page d'accueil du formulaire du répondant (sondage, aperçu, formulaire public) : objet de l'enquête, confidentialité,
+ * case de consentement. Champs absents si vides.
+ */
+export interface PageAccueil {
+  objetEnquete?: string | null;
+  texteConfidentialite?: string | null;
+  consentementRequis?: boolean;
+  texteConsentement?: string | null;
+}
+
+/** Page d'accueil à montrer : un texte d'accueil ou le consentement (la description seule ne suffit pas). */
+export function accueilNecessaire(page: PageAccueil): boolean {
+  return !!(page.objetEnquete?.trim() || page.texteConfidentialite?.trim() || page.consentementRequis);
+}
+
+/** PUT du brouillon depuis le sondage enregistré, avec quelques réglages changés (rien d'autre n'est perdu). */
+export function requeteSondage(sondage: SondageResponse, modifs: Partial<SondageRequest> = {}): SondageRequest {
+  return {
+    titre: sondage.titre,
+    description: sondage.description,
+    reponseUnique: sondage.reponseUnique,
+    objetEnquete: sondage.objetEnquete ?? null,
+    texteConfidentialite: sondage.texteConfidentialite ?? null,
+    consentementRequis: sondage.consentementRequis ?? false,
+    texteConsentement: sondage.texteConsentement ?? null,
+    ...modifs,
+  };
 }
 
 /** POST et PUT des sections. */
@@ -403,7 +443,7 @@ export interface LienSondageResponse {
 }
 
 /** GET .../apercu : le formulaire tel que le verra le répondant (brouillon compris). */
-export interface ApercuResponse {
+export interface ApercuResponse extends PageAccueil {
   id: number;
   titre: string;
   description: string | null;

@@ -1,0 +1,231 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+}
+
+.evitement {
+  position: absolute;
+  top: -100px;
+  left: var(--bt-espace-4);
+  z-index: 20;
+  padding: var(--bt-espace-2) var(--bt-espace-4);
+  border-radius: 8px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  &:focus {
+    top: var(--bt-espace-2);
+  }
+}
+
+// Sous la barre collée en haut.
+.ancre {
+  scroll-margin-top: 72px;
+}
+
+.section {
+  padding: 72px 0;
+
+  &.teinte {
+    background: var(--mat-sys-surface-container-low);
+  }
+}
+
+.interieur {
+  max-width: var(--bt-largeur-contenu);
+  margin: 0 auto;
+  padding: 0 var(--bt-espace-4);
+
+  &.etroit {
+    max-width: 760px;
+  }
+
+  &.centre {
+    text-align: center;
+  }
+}
+
+h2 {
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
+  font-weight: 700;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.chapeau {
+  margin: var(--bt-espace-2) 0 var(--bt-espace-8);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-large);
+  text-align: center;
+}
+
+h3 {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grille-fonctionnalites,
+.etapes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--bt-espace-6);
+}
+
+.etapes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: var(--bt-espace-8);
+}
+
+.carte,
+.etape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-6);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 16px;
+  background: var(--mat-sys-surface);
+
+  p {
+    margin: 0;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.icone,
+.numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.numero {
+  border-radius: 50%;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-title-medium);
+}
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin-top: var(--bt-espace-8);
+
+  details {
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: var(--bt-rayon);
+    background: var(--mat-sys-surface);
+  }
+
+  summary {
+    min-height: 44px;
+    padding: var(--bt-espace-3) var(--bt-espace-4);
+    font: var(--mat-sys-title-small);
+    cursor: pointer;
+  }
+
+  p {
+    margin: 0;
+    padding: 0 var(--bt-espace-4) var(--bt-espace-4);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.courriel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  min-height: 48px;
+  padding: 0 var(--bt-espace-6);
+  border-radius: 24px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+}
+
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.pied {
+  padding: var(--bt-espace-8) 0;
+  background: var(--bt-bandeau-fond);
+  color: var(--bt-bandeau-texte);
+
+  .interieur {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-espace-4);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  .marque {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--bt-espace-2);
+    font: var(--mat-sys-title-medium);
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bt-espace-4);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: inherit;
+  }
+}
+
+@media (max-width: 959.98px) {
+  .grille-fonctionnalites,
+  .etapes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 599.98px) {
+  .section {
+    padding: 48px 0;
+  }
+
+  .grille-fonctionnalites,
+  .etapes {
+    grid-template-columns: 1fr;
+  }
+
+  .pied .interieur {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

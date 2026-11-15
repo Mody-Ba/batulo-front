@@ -7,6 +7,10 @@ import { AbstractControl, FormArray, ValidationErrors, ValidatorFn } from '@angu
 export const REGLES_SONDAGE = {
   titreMax: 200,
   descriptionMax: 5000,
+  // Page d'accueil : longueurs PROVISOIRES, à vérifier dans l'OpenAPI (SondageRequest) quand le backend sera sur 8090.
+  objetEnqueteMax: 2000,
+  texteConfidentialiteMax: 5000,
+  texteConsentementMax: 500,
   sectionsMax: 50,
   titreSectionMax: 200,
   questionsMaxParSection: 100,

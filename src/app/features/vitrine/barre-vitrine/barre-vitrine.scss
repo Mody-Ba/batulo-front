@@ -1,0 +1,149 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: block;
+}
+
+.barre {
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  background: color-mix(in srgb, var(--mat-sys-surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.interieur {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-4);
+  max-width: var(--bt-largeur-contenu);
+  min-height: 64px;
+  margin: 0 auto;
+  padding: 0 var(--bt-espace-4);
+}
+
+.marque {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  min-height: 44px;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-title-large);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.menu {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--bt-espace-4);
+}
+
+.liens {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  gap: var(--bt-espace-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--bt-espace-3);
+    border-radius: 22px;
+    color: var(--mat-sys-on-surface);
+    font: var(--mat-sys-label-large);
+    text-decoration: none;
+
+    &:hover {
+      background: var(--mat-sys-surface-container-high);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: var(--bt-espace-2);
+}
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--bt-espace-4);
+  border-radius: 22px;
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &.contour {
+    border: 1px solid var(--mat-sys-outline);
+    color: var(--mat-sys-primary);
+  }
+
+  &.plein {
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+}
+
+a:focus-visible,
+.bouton-menu:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.bouton-menu {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: var(--mat-sys-on-surface);
+  cursor: pointer;
+}
+
+// Téléphone et tablette : menu replié derrière le bouton.
+@media (max-width: 839.98px) {
+  .bouton-menu {
+    display: inline-flex;
+  }
+
+  .menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--bt-espace-3) var(--bt-espace-4) var(--bt-espace-4);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    background: var(--mat-sys-surface);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 12%);
+
+    &.ouvert {
+      display: flex;
+    }
+  }
+
+  .liens {
+    flex-direction: column;
+
+    a {
+      width: 100%;
+    }
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
