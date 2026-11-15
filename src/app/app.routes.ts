@@ -1,7 +1,5 @@
-import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { authGuard, connecteGuard, inviteGuard, roleGuard } from './core/guards/auth.guards';
-import { AuthService } from './core/services/auth.service';
 
 /*
  * Les gardes ne font que choisir la page affichée : le serveur vérifie le jeton, le rôle et
@@ -9,9 +7,12 @@ import { AuthService } from './core/services/auth.service';
  */
 export const routes: Routes = [
   {
+    // Vitrine publique pour un visiteur ; un compte connecté va à son accueil (tableau de bord ou page imposée).
     path: '',
     pathMatch: 'full',
-    redirectTo: () => inject(AuthService).urlAccueil(),
+    title: 'Batulo · Sondages et enquêtes terrain',
+    canActivate: [inviteGuard],
+    loadComponent: () => import('./features/vitrine/vitrine').then((m) => m.Vitrine),
   },
 
   // ---------- Pages publiques (sans mise en page) ----------

@@ -1,0 +1,85 @@
+<div class="vitrine">
+  <a class="evitement" href="#haut" (click)="allerAuContenu($event)">Aller au contenu</a>
+  <app-barre-vitrine (aller)="aller($event)" />
+
+  <main>
+    <div id="haut" class="ancre">
+      <app-heros-vitrine />
+    </div>
+
+    <section id="fonctionnalites" class="section ancre" aria-labelledby="titre-fonctionnalites">
+      <div class="interieur">
+        <h2 id="titre-fonctionnalites" tabindex="-1">Tout pour vos enquêtes, de la question à l’analyse</h2>
+        <p class="chapeau">Conçu pour les équipes qui collectent en ligne et sur le terrain.</p>
+        <ul class="grille-fonctionnalites">
+          @for (f of fonctionnalites; track f.titre) {
+            <li class="carte">
+              <span class="material-icons icone" aria-hidden="true">{{ f.icone }}</span>
+              <h3>{{ f.titre }}</h3>
+              <p>{{ f.texte }}</p>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section id="comment-ca-marche" class="section ancre teinte" aria-labelledby="titre-etapes">
+      <div class="interieur">
+        <h2 id="titre-etapes" tabindex="-1">Comment ça marche</h2>
+        <ol class="etapes">
+          @for (e of etapes; track e.titre; let i = $index) {
+            <li class="etape">
+              <span class="numero" aria-hidden="true">{{ i + 1 }}</span>
+              <h3>{{ e.titre }}</h3>
+              <p>{{ e.texte }}</p>
+            </li>
+          }
+        </ol>
+      </div>
+    </section>
+
+    <section id="tarifs" class="section ancre" aria-labelledby="titre-tarifs">
+      <div class="interieur">
+        <h2 id="titre-tarifs" tabindex="-1">Tarifs</h2>
+        <p class="chapeau">Une formule pour toute votre entreprise, au mois ou à l’année.</p>
+        <app-tarifs-vitrine />
+      </div>
+    </section>
+
+    <section id="faq" class="section ancre teinte" aria-labelledby="titre-faq">
+      <div class="interieur etroit">
+        <h2 id="titre-faq" tabindex="-1">Questions fréquentes</h2>
+        <div class="faq">
+          @for (q of faq; track q.question) {
+            <details>
+              <summary>{{ q.question }}</summary>
+              <p>{{ q.reponse }}</p>
+            </details>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section ancre" aria-labelledby="titre-contact">
+      <div class="interieur etroit centre">
+        <h2 id="titre-contact" tabindex="-1">Une question ? Écrivez-nous</h2>
+        <p class="chapeau">Nous répondons aux entreprises qui veulent découvrir Batulo.</p>
+        <a class="courriel" [href]="'mailto:' + courriel">
+          <span class="material-icons" aria-hidden="true">mail</span>{{ courriel }}
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied">
+    <div class="interieur">
+      <p class="marque"><span class="material-icons" aria-hidden="true">ballot</span>Batulo</p>
+      <nav aria-label="Liens du pied de page">
+        <a routerLink="/connexion">Connexion</a>
+        <a routerLink="/inscription">Créer un compte</a>
+        <a [href]="'mailto:' + courriel">Contact</a>
+      </nav>
+      <p class="copyright">© {{ annee }} Batulo. Tous droits réservés.</p>
+    </div>
+  </footer>
+</div>

@@ -54,7 +54,7 @@ src/app/
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
-                   public/ (formulaire du répondant, sans compte)
+                   public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
                    filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
@@ -307,6 +307,24 @@ src/app/
   provisoires), code d'erreur du consentement manquant à l'envoi (`estRefusConsentement` accepte pour l'instant tout
   code contenant CONSENTEMENT), puis afficher la date du consentement dans le détail d'une réponse (champ de
   `ReponseResponse` à connaître).
+
+## Vitrine publique
+- « / » : `features/vitrine` (chargée à la demande, `inviteGuard`) pour un visiteur ; un compte connecté est renvoyé
+  par `inviteGuard` vers `urlAccueil()` (tableau de bord du rôle ou page imposée), comme sur `/connexion` et
+  `/inscription`. Adresse inconnue (`**` -> `''`) : la vitrine pour un visiteur. Déconnexion et session expirée mènent
+  toujours à `/connexion`.
+- Éléments natifs, sans Angular Material (chunk d'environ 27 ko, bundle initial inchangé) ; icônes par la classe
+  globale `.material-icons`. Découpée en `barre-vitrine` (collée en haut, menu hamburger sous 840 px : aria-expanded,
+  Échap, clic ailleurs), `heros-vitrine` (illustration HTML/CSS décorative), `tarifs-vitrine` et la page (budget de
+  4 ko de styles par composant).
+- Textes dans `contenu-vitrine.ts` (fonctionnalités, étapes, FAQ, `COURRIEL_CONTACT` = contact@batulo.example à
+  remplacer avant la mise en ligne) : ne décrire que ce que Batulo fait (pas de renouvellement automatique, envoi
+  qui demande une connexion, etc.).
+- Tarifs : jamais écrits dans le front, lus dans `GET /api/abonnements/formules` (route publique), formatés par
+  `Intl.NumberFormat('fr-CA')` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
+- Liens de section (`href="#id"`) gérés par la page : défilement (doux sauf `prefers-reduced-motion`), focus sur le
+  titre, `scroll-margin-top` sous la barre ; un lien partagé `/#tarifs` y mène au chargement. Lien d'évitement
+  « Aller au contenu ».
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
