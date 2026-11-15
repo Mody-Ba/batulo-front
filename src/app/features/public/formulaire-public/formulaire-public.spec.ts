@@ -227,4 +227,98 @@ describe('FormulairePublic (/s/:jeton)', () => {
     expect(service.lire).toHaveBeenCalledTimes(2);
     expect(element.textContent).toContain('Section 1 sur 2');
   });
+
+  describe('page d’accueil', () => {
+    const ACCUEIL: FormulairePublicResponse = {
+      ...FORMULAIRE,
+      objetEnquete: 'Mesurer l’état nutritionnel.',
+      texteConfidentialite: 'Réponses anonymes.',
+      consentementRequis: true,
+      texteConsentement: 'J’accepte de participer.',
+    };
+
+    function cocherConsentement(element: HTMLElement): void {
+      element.querySelector<HTMLInputElement>('app-accueil-sondage input[type="checkbox"]')!.click();
+      fixture.detectChanges();
+    }
+
+    it('sans texte d’accueil ni consentement : directement le questionnaire', async () => {
+      const element = await creer();
+      expect(element.querySelector('app-accueil-sondage')).toBeNull();
+      expect(element.textContent).toContain('Section 1 sur 2');
+    });
+
+    it('d’abord l’accueil (titre focalisé), « Commencer » après la case, puis consentement: true à l’envoi', async () => {
+      service.lire.mockReturnValue(of(ACCUEIL));
+      service.repondre.mockReturnValue(of({ message: 'Merci', dateSoumission: '2026-11-14T10:00:00Z' }));
+      const element = await creer();
+      await fixture.whenStable();
+      expect(element.querySelector('app-formulaire-sondage')).toBeNull();
+      expect(document.activeElement).toBe(element.querySelector('app-accueil-sondage h1'));
+      expect(element.textContent).toContain('Ce sondage ferme le');
+      const commencer = Array.from(element.querySelectorAll<HTMLButtonElement>('button')).find((b) => b.textContent?.includes('Commencer'))!;
+      expect(commencer.disabled).toBe(true);
+      cocherConsentement(element);
+      commencer.click();
+      fixture.detectChanges();
+
+      remplirEtAvancer(element);
+      cliquer(element, 'Envoyer mes réponses');
+      expect(service.repondre.mock.calls[0][1]).toEqual(expect.objectContaining({ consentement: true }));
+    });
+
+    it('sans consentement exigé : rien de tel dans le corps', async () => {
+      service.lire.mockReturnValue(of({ ...ACCUEIL, consentementRequis: false }));
+      service.repondre.mockReturnValue(of({ message: 'Merci', dateSoumission: '2026-11-14T10:00:00Z' }));
+      const element = await creer();
+      cliquer(element, 'Commencer');
+      remplirEtAvancer(element);
+      cliquer(element, 'Envoyer mes réponses');
+      expect(service.repondre.mock.calls[0][1]).not.toHaveProperty('consentement');
+    });
+
+    it('brouillon : proposé sur l’accueil (case à recocher), « Reprendre » le remet, « Recommencer à zéro » l’efface', async () => {
+      service.lire.mockReturnValue(of(ACCUEIL));
+      memoireRepondant.ecrireBrouillon('Ab3x', 1, { 1: true });
+      let element = await creer();
+      expect(element.querySelector('app-formulaire-sondage')).toBeNull();
+      expect(element.textContent).not.toContain('Vos réponses en cours ont été reprises');
+      cocherConsentement(element);
+      cliquer(element, 'Reprendre');
+      expect(element.textContent).toContain('Section 2 sur 2');
+
+      element = await creer();
+      cocherConsentement(element);
+      cliquer(element, 'Recommencer à zéro');
+      expect(element.textContent).toContain('Section 1 sur 2');
+      expect(memoireRepondant.lireBrouillon('Ab3x')).toBeNull();
+    });
+
+    it('refus du serveur faute de consentement : retour à l’accueil avec le message, réponses gardées', async () => {
+      service.lire.mockReturnValue(of(ACCUEIL));
+      service.repondre.mockReturnValue(throwError(() => erreurHttp(400, 'CONSENTEMENT_REQUIS', 'Le consentement est obligatoire.')));
+      const element = await creer();
+      cocherConsentement(element);
+      cliquer(element, 'Commencer');
+      remplirEtAvancer(element);
+      cliquer(element, 'Envoyer mes réponses');
+      expect(element.querySelector('app-accueil-sondage [role="alert"]')!.textContent).toContain('Le consentement est obligatoire.');
+      cocherConsentement(element);
+      cliquer(element, 'Reprendre');
+      expect(element.textContent).toContain('Section 2 sur 2');
+    });
+
+    it('collecte terrain : « Nouvelle réponse » revient à l’accueil, case décochée', async () => {
+      service.lire.mockReturnValue(of({ ...ACCUEIL, reponseUnique: false }));
+      service.repondre.mockReturnValue(of({ message: 'Merci', dateSoumission: '2026-11-14T10:00:00Z' }));
+      const element = await creer();
+      cocherConsentement(element);
+      cliquer(element, 'Commencer');
+      remplirEtAvancer(element);
+      cliquer(element, 'Envoyer mes réponses');
+      cliquer(element, 'Nouvelle réponse');
+      expect(element.querySelector('app-accueil-sondage')).not.toBeNull();
+      expect(element.querySelector<HTMLInputElement>('app-accueil-sondage input[type="checkbox"]')!.checked).toBe(false);
+    });
+  });
 });

@@ -68,7 +68,7 @@
     @if (mode() === 'apercu') {
       <p class="note-apercu">
         Aperçu : vous pouvez répondre pour essayer le formulaire ; rien n’est enregistré.
-        <button type="button" class="bouton lien" (click)="recommencer()">Recommencer</button>
+        <button type="button" class="bouton lien" (click)="recommencer(); recommence.emit()">Recommencer</button>
       </p>
     }
   }

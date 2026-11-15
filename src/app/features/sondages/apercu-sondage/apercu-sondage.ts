@@ -1,13 +1,14 @@
-import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
-import { ApercuResponse } from '../../../core/models/sondage.model';
+import { accueilNecessaire, ApercuResponse } from '../../../core/models/sondage.model';
 import { SondageService } from '../../../core/services/sondage.service';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { AccueilSondage } from '../../../shared/formulaire/accueil/accueil-sondage';
 import { FormulaireSondage } from '../../../shared/formulaire/formulaire-sondage';
 
 export type Appareil = 'ordinateur' | 'telephone';
@@ -15,7 +16,8 @@ export type Appareil = 'ordinateur' | 'telephone';
 /**
  * Prévisualisation (GET .../apercu) : le formulaire tel que le verra le répondant, avec les composants du formulaire
  * public (F6), sans envoi. Le cadre « téléphone » (390 px) montre la mise en page mobile, les champs suivant la
- * largeur du formulaire (container queries).
+ * largeur du formulaire (container queries). La page d'accueil (objet, confidentialité, consentement) vient d'abord,
+ * comme pour le répondant ; « Recommencer » y ramène.
  */
 @Component({
   selector: 'app-apercu-sondage',
@@ -26,6 +28,7 @@ export type Appareil = 'ordinateur' | 'telephone';
     MatIconModule,
     MatProgressBarModule,
     MessageErreur,
+    AccueilSondage,
     FormulaireSondage,
   ],
   template: `
@@ -63,7 +66,11 @@ export type Appareil = 'ordinateur' | 'telephone';
       @if (apercu(); as a) {
         <div class="scene" [class.telephone]="appareil() === 'telephone'">
           <div class="cadre">
-            <app-formulaire-sondage [contenu]="a" mode="apercu" />
+            @if (accueilAffiche()) {
+              <app-accueil-sondage [contenu]="a" mode="apercu" [niveauTitre]="2" (commencer)="accueilPasse.set(true)" />
+            } @else {
+              <app-formulaire-sondage [contenu]="a" mode="apercu" (recommence)="accueilPasse.set(false)" />
+            }
           </div>
         </div>
       }
@@ -135,6 +142,12 @@ export class ApercuSondage {
   readonly id = input.required<string>();
 
   protected readonly appareil = signal<Appareil>('ordinateur');
+  /** « Commencer » cliqué sur la page d'accueil de l'aperçu. */
+  protected readonly accueilPasse = signal(false);
+  protected readonly accueilAffiche = computed(() => {
+    const a = this.apercu();
+    return !!a && accueilNecessaire(a) && !this.accueilPasse();
+  });
   protected readonly apercu = signal<ApercuResponse | null>(null);
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);

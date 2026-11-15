@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { concatMap, Observable, of, tap } from 'rxjs';
-import { DatesSondageRequest, SondageResponse } from '../../../../core/models/sondage.model';
+import { DatesSondageRequest, requeteSondage, SondageResponse } from '../../../../core/models/sondage.model';
 import { SondageService } from '../../../../core/services/sondage.service';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
@@ -228,11 +228,7 @@ export class DialoguePublication {
         : of(null).pipe(
             tap(() => etape('reglage')),
             concatMap(() =>
-              this.service.modifier(this.sondage.id, {
-                titre: this.sondage.titre,
-                description: this.sondage.description,
-                reponseUnique: v.reponseUnique,
-              }),
+              this.service.modifier(this.sondage.id, requeteSondage(this.sondage, { reponseUnique: v.reponseUnique })),
             ),
             tap((brouillon) => {
               this.reponseUniqueEnregistree = brouillon.reponseUnique;

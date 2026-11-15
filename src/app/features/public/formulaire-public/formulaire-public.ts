@@ -19,6 +19,8 @@ import { ErreurQuestion } from '../../../core/models/erreur.model';
 import { ConfirmationReponseResponse, FormulairePublicResponse } from '../../../core/models/formulaire-public.model';
 import { FormulairePublicService } from '../../../core/services/formulaire-public.service';
 import { codeErreur, corpsErreur, messageErreur } from '../../../core/utils/erreur-http';
+import { accueilNecessaire } from '../../../core/models/sondage.model';
+import { AccueilSondage, DepartQuestionnaire, RepriseBrouillon } from '../../../shared/formulaire/accueil/accueil-sondage';
 import { FormulaireSondage, ReponsesParQuestion } from '../../../shared/formulaire/formulaire-sondage';
 import { ReponseQuestionRequest } from '../../../shared/formulaire/reponses';
 import { memoireRepondant } from './memoire-repondant';
@@ -38,6 +40,7 @@ export type RaisonIndisponible =
 
 type Etat =
   | { type: 'chargement' }
+  | { type: 'accueil'; formulaire: FormulairePublicResponse }
   | { type: 'formulaire'; formulaire: FormulairePublicResponse }
   | { type: 'confirmation'; formulaire: FormulairePublicResponse; confirmation: ConfirmationReponseResponse }
   | { type: 'indisponible'; raison: RaisonIndisponible; message: string | null };
@@ -51,6 +54,15 @@ export const TITRES_INDISPONIBLE: Record<RaisonIndisponible, string> = {
   injoignable: 'Connexion impossible',
   inattendu: 'Le sondage ne peut pas être affiché',
 };
+
+/**
+ * Refus de l'envoi faute de consentement. Code exact à confirmer dans l'OpenAPI (backend en cours) : tout code qui
+ * parle de consentement, hors TEXTE_CONSENTEMENT_REQUIS (réglage de l'éditeur).
+ */
+export function estRefusConsentement(erreur: unknown): boolean {
+  const code = codeErreur(erreur) ?? '';
+  return code.includes('CONSENTEMENT') && code !== 'TEXTE_CONSENTEMENT_REQUIS';
+}
 
 /** Raison selon l'erreur du serveur (GET ou POST), ou null si elle ne rend pas le formulaire indisponible. */
 export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndisponible | null {
@@ -81,11 +93,12 @@ export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndi
 /**
  * Formulaire public du répondant (/s/:jeton), sans compte et hors de la mise en page connectée. Mobile d'abord et
  * léger : composants partagés en éléments natifs, sans Angular Material. Le brouillon des réponses est gardé dans le
- * navigateur pendant la saisie et effacé après l'envoi.
+ * navigateur pendant la saisie et effacé après l'envoi. Page d'accueil d'abord (objet, confidentialité, consentement),
+ * sautée si elle n'a rien à dire ; le consentement n'est jamais gardé : il est redonné à chaque visite.
  */
 @Component({
   selector: 'app-formulaire-public',
-  imports: [DatePipe, FormulaireSondage],
+  imports: [DatePipe, AccueilSondage, FormulaireSondage],
   templateUrl: './formulaire-public.html',
   styleUrl: './formulaire-public.scss',
 })
@@ -109,6 +122,12 @@ export class FormulairePublic {
   protected readonly brouillonRepris = signal(false);
   protected readonly reponsesInitiales = signal<ReponsesParQuestion | null>(null);
   protected readonly sectionInitiale = signal(0);
+  /** Brouillon à proposer sur la page d'accueil (« Reprendre »). */
+  protected readonly reprise = signal<RepriseBrouillon | null>(null);
+  /** Case cochée sur la page d'accueil, pour cette visite seulement (jamais dans le brouillon). */
+  private consentementDonne = false;
+  /** Refus du serveur à l'envoi faute de consentement : rappel sur la page d'accueil. */
+  protected readonly erreurConsentement = signal<string | null>(null);
 
   private readonly formulaireSondage = viewChild(FormulaireSondage);
   private readonly saisies = new Subject<ReponsesParQuestion>();
@@ -147,6 +166,16 @@ export class FormulairePublic {
           this.sectionInitiale.set(brouillon?.section ?? 0);
           this.sectionCourante = brouillon?.section ?? 0;
           this.derniereSaisie = brouillon?.reponses ?? {};
+          this.erreurConsentement.set(null);
+          this.consentementDonne = false;
+          if (accueilNecessaire(formulaire)) {
+            // Le brouillon est proposé sur la page d'accueil (« Reprendre » ou « Recommencer à zéro »).
+            this.brouillonRepris.set(false);
+            this.reprise.set(brouillon ? { section: brouillon.section, nombreSections: this.nombreSections(formulaire) } : null);
+            this.etat.set({ type: 'accueil', formulaire });
+            this.focaliserTitre();
+            return;
+          }
           this.brouillonRepris.set(!!brouillon);
           this.etat.set({ type: 'formulaire', formulaire });
         },
@@ -160,6 +189,21 @@ export class FormulairePublic {
           this.afficherIndisponible(raison, corpsErreur(erreur)?.message ?? null);
         },
       });
+  }
+
+  /** Page d'accueil -> questionnaire, en reprenant le brouillon ou à zéro (le brouillon est alors effacé). */
+  protected commencer(formulaire: FormulairePublicResponse, depart: DepartQuestionnaire): void {
+    this.consentementDonne = depart.consentement;
+    this.erreurConsentement.set(null);
+    if (!depart.reprendre) {
+      memoireRepondant.effacerBrouillon(this.jeton());
+      this.reponsesInitiales.set(null);
+      this.sectionInitiale.set(0);
+      this.sectionCourante = 0;
+      this.derniereSaisie = {};
+    }
+    this.reprise.set(null);
+    this.etat.set({ type: 'formulaire', formulaire });
   }
 
   protected surSaisie(reponses: ReponsesParQuestion): void {
@@ -190,6 +234,7 @@ export class FormulairePublic {
     this.service
       .repondre(jeton, {
         ...(formulaire.reponseUnique ? { jetonRepondant: memoireRepondant.jetonRepondant(jeton) } : {}),
+        ...(formulaire.consentementRequis ? { consentement: this.consentementDonne } : {}),
         reponses,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -208,6 +253,17 @@ export class FormulairePublic {
           if (codeErreur(erreur) === 'REPONSES_INVALIDES') {
             // Chaque refus sur sa question (nouveau tableau : l'effet du formulaire repasse).
             this.erreursServeur.set([...(corpsErreur(erreur)?.erreurs ?? [])]);
+            return;
+          }
+          if (formulaire.consentementRequis && estRefusConsentement(erreur)) {
+            // Réponses gardées : retour à la page d'accueil pour cocher la case, puis « Reprendre ».
+            this.consentementDonne = false;
+            this.reponsesInitiales.set(this.derniereSaisie);
+            this.sectionInitiale.set(this.sectionCourante);
+            this.reprise.set({ section: this.sectionCourante, nombreSections: this.nombreSections(formulaire) });
+            this.erreurConsentement.set(messageErreur(erreur));
+            this.etat.set({ type: 'accueil', formulaire });
+            this.focaliserTitre();
             return;
           }
           const raison = raisonSelonErreur(erreur, false);
@@ -231,15 +287,22 @@ export class FormulairePublic {
       });
   }
 
-  /** Collecte terrain : formulaire vide pour la personne suivante. */
+  /** Collecte terrain : formulaire vide pour la personne suivante, qui donne son propre consentement. */
   protected nouvelleReponse(formulaire: FormulairePublicResponse): void {
     this.reponsesInitiales.set(null);
     this.sectionInitiale.set(0);
     this.sectionCourante = 0;
     this.derniereSaisie = {};
     this.brouillonRepris.set(false);
-    this.etat.set({ type: 'formulaire', formulaire });
+    this.consentementDonne = false;
+    this.reprise.set(null);
+    this.erreurConsentement.set(null);
+    this.etat.set({ type: accueilNecessaire(formulaire) ? 'accueil' : 'formulaire', formulaire });
     this.focaliserTitre();
+  }
+
+  private nombreSections(formulaire: FormulairePublicResponse): number {
+    return formulaire.sections.filter((s) => s.questions.length > 0).length;
   }
 
   private afficherIndisponible(raison: RaisonIndisponible, message: string | null): void {

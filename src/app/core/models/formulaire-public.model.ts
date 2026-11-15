@@ -1,11 +1,11 @@
-import { SectionAffichee } from './sondage.model';
+import { PageAccueil, SectionAffichee } from './sondage.model';
 import { ReponseQuestionRequest } from '../../shared/formulaire/reponses';
 
 /**
  * GET /api/public/sondages/{jeton} (sans compte) : seulement ce qu'il faut pour répondre. Le jeton du lien désigne la
  * lignée ; on répond à sa version ouverte. 404 SONDAGE_INTROUVABLE, 403 SONDAGE_NON_OUVERT, 410 SONDAGE_FERME.
  */
-export interface FormulairePublicResponse {
+export interface FormulairePublicResponse extends PageAccueil {
   titre: string;
   description: string | null;
   /** true : une seule réponse par appareil ; le front envoie alors son jetonRepondant. */
@@ -28,6 +28,8 @@ export interface FormulairePublicResponse {
 export interface SoumissionRequest {
   /** UUID gardé par le navigateur (un par sondage) ; obligatoire si reponseUnique. */
   jetonRepondant?: string;
+  /** true quand le sondage exige le consentement (case cochée sur la page d'accueil, à chaque visite). */
+  consentement?: boolean;
   reponses: ReponseQuestionRequest[];
 }
 

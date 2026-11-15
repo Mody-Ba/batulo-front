@@ -2,7 +2,7 @@ import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { TextFieldModule } from '@angular/cdk/text-field';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,7 +22,7 @@ import {
   SondageResponse,
 } from '../../../core/models/sondage.model';
 import { SondageService } from '../../../core/services/sondage.service';
-import { messageErreur } from '../../../core/utils/erreur-http';
+import { aLeCode, messageErreur } from '../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../core/utils/regles-question';
 import { nonVide } from '../../../core/utils/validateurs';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
@@ -101,6 +101,29 @@ export class EditeurSondage implements PeutQuitter {
       validators: [Validators.maxLength(REGLES_SONDAGE.descriptionMax)],
     }),
     reponseUnique: new FormControl(true, { nonNullable: true }),
+    // Page d'accueil du formulaire du répondant.
+    objetEnquete: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.maxLength(REGLES_SONDAGE.objetEnqueteMax)],
+    }),
+    texteConfidentialite: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.maxLength(REGLES_SONDAGE.texteConfidentialiteMax)],
+    }),
+    consentementRequis: new FormControl(false, { nonNullable: true }),
+    texteConsentement: new FormControl('', {
+      nonNullable: true,
+      validators: [texteConsentementSiExige, Validators.maxLength(REGLES_SONDAGE.texteConsentementMax)],
+    }),
+  });
+  /** Refus du serveur sur le texte de la case : affiché sur la carte « Page d'accueil » plutôt que sur l'en-tête. */
+  protected readonly erreurAccueil = computed(() => {
+    const erreur = this.enTete()?.erreur();
+    return aLeCode(erreur, 'TEXTE_CONSENTEMENT_REQUIS') ? erreur : null;
+  });
+  protected readonly erreurEnTete = computed(() => {
+    const erreur = this.enTete()?.erreur();
+    return aLeCode(erreur, 'TEXTE_CONSENTEMENT_REQUIS') ? null : erreur;
   });
   /** Créé au premier chargement du sondage. */
   protected readonly enTete = signal<EnregistrementAuto<SondageRequest> | null>(null);
@@ -132,6 +155,10 @@ export class EditeurSondage implements PeutQuitter {
         this.formulaire.disable({ emitEvent: false });
       }
     });
+    // Exiger le consentement rend le texte de la case obligatoire (et l'inverse).
+    this.formulaire.controls.consentementRequis.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.formulaire.controls.texteConsentement.updateValueAndValidity());
     effect(() => {
       const enTete = this.enTete();
       if (enTete) {
@@ -254,9 +281,18 @@ export class EditeurSondage implements PeutQuitter {
       return;
     }
     this.formulaire.setValue(
-      { titre: sondage.titre, description: sondage.description ?? '', reponseUnique: sondage.reponseUnique },
+      {
+        titre: sondage.titre,
+        description: sondage.description ?? '',
+        reponseUnique: sondage.reponseUnique,
+        objetEnquete: sondage.objetEnquete ?? '',
+        texteConfidentialite: sondage.texteConfidentialite ?? '',
+        consentementRequis: sondage.consentementRequis ?? false,
+        texteConsentement: sondage.texteConsentement ?? '',
+      },
       { emitEvent: false },
     );
+    this.formulaire.controls.texteConsentement.updateValueAndValidity({ emitEvent: false });
     this.enTete.set(
       new EnregistrementAuto<SondageRequest>({
         formulaire: this.formulaire,
@@ -270,7 +306,21 @@ export class EditeurSondage implements PeutQuitter {
   }
 
   private requeteEnTete(): SondageRequest {
-    const { titre, description, reponseUnique } = this.formulaire.getRawValue();
-    return { titre: titre.trim(), description: description.trim() || null, reponseUnique };
+    const v = this.formulaire.getRawValue();
+    return {
+      titre: v.titre.trim(),
+      description: v.description.trim() || null,
+      reponseUnique: v.reponseUnique,
+      objetEnquete: v.objetEnquete.trim() || null,
+      texteConfidentialite: v.texteConfidentialite.trim() || null,
+      consentementRequis: v.consentementRequis,
+      texteConsentement: v.texteConsentement.trim() || null,
+    };
   }
+}
+
+/** Texte de la case obligatoire quand le consentement est exigé (comme le backend : 400 TEXTE_CONSENTEMENT_REQUIS). */
+function texteConsentementSiExige(controle: AbstractControl): ValidationErrors | null {
+  const exige = controle.parent?.get('consentementRequis')?.value === true;
+  return exige && !String(controle.value ?? '').trim() ? { texteConsentementRequis: true } : null;
 }

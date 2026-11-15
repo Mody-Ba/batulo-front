@@ -285,6 +285,29 @@ src/app/
   formulaire est alors remplacé par un rappel ; 409 DEMANDE_EN_COURS -> liste relue) ; rappel : acceptée, l'admin
   paie lui-même par carte (« Payer la formule … » -> `/admin/abonnement/souscrire?formule=`).
 
+## Page d'accueil du sondage (en cours)
+- Champs du sondage (`PageAccueil`, sondage.model) : `objetEnquete`, `texteConfidentialite`, `consentementRequis`,
+  `texteConsentement` ; dans `SondageResponse`, `ApercuResponse`, `FormulairePublicResponse`, et dans le PUT du brouillon
+  (`SondageRequest`, tout l'en-tête). Tout PUT du brouillon passe par `requeteSondage(sondage, modifs)` (dialogue de
+  publication) ou par l'en-tête de l'éditeur : jamais un corps partiel, qui effacerait la page d'accueil.
+- Éditeur : carte « Page d'accueil » sous l'en-tête, dans le même formulaire et le même enregistrement automatique ;
+  texte de la case obligatoire si le consentement est exigé (erreur dans l'éditeur ; le backend renvoie aussi 400
+  TEXTE_CONSENTEMENT_REQUIS, affiché sur la carte) ; lecture seule comme le reste.
+- `shared/formulaire/accueil/accueil-sondage` (éléments natifs) : titre, description, objet, confidentialité, case de
+  consentement ; « Commencer le questionnaire » désactivé tant qu'elle n'est pas cochée ; avec un brouillon, « Reprendre »
+  ou « Recommencer à zéro » (efface le brouillon). Sautée si `accueilNecessaire()` est faux (ni objet, ni
+  confidentialité, ni consentement ; la description seule ne suffit pas).
+- Formulaire public : chargement -> accueil -> questionnaire -> confirmation. Le consentement n'est jamais gardé dans le
+  brouillon : il est redonné à chaque visite (case à recocher pour reprendre) ; `consentement: true` dans le corps de
+  l'envoi si exigé. Refus faute de consentement -> retour à l'accueil avec le message, réponses gardées. « Nouvelle
+  réponse » (collecte terrain) -> accueil, case décochée.
+- Aperçu : l'accueil d'abord, « Recommencer » y ramène (sortie `recommence` de FormulaireSondage).
+- À vérifier dans l'OpenAPI quand le backend sera sur 8090 : emplacement exact des champs (dont `ApercuResponse`),
+  longueurs maximales (`REGLES_SONDAGE.objetEnqueteMax`, `texteConfidentialiteMax`, `texteConsentementMax`,
+  provisoires), code d'erreur du consentement manquant à l'envoi (`estRefusConsentement` accepte pour l'instant tout
+  code contenant CONSENTEMENT), puis afficher la date du consentement dans le détail d'une réponse (champ de
+  `ReponseResponse` à connaître).
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`

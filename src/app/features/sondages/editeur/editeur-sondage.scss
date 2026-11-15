@@ -45,6 +45,16 @@
   background: var(--mat-sys-surface-container-low);
 }
 
+.carte-accueil {
+  border-top-width: 1px;
+  background: var(--mat-sys-surface);
+
+  .titre-carte {
+    margin: 0;
+    font: var(--mat-sys-title-medium);
+  }
+}
+
 .ligne-entete {
   display: flex;
   flex-wrap: wrap;
