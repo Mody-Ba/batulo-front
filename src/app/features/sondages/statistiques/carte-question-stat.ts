@@ -33,6 +33,11 @@ export class CarteQuestionStat {
   /** Pour paginer les textes avec les mêmes filtres. */
   readonly sondageId = input.required<number>();
   readonly filtres = input.required<FiltresStatistiques>();
+  /**
+   * Réponses de la portée affichée, pour « vue par X répondants sur Y » ; null en vue « toutes les versions » (le total
+   * peut compter des versions où la question n'existait pas : le backend ne l'expose pas encore par question).
+   */
+  readonly totalReponses = input<number | null>(null);
 
   protected readonly barresOptions = computed<Barre[]>(() => barresEffectifs(this.question().options ?? []));
 

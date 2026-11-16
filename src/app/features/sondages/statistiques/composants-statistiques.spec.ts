@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { CroisementResponse, FiltresStatistiques, QuestionStat } from '../../../core/models/statistiques.model';
 import { ExportService } from '../../../core/services/export.service';
 import { StatistiquesService } from '../../../core/services/statistiques.service';
+import { totalUneVersion } from './resume-filtres';
 import { CarteQuestionStat } from './carte-question-stat';
 import { BarresHorizontales } from './graphiques/barres-horizontales';
 import { Colonnes } from './graphiques/colonnes';
@@ -107,6 +108,26 @@ describe('Composants des statistiques', () => {
       expect(texte(f)).toContain('120 répondants · 8 sans réponse');
       expect(texte(f)).toContain('62 · 51,7 %');
       expect(texte(f)).not.toContain('Moins de 5 répondants');
+    });
+
+    it('question conditionnelle : « vue par X répondants sur Y » (une version), sans « sur Y » pour toutes les versions', async () => {
+      const question = stat({ conditionnelle: true, vues: 128, options: [] });
+      let f = await afficher(CarteQuestionStat, { question, numero: 1, sondageId: 3, filtres: FILTRES, totalReponses: 200 });
+      expect(texte(f)).toContain('120 répondants · 8 sans réponse');
+      expect(texte(f)).toContain('Question conditionnelle : vue par 128 répondants sur 200');
+      expect(texte(f)).toContain('pourcentages calculés sur ceux qui ont répondu');
+      f = await afficher(CarteQuestionStat, { question, numero: 1, sondageId: 3, filtres: { ...FILTRES, lignee: true }, totalReponses: null });
+      expect(texte(f)).toContain('vue par 128 répondants');
+      expect(texte(f)).not.toContain(' sur 200');
+      f = await afficher(CarteQuestionStat, { question: stat({ vues: 128, options: [] }), numero: 1, sondageId: 3, filtres: FILTRES, totalReponses: 200 });
+      expect(texte(f)).not.toContain('vue par');
+    });
+
+    it('total pour « sur Y » : une seule version seulement', () => {
+      const resume = { nombreReponses: 200 };
+      expect(totalUneVersion({ lignee: false, versions: [2], resume })).toBe(200);
+      expect(totalUneVersion({ lignee: true, versions: [1], resume })).toBe(200);
+      expect(totalUneVersion({ lignee: true, versions: [1, 2], resume })).toBeNull();
     });
 
     it('petit effectif signalé ; aucune réponse : message à la place du graphique', async () => {

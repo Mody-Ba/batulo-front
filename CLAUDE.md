@@ -107,9 +107,9 @@ src/app/
   paginateur n'apparaît qu'au-delà de 5 paiements.
 
 ## Paiement mobile Moosyl (Bankily, Masrvi, Sedad…)
-- À côté de la carte Stripe (inchangée). Contrat lu dans les records Java du backend (`PaiementMobileRequest|Response`,
+- À côté de la carte Stripe (inchangée). Contrat vérifié dans l'OpenAPI : `PaiementMobileRequest|Response`,
   `StatutPaiementMobileResponse`, `FormuleResponse.prixMobile|deviseMobile`, `PaiementResponse.fournisseur`
-  STRIPE|MOOSYL) : **à revérifier dans l'OpenAPI** quand l'instance 8090 aura été relancée.
+  (STRIPE|MOOSYL).
 - `/admin/abonnement/souscrire[?formule&moyen=carte|mobile]` : choix du moyen (cartes radio « Carte bancaire » /
   « Application mobile (Bankily, Masrvi, Sedad…) »), prix du moyen choisi (`prix` CAD ou `prixMobile` MRU, économie
   annuelle comprise). Mobile : `paiement-mobile/paiement-mobile` (étape 2) -> `POST /api/abonnements/paiement-mobile
@@ -342,6 +342,39 @@ src/app/
   code contenant CONSENTEMENT), puis afficher la date du consentement dans le détail d'une réponse (champ de
   `ReponseResponse` à connaître).
 
+## Questions conditionnelles (phase 4, étape 1)
+- Contrat vérifié dans l'OpenAPI : `ConditionRequest|Response`, `RegleConditionRequest|Response`, enums ET|OU et
+  opérateurs, champ `condition` de `QuestionResponse`, `SectionResponse` (aperçu compris), `QuestionPubliqueResponse`,
+  `SectionPubliqueResponse`, `QuestionStat.vues` et `conditionnelle` ; routes PUT/DELETE `.../questions/{id}/condition`
+  et `.../sections/{id}/condition`.
+- Modèle (`sondage.model.ts`) : `ConditionAffichage { combinaison: ET|OU, regles: [{ questionId, operateur, valeur? }] }`
+  (1 à 10 règles), `condition?` sur `QuestionResponse`, `SectionResponse` et `SectionAffichee` (absente : toujours
+  affichée). `operateursPermis(type)` = `OperateurCondition.permis` : CHOIX_UNIQUE EGAL/DIFFERENT/PARMI ; CHOIX_MULTIPLE
+  CONTIENT/PARMI ; OUI_NON EGAL/DIFFERENT ; NUMERIQUE, ECHELLE, DATE EGAL/DIFFERENT/SUPERIEUR/INFERIEUR/ENTRE ; tous
+  REPONDUE/NON_REPONDUE (sans valeur). Valeur : `valeur` d'option (jamais le libellé), booléen, nombre, date ISO, liste
+  (PARMI), [min, max] (ENTRE).
+- **Un seul évaluateur côté front** : `shared/formulaire/conditions.ts` (`evaluerVisibilite`, copie fidèle
+  d'`EvaluateurConditions`) : parcours dans l'ordre, source masquée = non répondue, section masquée = ses questions
+  masquées, sans réponse seule NON_REPONDUE est vraie (DIFFERENT compris), SUPERIEUR / INFERIEUR stricts, ENTRE bornes
+  comprises, types incomparables = faux, réponse vide = non répondue. Toute évolution du backend doit y être recopiée
+  (tests dans `conditions.spec.ts`).
+- Éditeur (`editeur/condition/`) : menu des cartes « Ajouter / Modifier la condition d'affichage » (question enregistrée ;
+  section à partir de la deuxième) -> `dialogue-condition` (règles « Afficher si » [question] [condition] [valeur], ET /
+  OU, valeur choisie dans les options pour un choix, champs nombre ou date, deux bornes pour ENTRE) -> PUT
+  `.../questions/{id}/condition` ou `.../sections/{id}/condition` par la file du store ; « Retirer » -> DELETE. Sources
+  (`sourcesPossibles`) : questions enregistrées placées avant (section : sections précédentes). Résumé lisible
+  (`resume-condition`, icône `alt_route`, « Visible si : … = Oui ») ; en lecture seule, le résumé sans actions.
+  400 CONDITION_INVALIDE / 409 : message du serveur dans la boîte ; 409 CONDITION_DEPENDANTE (suppression, déplacement)
+  : « Action refusée » gardé sur la carte (`erreurAction`), pas un message passager.
+- Formulaire (`formulaire-sondage`, aperçu et public) : visibilité recalculée à chaque saisie ; question masquée
+  désactivée (ni obligatoire ni validée), réponse effacée (brouillon compris) et jamais envoyée ; section sans question
+  visible sautée ; « Section N sur M », progression et numéros sur le visible ; apparition : classe `apparition`
+  (`conditions.scss`, fondu de 200 ms, aucun si `prefers-reduced-motion`) ; annonce `aria-live="polite"` des questions
+  apparues ou masquées dans la section affichée (`texteAnnonce`). Le serveur recalcule tout à l'envoi.
+- Statistiques : pourcentages du backend (sur ceux qui ont répondu, qui ont forcément vu la question) ; question
+  `conditionnelle` : « Question conditionnelle : vue par X répondants » (`vues`) + « sur Y » (`resume.nombreReponses`)
+  pour une seule version seulement (`totalUneVersion`), en plus de « N répondants · M sans réponse ».
+
 ## Vitrine publique
 - « / » : `features/vitrine` (chargée à la demande, `inviteGuard`) pour un visiteur ; un compte connecté est renvoyé
   par `inviteGuard` vers `urlAccueil()` (tableau de bord du rôle ou page imposée), comme sur `/connexion` et
@@ -373,6 +406,11 @@ src/app/
 - Les règles métier détaillées (versions, assignations, collecte, statistiques, messagerie…) sont dans le
   `CLAUDE.md` du backend : le relire au début de chaque étape.
 
+## À venir (backend)
+- Exposer, pour chaque question des statistiques, le nombre de réponses aux versions qui contiennent la question
+  (`reponsesAuxVersions` de `StatistiqueServiceImpl`, ou les réponses où elle était masquée) : le front pourra alors
+  afficher « vue par X répondants sur Y » aussi en vue « toutes les versions ».
+
 ## Plan des étapes
 - [x] **F1 – Socle et authentification** : structure, mise en page (barre du haut avec utilisateur et
   notifications, menu latéral par rôle), connexion, inscription admin, mot de passe oublié, réinitialisation,
@@ -399,6 +437,8 @@ src/app/
 - [x] **F8 – Messagerie et notifications** : conversations, fil, nouvelle conversation, messages automatiques et leurs
   liens, demandes d'augmentation de l'admin, statistiques envoyées du gestionnaire (liste et détail), page des
   notifications (filtre lues / non lues, liens précis), compteurs partagés, détail d'une demande côté super admin.
+- [x] **Phase 4, étape 1 – Questions conditionnelles** : conditions d'affichage dans l'éditeur (questions et sections),
+  évaluation en direct dans l'aperçu et le formulaire public, « vue par » dans les statistiques (voir la section dédiée).
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

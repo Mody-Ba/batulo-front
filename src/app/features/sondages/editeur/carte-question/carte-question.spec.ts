@@ -55,6 +55,7 @@ describe('CarteQuestion', () => {
       peutChangerDeSection: vi.fn(() => true),
       sectionPleine: vi.fn(() => false),
       changerDeSection: vi.fn(() => of({})),
+      definirConditionQuestion: vi.fn(() => of({})),
     };
     TestBed.configureTestingModule({
       imports: [CarteQuestion],
@@ -253,5 +254,62 @@ describe('CarteQuestion', () => {
     expect(carte.autresSections().map((a) => [a.section.id, a.numero])).toEqual([[20, 2]]);
     carte.changerDeSection(20);
     expect(store['changerDeSection']).toHaveBeenCalledWith(101, 20);
+  });
+
+  describe('condition d’affichage', () => {
+    const source = questionDeTest({ id: 100, libelle: 'Avez-vous des enfants ?', type: 'OUI_NON', options: [] });
+    const cible = questionDeTest({
+      id: 101,
+      condition: { combinaison: 'ET', regles: [{ questionId: 100, operateur: 'EGAL', valeur: true }] },
+    });
+
+    beforeEach(() => {
+      const etat = TestBed.inject(EditeurSondageStore) as unknown as { sondage: ReturnType<typeof signal> };
+      etat.sondage.set(sondageDeTest({ sections: [sectionDeTest({ id: 10, titre: 'Profil', questions: [source, cible] })] }));
+      store['questionEnregistree'].mockImplementation((id: number | null) => [source, cible].find((q) => q.id === id));
+    });
+
+    it('résumé lisible et icône sur la question conditionnelle ; « Retirer » appelle DELETE', async () => {
+      const element = await creer(cible);
+      const resume = element.querySelector('app-resume-condition')!;
+      expect(resume.textContent?.replace(/\s+/g, ' ')).toContain('Visible si : Avez-vous des enfants ? = Oui');
+      expect(resume.querySelector('mat-icon[aria-hidden="true"]')).not.toBeNull();
+      Array.from(resume.querySelectorAll('button')).find((b) => b.textContent?.includes('Retirer'))!.click();
+      expect(store['definirConditionQuestion']).toHaveBeenCalledWith(101, null);
+    });
+
+    it('lecture seule (sondage publié) : résumé seul, sans Modifier ni Retirer', async () => {
+      modifiable.set(false);
+      const element = await creer(cible);
+      const resume = element.querySelector('app-resume-condition')!;
+      expect(resume.textContent).toContain('Visible si');
+      expect(resume.querySelectorAll('button').length).toBe(0);
+    });
+
+    it('« Modifier » ouvre la boîte avec la condition et les sources placées avant', async () => {
+      const element = await creer(cible);
+      Array.from(element.querySelectorAll('app-resume-condition button')).find((b) => b.textContent?.includes('Modifier'))!.dispatchEvent(new Event('click'));
+      const donnees = dialog.open.mock.calls.at(-1)![1].data;
+      expect(donnees.cible).toEqual({ type: 'question', questionId: 101 });
+      expect(donnees.condition).toEqual(cible.condition);
+      expect(donnees.nomCible).toBe('la question 1 de la section 1');
+    });
+
+    it('409 CONDITION_DEPENDANTE à la suppression : message gardé sur la carte', async () => {
+      const element = await creer(source);
+      store['supprimerQuestion'].mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 409,
+              error: { code: 'CONDITION_DEPENDANTE', message: 'Cette question sert de condition à la question « Votre secteur ? » : retirez d’abord la condition.' },
+            }),
+        ),
+      );
+      (fixture.componentInstance as unknown as { supprimer(): void }).supprimer();
+      fixture.detectChanges();
+      expect(element.textContent).toContain('Action refusée');
+      expect(element.textContent).toContain('retirez d’abord la condition');
+    });
   });
 });

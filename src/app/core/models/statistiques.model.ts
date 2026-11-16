@@ -110,7 +110,12 @@ export interface QuestionStat {
   libelle: string;
   type: TypeQuestion;
   nombreRepondants: number;
+  /** Répondants qui ont vu la question sans y répondre (vues - nombreRepondants). */
   sansReponse: number;
+  /** true : la question (ou sa section) a une condition d'affichage, ou a été masquée pour une réponse. */
+  conditionnelle?: boolean;
+  /** Réponses pour lesquelles la question était affichée (toutes, sauf celles où une condition l'a masquée). */
+  vues?: number;
   /** Moins de répondants que le seuil (5) : à interpréter avec prudence. */
   petitEffectif: boolean;
   /** CHOIX_UNIQUE, CHOIX_MULTIPLE, OUI_NON */

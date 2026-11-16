@@ -62,6 +62,17 @@
     <mat-hint>Affichée sous la question, pour préciser ce qui est attendu.</mat-hint>
   </mat-form-field>
 
+  @if (condition(); as c) {
+    <app-resume-condition
+      [condition]="c"
+      [sondage]="store.sondage()"
+      [nomCible]="nomCible()"
+      [modifiable]="store.modifiable()"
+      (modifier)="editerCondition()"
+      (retirer)="retirerCondition()"
+    />
+  }
+
   <div class="configuration">
     @switch (type) {
       @case ('CHOIX_UNIQUE') {
@@ -101,6 +112,8 @@
     <app-critere-question [question]="q" />
   }
 
+  <app-message-erreur [erreur]="erreurAction()" titre="Action refusée" parDefaut="Cette action n’a pas pu être faite." />
+
   <app-message-erreur
     [erreur]="auto.erreur()"
     [titre]="'La question ' + numero() + ' n’a pas été enregistrée'"
@@ -129,6 +142,10 @@
       </button>
       <button mat-menu-item type="button" (click)="descendre()" [disabled]="position() >= nombreEnregistrees() - 1">
         <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre</span>
+      </button>
+      <button mat-menu-item type="button" (click)="editerCondition()">
+        <mat-icon fontIcon="alt_route" aria-hidden="true" />
+        <span>{{ condition() ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
       </button>
       @if (autresSections().length) {
         <button

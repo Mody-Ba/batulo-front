@@ -27,9 +27,16 @@
       }
       <div class="questions">
         @for (q of s.questions; track q.id; let i = $index) {
-          <app-question-repondant [question]="q" [controle]="controle(cleReponse(q))" [numero]="premierNumero()[indexSection()] + i" />
+          <app-question-repondant
+            [class.apparition]="apparues().has(q.id)"
+            [question]="q"
+            [controle]="controle(cleReponse(q))"
+            [numero]="premierNumero()[indexSection()] + i"
+          />
         }
       </div>
+      <!-- Questions apparues ou masquées par les conditions d'affichage : annoncées sans déplacer le focus. -->
+      <p class="visuellement-cache" aria-live="polite" aria-atomic="true">{{ annonce() }}</p>
     </section>
 
     @if (erreursGenerales().length) {

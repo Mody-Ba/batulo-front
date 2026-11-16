@@ -26,6 +26,13 @@ describe('PaiementMobile (Moosyl)', () => {
     }
   };
 
+  /** Attend qu'une condition soit vraie (import dynamique d'uqr plus ou moins rapide), 2 s au plus. */
+  const attendre = async (condition: () => boolean) => {
+    for (let i = 0; i < 100 && !condition(); i++) {
+      await stable();
+    }
+  };
+
   async function creer(): Promise<void> {
     fixture = TestBed.createComponent(PaiementMobile);
     element = fixture.nativeElement;
@@ -47,6 +54,7 @@ describe('PaiementMobile (Moosyl)', () => {
   it('crée le paiement, puis code QR, bouton « Payer sur ce téléphone » (même onglet), montant en MRU et expiration', async () => {
     await creer();
     expect(payerMobile).toHaveBeenCalledWith('ANNUEL');
+    await attendre(() => !!element.querySelector('app-code-qr svg'));
     const qr = element.querySelector('app-code-qr svg');
     expect(qr?.getAttribute('role')).toBe('img');
     expect(qr?.getAttribute('aria-label')).toBe('Code QR de la page de paiement mobile');
@@ -82,7 +90,7 @@ describe('PaiementMobile (Moosyl)', () => {
     expect(element.querySelector('app-code-qr')).toBeNull();
     statutMobile.mockReturnValue(of(statutMobileDeTest()));
     bouton('Réessayer')!.click();
-    await stable();
+    await attendre(() => !!element.querySelector('app-code-qr'));
     expect(payerMobile).toHaveBeenCalledTimes(2);
     expect(element.querySelector('app-code-qr')).not.toBeNull();
   });

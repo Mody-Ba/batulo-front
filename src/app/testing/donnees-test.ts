@@ -52,7 +52,8 @@ export function sessionMobileDeTest(modifs: Partial<PaiementMobileResponse> = {}
     formule: 'ANNUEL',
     montant: 80,
     devise: 'MRU',
-    expireLe: '2026-11-15T12:30:00Z',
+    // Toujours dans le futur : une date fixe finirait par être passée (session expirée).
+    expireLe: new Date(Date.now() + 30 * 60_000).toISOString(),
     ...modifs,
   };
 }
