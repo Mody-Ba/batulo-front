@@ -67,7 +67,7 @@ export interface Etape {
 }
 
 export const ETAPES: readonly Etape[] = [
-  { titre: 'Créez votre compte et abonnez-vous', texte: 'Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle et payez par carte.' },
+  { titre: 'Créez votre compte et abonnez-vous', texte: 'Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle et payez par carte bancaire ou par application mobile (Bankily, Masrvi, Sedad).' },
   { titre: 'Construisez votre sondage', texte: 'Ajoutez sections et questions, prévisualisez sur ordinateur et sur téléphone, puis publiez.' },
   { titre: 'Partagez le lien', texte: 'Envoyez le lien ou affichez le QR code ; collectez aussi sur le terrain depuis un téléphone.' },
   { titre: 'Analysez et exportez', texte: 'Suivez les résultats, croisez les réponses, exportez en Excel, CSV ou PDF.' },
@@ -90,7 +90,8 @@ export const FAQ: readonly QuestionFaq[] = [
   },
   {
     question: 'Comment se fait le paiement ?',
-    reponse: 'Par carte bancaire, avec un paiement sécurisé par Stripe, pour un mois ou pour un an. Les prix sont indiqués en dollars canadiens.',
+    reponse:
+      'Par carte bancaire, avec un paiement sécurisé par Stripe, en dollars canadiens, ou par application mobile (Bankily, Masrvi, Sedad), en ouguiyas. Pour un mois ou pour un an.',
   },
   {
     question: 'Puis-je annuler ?',

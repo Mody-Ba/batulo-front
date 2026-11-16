@@ -52,8 +52,11 @@ describe('gardes', () => {
     serveur = TestBed.inject(HttpTestingController);
   });
 
-  it('renvoie un visiteur vers la connexion', () => {
-    expect(executer(roleGuard('ADMIN'), '/admin')).toBe('/connexion');
+  it('renvoie un visiteur vers la connexion, avec la page demandée en ?retour=', () => {
+    expect(executer(roleGuard('ADMIN'), '/admin/abonnement/paiement-mobile?reference=r1')).toBe(
+      '/connexion?retour=%2Fadmin%2Fabonnement%2Fpaiement-mobile%3Freference%3Dr1',
+    );
+    expect(executer(roleGuard('ADMIN'), '/')).toBe('/connexion');
   });
 
   it('laisse passer le bon rôle', () => {

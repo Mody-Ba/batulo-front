@@ -28,7 +28,14 @@ export const routes: Routes = [
     loadComponent: () => import('./demandes/demandes-abonnement').then((m) => m.DemandesAbonnement),
   },
   {
-    // ?formule=MENSUEL|ANNUEL pour présélectionner (bouton « Renouveler »).
+    // URL de retour de Moosyl (?reference=) ; permise abonnement en attente de paiement (sous /admin/abonnement).
+    path: 'paiement-mobile',
+    title: 'Paiement mobile · Batulo',
+    loadComponent: () =>
+      import('./paiement-mobile/retour-paiement-mobile').then((m) => m.RetourPaiementMobile),
+  },
+  {
+    // ?formule=MENSUEL|ANNUEL pour présélectionner (bouton « Renouveler ») ; ?moyen=carte|mobile.
     path: 'souscrire',
     title: 'S’abonner · Batulo',
     loadComponent: () => import('./souscrire/souscrire').then((m) => m.Souscrire),

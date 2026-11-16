@@ -16,8 +16,9 @@ const RECENT: PaiementResponse = {
   id: 3,
   datePaiement: '2026-11-01T15:00:00Z',
   formule: 'ANNUEL',
-  montant: 120,
-  devise: 'cad',
+  montant: 80,
+  devise: 'MRU',
+  fournisseur: 'MOOSYL',
 };
 const ANCIEN: PaiementResponse = {
   id: 1,
@@ -25,6 +26,7 @@ const ANCIEN: PaiementResponse = {
   formule: 'MENSUEL',
   montant: 12.5,
   devise: 'cad',
+  fournisseur: 'STRIPE',
 };
 
 describe('MonAbonnement', () => {
@@ -60,8 +62,11 @@ describe('MonAbonnement', () => {
     );
     expect(lignes).toHaveLength(2);
     expect(lignes[0][1]).toBe('Formule annuelle');
-    expect(lignes[0][2]).toContain('120');
+    expect(lignes[0][2]).toBe('Mobile');
+    expect(lignes[0][3]).toBe('80 MRU');
     expect(lignes[1][1]).toBe('Formule mensuelle');
+    expect(lignes[1][2]).toBe('Carte');
+    expect(lignes[1][3]).toBe('12,50 CAD');
     expect(element.textContent).not.toContain('bientôt disponible');
     // Une seule page : pas de paginateur.
     expect(element.querySelector('mat-paginator')).toBeNull();

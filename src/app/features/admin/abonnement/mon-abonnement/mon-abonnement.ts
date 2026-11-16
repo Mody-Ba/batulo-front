@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,10 +9,12 @@ import { RouterLink } from '@angular/router';
 import {
   abonnementEnAlerte,
   LIBELLES_FORMULE,
+  LIBELLES_FOURNISSEUR,
   LIBELLES_STATUT_ABONNEMENT,
   PaiementResponse,
 } from '../../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
+import { montantEnClair } from '../../../../core/utils/montant';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
@@ -28,9 +30,7 @@ export const TAILLES_PAIEMENTS = [5, 10, 20];
 @Component({
   selector: 'app-mon-abonnement',
   imports: [
-    CurrencyPipe,
     DatePipe,
-    UpperCasePipe,
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -49,6 +49,8 @@ export class MonAbonnement {
 
   protected readonly abonnement = this.service.abonnement;
   protected readonly libellesFormule = LIBELLES_FORMULE;
+  protected readonly libellesFournisseur = LIBELLES_FOURNISSEUR;
+  protected readonly montant = montantEnClair;
   protected readonly libellesStatut = LIBELLES_STATUT_ABONNEMENT;
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);

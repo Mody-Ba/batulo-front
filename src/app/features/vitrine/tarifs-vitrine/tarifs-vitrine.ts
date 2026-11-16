@@ -1,8 +1,9 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { FormuleResponse } from '../../../core/models/abonnement.model';
+import { APPLICATIONS_MOBILES, FormuleResponse } from '../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../core/services/abonnement.service';
+import { montantEnClair } from '../../../core/utils/montant';
 
 /** « 1,00 $ » (fr-CA) : Intl plutôt que CurrencyPipe (pas de données de locale à charger). */
 export function prixEnClair(formule: Pick<FormuleResponse, 'prix' | 'devise'>): string {
@@ -10,7 +11,8 @@ export function prixEnClair(formule: Pick<FormuleResponse, 'prix' | 'devise'>): 
 }
 
 /**
- * Tarifs de la vitrine, lus dans GET /api/abonnements/formules (route publique) : rien n'est écrit dans le front.
+ * Tarifs de la vitrine, lus dans GET /api/abonnements/formules (route publique) : rien n'est écrit dans le front
+ * (prix par carte et prix du paiement mobile en MRU).
  * Pendant la lecture, des emplacements ; si l'API ne répond pas, un message et « Réessayer ».
  */
 @Component({
@@ -23,6 +25,8 @@ export class TarifsVitrine {
   private readonly service = inject(AbonnementService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly prix = prixEnClair;
+  protected readonly montant = montantEnClair;
+  protected readonly applications = APPLICATIONS_MOBILES;
 
   protected readonly formules = signal<FormuleResponse[] | null>(null);
   protected readonly chargement = signal(true);

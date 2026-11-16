@@ -11,17 +11,19 @@ import {
   IntentionPaiementResponse,
 } from '../../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
-import { abonnementDeTest } from '../../../../testing/donnees-test';
+import {
+  abonnementDeTest,
+  FORMULES_DE_TEST,
+  sessionMobileDeTest,
+  statutMobileDeTest,
+} from '../../../../testing/donnees-test';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StripeService } from '../../../../core/services/stripe.service';
 import { DELAI_REDIRECTION_MS, MESSAGE_CARTE_INCOMPLETE, MESSAGE_RECONNEXION, Souscrire } from './souscrire';
 
 registerLocaleData(localeFrCa);
 
-const FORMULES: FormuleResponse[] = [
-  { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois' },
-  { formule: 'ANNUEL', libelle: 'Abonnement annuel', prix: 2, devise: 'CAD', duree: '1 an' },
-];
+const FORMULES: FormuleResponse[] = FORMULES_DE_TEST;
 const INTENTION: IntentionPaiementResponse = {
   paymentIntentId: 'pi_123',
   clientSecret: 'pi_123_secret_abc',
@@ -56,6 +58,8 @@ describe('Souscrire (parcours de paiement)', () => {
     actualiser: ReturnType<typeof vi.fn>;
     creerIntention: ReturnType<typeof vi.fn>;
     confirmer: ReturnType<typeof vi.fn>;
+    payerMobile: ReturnType<typeof vi.fn>;
+    statutMobile: ReturnType<typeof vi.fn>;
   };
   let auth: {
     utilisateur: ReturnType<typeof signal>;
@@ -111,6 +115,8 @@ describe('Souscrire (parcours de paiement)', () => {
       confirmer: vi.fn(() =>
         of({ message: 'ok', abonnement: abonnementDeTest({ formule: 'ANNUEL', dateExpiration: '2027-11-09T12:00:00Z' }) }),
       ),
+      payerMobile: vi.fn(() => of(sessionMobileDeTest())),
+      statutMobile: vi.fn(() => of(statutMobileDeTest())),
     };
     auth = {
       utilisateur: signal({ courriel: 'awa@test.local' }),
@@ -152,7 +158,7 @@ describe('Souscrire (parcours de paiement)', () => {
     expect(texte()).toContain('1,00 $');
     expect(texte()).toContain('2,00 $');
     expect(texte()).toContain('Économisez 10,00 $');
-    const choisie = element.querySelector('.formule.choisie');
+    const choisie = element.querySelector('.formules:not(.moyens) .formule.choisie');
     expect(choisie?.textContent).toContain('Abonnement annuel');
   });
 
@@ -245,6 +251,64 @@ describe('Souscrire (parcours de paiement)', () => {
     await payer();
 
     expect(auth.terminerSession).toHaveBeenCalledWith(MESSAGE_RECONNEXION);
+  });
+
+  it('deux moyens de paiement, carte par défaut ; mobile : prix en MRU (économie comprise), moyen gardé dans l’URL', async () => {
+    const naviguer = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    fixture.componentRef.setInput('formule', 'ANNUEL');
+    await stable();
+    const moyens = element.querySelectorAll<HTMLInputElement>('input[name="moyen"]');
+    expect(moyens).toHaveLength(2);
+    expect(moyens[0].checked).toBe(true);
+    expect(texte()).toContain('Carte bancaire');
+    expect(texte()).toContain('Application mobile (Bankily, Masrvi, Sedad…)');
+
+    moyens[1].click();
+    await stable();
+    expect(naviguer).toHaveBeenCalledWith([], { queryParams: { moyen: 'mobile' }, queryParamsHandling: 'merge', replaceUrl: true });
+    expect(texte()).toContain('40 MRU');
+    expect(texte()).toContain('80 MRU');
+    expect(texte()).toContain('Économisez 400 MRU');
+    expect(texte()).not.toContain('2,00 $');
+  });
+
+  it('mobile : pas de Stripe ; le paiement mobile de la formule choisie, puis succès, nouveau jeton et redirection', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    abonnementService.statutMobile.mockReturnValue(
+      of(
+        statutMobileDeTest({
+          statut: 'REUSSI',
+          abonnement: abonnementDeTest({ formule: 'ANNUEL', dateExpiration: '2027-11-15T12:00:00Z' }),
+        }),
+      ),
+    );
+    fixture.componentRef.setInput('formule', 'ANNUEL');
+    fixture.componentRef.setInput('moyen', 'mobile');
+    await stable();
+    bouton('Continuer vers le paiement mobile')!.click();
+    await stable();
+    await stable();
+
+    expect(abonnementService.creerIntention).not.toHaveBeenCalled();
+    expect(stripeService.charger).not.toHaveBeenCalled();
+    expect(abonnementService.payerMobile).toHaveBeenCalledWith('ANNUEL');
+    expect(auth.mettreAJourStatutAbonnement).toHaveBeenCalledWith('ACTIF');
+    expect(auth.rafraichir).toHaveBeenCalled();
+    expect(texte()).toContain('Vous êtes bien abonné');
+    vi.advanceTimersByTime(DELAI_REDIRECTION_MS);
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/admin');
+  });
+
+  it('mobile : « Changer de formule » ramène au choix (le suivi s’arrête avec le composant)', async () => {
+    fixture.componentRef.setInput('moyen', 'mobile');
+    await stable();
+    bouton('Continuer vers le paiement mobile')!.click();
+    await stable();
+    expect(element.querySelector('app-paiement-mobile')).not.toBeNull();
+    bouton('Changer de formule')!.click();
+    await stable();
+    expect(element.querySelector('app-paiement-mobile')).toBeNull();
+    expect(element.querySelectorAll<HTMLInputElement>('input[name="moyen"]')[1].checked).toBe(true);
   });
 
   it('Stripe.js injoignable : message clair, on reste au choix de la formule', async () => {

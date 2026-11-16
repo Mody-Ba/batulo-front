@@ -83,9 +83,20 @@ describe('Routage : vitrine pour un visiteur, tableau de bord pour un compte con
     TestBed.resetTestingModule();
     expect(await aller('/inscription')).toBe('/inscription');
     TestBed.resetTestingModule();
-    expect(await aller('/admin')).toBe('/connexion');
+    expect(await aller('/admin')).toBe('/connexion?retour=%2Fadmin');
     TestBed.resetTestingModule();
     expect(await aller('/s/Ab3x')).toBe('/s/Ab3x');
+  });
+
+  it('retour de Moosyl sur un téléphone sans session : connexion, puis retour à la page de statut', async () => {
+    expect(await aller('/admin/abonnement/paiement-mobile?reference=r1')).toBe(
+      '/connexion?retour=%2Fadmin%2Fabonnement%2Fpaiement-mobile%3Freference%3Dr1',
+    );
+  });
+
+  it('page de retour Moosyl permise à l’admin dont l’abonnement est en attente de paiement', async () => {
+    ouvrirSession('ADMIN', { statutAbonnement: 'EN_ATTENTE_PAIEMENT' });
+    expect(await aller('/admin/abonnement/paiement-mobile?reference=r1')).toBe('/admin/abonnement/paiement-mobile?reference=r1');
   });
 
   it('adresse inconnue : la vitrine pour un visiteur', async () => {

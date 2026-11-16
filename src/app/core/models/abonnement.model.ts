@@ -37,7 +37,25 @@ export interface FormuleResponse {
   devise: string;
   /** Ex. « 1 mois ». */
   duree: string;
+  /** Prix en paiement mobile (Moosyl : Bankily, Masrvi, Sedad…), en MRU entiers. */
+  prixMobile: number;
+  /** Ex. « MRU ». */
+  deviseMobile: string;
 }
+
+/** Prestataire qui a encaissé un paiement (enum FournisseurPaiement du backend). */
+export type FournisseurPaiement = 'STRIPE' | 'MOOSYL';
+
+export const LIBELLES_FOURNISSEUR: Record<FournisseurPaiement, string> = {
+  STRIPE: 'Carte',
+  MOOSYL: 'Mobile',
+};
+
+/** Moyen de paiement choisi à la souscription (?moyen= dans l'URL). */
+export type MoyenPaiement = 'carte' | 'mobile';
+
+/** Applications de paiement mobile mauritaniennes acceptées par Moosyl. */
+export const APPLICATIONS_MOBILES = 'Bankily, Masrvi, Sedad';
 
 /** GET /api/abonnements/moi (dates ISO 8601). 404 ABONNEMENT_INTROUVABLE s'il n'y en a pas. */
 export interface AbonnementResponse {
@@ -64,6 +82,45 @@ export interface PaiementResponse {
   formule: Formule;
   montant: number;
   devise: string;
+  /** STRIPE (carte) ou MOOSYL (paiement mobile). */
+  fournisseur: FournisseurPaiement;
+}
+
+/** Statut d'un paiement (enum StatutPaiement du backend). */
+export type StatutPaiement = 'EN_ATTENTE' | 'REUSSI' | 'ECHOUE';
+
+/** POST /api/abonnements/paiement-mobile (201). 503 PAIEMENT_MOBILE_NON_CONFIGURE, 502 MOOSYL_ERREUR. */
+export interface PaiementMobileRequest {
+  formule: Formule;
+  /** Facultatif (8 chiffres) : sinon Moosyl le demande. Le front ne l'envoie pas. */
+  telephone?: string;
+}
+
+export interface PaiementMobileResponse {
+  /** Référence Batulo, renvoyée par Moosyl dans l'URL de retour (?reference=). */
+  reference: string;
+  /** Page de paiement Moosyl. */
+  checkoutUrl: string;
+  formule: Formule;
+  montant: number;
+  /** « MRU ». */
+  devise: string;
+  /** Fin de validité de la session ; absente si Moosyl ne la donne pas. */
+  expireLe?: string | null;
+}
+
+/** GET /api/abonnements/paiement-mobile/{reference}. 404 PAIEMENT_INTROUVABLE. */
+export interface StatutPaiementMobileResponse {
+  reference: string;
+  /** EN_ATTENTE : pas encore confirmé ; REUSSI : abonnement activé ; ECHOUE : refusé, annulé ou expiré. */
+  statut: StatutPaiement;
+  formule: Formule;
+  montant: number;
+  devise: string;
+  dateCreation: string;
+  /** Absente tant que le paiement n'a pas réussi. */
+  datePaiement?: string | null;
+  abonnement: AbonnementResponse;
 }
 
 /** POST /api/abonnements/paiement/intention */

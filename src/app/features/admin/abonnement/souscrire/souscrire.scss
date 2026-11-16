@@ -69,7 +69,15 @@
 }
 
 .formule-libelle {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
   font: var(--mat-sys-title-medium);
+}
+
+.titre-groupe {
+  margin: var(--bt-espace-5) 0 0;
+  font: var(--mat-sys-title-small);
 }
 
 .coche {

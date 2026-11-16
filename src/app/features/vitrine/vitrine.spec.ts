@@ -7,8 +7,8 @@ import { prixEnClair } from './tarifs-vitrine/tarifs-vitrine';
 import { Vitrine } from './vitrine';
 
 const FORMULES = [
-  { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois' },
-  { formule: 'ANNUEL', libelle: 'Abonnement annuel', prix: 2, devise: 'CAD', duree: '1 an' },
+  { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois', prixMobile: 40, deviseMobile: 'MRU' },
+  { formule: 'ANNUEL', libelle: 'Abonnement annuel', prix: 2, devise: 'CAD', duree: '1 an', prixMobile: 80, deviseMobile: 'MRU' },
 ];
 
 describe('Vitrine publique', () => {
@@ -63,6 +63,14 @@ describe('Vitrine publique', () => {
     expect(texte(cartes[0] as HTMLElement)).toContain('CAD / 1 mois');
     expect(cartes[1].classList).toContain('en-avant');
     expect(cartes[1].textContent).toContain('Le plus avantageux');
+  });
+
+  it('tarifs : prix du paiement mobile en MRU, lus dans l’API, et applications acceptées', async () => {
+    const el = await creer();
+    const cartes = el.querySelectorAll('#tarifs .carte');
+    expect(texte(cartes[0] as HTMLElement)).toContain('ou 40 MRU par paiement mobile');
+    expect(texte(cartes[1] as HTMLElement)).toContain('ou 80 MRU par paiement mobile');
+    expect(texte(el.querySelector('#tarifs') as HTMLElement)).toContain('Bankily, Masrvi, Sedad');
   });
 
   it('tarifs indisponibles : message et « Réessayer »', async () => {

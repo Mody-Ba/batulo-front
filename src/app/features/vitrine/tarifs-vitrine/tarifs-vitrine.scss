@@ -61,8 +61,18 @@
   font-weight: 700;
 }
 
-.devise {
+.devise,
+.prix-mobile {
   color: var(--mat-sys-on-surface-variant);
+}
+
+.moyens {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  margin: var(--bt-espace-6) 0 0;
+  text-align: center;
 }
 
 .inclus {
