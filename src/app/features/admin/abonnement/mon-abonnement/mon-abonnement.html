@@ -94,6 +94,7 @@
               <tr>
                 <th scope="col">Date</th>
                 <th scope="col">Formule</th>
+                <th scope="col">Moyen</th>
                 <th scope="col" class="colonne-montant">Montant</th>
               </tr>
             </thead>
@@ -102,7 +103,8 @@
                 <tr>
                   <td>{{ p.datePaiement | date: 'd MMM y' }}</td>
                   <td>{{ libellesFormule[p.formule] }}</td>
-                  <td class="colonne-montant">{{ p.montant | currency: (p.devise | uppercase) }}</td>
+                  <td>{{ p.fournisseur ? libellesFournisseur[p.fournisseur] : '—' }}</td>
+                  <td class="colonne-montant">{{ montant(p.montant, p.devise, true) }}</td>
                 </tr>
               }
             </tbody>

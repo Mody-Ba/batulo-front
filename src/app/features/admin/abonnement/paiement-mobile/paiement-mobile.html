@@ -1,0 +1,69 @@
+<h2 class="titre-etape visuellement-cache" tabindex="-1">Paiement par application mobile</h2>
+
+<div class="resume">
+  <div>
+    <p class="resume-formule">{{ libellesFormule[formule()] }} · application mobile</p>
+    @if (session(); as s) {
+      <p class="resume-montant">{{ montant(s.montant, s.devise) }}</p>
+    }
+  </div>
+  <button matButton type="button" (click)="changerFormule.emit()">Changer de formule</button>
+</div>
+
+@switch (etat()) {
+  @case ('creation') {
+    <mat-progress-bar mode="indeterminate" aria-label="Préparation du paiement mobile" />
+    <p class="texte-aide" role="status">Préparation de la page de paiement…</p>
+  }
+
+  @case ('erreur') {
+    <app-message-erreur [erreur]="erreur()" parDefaut="Le paiement mobile n’a pas pu être préparé. Réessayez." />
+    <div class="actions">
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+    </div>
+  }
+
+  @case ('attente') {
+    @if (session(); as s) {
+      <div class="paiement">
+        <div class="bloc-qr">
+          <app-code-qr [texte]="s.checkoutUrl" libelle="Code QR de la page de paiement mobile" />
+          <p>Scannez ce code avec l’appareil photo de votre téléphone, puis payez avec {{ applications }}…</p>
+          <p class="revenir">Une fois payé, revenez sur cette page.</p>
+        </div>
+
+        <div class="bloc-infos">
+          <p class="montant">{{ montant(s.montant, s.devise) }}</p>
+          @if (s.expireLe) {
+            <p class="expiration">
+              <mat-icon fontIcon="schedule" aria-hidden="true" />
+              Valable jusqu’à {{ s.expireLe | date: 'HH:mm' }}
+            </p>
+          }
+          <!-- Même onglet : la session (sessionStorage) est encore là quand Moosyl renvoie sur Batulo. -->
+          <a matButton="filled" class="bouton-principal bouton-large" [href]="s.checkoutUrl">
+            <mat-icon fontIcon="smartphone" aria-hidden="true" />Payer sur ce téléphone
+          </a>
+          <p class="en-cours" role="status">
+            <mat-spinner diameter="18" aria-hidden="true" />
+            Paiement en cours… Cette page se met à jour dès que le paiement est confirmé.
+          </p>
+        </div>
+      </div>
+    }
+  }
+
+  @case ('echoue') {
+    <app-encadre type="erreur" role="alert" icone="error"><p>{{ messageEchec }}</p></app-encadre>
+    <div class="actions">
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+    </div>
+  }
+
+  @case ('expire') {
+    <app-encadre type="avertissement" role="alert" icone="timer_off"><p>{{ messageExpire }}</p></app-encadre>
+    <div class="actions">
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+    </div>
+  }
+}

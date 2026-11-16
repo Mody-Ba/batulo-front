@@ -50,7 +50,8 @@ src/app/
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
                    (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch),
-                   interrogation.ts (interrogation périodique arrêtée onglet caché)
+                   interrogation.ts (interrogation périodique arrêtée onglet caché), montant.ts (montants fr-CA,
+                   MRU sans décimales), redirection.ts (?retour= : chemins internes seulement)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
@@ -76,6 +77,10 @@ src/app/
   `EN_ATTENTE_PAIEMENT` -> `/admin/abonnement` (admin) ou `/compte-suspendu` (gestionnaire). `EXPIRE` : pas de
   redirection, bandeau « lecture seule » dans la mise en page.
 - Les gardes ne protègent aucune donnée (le serveur le fait) : elles choisissent seulement la page.
+- Visiteur sur une page protégée : `/connexion?retour=<page demandée>` (`authGuard`, `roleGuard`, `connecteGuard`) ;
+  après connexion, la page y revient. Contre les redirections ouvertes, `cheminInterne()` (`core/utils/redirection.ts`)
+  n'accepte qu'un chemin commençant par un seul « / » (ni « // », ni « /\ », ni URL externe, ni caractère de
+  contrôle), relu par la page de connexion ; sinon `urlAccueil()`. Une page imposée reste prioritaire (gardes).
 - Le statut d'abonnement est écrit dans le jeton : après un paiement (F2), appeler `rafraichir()` (ou
   `mettreAJourStatutAbonnement`) pour que le front et le backend voient le nouveau statut.
 
@@ -100,6 +105,35 @@ src/app/
   -> `PageResponse<PaiementResponse>` (`id`, `datePaiement`, `formule`, `montant`, `devise`), paiements **REUSSI
   seulement**, plus récents d'abord ; pas de statut ni de période. Pagination locale à la carte (5, 10, 20), le
   paginateur n'apparaît qu'au-delà de 5 paiements.
+
+## Paiement mobile Moosyl (Bankily, Masrvi, Sedad…)
+- À côté de la carte Stripe (inchangée). Contrat lu dans les records Java du backend (`PaiementMobileRequest|Response`,
+  `StatutPaiementMobileResponse`, `FormuleResponse.prixMobile|deviseMobile`, `PaiementResponse.fournisseur`
+  STRIPE|MOOSYL) : **à revérifier dans l'OpenAPI** quand l'instance 8090 aura été relancée.
+- `/admin/abonnement/souscrire[?formule&moyen=carte|mobile]` : choix du moyen (cartes radio « Carte bancaire » /
+  « Application mobile (Bankily, Masrvi, Sedad…) »), prix du moyen choisi (`prix` CAD ou `prixMobile` MRU, économie
+  annuelle comprise). Mobile : `paiement-mobile/paiement-mobile` (étape 2) -> `POST /api/abonnements/paiement-mobile
+  { formule }` (le téléphone n'est pas envoyé : Moosyl le demande) -> code QR de `checkoutUrl`, « Payer sur ce
+  téléphone » (lien dans le **même onglet** : la session est en sessionStorage, un nouvel onglet reviendrait sans
+  session), montant, « Valable jusqu'à » (`expireLe`, 30 min côté backend, rien si absent), « Une fois payé, revenez
+  sur cette page ». Succès : signal `abonnement`, `mettreAJourStatutAbonnement` puis `rafraichir()` (statut dans le
+  jeton ; échec -> reconnexion), écran « Vous êtes bien abonné » commun avec la carte.
+- Suivi (`suivi-paiement-mobile.ts`, `suivrePaiementMobile`) : `GET .../paiement-mobile/{reference}` toutes les 3 s par
+  `interrogationPeriodique` (rien onglet caché, relu tout de suite au retour), arrêt à REUSSI / ECHOUE, à `expireLe`
+  après une dernière lecture (« expire » si toujours EN_ATTENTE ; sans expireLe : 10 min), ou en quittant la page.
+  Erreurs passagères (réseau, 408, 429, 5xx) ignorées ; les autres (404 PAIEMENT_INTROUVABLE…) arrêtent le suivi.
+  503 PAIEMENT_MOBILE_NON_CONFIGURE et 502 MOOSYL_ERREUR : message du serveur et « Réessayer ».
+- Retour de Moosyl : `/admin/abonnement/paiement-mobile?reference=` (`retour-paiement-mobile`, permise en attente de
+  paiement car sous `/admin/abonnement`) : même suivi ; réussi -> nouveau jeton, « Abonnement activé » et lien vers
+  `/admin` ; échoué -> « Réessayer » (`souscrire?moyen=mobile&formule=`) ; référence absente ou 404 -> lien vers la
+  souscription ; attente trop longue -> « Vérifier à nouveau ». Le téléphone qui a scanné le QR n'a pas de session :
+  connexion puis retour sur cette page (`?retour=`) ; l'ordinateur voit le succès par son propre suivi.
+- Code QR : bibliothèque `uqr` (ESM, sans dépendance), `encode()` chargé par `import()` dans `code-qr.ts` (chunk à part
+  d'environ 10 ko), dessiné en SVG (un tracé, sans innerHTML), noir sur blanc avec 4 modules de marge, `role="img"`.
+- Montants : `montantEnClair()` (Intl fr-CA) ; MRU par son code et sans décimales inutiles (« 40 MRU »). Historique
+  des paiements : colonne « Moyen » (Carte / Mobile, `LIBELLES_FOURNISSEUR`) et montant avec le code de sa devise.
+- Vitrine : sous chaque prix, « ou N MRU par paiement mobile » (`prixMobile`, jamais écrit dans le front) et mention
+  des applications (`APPLICATIONS_MOBILES`) ; étapes et FAQ mentionnent les deux moyens.
 
 ## Espace admin (F4)
 - Routes : `/admin` (tableau de bord), `/admin/gestionnaires[?page&taille]`, `/admin/gestionnaires/:id`,
@@ -320,8 +354,8 @@ src/app/
 - Textes dans `contenu-vitrine.ts` (fonctionnalités, étapes, FAQ, `COURRIEL_CONTACT` = contact@batulo.example à
   remplacer avant la mise en ligne) : ne décrire que ce que Batulo fait (pas de renouvellement automatique, envoi
   qui demande une connexion, etc.).
-- Tarifs : jamais écrits dans le front, lus dans `GET /api/abonnements/formules` (route publique), formatés par
-  `Intl.NumberFormat('fr-CA')` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
+- Tarifs : jamais écrits dans le front, lus dans `GET /api/abonnements/formules` (route publique : prix par carte et
+  `prixMobile` en MRU), formatés par `Intl.NumberFormat('fr-CA')` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
 - Liens de section (`href="#id"`) gérés par la page : défilement (doux sauf `prefers-reduced-motion`), focus sur le
   titre, `scroll-margin-top` sous la barre ; un lien partagé `/#tarifs` y mène au chargement. Lien d'évitement
   « Aller au contenu ».
@@ -347,6 +381,7 @@ src/app/
 - [x] **F2 – Abonnement et Stripe** : formules, paiement Stripe Elements, confirmation, rafraîchissement du jeton,
   bandeau d'abonnement de l'admin, page « Mon abonnement » avec l'historique des paiements.
   Demande d'augmentation : faite en F8 (`/admin/abonnement/demandes`).
+  Paiement mobile Moosyl (Bankily, Masrvi, Sedad…) ajouté ensuite : voir « Paiement mobile Moosyl ».
 - [x] **F3 – Super admin** : tableau de bord (compteurs, demandes en attente, notifications), admins et entreprises
   (recherche, filtre, CRUD, activer/désactiver, suppression confirmée, mot de passe temporaire), abonnements
   (expirations proches en évidence), demandes d'abonnement (réponse TRAITEE ou REFUSEE).

@@ -4,16 +4,19 @@ import { catchError, EMPTY, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AbonnementResponse,
+  Formule,
   FormuleResponse,
   IntentionPaiementRequest,
   IntentionPaiementResponse,
   PaiementConfirmeResponse,
+  PaiementMobileResponse,
   PaiementResponse,
+  StatutPaiementMobileResponse,
 } from '../models/abonnement.model';
 import { PageResponse } from '../models/page.model';
 
 /**
- * Abonnement de l'entreprise de l'admin connecté et paiement Stripe.
+ * Abonnement de l'entreprise de l'admin connecté, paiement Stripe (carte) et Moosyl (mobile).
  * L'entreprise est lue dans le jeton par le backend : aucun identifiant à passer.
  */
 @Injectable({ providedIn: 'root' })
@@ -67,5 +70,26 @@ export class AbonnementService {
     return this.http
       .post<PaiementConfirmeResponse>(`${this.url}/paiement/confirmer`, { paymentIntentId })
       .pipe(tap((reponse) => this._abonnement.set(reponse.abonnement)));
+  }
+
+  /**
+   * Paiement mobile (Moosyl, en MRU) : crée le paiement EN_ATTENTE et la session ; l'admin paie sur checkoutUrl.
+   * L'abonnement n'est activé qu'à la confirmation de Moosyl (webhook, ou relecture par statutMobile).
+   */
+  payerMobile(formule: Formule): Observable<PaiementMobileResponse> {
+    return this.http.post<PaiementMobileResponse>(`${this.url}/paiement-mobile`, { formule });
+  }
+
+  /** Statut d'un paiement mobile ; REUSSI met à jour le signal partagé. */
+  statutMobile(reference: string): Observable<StatutPaiementMobileResponse> {
+    return this.http
+      .get<StatutPaiementMobileResponse>(`${this.url}/paiement-mobile/${encodeURIComponent(reference)}`)
+      .pipe(
+        tap((reponse) => {
+          if (reponse.statut === 'REUSSI') {
+            this._abonnement.set(reponse.abonnement);
+          }
+        }),
+      );
   }
 }

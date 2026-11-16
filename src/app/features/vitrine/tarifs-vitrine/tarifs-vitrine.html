@@ -23,10 +23,13 @@
           <span class="montant">{{ prix(f) }}</span>
           <span class="devise">{{ f.devise }} / {{ f.duree }}</span>
         </p>
+        @if (f.prixMobile != null && f.deviseMobile) {
+          <p class="prix-mobile">ou <strong>{{ montant(f.prixMobile, f.deviseMobile) }}</strong> par paiement mobile</p>
+        }
         <ul class="inclus">
           <li><span class="material-icons" aria-hidden="true">check</span>Toutes les fonctionnalités</li>
           <li><span class="material-icons" aria-hidden="true">check</span>Gestionnaires de votre entreprise</li>
-          <li><span class="material-icons" aria-hidden="true">check</span>Paiement par carte, sans renouvellement automatique</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>Carte bancaire ou paiement mobile, sans renouvellement automatique</li>
         </ul>
         <a class="bouton" [class.plein]="f.formule === 'ANNUEL'" [class.contour]="f.formule !== 'ANNUEL'" routerLink="/inscription">
           Commencer
@@ -34,4 +37,8 @@
       </li>
     }
   </ul>
+  <p class="moyens">
+    <span class="material-icons" aria-hidden="true">smartphone</span>
+    Payez par carte bancaire ou par application mobile : {{ applications }}.
+  </p>
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { cheminInterne } from '../../../core/utils/redirection';
 import { nonVide } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
@@ -34,6 +35,9 @@ export class Connexion {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
+  /** ?retour= : page demandée avant la connexion (posé par les gardes), chemin interne seulement. */
+  readonly retour = input<string | undefined>(undefined);
+
   protected readonly formulaire = inject(NonNullableFormBuilder).group({
     courriel: ['', [Validators.required, nonVide, Validators.email, Validators.maxLength(255)]],
     motDePasse: ['', [Validators.required, Validators.maxLength(72)]],
@@ -58,7 +62,8 @@ export class Connexion {
     this.auth.connexion({ courriel: courriel.trim(), motDePasse }).subscribe({
       next: () => {
         this.enCours.set(false);
-        void this.router.navigateByUrl(this.auth.urlAccueil());
+        // Une page imposée (mot de passe temporaire, paiement…) reste prioritaire : les gardes y renvoient.
+        void this.router.navigateByUrl(cheminInterne(this.retour()) ?? this.auth.urlAccueil());
       },
       error: (erreur: unknown) => {
         this.enCours.set(false);

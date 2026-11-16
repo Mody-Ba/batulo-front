@@ -35,8 +35,11 @@ import {
   Formule,
   FormuleResponse,
   IntentionPaiementResponse,
+  APPLICATIONS_MOBILES,
   LIBELLES_FORMULE,
+  MoyenPaiement,
   PaiementConfirmeResponse,
+  StatutPaiementMobileResponse,
 } from '../../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -46,12 +49,15 @@ import {
   MESSAGE_STRIPE_INDISPONIBLE,
   messageErreurStripe,
 } from '../../../../core/utils/stripe-erreurs';
+import { montantEnClair } from '../../../../core/utils/montant';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { PaiementMobile } from '../paiement-mobile/paiement-mobile';
+import { activerAbonnement, MESSAGE_RECONNEXION } from '../paiement-mobile/suivi-paiement-mobile';
 
-type Etape = 'formule' | 'paiement' | 'succes';
+type Etape = 'formule' | 'paiement' | 'mobile' | 'succes';
 type ChampCarte = 'numero' | 'expiration' | 'code';
 
 const CHAMPS_VIDES: Record<ChampCarte, string | null> = { numero: null, expiration: null, code: null };
@@ -62,12 +68,12 @@ export const DELAI_REDIRECTION_MS = 4000;
 export const MESSAGE_CARTE_INCOMPLETE = 'Complétez les informations de la carte.';
 export const MESSAGE_PAIEMENT_EN_TRAITEMENT =
   'Votre banque traite encore le paiement. Vérifiez à nouveau dans quelques instants.';
-export const MESSAGE_RECONNEXION =
-  'Votre paiement est enregistré. Reconnectez-vous pour accéder à Batulo.';
+export { MESSAGE_RECONNEXION };
 
 /**
  * Souscription ou renouvellement :
- * 1. choix de la formule ; 2. intention de paiement (backend) puis carte saisie dans les champs
+ * 1. choix de la formule et du moyen de paiement (carte ou application mobile, ?moyen=) ;
+ * 2. mobile : PaiementMobile (Moosyl, code QR et suivi du statut), puis nouveau jeton ; carte : intention de paiement (backend) puis carte saisie dans les champs
  * Stripe Elements et confirmation chez Stripe ; 3. confirmation auprès de Batulo (revérifiée chez
  * Stripe), rafraîchissement du jeton (nouveau statut) puis redirection vers le tableau de bord.
  * Les données de carte restent dans les iframes de Stripe : notre code ne les voit jamais.
@@ -89,6 +95,7 @@ export const MESSAGE_RECONNEXION =
     EntetePage,
     Encadre,
     MessageErreur,
+    PaiementMobile,
   ],
   templateUrl: './souscrire.html',
   styleUrl: './souscrire.scss',
@@ -104,8 +111,20 @@ export class Souscrire {
 
   /** Paramètre ?formule= (bouton « Renouveler »). */
   readonly formule = input<string | undefined>(undefined);
+  /** Paramètre ?moyen=carte|mobile (bouton « Réessayer » de la page de retour Moosyl). */
+  readonly moyen = input<string | undefined>(undefined);
 
   protected readonly libellesFormule = LIBELLES_FORMULE;
+  protected readonly montant = montantEnClair;
+  protected readonly moyens: readonly { moyen: MoyenPaiement; libelle: string; detail: string; icone: string }[] = [
+    { moyen: 'carte', libelle: 'Carte bancaire', detail: 'Visa, Mastercard…, paiement sécurisé par Stripe', icone: 'credit_card' },
+    {
+      moyen: 'mobile',
+      libelle: `Application mobile (${APPLICATIONS_MOBILES}…)`,
+      detail: 'Depuis votre téléphone, en ouguiyas',
+      icone: 'smartphone',
+    },
+  ];
   protected readonly abonnementActuel = this.service.abonnement;
 
   protected readonly etape = signal<Etape>('formule');
@@ -114,6 +133,7 @@ export class Souscrire {
   protected readonly formuleChoisie = linkedSignal<Formule>(() =>
     this.formule() === 'ANNUEL' ? 'ANNUEL' : 'MENSUEL',
   );
+  protected readonly moyenChoisi = linkedSignal<MoyenPaiement>(() => (this.moyen() === 'mobile' ? 'mobile' : 'carte'));
 
   protected readonly intention = signal<IntentionPaiementResponse | null>(null);
   protected readonly preparation = signal(false);
@@ -144,11 +164,15 @@ export class Souscrire {
   protected readonly formuleSelectionnee = computed(() =>
     this.formules().find((f) => f.formule === this.formuleChoisie()),
   );
-  /** Économie de la formule annuelle par rapport à 12 mois (0 si aucune). */
+  /** Économie de la formule annuelle par rapport à 12 mois (0 si aucune), dans la devise du moyen choisi. */
   protected readonly economieAnnuelle = computed(() => {
     const mensuel = this.formules().find((f) => f.formule === 'MENSUEL');
     const annuel = this.formules().find((f) => f.formule === 'ANNUEL');
-    return mensuel && annuel ? Math.max(Math.round((mensuel.prix * 12 - annuel.prix) * 100) / 100, 0) : 0;
+    if (!mensuel || !annuel) {
+      return 0;
+    }
+    const [m, a] = this.moyenChoisi() === 'mobile' ? [mensuel.prixMobile, annuel.prixMobile] : [mensuel.prix, annuel.prix];
+    return m != null && a != null ? Math.max(Math.round((m * 12 - a) * 100) / 100, 0) : 0;
   });
   protected readonly modeTest = computed(
     () => this.intention()?.clePublique.startsWith('pk_test_') ?? false,
@@ -206,9 +230,39 @@ export class Souscrire {
     this.formuleChoisie.set(formule);
   }
 
-  /** Étape 1 -> 2 : intention de paiement chez Batulo, puis chargement de Stripe.js. */
+  /** Le moyen choisi est gardé dans l'URL (retour arrière, rechargement). */
+  protected choisirMoyen(moyen: MoyenPaiement): void {
+    this.moyenChoisi.set(moyen);
+    void this.router.navigate([], {
+      queryParams: { moyen: moyen === 'mobile' ? 'mobile' : null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+  }
+
+  /** Prix d'une formule pour le moyen choisi : CAD par carte, MRU par application mobile. */
+  protected prix(formule: FormuleResponse): string {
+    if (this.moyenChoisi() !== 'mobile') {
+      return montantEnClair(formule.prix, formule.devise);
+    }
+    // Backend sans prix mobile (instance pas encore à jour) : pas de prix inventé.
+    return formule.prixMobile != null && formule.deviseMobile ? montantEnClair(formule.prixMobile, formule.deviseMobile) : '—';
+  }
+
+  /** Devise du moyen choisi (économie annuelle). */
+  protected devise(formule: FormuleResponse): string {
+    return (this.moyenChoisi() === 'mobile' ? formule.deviseMobile : formule.devise) ?? '';
+  }
+
+  /** Étape 1 -> 2 : mobile, le composant PaiementMobile ; carte, intention chez Batulo puis Stripe.js. */
   protected async continuer(): Promise<void> {
     if (this.preparation()) {
+      return;
+    }
+    if (this.moyenChoisi() === 'mobile') {
+      this.erreur.set(null);
+      this.erreurPaiement.set(null);
+      this.allerA('mobile');
       return;
     }
     this.preparation.set(true);
@@ -308,6 +362,19 @@ export class Souscrire {
     }
   }
 
+  /** Paiement mobile confirmé par Moosyl : nouveau jeton (nouveau statut), puis la confirmation. */
+  protected paiementMobileReussi(statut: StatutPaiementMobileResponse): void {
+    activerAbonnement(this.auth, statut)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((sessionAJour) => {
+        if (!sessionAJour) {
+          this.auth.terminerSession(MESSAGE_RECONNEXION);
+          return;
+        }
+        this.afficherSucces({ message: '', abonnement: statut.abonnement });
+      });
+  }
+
   protected allerAuTableauDeBord(): void {
     void this.router.navigateByUrl('/admin');
   }
@@ -343,18 +410,22 @@ export class Souscrire {
             this.auth.terminerSession(MESSAGE_RECONNEXION);
             return;
           }
-          this.confirmation.set(reponse);
           this.detruireChamps();
-          this.allerA('succes');
-          timer(DELAI_REDIRECTION_MS)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(() => this.allerAuTableauDeBord());
+          this.afficherSucces(reponse);
         },
         error: (erreur: unknown) => {
           this.paiementEnCours.set(false);
           this.erreur.set(erreur);
         },
       });
+  }
+
+  private afficherSucces(reponse: PaiementConfirmeResponse): void {
+    this.confirmation.set(reponse);
+    this.allerA('succes');
+    timer(DELAI_REDIRECTION_MS)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.allerAuTableauDeBord());
   }
 
   private finPaiementEchoue(message: string): void {

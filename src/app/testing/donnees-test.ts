@@ -1,4 +1,9 @@
-import { AbonnementResponse } from '../core/models/abonnement.model';
+import {
+  AbonnementResponse,
+  FormuleResponse,
+  PaiementMobileResponse,
+  StatutPaiementMobileResponse,
+} from '../core/models/abonnement.model';
 import { DemandeAbonnementResponse } from '../core/models/demande-abonnement.model';
 import { GestionnaireResponse } from '../core/models/gestionnaire.model';
 import {
@@ -30,6 +35,37 @@ export function abonnementDeTest(modifs: Partial<AbonnementResponse> = {}): Abon
     joursRestants: 23,
     montant: 1,
     devise: 'cad',
+    ...modifs,
+  };
+}
+
+/** Formules au format de GET /api/abonnements/formules (valeurs de test du backend : 1 / 2 CAD, 40 / 80 MRU). */
+export const FORMULES_DE_TEST: FormuleResponse[] = [
+  { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois', prixMobile: 40, deviseMobile: 'MRU' },
+  { formule: 'ANNUEL', libelle: 'Abonnement annuel', prix: 2, devise: 'CAD', duree: '1 an', prixMobile: 80, deviseMobile: 'MRU' },
+];
+
+export function sessionMobileDeTest(modifs: Partial<PaiementMobileResponse> = {}): PaiementMobileResponse {
+  return {
+    reference: 'ref-123',
+    checkoutUrl: 'https://pay.moosyl.test/checkout/abc',
+    formule: 'ANNUEL',
+    montant: 80,
+    devise: 'MRU',
+    expireLe: '2026-11-15T12:30:00Z',
+    ...modifs,
+  };
+}
+
+export function statutMobileDeTest(modifs: Partial<StatutPaiementMobileResponse> = {}): StatutPaiementMobileResponse {
+  return {
+    reference: 'ref-123',
+    statut: 'EN_ATTENTE',
+    formule: 'ANNUEL',
+    montant: 80,
+    devise: 'MRU',
+    dateCreation: '2026-11-15T12:00:00Z',
+    abonnement: abonnementDeTest({ statut: 'EN_ATTENTE_PAIEMENT', formule: null }),
     ...modifs,
   };
 }

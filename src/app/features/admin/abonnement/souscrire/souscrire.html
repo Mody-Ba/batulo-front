@@ -2,7 +2,7 @@
   <app-entete-page
     [titre]="renouvellement() ? 'Renouveler mon abonnement' : 'S’abonner à Batulo'"
     icone="card_membership"
-    [sousTitre]="etape() === 'succes' ? null : etape() === 'formule' ? 'Étape 1 sur 2 : choisissez votre formule' : 'Étape 2 sur 2 : paiement'"
+    [sousTitre]="etape() === 'succes' ? null : etape() === 'formule' ? 'Étape 1 sur 2 : formule et moyen de paiement' : 'Étape 2 sur 2 : paiement'"
   >
     @if (renouvellement() && etape() !== 'succes') {
       <a matButton routerLink="/admin/abonnement">Retour à mon abonnement</a>
@@ -39,7 +39,33 @@
       @if (chargementFormules()) {
         <mat-progress-bar mode="indeterminate" aria-label="Chargement des formules" />
       } @else if (formules().length) {
-        <div class="formules" role="radiogroup" aria-label="Formules d’abonnement">
+        <h3 class="titre-groupe" id="titre-moyen">Moyen de paiement</h3>
+        <div class="formules moyens" role="radiogroup" aria-labelledby="titre-moyen">
+          @for (m of moyens; track m.moyen) {
+            <label class="formule" [class.choisie]="m.moyen === moyenChoisi()">
+              <input
+                type="radio"
+                name="moyen"
+                class="visuellement-cache"
+                [value]="m.moyen"
+                [checked]="m.moyen === moyenChoisi()"
+                (change)="choisirMoyen(m.moyen)"
+              />
+              <span class="formule-entete">
+                <span class="formule-libelle"><mat-icon [fontIcon]="m.icone" aria-hidden="true" />{{ m.libelle }}</span>
+                <mat-icon
+                  class="coche"
+                  [fontIcon]="m.moyen === moyenChoisi() ? 'radio_button_checked' : 'radio_button_unchecked'"
+                  aria-hidden="true"
+                />
+              </span>
+              <span class="duree">{{ m.detail }}</span>
+            </label>
+          }
+        </div>
+
+        <h3 class="titre-groupe" id="titre-formule">Formule</h3>
+        <div class="formules" role="radiogroup" aria-labelledby="titre-formule">
           @for (formule of formules(); track formule.formule) {
             <label class="formule" [class.choisie]="formule.formule === formuleChoisie()">
               <input
@@ -58,12 +84,11 @@
                   aria-hidden="true"
                 />
               </span>
-              <span class="prix">{{ formule.prix | currency: (formule.devise | uppercase) }}</span>
+              <span class="prix">{{ prix(formule) }}</span>
               <span class="duree">pour {{ formule.duree }}</span>
               @if (formule.formule === 'ANNUEL' && economieAnnuelle() > 0) {
                 <span class="economie">
-                  Économisez {{ economieAnnuelle() | currency: (formule.devise | uppercase) }} par rapport
-                  à 12 mois
+                  Économisez {{ montant(economieAnnuelle(), devise(formule)) }} par rapport à 12 mois
                 </span>
               }
             </label>
@@ -81,7 +106,7 @@
             @if (preparation()) {
               <mat-spinner diameter="20" aria-label="Préparation du paiement" />
             } @else {
-              Continuer vers le paiement
+              {{ moyenChoisi() === 'mobile' ? 'Continuer vers le paiement mobile' : 'Continuer vers le paiement' }}
             }
           </button>
         </div>
@@ -209,6 +234,15 @@
           </p>
         </form>
       }
+    }
+
+    <!-- ---------- Étape 2 : application mobile (Moosyl) ---------- -->
+    @case ('mobile') {
+      <app-paiement-mobile
+        [formule]="formuleChoisie()"
+        (reussi)="paiementMobileReussi($event)"
+        (changerFormule)="changerFormule()"
+      />
     }
 
     <!-- ---------- Succès ---------- -->
