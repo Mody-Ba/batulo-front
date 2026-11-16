@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { PageResponse } from '../models/page.model';
 import {
   ApercuResponse,
+  ConditionAffichage,
   CreationSondageRequest,
   CritereRequest,
   DatesSondageRequest,
@@ -175,6 +176,27 @@ export class SondageService {
   /** Réglage d'analyse : permis même après publication. */
   definirCritere(id: number, questionId: number, critere: CritereRequest): Observable<SondageResponse> {
     return this.http.put<SondageResponse>(`${this.url}/${id}/questions/${questionId}/critere`, critere);
+  }
+
+  /**
+   * Condition d'affichage d'une question (PUT, remplace l'existante) ou retrait (DELETE). Brouillon seulement
+   * (409 SONDAGE_PUBLIE) ; 400 CONDITION_INVALIDE avec un message clair.
+   */
+  definirConditionQuestion(id: number, questionId: number, condition: ConditionAffichage): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/questions/${questionId}/condition`, condition);
+  }
+
+  retirerConditionQuestion(id: number, questionId: number): Observable<SondageResponse> {
+    return this.http.delete<SondageResponse>(`${this.url}/${id}/questions/${questionId}/condition`);
+  }
+
+  /** Condition d'affichage d'une section (masquée, elle masque toutes ses questions), ou retrait. */
+  definirConditionSection(id: number, sectionId: number, condition: ConditionAffichage): Observable<SondageResponse> {
+    return this.http.put<SondageResponse>(`${this.url}/${id}/sections/${sectionId}/condition`, condition);
+  }
+
+  retirerConditionSection(id: number, sectionId: number): Observable<SondageResponse> {
+    return this.http.delete<SondageResponse>(`${this.url}/${id}/sections/${sectionId}/condition`);
   }
 
   lien(id: number): Observable<LienSondageResponse> {

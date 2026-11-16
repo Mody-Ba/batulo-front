@@ -1,0 +1,15 @@
+// Question apparue par une condition d'affichage : fondu et léger glissement (aucun si mouvement réduit).
+app-formulaire-sondage .apparition {
+  animation: apparition-question 200ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes apparition-question {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}

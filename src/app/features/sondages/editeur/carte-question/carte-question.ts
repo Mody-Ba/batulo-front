@@ -3,6 +3,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import {
   afterNextRender,
   Component,
+  computed,
   DestroyRef,
   effect,
   ElementRef,
@@ -33,10 +34,11 @@ import {
   TYPES_QUESTION,
   TypeQuestion,
 } from '../../../../core/models/sondage.model';
-import { messageErreur } from '../../../../core/utils/erreur-http';
+import { aLeCode, messageErreur } from '../../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../../core/utils/regles-question';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { ouvrirDialogueCondition, ResumeCondition } from '../condition/resume-condition';
 import { CritereQuestion } from '../critere-question/critere-question';
 import { EditeurSondageStore } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
@@ -92,6 +94,7 @@ import { QuestionTexteLong } from '../types/question-texte-long/question-texte-l
     QuestionNumerique,
     QuestionDate,
     QuestionMatrice,
+    ResumeCondition,
   ],
   templateUrl: './carte-question.html',
   styleUrl: './carte-question.scss',
@@ -124,6 +127,19 @@ export class CarteQuestion implements OnInit {
   protected readonly idQuestion = signal<number | null>(null);
 
   private readonly champLibelle = viewChild<ElementRef<HTMLTextAreaElement>>('champLibelle');
+
+  /** Condition d'affichage enregistrée (relue dans le sondage du store). */
+  protected readonly condition = computed(() => this.store.questionEnregistree(this.idQuestion())?.condition ?? null);
+  /** « la question 2 de la section 1 » (boîte de condition, libellés des boutons). */
+  protected readonly nomCible = computed(() => {
+    const rang = (this.store.sondage()?.sections.findIndex((s) => s.id === this.sectionId()) ?? -1) + 1;
+    return `la question ${this.numero()}${rang > 0 ? ` de la section ${rang}` : ''}`;
+  });
+  /**
+   * Refus qui concerne cette question et doit rester lisible (409 CONDITION_DEPENDANTE : suppression, déplacement ou
+   * changement qui casserait une condition ; erreur en retirant la condition).
+   */
+  protected readonly erreurAction = signal<unknown>(null);
 
   ngOnInit(): void {
     const question = this.question();
@@ -228,10 +244,52 @@ export class CarteQuestion implements OnInit {
     this.store.changerDeSection(id, sectionId).subscribe({
       next: () => this.snackBar.open('Question déplacée.', 'Fermer', { duration: 4000 }),
       error: (erreur: unknown) => {
-        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.signalerRefus(erreur);
         this.store.recharger();
       },
     });
+  }
+
+  /** « Ajouter / Modifier la condition d'affichage ». */
+  protected editerCondition(): void {
+    const id = this.idQuestion();
+    const sondage = this.store.sondage();
+    if (id === null || !sondage) {
+      return;
+    }
+    this.erreurAction.set(null);
+    ouvrirDialogueCondition(this.dialog, {
+      sondage,
+      cible: { type: 'question', questionId: id },
+      nomCible: this.nomCible(),
+      condition: this.condition(),
+      enregistrer: (condition) => this.store.definirConditionQuestion(id, condition),
+    }).subscribe((sondage) => {
+      if (sondage) {
+        this.snackBar.open('Condition d’affichage enregistrée.', 'Fermer', { duration: 4000 });
+      }
+    });
+  }
+
+  protected retirerCondition(): void {
+    const id = this.idQuestion();
+    if (id === null) {
+      return;
+    }
+    this.erreurAction.set(null);
+    this.store.definirConditionQuestion(id, null).subscribe({
+      next: () => this.snackBar.open('Condition d’affichage retirée : la question est toujours affichée.', 'Fermer', { duration: 4000 }),
+      error: (erreur: unknown) => this.erreurAction.set(erreur),
+    });
+  }
+
+  /** Refus d'une action : CONDITION_DEPENDANTE reste affiché sur la carte, le reste en message passager. */
+  private signalerRefus(erreur: unknown): void {
+    if (aLeCode(erreur, 'CONDITION_DEPENDANTE')) {
+      this.erreurAction.set(erreur);
+    } else {
+      this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+    }
   }
 
   protected monter(): void {
@@ -250,7 +308,7 @@ export class CarteQuestion implements OnInit {
         ? this.store.retirerQuestionLocale(this.sectionId(), this.cle())
         : this.store.supprimerQuestion(id).subscribe({
             next: () => this.snackBar.open('Question supprimée.', 'Fermer', { duration: 4000 }),
-            error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+            error: (erreur: unknown) => this.signalerRefus(erreur),
           });
     if (id === null && !libelle) {
       retirer();
@@ -267,9 +325,10 @@ export class CarteQuestion implements OnInit {
   }
 
   private deplacer(vers: number): void {
+    this.erreurAction.set(null);
     this.store.deplacerQuestion(this.sectionId(), this.position(), vers).subscribe({
       error: (erreur: unknown) => {
-        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.signalerRefus(erreur);
         this.store.recharger();
       },
     });

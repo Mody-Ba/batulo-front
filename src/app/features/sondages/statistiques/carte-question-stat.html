@@ -5,6 +5,16 @@
       {{ nombre(question().nombreRepondants) }} répondant{{ question().nombreRepondants > 1 ? 's' : '' }}
       · {{ nombre(question().sansReponse) }} sans réponse
     </p>
+    @if (question().conditionnelle && question().vues != null) {
+      <p class="vue-par">
+        <span class="material-icons" aria-hidden="true">alt_route</span>
+        Question conditionnelle : vue par {{ nombre(question().vues!) }} répondant{{ question().vues! > 1 ? 's' : '' }}
+        @if (totalReponses() != null) {
+          sur {{ nombre(totalReponses()!) }}
+        }
+        <span class="texte-aide">(pourcentages calculés sur ceux qui ont répondu)</span>
+      </p>
+    }
     @if (question().petitEffectif && question().nombreRepondants > 0) {
       <p class="avertissement" role="note">
         <span aria-hidden="true">⚠</span> Moins de 5 répondants : résultats à interpréter avec prudence.

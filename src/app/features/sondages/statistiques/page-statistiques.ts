@@ -27,7 +27,7 @@ import { DialogueExport, DonneesExport } from './dialogue-export';
 import { FiltresStatistiquesComposant } from './filtres-statistiques';
 import { filtresDepuisUrl, parametresUrl } from './filtres-url';
 import { nombre } from './graphiques/format';
-import { resumeFiltres } from './resume-filtres';
+import { resumeFiltres, totalUneVersion } from './resume-filtres';
 import { grouperParSection } from './groupes-questions';
 import { TableauCroise } from './tableau-croise';
 
@@ -63,6 +63,7 @@ export class PageStatistiques {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly nombre = nombre;
+  protected readonly totalUneVersion = totalUneVersion;
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
 

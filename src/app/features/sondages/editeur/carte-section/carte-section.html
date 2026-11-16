@@ -45,7 +45,18 @@
         [maxlength]="regles.descriptionMax"
       ></textarea>
     </mat-form-field>
+    @if (section().condition; as c) {
+      <app-resume-condition
+        [condition]="c"
+        [sondage]="store.sondage()"
+        [nomCible]="nomCible()"
+        [modifiable]="store.modifiable()"
+        (modifier)="editerCondition()"
+        (retirer)="retirerCondition()"
+      />
+    }
     <app-message-erreur [erreur]="auto.erreur()" parDefaut="La section n’a pas pu être enregistrée." />
+    <app-message-erreur [erreur]="erreurAction()" titre="Action refusée" parDefaut="Cette action n’a pas pu être faite." />
   </div>
 
   @if (elements().length === 0) {
@@ -102,6 +113,12 @@
     >
       <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre la section</span>
     </button>
+    @if (position() > 0) {
+      <button mat-menu-item type="button" (click)="editerCondition()">
+        <mat-icon fontIcon="alt_route" aria-hidden="true" />
+        <span>{{ section().condition ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
+      </button>
+    }
     <button mat-menu-item type="button" class="action-danger" (click)="supprimer()">
       <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la section</span>
     </button>

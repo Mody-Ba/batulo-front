@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 import { TextFieldModule } from '@angular/cdk/text-field';
-import { Component, computed, DestroyRef, effect, inject, Injector, input, OnInit } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, Injector, input, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,12 +11,13 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { filter, Observable } from 'rxjs';
 import { SectionRequest, SectionResponse } from '../../../../core/models/sondage.model';
-import { messageErreur } from '../../../../core/utils/erreur-http';
+import { aLeCode, messageErreur } from '../../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../../core/utils/regles-question';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { CarteQuestion } from '../carte-question/carte-question';
+import { ouvrirDialogueCondition, ResumeCondition } from '../condition/resume-condition';
 import { EditeurSondageStore, ElementQuestion } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
 import { EtatEnregistrementIndicateur } from '../etat-enregistrement/etat-enregistrement';
@@ -46,6 +47,7 @@ export function idListeQuestions(sectionId: number): string {
     MessageErreur,
     CarteQuestion,
     EtatEnregistrementIndicateur,
+    ResumeCondition,
   ],
   templateUrl: './carte-section.html',
   styleUrl: './carte-section.scss',
@@ -88,6 +90,9 @@ export class CarteSection implements OnInit {
     drag.dropContainer === liste ||
     (this.store.peutChangerDeSection(drag.data) && !this.store.sectionPleine(this.section().id));
   protected readonly parCle = (_index: number, element: ElementQuestion) => element.cle;
+  protected readonly nomCible = computed(() => `la section ${this.position() + 1}`);
+  /** Refus à garder lisible sur la carte (409 CONDITION_DEPENDANTE, retrait de condition refusé). */
+  protected readonly erreurAction = signal<unknown>(null);
 
   protected readonly formulaire = new FormGroup({
     titre: new FormControl('', {
@@ -155,6 +160,35 @@ export class CarteSection implements OnInit {
     this.store.deplacerSection(this.position(), vers).subscribe({ error: (e: unknown) => this.echecOrdre(e) });
   }
 
+  /** « Ajouter / Modifier la condition d'affichage » (sources : questions des sections précédentes). */
+  protected editerCondition(): void {
+    const sondage = this.store.sondage();
+    const section = this.section();
+    if (!sondage) {
+      return;
+    }
+    this.erreurAction.set(null);
+    ouvrirDialogueCondition(this.dialog, {
+      sondage,
+      cible: { type: 'section', sectionId: section.id },
+      nomCible: this.nomCible(),
+      condition: section.condition ?? null,
+      enregistrer: (condition) => this.store.definirConditionSection(section.id, condition),
+    }).subscribe((resultat) => {
+      if (resultat) {
+        this.snackBar.open('Condition d’affichage enregistrée.', 'Fermer', { duration: 4000 });
+      }
+    });
+  }
+
+  protected retirerCondition(): void {
+    this.erreurAction.set(null);
+    this.store.definirConditionSection(this.section().id, null).subscribe({
+      next: () => this.snackBar.open('Condition d’affichage retirée : la section est toujours affichée.', 'Fermer', { duration: 4000 }),
+      error: (erreur: unknown) => this.erreurAction.set(erreur),
+    });
+  }
+
   protected supprimer(): void {
     const section = this.section();
     const nombre = this.elements().length;
@@ -171,7 +205,7 @@ export class CarteSection implements OnInit {
       .subscribe(() =>
         this.store.supprimerSection(section.id).subscribe({
           next: () => this.snackBar.open('Section supprimée.', 'Fermer', { duration: 4000 }),
-          error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+          error: (erreur: unknown) => this.signalerRefus(erreur),
         }),
       );
   }
@@ -184,8 +218,17 @@ export class CarteSection implements OnInit {
 
   /** L'ordre affiché revient à celui du serveur. */
   private echecOrdre(erreur: unknown): void {
-    this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+    this.signalerRefus(erreur);
     this.store.recharger();
+  }
+
+  /** CONDITION_DEPENDANTE reste affiché sur la carte de la section ; le reste en message passager. */
+  private signalerRefus(erreur: unknown): void {
+    if (aLeCode(erreur, 'CONDITION_DEPENDANTE')) {
+      this.erreurAction.set(erreur);
+    } else {
+      this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+    }
   }
 
   private requete(): SectionRequest {

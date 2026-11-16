@@ -23,3 +23,12 @@ export function resumeFiltres(filtres: FiltresStatistiques, criteres: CritereRes
   }
   return parties;
 }
+
+/**
+ * Total des réponses pour « vue par X répondants sur Y » : seulement pour une seule version. En vue « toutes les
+ * versions », le total peut compter des versions où la question n'existait pas (le backend ne donne pas encore ce total
+ * par question) : null.
+ */
+export function totalUneVersion(st: { lignee: boolean; versions: number[]; resume: { nombreReponses: number } }): number | null {
+  return !st.lignee || st.versions.length <= 1 ? st.resume.nombreReponses : null;
+}

@@ -19,7 +19,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
 import { CarteQuestionStat } from '../../sondages/statistiques/carte-question-stat';
 import { nombre } from '../../sondages/statistiques/graphiques/format';
 import { grouperParSection } from '../../sondages/statistiques/groupes-questions';
-import { resumeFiltres } from '../../sondages/statistiques/resume-filtres';
+import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resume-filtres';
 
 /**
  * Admin : statistiques reçues, recalculées avec les filtres de l'envoi (GET /api/statistiques-recues/{id}, qui les
@@ -71,7 +71,7 @@ import { resumeFiltres } from '../../sondages/statistiques/resume-filtres';
           <section class="groupe" [attr.aria-label]="'Section ' + g.section">
             <h2 class="titre-section">{{ g.section }}</h2>
             @for (q of g.questions; track q.question.questionId) {
-              <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="st.sondageId" [filtres]="filtres()" />
+              <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="st.sondageId" [filtres]="filtres()" [totalReponses]="totalUneVersion(st)" />
             }
           </section>
         }
@@ -127,6 +127,7 @@ export class StatistiquesRecues {
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly nombre = nombre;
+  protected readonly totalUneVersion = totalUneVersion;
 
   /** Paramètre de route :envoiId. */
   readonly envoiId = input.required<string>();

@@ -74,7 +74,7 @@
         <section class="groupe" [attr.aria-label]="'Section ' + g.section">
           <h2 class="titre-section">{{ g.section }}</h2>
           @for (q of g.questions; track q.question.questionId) {
-            <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="identifiant()" [filtres]="filtres()" />
+            <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="identifiant()" [filtres]="filtres()" [totalReponses]="totalUneVersion(st)" />
           }
         </section>
       }

@@ -14,7 +14,8 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { ErreurQuestion } from '../../core/models/erreur.model';
-import { SectionAffichee } from '../../core/models/sondage.model';
+import { QuestionAffichee, SectionAffichee } from '../../core/models/sondage.model';
+import { evaluerVisibilite, Visibilite } from './conditions';
 import { QuestionRepondant } from './question-repondant';
 import {
   cleReponse,
@@ -37,7 +38,9 @@ export type ReponsesParQuestion = Record<number, ValeurReponse>;
 
 /**
  * Formulaire tel que le voit le répondant : une section par page (Précédent / Suivant, progression), questions
- * numérotées en continu. « Suivant » et « Envoyer » vérifient d'abord la section ; la première question à corriger
+ * numérotées en continu. Conditions d'affichage (`conditions.ts`) évaluées en direct à chaque saisie : une question
+ * masquée est désactivée (ni obligatoire ni validée), sa réponse effacée et jamais envoyée ; une section sans question
+ * visible est sautée ; progression et numéros ne comptent que le visible ; apparitions annoncées (aria-live). « Suivant » et « Envoyer » vérifient d'abord la section ; la première question à corriger
  * reçoit le focus. Les refus du serveur (REPONSES_INVALIDES) sont posés sur leur question. En aperçu, rien n'est
  * envoyé : « Vérifier » contrôle seulement les réponses. Éléments natifs, sans Angular Material (formulaire public
  * léger) ; mise en page selon la largeur du formulaire (container queries), pas de l'écran.
@@ -52,6 +55,7 @@ export type ReponsesParQuestion = Record<number, ValeurReponse>;
     './champs/champs-choix.scss',
     './champs/champs-saisie.scss',
     './champs/champs-matrice.scss',
+    './conditions.scss',
   ],
   encapsulation: ViewEncapsulation.None,
 })
@@ -86,8 +90,24 @@ export class FormulaireSondage {
   protected readonly verifie = signal(false);
   /** Erreurs du serveur qui ne correspondent à aucune question affichée. */
   protected readonly erreursGenerales = signal<string[]>([]);
+  /** Réponses en cours, relues à chaque saisie : la visibilité en dépend. */
+  private readonly valeurs = signal<ReponsesParQuestion>({});
+  /** Questions qui viennent d'apparaître (transition discrète). */
+  protected readonly apparues = signal<ReadonlySet<number>>(new Set());
+  /** Annonce des questions apparues ou masquées dans la section affichée (lecteurs d'écran). */
+  protected readonly annonce = signal('');
 
-  protected readonly sections = computed(() => this.contenu().sections.filter((s) => s.questions.length > 0));
+  protected readonly visibilite = computed<Visibilite>(() =>
+    evaluerVisibilite(this.contenu().sections, (id) => this.valeurs()[id]),
+  );
+  /** Sections affichées, réduites à leurs questions visibles ; une section sans question visible est sautée. */
+  protected readonly sections = computed(() => {
+    const { sections, questions } = this.visibilite();
+    return this.contenu()
+      .sections.filter((s) => sections.has(s.id))
+      .map((s) => ({ ...s, questions: s.questions.filter((q) => questions.has(q.id)) }))
+      .filter((s) => s.questions.length > 0);
+  });
   protected readonly section = computed(() => this.sections()[this.indexSection()] ?? null);
   protected readonly derniere = computed(() => this.indexSection() >= this.sections().length - 1);
   /** Numéro de la première question de chaque section (numérotation continue). */
@@ -136,7 +156,8 @@ export class FormulaireSondage {
     if (!this.verifierSection()) {
       return;
     }
-    const reponses = reponsesAEnvoyer(this.contenu().sections, this.reponses());
+    // Questions visibles seulement : une question masquée n'est jamais envoyée.
+    const reponses = reponsesAEnvoyer(this.sections(), this.reponses());
     if (this.mode() === 'apercu') {
       this.verifie.set(true);
     } else {
@@ -151,9 +172,8 @@ export class FormulaireSondage {
     indexInitial = 0,
   ): void {
     const formulaire = creerFormulaireReponses(sections);
-    const visibles = sections.filter((s) => s.questions.length > 0);
     if (initiales) {
-      for (const question of visibles.flatMap((s) => s.questions)) {
+      for (const question of sections.flatMap((s) => s.questions)) {
         const valeur = initiales[question.id];
         if (valeur !== undefined) {
           formulaire.controls[cleReponse(question)].setValue(valeur, { emitEvent: false });
@@ -161,12 +181,68 @@ export class FormulaireSondage {
       }
     }
     this.abonnement?.unsubscribe();
-    this.abonnement = formulaire.valueChanges.subscribe(() => this.reponsesModifiees.emit(this.valeursParQuestion()));
     this.reponses.set(formulaire);
-    this.indexSection.set(Math.min(Math.max(indexInitial, 0), Math.max(visibles.length - 1, 0)));
+    // Brouillon repris : les réponses des questions masquées par ses propres réponses sont effacées.
+    this.appliquerConditions(false);
+    this.abonnement = formulaire.valueChanges.subscribe(() => {
+      this.appliquerConditions(true);
+      this.reponsesModifiees.emit(this.valeursParQuestion());
+    });
+    this.indexSection.set(Math.min(Math.max(indexInitial, 0), Math.max(this.sections().length - 1, 0)));
+    this.apparues.set(new Set());
+    this.annonce.set('');
     this.aCorriger.set(false);
     this.verifie.set(false);
     this.erreursGenerales.set([]);
+  }
+
+  /**
+   * Relit les réponses et la visibilité ; une question masquée est désactivée et sa réponse effacée (ce qui peut en
+   * masquer d'autres : on recommence jusqu'à stabilité). `annoncer` : signale les changements de la section affichée.
+   */
+  private appliquerConditions(annoncer: boolean): void {
+    const avant = this.visibilite().questions;
+    const sectionAvant = this.section();
+    let visibilite: Visibilite;
+    for (let tour = 0; ; tour++) {
+      this.valeurs.set(this.valeursParQuestion());
+      visibilite = this.visibilite();
+      const aEffacer = this.toutesLesQuestions().filter(
+        (q) => !visibilite.questions.has(q.id) && this.controle(cleReponse(q))?.value !== null,
+      );
+      if (aEffacer.length === 0 || tour > 50) {
+        break;
+      }
+      aEffacer.forEach((q) => this.controle(cleReponse(q)).setValue(null, { emitEvent: false }));
+    }
+    for (const question of this.toutesLesQuestions()) {
+      const controle = this.controle(cleReponse(question));
+      if (visibilite.questions.has(question.id)) {
+        controle?.enable({ emitEvent: false });
+      } else {
+        controle?.disable({ emitEvent: false });
+      }
+    }
+    if (!annoncer) {
+      return;
+    }
+    const nouvelles = this.toutesLesQuestions().filter((q) => visibilite.questions.has(q.id) && !avant.has(q.id));
+    this.apparues.set(new Set(nouvelles.map((q) => q.id)));
+    // Section affichée : on reste dessus (ses propres réponses ne peuvent pas la masquer : sources placées avant).
+    if (sectionAvant) {
+      const index = this.sections().findIndex((s) => s.id === sectionAvant.id);
+      if (index >= 0) {
+        this.indexSection.set(index);
+      }
+      const ici = new Set(this.contenu().sections.find((x) => x.id === sectionAvant.id)?.questions.map((q) => q.id) ?? []);
+      const apparuesIci = nouvelles.filter((q) => ici.has(q.id));
+      const masqueesIci = [...avant].filter((id) => ici.has(id) && !visibilite.questions.has(id));
+      this.annonce.set(texteAnnonce(apparuesIci, masqueesIci.length));
+    }
+  }
+
+  private toutesLesQuestions(): QuestionAffichee[] {
+    return this.contenu().sections.flatMap((s) => s.questions);
   }
 
   private valeursParQuestion(): ReponsesParQuestion {
@@ -211,6 +287,8 @@ export class FormulaireSondage {
   }
 
   private allerA(index: number): void {
+    this.apparues.set(new Set());
+    this.annonce.set('');
     this.indexSection.set(Math.min(Math.max(index, 0), this.sections().length - 1));
     this.sectionChangee.emit(this.indexSection());
     this.focaliser('.titre-section', 'start');
@@ -252,4 +330,20 @@ export class FormulaireSondage {
       { injector: this.injector },
     );
   }
+}
+
+/** « Nouvelle question affichée : « … ». », « 2 nouvelles questions affichées. », « Une question n'est plus affichée. » */
+export function texteAnnonce(apparues: readonly QuestionAffichee[], masquees: number): string {
+  const morceaux: string[] = [];
+  if (apparues.length === 1) {
+    morceaux.push(`Nouvelle question affichée : « ${apparues[0].libelle} ».`);
+  } else if (apparues.length > 1) {
+    morceaux.push(`${apparues.length} nouvelles questions affichées.`);
+  }
+  if (masquees === 1) {
+    morceaux.push('Une question n’est plus affichée.');
+  } else if (masquees > 1) {
+    morceaux.push(`${masquees} questions ne sont plus affichées.`);
+  }
+  return morceaux.join(' ');
 }

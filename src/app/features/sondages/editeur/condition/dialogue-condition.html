@@ -1,0 +1,156 @@
+<h2 mat-dialog-title>Condition d’affichage de {{ donnees.nomCible }}</h2>
+
+<form (submit)="$event.preventDefault(); valider()" novalidate>
+  <mat-dialog-content>
+    <div class="zone-erreur" tabindex="-1">
+      <app-message-erreur [erreur]="erreur()" titre="La condition n’a pas été enregistrée" parDefaut="La condition n’a pas pu être enregistrée." />
+    </div>
+
+    @if (sources.length === 0) {
+      <p class="texte-aide" role="status">
+        Aucune question enregistrée n’est placée avant {{ donnees.nomCible }} : une condition ne peut dépendre que
+        d’une question qui la précède.
+      </p>
+    } @else {
+      <p class="texte-aide">
+        {{ donnees.cible.type === 'section' ? 'Cette section' : 'Cette question' }} ne sera affichée qu’aux répondants dont les réponses vérifient ces règles.
+        Seules les questions placées avant sont proposées.
+      </p>
+
+      @if (regles.length > 1) {
+        <mat-radio-group class="combinaison" [formControl]="combinaison" aria-label="Combinaison des règles">
+          <mat-radio-button value="ET">Toutes les règles (ET)</mat-radio-button>
+          <mat-radio-button value="OU">Au moins une règle (OU)</mat-radio-button>
+        </mat-radio-group>
+      }
+
+      @for (groupe of regles.controls; track groupe; let i = $index) {
+        <fieldset class="regle" [formGroup]="groupe">
+          <legend>
+            {{ i === 0 ? 'Afficher si' : combinaison.value === 'OU' ? 'ou si' : 'et si' }}
+            <span class="visuellement-cache">(règle {{ i + 1 }})</span>
+          </legend>
+          <div class="champs">
+            <mat-form-field class="champ-source">
+              <mat-label>Question</mat-label>
+              <mat-select [id]="'source-regle-' + i" formControlName="questionId">
+                @for (g of groupes; track g.titre) {
+                  <mat-optgroup [label]="g.titre">
+                    @for (s of g.sources; track s.question.id) {
+                      <mat-option [value]="s.question.id">{{ s.numero }}. {{ s.question.libelle || '(sans libellé)' }}</mat-option>
+                    }
+                  </mat-optgroup>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            @if (source(groupe); as src) {
+              <mat-form-field class="champ-operateur">
+                <mat-label>Condition</mat-label>
+                <mat-select formControlName="operateur">
+                  @for (op of operateurs(groupe); track op) {
+                    <mat-option [value]="op">{{ libelleOperateur(op, src.type) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              @switch (genre(groupe)) {
+                @case ('option') {
+                  <mat-form-field class="champ-valeur">
+                    <mat-label>Option</mat-label>
+                    <mat-select formControlName="valeur">
+                      @for (o of src.options; track o.id) {
+                        <mat-option [value]="o.valeur">{{ o.libelle }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+                @case ('options') {
+                  <mat-form-field class="champ-valeur">
+                    <mat-label>Options</mat-label>
+                    <mat-select formControlName="valeurs" multiple>
+                      @for (o of src.options; track o.id) {
+                        <mat-option [value]="o.valeur">{{ o.libelle }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+                @case ('booleen') {
+                  <mat-form-field class="champ-valeur">
+                    <mat-label>Réponse</mat-label>
+                    <mat-select formControlName="valeur">
+                      <mat-option [value]="true">Oui</mat-option>
+                      <mat-option [value]="false">Non</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                }
+                @case ('nombre') {
+                  <mat-form-field class="champ-valeur">
+                    <mat-label>Valeur</mat-label>
+                    <input matInput type="number" formControlName="valeur" />
+                  </mat-form-field>
+                }
+                @case ('date') {
+                  <mat-form-field class="champ-valeur">
+                    <mat-label>Date</mat-label>
+                    <input matInput type="date" formControlName="valeur" />
+                  </mat-form-field>
+                }
+                @case ('intervalle-nombre') {
+                  <mat-form-field class="champ-borne">
+                    <mat-label>De</mat-label>
+                    <input matInput type="number" formControlName="min" />
+                  </mat-form-field>
+                  <mat-form-field class="champ-borne">
+                    <mat-label>À (compris)</mat-label>
+                    <input matInput type="number" formControlName="max" />
+                  </mat-form-field>
+                }
+                @case ('intervalle-date') {
+                  <mat-form-field class="champ-borne">
+                    <mat-label>Du</mat-label>
+                    <input matInput type="date" formControlName="min" />
+                  </mat-form-field>
+                  <mat-form-field class="champ-borne">
+                    <mat-label>Au (compris)</mat-label>
+                    <input matInput type="date" formControlName="max" />
+                  </mat-form-field>
+                }
+              }
+            }
+
+            @if (regles.length > 1) {
+              <button matIconButton type="button" class="retirer" (click)="retirerRegle(i)" [attr.aria-label]="'Retirer la règle ' + (i + 1)">
+                <mat-icon fontIcon="delete" aria-hidden="true" />
+              </button>
+            }
+          </div>
+          @if (messageRegle(groupe); as message) {
+            <p class="erreur-regle" role="alert">{{ message }}</p>
+          }
+        </fieldset>
+      }
+
+      @if (regles.length < maxRegles) {
+        <button matButton type="button" (click)="ajouterRegle()">
+          <mat-icon fontIcon="add" aria-hidden="true" />Ajouter une règle
+        </button>
+      } @else {
+        <p class="texte-aide">{{ maxRegles }} règles au plus.</p>
+      }
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close>Annuler</button>
+    @if (sources.length) {
+      <button matButton="filled" type="submit" [disabled]="enCours()">
+        @if (enCours()) {
+          <mat-spinner diameter="20" aria-label="Enregistrement de la condition" />
+        } @else {
+          Enregistrer la condition
+        }
+      </button>
+    }
+  </mat-dialog-actions>
+</form>

@@ -207,6 +207,96 @@ export const ICONES_TYPE_QUESTION: Record<TypeQuestion, string> = {
   MATRICE: 'grid_on',
 };
 
+// ---------------------------------------------------------------- Conditions d'affichage (phase 4)
+
+/** Combinaison des règles (CombinaisonCondition du backend) : toutes (ET) ou au moins une (OU). */
+export type CombinaisonCondition = 'ET' | 'OU';
+
+/** Opérateur d'une règle (OperateurCondition du backend). */
+export type OperateurCondition =
+  | 'EGAL'
+  | 'DIFFERENT'
+  | 'PARMI'
+  | 'CONTIENT'
+  | 'SUPERIEUR'
+  | 'INFERIEUR'
+  | 'ENTRE'
+  | 'REPONDUE'
+  | 'NON_REPONDUE';
+
+/**
+ * Valeur d'une règle : valeur d'option (jamais le libellé), true/false (OUI_NON), nombre, date « AAAA-MM-JJ »,
+ * liste de valeurs d'options (PARMI), [min, max] (ENTRE) ; absente pour REPONDUE et NON_REPONDUE.
+ */
+export type ValeurCondition = string | number | boolean | (string | number)[];
+
+/** RegleConditionRequest / RegleConditionResponse : la source est désignée par son id dans cette version. */
+export interface RegleCondition {
+  questionId: number;
+  operateur: OperateurCondition;
+  /** Absente pour REPONDUE et NON_REPONDUE. */
+  valeur?: ValeurCondition | null;
+}
+
+/** ConditionRequest / ConditionResponse : la cible n'est affichée que si ses règles sont vérifiées. */
+export interface ConditionAffichage {
+  combinaison: CombinaisonCondition;
+  /** 1 à 10 règles. */
+  regles: RegleCondition[];
+}
+
+/** Nombre maximal de règles d'une condition (ConditionRequest). */
+export const REGLES_CONDITION_MAX = 10;
+
+/** Opérateurs permis selon le type de la source (OperateurCondition.permis du backend), dans l'ordre proposé. */
+export function operateursPermis(type: TypeQuestion): OperateurCondition[] {
+  const tous: OperateurCondition[] = ['REPONDUE', 'NON_REPONDUE'];
+  switch (type) {
+    case 'CHOIX_UNIQUE':
+      return ['EGAL', 'DIFFERENT', 'PARMI', ...tous];
+    case 'CHOIX_MULTIPLE':
+      return ['CONTIENT', 'PARMI', ...tous];
+    case 'OUI_NON':
+      return ['EGAL', 'DIFFERENT', ...tous];
+    case 'NUMERIQUE':
+    case 'ECHELLE':
+    case 'DATE':
+      return ['EGAL', 'DIFFERENT', 'SUPERIEUR', 'INFERIEUR', 'ENTRE', ...tous];
+    default:
+      return tous;
+  }
+}
+
+/** REPONDUE et NON_REPONDUE ne prennent pas de valeur. */
+export function operateurSansValeur(operateur: OperateurCondition): boolean {
+  return operateur === 'REPONDUE' || operateur === 'NON_REPONDUE';
+}
+
+/** Libellé d'un opérateur ; les dates disent « après » / « avant ». */
+export function libelleOperateur(operateur: OperateurCondition, type: TypeQuestion): string {
+  const date = type === 'DATE';
+  switch (operateur) {
+    case 'EGAL':
+      return date ? 'est le' : 'est égal à';
+    case 'DIFFERENT':
+      return date ? 'n’est pas le' : 'est différent de';
+    case 'PARMI':
+      return type === 'CHOIX_MULTIPLE' ? 'contient au moins une de' : 'est l’une de';
+    case 'CONTIENT':
+      return 'contient';
+    case 'SUPERIEUR':
+      return date ? 'est après le' : 'est supérieur à';
+    case 'INFERIEUR':
+      return date ? 'est avant le' : 'est inférieur à';
+    case 'ENTRE':
+      return 'est entre';
+    case 'REPONDUE':
+      return 'a reçu une réponse';
+    case 'NON_REPONDUE':
+      return 'n’a pas reçu de réponse';
+  }
+}
+
 /** Types qui ont des options (au moins 2) ; les autres n'en ont aucune. */
 export const TYPES_AVEC_OPTIONS: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>([
   'CHOIX_UNIQUE',
@@ -275,6 +365,8 @@ export interface QuestionResponse {
   /** Réglages d'analyse (F5b) : jamais envoyés par l'éditeur, le backend les garde. */
   estCritere: boolean;
   critereConfig: unknown;
+  /** Condition d'affichage ; absente : toujours affichée (si sa section l'est). Posée par PUT .../condition. */
+  condition?: ConditionAffichage | null;
 }
 
 /**
@@ -290,6 +382,8 @@ export interface SectionAffichee {
   description: string | null;
   ordre: number;
   questions: QuestionAffichee[];
+  /** Condition d'affichage ; absente : toujours affichée. Masquée, la section masque toutes ses questions. */
+  condition?: ConditionAffichage | null;
 }
 
 export interface SectionResponse {
@@ -298,6 +392,8 @@ export interface SectionResponse {
   description: string | null;
   ordre: number;
   questions: QuestionResponse[];
+  /** Condition d'affichage ; absente : toujours affichée. Masquée, la section masque toutes ses questions. */
+  condition?: ConditionAffichage | null;
 }
 
 /** Option envoyée : `id` pour une option existante ; `valeur` absente = générée (nouvelle) ou gardée (existante). */

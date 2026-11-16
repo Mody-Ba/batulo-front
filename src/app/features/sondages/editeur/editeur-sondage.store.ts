@@ -3,6 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, concatMap, EMPTY, finalize, map, Observable, ReplaySubject, Subject, tap } from 'rxjs';
 import {
+  ConditionAffichage,
   CritereRequest,
   QuestionRequest,
   QuestionResponse,
@@ -363,6 +364,26 @@ export class EditeurSondageStore {
   definirCritere(questionId: number, critere: CritereRequest): Observable<SondageResponse> {
     const id = this.id;
     return this.executer(() => this.service.definirCritere(id, questionId, critere));
+  }
+
+  /** Condition d'affichage d'une question enregistrée ; null la retire (DELETE). Brouillon seulement. */
+  definirConditionQuestion(questionId: number, condition: ConditionAffichage | null): Observable<SondageResponse> {
+    const id = this.id;
+    return this.executer(() =>
+      condition
+        ? this.service.definirConditionQuestion(id, questionId, condition)
+        : this.service.retirerConditionQuestion(id, questionId),
+    );
+  }
+
+  /** Condition d'affichage d'une section ; null la retire (DELETE). */
+  definirConditionSection(sectionId: number, condition: ConditionAffichage | null): Observable<SondageResponse> {
+    const id = this.id;
+    return this.executer(() =>
+      condition
+        ? this.service.definirConditionSection(id, sectionId, condition)
+        : this.service.retirerConditionSection(id, sectionId),
+    );
   }
 
   /**

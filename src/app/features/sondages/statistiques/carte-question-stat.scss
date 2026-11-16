@@ -26,6 +26,20 @@
   }
 }
 
+.vue-par {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--bt-espace-1);
+  margin: var(--bt-espace-1) 0 0;
+  font: var(--mat-sys-body-small);
+
+  .material-icons {
+    color: var(--mat-sys-tertiary);
+    font-size: 18px;
+  }
+}
+
 .effectifs,
 .note,
 .vide {
