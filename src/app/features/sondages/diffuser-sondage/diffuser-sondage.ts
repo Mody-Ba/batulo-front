@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -9,12 +9,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
-import { LienSondageResponse } from '../../../core/models/sondage.model';
+import { LienSondageResponse, SondageResponse } from '../../../core/models/sondage.model';
 import { SondageService } from '../../../core/services/sondage.service';
 import { aLeCode } from '../../../core/utils/erreur-http';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { PartageMessage } from './partage-message';
 
 /** Tailles proposées pour le QR code (le backend accepte de 100 à 1000 pixels). */
 export const TAILLES_QR = [300, 600, 1000] as const;
@@ -22,7 +23,8 @@ export const TAILLES_QR = [300, 600, 1000] as const;
 /**
  * Diffuser un sondage publié : lien public (le même pour toutes les versions, il mène à la version ouverte), copie
  * en un clic, QR code affiché et téléchargeable en PNG. Le QR code est lu par HttpClient (jeton envoyé), puis
- * affiché depuis une URL locale (blob:), libérée ensuite.
+ * affiché depuis une URL locale (blob:), libérée ensuite. Partage par WhatsApp et SMS (message prérempli avec le titre),
+ * sauf pour un sondage terminé (le lien n'affiche plus que « fermé ») ; gardé pour un sondage planifié.
  */
 @Component({
   selector: 'app-diffuser-sondage',
@@ -37,6 +39,7 @@ export const TAILLES_QR = [300, 600, 1000] as const;
     Encadre,
     EntetePage,
     MessageErreur,
+    PartageMessage,
   ],
   templateUrl: './diffuser-sondage.html',
   styleUrl: './diffuser-sondage.scss',
@@ -56,6 +59,9 @@ export class DiffuserSondage {
   protected readonly erreur = signal<unknown>(null);
   /** Jamais publié : pas encore de lien (409 SONDAGE_BROUILLON). */
   protected readonly brouillon = signal(false);
+  /** Titre et statut (partage) ; une erreur ici n'empêche pas le partage, sans titre. */
+  protected readonly sondage = signal<SondageResponse | null>(null);
+  protected readonly termine = computed(() => this.sondage()?.statut === 'TERMINE');
 
   protected readonly taille = signal<number>(TAILLES_QR[0]);
   protected readonly urlQr = signal<string | null>(null);
@@ -74,6 +80,10 @@ export class DiffuserSondage {
     this.chargement.set(true);
     this.erreur.set(null);
     this.brouillon.set(false);
+    this.service
+      .detail(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: (sondage) => this.sondage.set(sondage), error: () => undefined });
     this.service
       .lien(id)
       .pipe(takeUntilDestroyed(this.destroyRef))

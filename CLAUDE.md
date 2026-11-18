@@ -228,6 +228,12 @@ src/app/
 - Routes : `/sondages/:id/apercu` (sélecteur ordinateur / téléphone) et `/sondages/:id/diffuser` (lien, copier, QR
   code en blob via HttpClient, PNG 300/600/1000 ; 409 SONDAGE_BROUILLON = jamais publié). La fiche a une barre
   d'actions ; l'éditeur a Prévisualiser / Publier, et « Créer une nouvelle version » dans le bandeau de lecture seule.
+- Partage (`diffuser-sondage/partage-message`, carte « Partager par WhatsApp ou SMS ») : message prérempli et modifiable
+  (« Bonjour, merci de répondre à notre enquête « titre » : lien », titre lu par GET /api/sondages/{id}, sans titre si
+  la lecture échoue ; un message modifié n'est jamais écrasé), liens `https://wa.me/?text=…` (nouvel onglet,
+  `rel="noopener noreferrer"`) et `sms:?&body=…` (iPhone et Android), texte encodé par `encodeURIComponent`
+  (`partage.ts`) ; message vide : liens désactivés. Absent sans lien (brouillon, 409 SONDAGE_BROUILLON) ; sondage TERMINE :
+  « Ce sondage est terminé : le lien affiche qu'il est fermé » ; gardé pour un sondage planifié. Sans service payant.
 - `cycle-de-vie/actions-sondage.ts` : publier et modifier les dates (`dialogue-publication` : ouverture maintenant ou
   planifiée, fermeture facultative, « une réponse par appareil » enregistré par PUT du brouillon juste avant
   `POST .../publier` s'il a changé), fermer (confirmation : définitif), nouvelle version (BROUILLON_EXISTANT : la
@@ -470,6 +476,8 @@ src/app/
   `CLAUDE.md` du backend : le relire au début de chaque étape.
 
 ## À venir (backend)
+- Envoi automatique par SMS/WhatsApp (Twilio ou fournisseur local) après la mise en ligne (aujourd'hui : liens wa.me et
+  sms: ouverts par l'utilisateur, sans envoi par Batulo).
 - Logo : renvoyer un chemin relatif (`/api/public/logos/{jeton}`) dans `logo.url` et `apparence.logoUrl`, plutôt qu'une
   URL construite avec `APP_BASE_URL` (qui, mal réglée, désigne le front) ; le front l'accepte déjà tel quel.
 - `apparence.nomAffiche` (formulaire public, aperçu) à `null` quand l'admin n'a rien saisi : le front pourra alors montrer
