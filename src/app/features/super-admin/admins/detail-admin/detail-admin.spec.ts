@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
-import { abonnementDeTest, adminDeTest, adminDetailDeTest } from '../../../../testing/donnees-test';
+import { abonnementDeTest, adminDeTest, adminDetailDeTest, personnalisationDeTest } from '../../../../testing/donnees-test';
 import { ActionsAdmin } from '../actions-admin';
 import { DetailAdmin } from './detail-admin';
 
@@ -87,5 +87,34 @@ describe('DetailAdmin', () => {
     bouton(element, 'Supprimer').click();
     expect(actions['supprimer']).toHaveBeenCalledWith(expect.objectContaining({ id: 3 }), 4);
     expect(naviguer).toHaveBeenCalledWith('/super-admin/admins');
+  });
+
+  it('apparence de l’entreprise en lecture seule : logo, nom affiché et couleur', async () => {
+    detailAdmin.mockReturnValue(
+      of(
+        adminDetailDeTest({
+          personnalisation: personnalisationDeTest({
+            nomAffiche: 'Coopérative de Kaolack',
+            nomEffectif: 'Coopérative de Kaolack',
+            couleurPrincipale: '#1E6B52',
+            couleurEffective: '#1E6B52',
+            logo: { url: 'https://api.batulo.test/api/public/logos/2f1c', typeMime: 'image/png', taille: 1000, largeur: 40, hauteur: 40, dateModification: '2026-11-16T10:00:00Z' },
+          }),
+        }),
+      ),
+    );
+    const element = await creer();
+    const logo = element.querySelector<HTMLImageElement>('.logo-entreprise')!;
+    expect(logo.getAttribute('alt')).toBe('Logo de Coopérative de Kaolack');
+    expect(element.textContent).toContain('#1E6B52');
+    expect(element.querySelector<HTMLElement>('.pastille-couleur')!.style.background).toContain('rgb(30, 107, 82)');
+    expect(bouton(element, 'Supprimer le logo')).toBeUndefined();
+  });
+
+  it('sans logo : « Aucun » et la couleur Batulo signalée', async () => {
+    detailAdmin.mockReturnValue(of(adminDetailDeTest({ personnalisation: personnalisationDeTest() })));
+    const element = await creer();
+    expect(element.textContent).toContain('#005CBB (couleur Batulo)');
+    expect(element.querySelector('.logo-entreprise')).toBeNull();
   });
 });

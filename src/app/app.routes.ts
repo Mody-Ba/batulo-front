@@ -112,6 +112,13 @@ export const routes: Routes = [
         loadChildren: () => import('./features/sondages/sondages.routes').then((m) => m.routes),
       },
       {
+        // Apparence des formulaires de l'entreprise : modifiable par l'admin, en lecture seule pour ses gestionnaires.
+        path: 'apparence',
+        title: 'Apparence · Batulo',
+        canActivate: [roleGuard('ADMIN', 'GESTIONNAIRE')],
+        loadComponent: () => import('./features/apparence/page-apparence').then((m) => m.PageApparence),
+      },
+      {
         path: 'messagerie',
         canActivate: [authGuard],
         loadChildren: () => import('./features/messagerie/messagerie.routes').then((m) => m.routes),

@@ -21,6 +21,11 @@ html {
     )
   );
 
+  // Couleur d'entreprise du formulaire répondant (surfaces pleines seulement) : le primaire Batulo par défaut,
+  // remplacée sur le conteneur du formulaire public ou de l'aperçu (variablesApparence) si l'entreprise en a choisi une.
+  --bt-marque: var(--mat-sys-primary);
+  --bt-sur-marque: var(--mat-sys-on-primary);
+
   // Barre du haut : bandeau de la couleur principale.
   @include mat.toolbar-overrides(
     (

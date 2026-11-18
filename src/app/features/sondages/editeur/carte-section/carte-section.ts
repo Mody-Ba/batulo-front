@@ -17,6 +17,7 @@ import { nonVide } from '../../../../core/utils/validateurs';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { CarteQuestion } from '../carte-question/carte-question';
+import { sourcesPossibles } from '../condition/condition-editeur';
 import { ouvrirDialogueCondition, ResumeCondition } from '../condition/resume-condition';
 import { EditeurSondageStore, ElementQuestion } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
@@ -91,6 +92,14 @@ export class CarteSection implements OnInit {
     (this.store.peutChangerDeSection(drag.data) && !this.store.sectionPleine(this.section().id));
   protected readonly parCle = (_index: number, element: ElementQuestion) => element.cle;
   protected readonly nomCible = computed(() => `la section ${this.position() + 1}`);
+  /** Bouton « Ajouter une condition » : brouillon, sans condition, et au moins une question dans les sections précédentes. */
+  protected readonly peutAjouterCondition = computed(() => {
+    const sondage = this.store.sondage();
+    if (!this.store.modifiable() || !sondage || this.section().condition) {
+      return false;
+    }
+    return sourcesPossibles(sondage, { type: 'section', sectionId: this.section().id }).length > 0;
+  });
   /** Refus à garder lisible sur la carte (409 CONDITION_DEPENDANTE, retrait de condition refusé). */
   protected readonly erreurAction = signal<unknown>(null);
 

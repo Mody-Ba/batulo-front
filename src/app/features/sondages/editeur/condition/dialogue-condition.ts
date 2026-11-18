@@ -2,14 +2,15 @@ import { afterNextRender, Component, DestroyRef, ElementRef, inject, Injector, s
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
-import { Observable } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { filter, map, merge, Observable, timeout } from 'rxjs';
 import {
   CombinaisonCondition,
   ConditionAffichage,
@@ -23,7 +24,8 @@ import {
   SondageResponse,
   ValeurCondition,
 } from '../../../../core/models/sondage.model';
-import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
+import { codeErreur, messageErreur } from '../../../../core/utils/erreur-http';
 import { CibleCondition, SourceCondition, sourcesPossibles } from './condition-editeur';
 
 export interface DonneesCondition {
@@ -58,6 +60,41 @@ export function genreValeur(source: QuestionResponse | undefined, operateur: Ope
 
 type Saisie = string | number | boolean | null;
 
+/** Au-delà, l'enregistrement est déclaré sans réponse (au lieu d'un bouton qui tourne sans fin). */
+export const DELAI_ENREGISTREMENT_CONDITION_MS = 20_000;
+export const MESSAGE_SANS_REPONSE = 'Le serveur n’a pas répondu : la condition n’a pas été enregistrée. Réessayez.';
+export const MESSAGE_NON_ENREGISTREE =
+  'Le serveur a répondu sans la condition : elle n’a pas été enregistrée. Réessayez ; si cela se reproduit, signalez le détail ci-dessous.';
+export const MESSAGE_REGLES_INCOMPLETES = 'Une règle est incomplète : complétez les champs signalés en rouge, puis enregistrez.';
+
+/** Condition de la cible (question ou section) dans le sondage renvoyé par le serveur. */
+export function conditionDeLaCible(sondage: SondageResponse, cible: CibleCondition): ConditionAffichage | null {
+  if (cible.type === 'section') {
+    return sondage.sections.find((s) => s.id === cible.sectionId)?.condition ?? null;
+  }
+  return sondage.sections.flatMap((s) => s.questions).find((q) => q.id === cible.questionId)?.condition ?? null;
+}
+
+/** Erreur à montrer près du bouton : message et détail technique (statut HTTP, code), pour la signaler. */
+export interface ErreurEnregistrement {
+  message: string;
+  detail: string | null;
+}
+
+export function erreurEnregistrement(erreur: unknown): ErreurEnregistrement {
+  if (erreur instanceof HttpErrorResponse) {
+    const code = codeErreur(erreur);
+    return {
+      message: messageErreur(erreur, 'La condition n’a pas pu être enregistrée.'),
+      detail: `HTTP ${erreur.status}${code ? ` · ${code}` : ''} · ${erreur.url ?? ''}`.trim(),
+    };
+  }
+  if (erreur instanceof Error && erreur.name === 'TimeoutError') {
+    return { message: MESSAGE_SANS_REPONSE, detail: null };
+  }
+  return { message: erreur instanceof Error ? erreur.message : 'La condition n’a pas pu être enregistrée.', detail: null };
+}
+
 interface ControlesRegle {
   questionId: FormControl<number | null>;
   operateur: FormControl<OperateurCondition | null>;
@@ -88,7 +125,6 @@ const vide = (v: unknown) => v === null || v === undefined || (typeof v === 'str
     MatProgressSpinnerModule,
     MatRadioModule,
     MatSelectModule,
-    MessageErreur,
   ],
   templateUrl: './dialogue-condition.html',
   styleUrl: './dialogue-condition.scss',
@@ -96,6 +132,7 @@ const vide = (v: unknown) => v === null || v === undefined || (typeof v === 'str
 export class DialogueCondition {
   protected readonly donnees = inject<DonneesCondition>(MAT_DIALOG_DATA);
   private readonly ref = inject<MatDialogRef<DialogueCondition, SondageResponse>>(MatDialogRef);
+  private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
   private readonly hote = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -120,12 +157,63 @@ export class DialogueCondition {
   });
   protected readonly regles = new FormArray<GroupeRegle>([]);
   protected readonly enCours = signal(false);
-  protected readonly erreur = signal<unknown>(null);
+  /** Échec de l'enregistrement, affiché juste au-dessus du bouton (toujours visible). */
+  protected readonly erreur = signal<ErreurEnregistrement | null>(null);
   protected readonly tentee = signal(false);
+  /** Règles changées depuis l'ouverture et pas encore enregistrées (rien n'est enregistré sans le bouton). */
+  protected readonly modifiee = signal(false);
+  private readonly instantaneInitial: string;
 
   constructor() {
     const existantes = this.donnees.condition?.regles ?? [];
     (existantes.length ? existantes : [null]).forEach((regle) => this.regles.push(this.creerRegle(regle)));
+    this.instantaneInitial = this.instantane();
+    merge(this.regles.valueChanges, this.combinaison.valueChanges)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.modifiee.set(this.instantane() !== this.instantaneInitial));
+
+    // Échap, clic à côté et « Annuler » passent par fermer() : confirmation si des règles seraient perdues.
+    this.ref.disableClose = true;
+    this.ref
+      .backdropClick()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.fermer());
+    this.ref
+      .keydownEvents()
+      .pipe(
+        filter((evenement) => evenement.key === 'Escape'),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((evenement) => {
+        evenement.preventDefault();
+        this.fermer();
+      });
+  }
+
+  /** Fermer sans enregistrer : directement si rien n'a changé, sinon après confirmation. */
+  fermer(): void {
+    if (this.enCours()) {
+      return;
+    }
+    if (!this.modifiee() || this.sources.length === 0) {
+      this.ref.close();
+      return;
+    }
+    confirmer(this.dialog, {
+      titre: 'Fermer sans enregistrer ?',
+      message: 'Les règles de cette condition d’affichage ne sont pas enregistrées : elles seront perdues.',
+      action: 'Fermer sans enregistrer',
+      destructive: true,
+    }).subscribe((ok) => {
+      if (ok) {
+        this.ref.close();
+      }
+    });
+  }
+
+  /** État comparable de la saisie (combinaison et règles). */
+  private instantane(): string {
+    return JSON.stringify({ combinaison: this.combinaison.value, regles: this.regles.getRawValue() });
   }
 
   protected source(groupe: GroupeRegle): QuestionResponse | undefined {
@@ -160,24 +248,44 @@ export class DialogueCondition {
   protected valider(): void {
     this.tentee.set(true);
     this.regles.markAllAsTouched();
-    if (this.regles.invalid || this.enCours()) {
+    if (this.enCours()) {
       return;
     }
+    if (this.regles.invalid) {
+      this.montrerErreur({ message: MESSAGE_REGLES_INCOMPLETES, detail: null });
+      return;
+    }
+    const demande = this.requete();
     this.enCours.set(true);
     this.erreur.set(null);
     this.donnees
-      .enregistrer(this.requete())
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .enregistrer(demande)
+      .pipe(
+        timeout({ first: DELAI_ENREGISTREMENT_CONDITION_MS }),
+        // La boîte ne se ferme que si la réponse contient bien la condition de la cible.
+        map((sondage) => {
+          const enregistree = conditionDeLaCible(sondage, this.donnees.cible);
+          if (!enregistree || enregistree.regles.length !== demande.regles.length) {
+            throw new Error(MESSAGE_NON_ENREGISTREE);
+          }
+          return sondage;
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (sondage) => this.ref.close(sondage),
         error: (erreur: unknown) => {
           this.enCours.set(false);
-          this.erreur.set(erreur);
-          afterNextRender(() => this.hote.nativeElement.querySelector<HTMLElement>('.zone-erreur')?.focus(), {
-            injector: this.injector,
-          });
+          this.montrerErreur(erreurEnregistrement(erreur));
         },
       });
+  }
+
+  private montrerErreur(erreur: ErreurEnregistrement): void {
+    this.erreur.set(erreur);
+    afterNextRender(() => this.hote.nativeElement.querySelector<HTMLElement>('.erreur-enregistrement')?.focus(), {
+      injector: this.injector,
+    });
   }
 
   /** Corps de PUT .../condition : valeur absente pour REPONDUE et NON_REPONDUE. */

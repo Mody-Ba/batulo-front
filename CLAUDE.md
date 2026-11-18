@@ -22,6 +22,20 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
   sur 4300 (`CORS_ORIGINS`, `RESET_PASSWORD_URL`) ; tout arrêter, supprimer et remettre 8090 à la fin.
 - Vérifications : `npx ng build` (sans avertissement) et `npx ng test --watch=false` (Vitest).
 
+## Tester depuis un téléphone (même Wi-Fi)
+- `npm run start:reseau` (= `ng serve --configuration reseau-local --host 0.0.0.0 --port 4200 --proxy-config
+  proxy.conf.json`), puis sur le téléphone `http://<IP du Mac>:4200` (IP : `ipconfig getifaddr en0`). Le backend tourne
+  comme d'habitude sur 8090 ; `npm start` et `environment.ts` ne changent pas.
+- Configuration `reseau-local` d'angular.json (build et serve) : remplace `environment.ts` par
+  `environment.reseau-local.ts` (`apiUrl: ''`) : les appels partent en relatif (`/api/...`) vers le serveur de
+  développement, que `proxy.conf.json` transmet à `http://localhost:8090`. Le proxy remplace l'en-tête `Origin` par
+  `http://localhost:4200` : le CORS du backend (`CORS_ORIGINS`) n'accepte que cette origine.
+- apiUrl vide prise en charge : l'intercepteur prend l'origine de la page comme origine de l'API (`origineApi`, le jeton
+  ne part qu'à elle) ; le logo devient le chemin relatif `/api/public/logos/{jeton}` (`urlLogoSure`), servi par le
+  proxy. Le pare-feu macOS doit autoriser node à recevoir des connexions.
+- Liens produits par le backend (courriels, QR des sondages, retour Moosyl) : ils gardent ses propres réglages
+  (`localhost:4200`), donc ne s'ouvrent pas tels quels sur le téléphone ; y remplacer `localhost` par l'IP du Mac.
+
 ## Règles techniques
 - Dernière version stable d'Angular (22.x), composants **standalone**, **signals** (`signal`, `computed`,
   `input`, `output`), contrôle de flux `@if/@for/@switch`, **Reactive Forms** (`NonNullableFormBuilder`),
@@ -42,20 +56,21 @@ src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
                    gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
-                   formulaire-public, statistiques, messagerie)
+                   formulaire-public, statistiques, messagerie, personnalisation)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
-                   super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie)
+                   super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie, personnalisation)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
-    utils/         erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
+    utils/         couleur.ts (#RRGGBB, contraste WCAG), erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
                    (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch),
                    interrogation.ts (interrogation périodique arrêtée onglet caché), montant.ts (montants fr-CA,
                    MRU sans décimales), redirection.ts (?retour= : chemins internes seulement)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
-                   public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »)
+                   public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »),
+                   apparence/ (personnalisation de l'entreprise)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
                    filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
@@ -358,12 +373,20 @@ src/app/
   masquées, sans réponse seule NON_REPONDUE est vraie (DIFFERENT compris), SUPERIEUR / INFERIEUR stricts, ENTRE bornes
   comprises, types incomparables = faux, réponse vide = non répondue. Toute évolution du backend doit y être recopiée
   (tests dans `conditions.spec.ts`).
-- Éditeur (`editeur/condition/`) : menu des cartes « Ajouter / Modifier la condition d'affichage » (question enregistrée ;
-  section à partir de la deuxième) -> `dialogue-condition` (règles « Afficher si » [question] [condition] [valeur], ET /
+- Éditeur (`editeur/condition/`) : bouton « Ajouter une condition » bien visible en bas de la carte d'une question
+  (`.pied`) et sous l'en-tête d'une section, sur un brouillon modifiable, sans condition, et seulement s'il existe une
+  question enregistrée placée avant (`peutAjouterCondition`, d'après `sourcesPossibles`) : jamais sur la toute première
+  question ni sur un sondage publié ; aussi dans le menu ⋮ (« Modifier » quand elle existe). -> `dialogue-condition` (règles « Afficher si » [question] [condition] [valeur], ET /
   OU, valeur choisie dans les options pour un choix, champs nombre ou date, deux bornes pour ENTRE) -> PUT
   `.../questions/{id}/condition` ou `.../sections/{id}/condition` par la file du store ; « Retirer » -> DELETE. Sources
   (`sourcesPossibles`) : questions enregistrées placées avant (section : sections précédentes). Résumé lisible
   (`resume-condition`, icône `alt_route`, « Visible si : … = Oui ») ; en lecture seule, le résumé sans actions.
+  Rien n'est enregistré sans « Enregistrer la condition » (bouton plein avec icône, toujours visible dans la barre du
+  bas, pleine largeur sur téléphone) ; règles modifiées : « Pas encore enregistrée » (role=status), et Annuler, Échap
+  ou un clic à côté demandent « Fermer sans enregistrer ? » (`disableClose`, `fermer()`).
+  La boîte ne se ferme qu'après une réponse qui contient bien la condition de la cible (`conditionDeLaCible`) ; sinon,
+  comme pour un refus, une erreur réseau, une règle incomplète ou 20 s sans réponse, l'erreur s'affiche dans la barre
+  du bas, au-dessus du bouton (role=alert, focus), avec le statut HTTP, le code et l'URL appelée pour la signaler.
   400 CONDITION_INVALIDE / 409 : message du serveur dans la boîte ; 409 CONDITION_DEPENDANTE (suppression, déplacement)
   : « Action refusée » gardé sur la carte (`erreurAction`), pas un message passager.
 - Formulaire (`formulaire-sondage`, aperçu et public) : visibilité recalculée à chaque saisie ; question masquée
@@ -374,6 +397,46 @@ src/app/
 - Statistiques : pourcentages du backend (sur ceux qui ont répondu, qui ont forcément vu la question) ; question
   `conditionnelle` : « Question conditionnelle : vue par X répondants » (`vues`) + « sur Y » (`resume.nombreReponses`)
   pour une seule version seulement (`totalUneVersion`), en plus de « N répondants · M sans réponse ».
+
+## Personnalisation de l'entreprise (phase 4, étape 2)
+- Contrat lu dans les records Java du backend (`PersonnalisationResponse`, `LogoInfoResponse`, `PersonnalisationRequest`,
+  `ApparenceResponse`, `apparence` du formulaire public et de l'aperçu, `personnalisation` de `AdminDetailResponse`) :
+  **à revérifier dans l'OpenAPI** quand l'instance 8090 aura été relancée (elle ne les avait pas).
+- Modèle `personnalisation.model.ts`, service `PersonnalisationService` : `GET /api/entreprise/personnalisation` (admin et
+  gestionnaires) ; admin : `PUT /api/admin/personnalisation { nomAffiche?, couleurPrincipale? }` (absent : inchangé ;
+  "" : valeur par défaut ; 400 COULEUR_INVALIDE), `PUT .../logo` (multipart, champ `fichier`), `DELETE .../logo`.
+- `/apparence` (`features/apparence`, admin et gestionnaire, lien « Apparence » du menu) :
+  - logo (`zone-logo`) : glisser-déposer ou « Choisir un fichier », vérifié avant envoi (`validation-logo.ts` : PNG ou
+    JPEG reconnu aux premiers octets comme le backend, 1 Mo), aperçu local (URL `blob:`, libérée ensuite), « Enregistrer
+    ce logo » ; erreurs du serveur (LOGO_FORMAT_INVALIDE, LOGO_DIMENSIONS, LOGO_ILLISIBLE / JPEG CMYK, 413
+    FICHIER_TROP_GROS) affichées ; « Remplacer », « Supprimer » après confirmation ;
+  - couleur : `<input type="color">` et champ hexadécimal synchronisés (« 1e6b52 » -> « #1E6B52 » à la sortie du champ),
+    vide = couleur Batulo, « Couleur par défaut » envoie "" ; nom affiché facultatif (150 car.) ; un bouton
+    « Enregistrer » ;
+  - aperçu en direct (`apercu-apparence`) : bandeau, bord du titre, progression, choix sélectionné, bouton ; couleur de
+    texte du backend pour la couleur enregistrée, sinon le même calcul de contraste (`core/utils/couleur.ts`, copie de
+    ContrasteCouleur) ;
+  - lecture seule : gestionnaire, et admin dont l'abonnement a expiré (valeurs et aperçu, aucun bouton ni champ).
+- Formulaire public et aperçu : `--bt-marque` / `--bt-sur-marque` (définies sur `html` à partir du primaire Batulo dans
+  `styles.scss`) remplacées sur le conteneur (`main.page-publique`, `.cadre` de l'aperçu) par `variablesApparence()`
+  (`shared/formulaire/apparence/apparence.ts`) seulement si la couleur est #RRGGBB et diffère de #005CBB : sinon le
+  thème garde son bleu, sombre compris. Elles ne servent qu'aux surfaces pleines (boutons principaux, progression, choix
+  sélectionnés, case et bouton de l'accueil, bords décoratifs) ; textes, liens et contours de focus gardent le thème
+  (une couleur claire ne rend aucun texte illisible). Vitrine et espaces connectés : inchangés.
+- Bandeau (`bandeau-apparence`) seulement s'il y a un logo : image (texte alternatif = nom affiché, 56 px de haut au
+  plus, 60 % de la largeur sur téléphone) et nom (caché aux lecteurs d'écran, déjà dans le texte alternatif). Logo
+  affiché seulement en http(s) (ou `blob:` pour l'aperçu local) : `urlLogoSure()`. Aucun innerHTML.
+- Fiche super admin (`detail-admin`) : nom affiché, couleur (pastille) et logo dans la carte « Entreprise », lecture seule.
+- URL du logo : le backend la renvoie absolue, construite avec son `APP_BASE_URL`, qui peut désigner le front
+  (`http://localhost:4200/api/public/logos/…` : index.html, image cassée). `urlLogoSure()` (seul passage de toute URL de
+  logo : page Apparence, aperçu, formulaire public, fiche super admin) ignore donc l'hôte reçu, garde seulement le chemin
+  `/api/public/logos/{jeton}` (lettres, chiffres, tirets ; ni requête, ni fragment, ni autre chemin) et le préfixe par
+  `environment.apiUrl` : `http://localhost:8090` avec `npm start`, vide (proxy `/api`) avec `start:reseau`, l'API en
+  production. Seule exception : l'aperçu local (`blob:` de la page). Image illisible : message dans la page Apparence,
+  bandeau retiré du formulaire (pas d'icône cassée).
+- Couleur : PUT avec seulement les champs modifiés (rien si rien n'a changé) ; aucune couleur enregistrée = champ vide et
+  sélecteur natif sur #005cbb, réécrit après chaque rendu (sinon il retombe sur #000000) ; ouvrir et fermer le sélecteur
+  sans choisir n'impose aucune couleur.
 
 ## Vitrine publique
 - « / » : `features/vitrine` (chargée à la demande, `inviteGuard`) pour un visiteur ; un compte connecté est renvoyé
@@ -407,6 +470,11 @@ src/app/
   `CLAUDE.md` du backend : le relire au début de chaque étape.
 
 ## À venir (backend)
+- Logo : renvoyer un chemin relatif (`/api/public/logos/{jeton}`) dans `logo.url` et `apparence.logoUrl`, plutôt qu'une
+  URL construite avec `APP_BASE_URL` (qui, mal réglée, désigne le front) ; le front l'accepte déjà tel quel.
+- `apparence.nomAffiche` (formulaire public, aperçu) à `null` quand l'admin n'a rien saisi : le front pourra alors montrer
+  le nom affiché seul, sans logo (aujourd'hui le bandeau n'apparaît qu'avec un logo, car le nom de l'entreprise y est
+  toujours renvoyé par défaut).
 - Exposer, pour chaque question des statistiques, le nombre de réponses aux versions qui contiennent la question
   (`reponsesAuxVersions` de `StatistiqueServiceImpl`, ou les réponses où elle était masquée) : le front pourra alors
   afficher « vue par X répondants sur Y » aussi en vue « toutes les versions ».
@@ -437,6 +505,9 @@ src/app/
 - [x] **F8 – Messagerie et notifications** : conversations, fil, nouvelle conversation, messages automatiques et leurs
   liens, demandes d'augmentation de l'admin, statistiques envoyées du gestionnaire (liste et détail), page des
   notifications (filtre lues / non lues, liens précis), compteurs partagés, détail d'une demande côté super admin.
+- [x] **Phase 4, étape 2 – Personnalisation de l'entreprise** : page « Apparence » (logo, couleur, nom affiché, aperçu,
+  lecture seule du gestionnaire), apparence appliquée au formulaire public et à l'aperçu, logo sur la fiche super admin
+  (noms à revérifier dans l'OpenAPI).
 - [x] **Phase 4, étape 1 – Questions conditionnelles** : conditions d'affichage dans l'éditeur (questions et sections),
   évaluation en direct dans l'aperçu et le formulaire public, « vue par » dans les statistiques (voir la section dédiée).
 

@@ -14,7 +14,7 @@ app-formulaire-sondage {
   .entete {
     padding: var(--bt-espace-4);
     border: 1px solid var(--mat-sys-outline-variant);
-    border-top: 8px solid var(--mat-sys-primary);
+    border-top: 8px solid var(--bt-marque);
     border-radius: var(--bt-rayon);
     background: var(--mat-sys-surface);
   }
@@ -55,7 +55,7 @@ app-formulaire-sondage {
       border: 0;
       border-radius: 4px;
       background: var(--mat-sys-surface-container-highest);
-      accent-color: var(--mat-sys-primary);
+      accent-color: var(--bt-marque);
       appearance: none;
       overflow: hidden;
 
@@ -64,11 +64,11 @@ app-formulaire-sondage {
       }
 
       &::-webkit-progress-value {
-        background: var(--mat-sys-primary);
+        background: var(--bt-marque);
       }
 
       &::-moz-progress-bar {
-        background: var(--mat-sys-primary);
+        background: var(--bt-marque);
       }
     }
   }
@@ -158,8 +158,8 @@ app-formulaire-sondage {
 
     &.principal {
       border: 0;
-      background: var(--mat-sys-primary);
-      color: var(--mat-sys-on-primary);
+      background: var(--bt-marque);
+      color: var(--bt-sur-marque);
     }
 
     &.secondaire {

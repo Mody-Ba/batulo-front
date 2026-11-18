@@ -38,6 +38,7 @@ import { aLeCode, messageErreur } from '../../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../../core/utils/regles-question';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { sourcesPossibles } from '../condition/condition-editeur';
 import { ouvrirDialogueCondition, ResumeCondition } from '../condition/resume-condition';
 import { CritereQuestion } from '../critere-question/critere-question';
 import { EditeurSondageStore } from '../editeur-sondage.store';
@@ -130,6 +131,18 @@ export class CarteQuestion implements OnInit {
 
   /** Condition d'affichage enregistrée (relue dans le sondage du store). */
   protected readonly condition = computed(() => this.store.questionEnregistree(this.idQuestion())?.condition ?? null);
+  /**
+   * Bouton « Ajouter une condition » en bas de la carte : brouillon modifiable, question enregistrée, sans condition, et
+   * au moins une question enregistrée placée avant elle (jamais sur la toute première question).
+   */
+  protected readonly peutAjouterCondition = computed(() => {
+    const sondage = this.store.sondage();
+    const id = this.idQuestion();
+    if (!this.store.modifiable() || !sondage || id === null || this.condition()) {
+      return false;
+    }
+    return sourcesPossibles(sondage, { type: 'question', questionId: id }).length > 0;
+  });
   /** « la question 2 de la section 1 » (boîte de condition, libellés des boutons). */
   protected readonly nomCible = computed(() => {
     const rang = (this.store.sondage()?.sections.findIndex((s) => s.id === this.sectionId()) ?? -1) + 1;

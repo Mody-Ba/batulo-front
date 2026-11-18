@@ -1,0 +1,85 @@
+// Téléphone : réglages puis aperçu ; ordinateur : côte à côte, l'aperçu reste visible en défilant.
+.grille-apparence {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--bt-espace-4);
+  align-items: start;
+
+  @media (min-width: 960px) {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+
+    .apercu {
+      position: sticky;
+      top: var(--bt-espace-4);
+    }
+  }
+}
+
+.reglages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-4);
+}
+
+.titre-carte {
+  margin: 0 0 var(--bt-espace-3);
+  font: var(--mat-sys-title-medium);
+}
+
+.formulaire-apparence {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+}
+
+.ligne-couleur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--bt-espace-2) var(--bt-espace-3);
+}
+
+.selecteur-couleur input {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+}
+
+.champ-couleur {
+  flex: 1 1 220px;
+}
+
+.valeurs {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--bt-espace-2) var(--bt-espace-4);
+  margin: 0;
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    gap: var(--bt-espace-2);
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.pastille {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 50%;
+}

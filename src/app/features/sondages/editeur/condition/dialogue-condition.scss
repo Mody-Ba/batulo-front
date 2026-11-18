@@ -1,6 +1,3 @@
-.zone-erreur:focus {
-  outline: none;
-}
 
 .combinaison {
   display: flex;
@@ -45,4 +42,64 @@
   margin: 0 0 var(--bt-espace-3);
   color: var(--mat-sys-error);
   font: var(--mat-sys-body-small);
+}
+
+// Barre du bas toujours visible (hors de la zone qui défile) ; bouton d'enregistrement large, au premier plan.
+.actions-condition {
+  flex-wrap: wrap;
+  gap: var(--bt-espace-2);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+
+  .espace {
+    flex: 1;
+  }
+
+  .enregistrer {
+    min-height: 48px;
+  }
+
+  @media (max-width: 599px) {
+    .enregistrer {
+      order: -1;
+      width: 100%;
+    }
+  }
+}
+
+.non-enregistree {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-1);
+  margin: 0;
+  color: var(--bt-attente-texte);
+  font: var(--mat-sys-label-large);
+}
+
+// Erreur d'enregistrement : au-dessus du bouton, dans la barre toujours visible.
+.erreur-enregistrement {
+  display: flex;
+  flex-basis: 100%;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-2) var(--bt-espace-3);
+  border-radius: 8px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+
+  &:focus {
+    outline: 2px solid var(--mat-sys-error);
+  }
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.titre-erreur {
+  font-weight: 500;
+}
+
+.detail-erreur {
+  font: var(--mat-sys-body-small);
+  opacity: 0.85;
 }

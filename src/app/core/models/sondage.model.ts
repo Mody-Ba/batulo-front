@@ -1,3 +1,5 @@
+import { ApparenceResponse } from './personnalisation.model';
+
 /** Statut calculé à partir des dates (StatutSondage du backend). Un brouillon est NON_COMMENCE et publie=false. */
 export type StatutSondage = 'NON_COMMENCE' | 'EN_COURS' | 'TERMINE';
 
@@ -546,4 +548,6 @@ export interface ApercuResponse extends PageAccueil {
   version: number;
   statut: StatutSondage;
   sections: SectionResponse[];
+  /** Apparence à l'image de l'entreprise, comme le formulaire public. */
+  apparence?: ApparenceResponse | null;
 }

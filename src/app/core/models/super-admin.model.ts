@@ -1,4 +1,5 @@
 import { AbonnementResponse, Formule, JOURS_ALERTE_EXPIRATION, StatutAbonnement } from './abonnement.model';
+import { PersonnalisationResponse } from './personnalisation.model';
 import { UtilisateurResponse } from './utilisateur.model';
 
 /** Ordre d'affichage des statuts d'abonnement (filtres et compteurs du super admin). */
@@ -39,6 +40,8 @@ export interface AdminDetailResponse {
   /** Null seulement si l'entreprise n'a pas d'abonnement (ne devrait pas arriver). */
   abonnement: AbonnementResponse | null;
   nombreGestionnaires: number;
+  /** Apparence de l'entreprise (logo, couleur, nom affiché), en lecture seule pour le super admin. */
+  personnalisation?: PersonnalisationResponse | null;
 }
 
 /** POST /api/super-admin/admins : mot de passe temporaire (24 h) envoyé par courriel, abonnement EN_ATTENTE_PAIEMENT. */

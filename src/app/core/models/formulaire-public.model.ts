@@ -1,3 +1,4 @@
+import { ApparenceResponse } from './personnalisation.model';
 import { PageAccueil, SectionAffichee } from './sondage.model';
 import { ReponseQuestionRequest } from '../../shared/formulaire/reponses';
 
@@ -14,6 +15,8 @@ export interface FormulairePublicResponse extends PageAccueil {
   dateFermeture: string | null;
   /** SectionPubliqueResponse : sans réglages d'analyse internes. */
   sections: SectionAffichee[];
+  /** Apparence à l'image de l'entreprise (nom affiché, logo, couleurs) ; rien d'autre sur l'entreprise. */
+  apparence?: ApparenceResponse | null;
   /**
    * Seulement si reponseUnique : true si l'appareil (en-tête X-Jeton-Repondant) a déjà répondu à l'une des versions ;
    * false sans jeton ou avec un jeton mal formé. Absent sinon.

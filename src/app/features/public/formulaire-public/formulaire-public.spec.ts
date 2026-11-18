@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
@@ -319,6 +320,55 @@ describe('FormulairePublic (/s/:jeton)', () => {
       cliquer(element, 'Nouvelle réponse');
       expect(element.querySelector('app-accueil-sondage')).not.toBeNull();
       expect(element.querySelector<HTMLInputElement>('app-accueil-sondage input[type="checkbox"]')!.checked).toBe(false);
+    });
+  });
+
+  describe('apparence de l’entreprise', () => {
+    const page = (element: HTMLElement) => element.querySelector<HTMLElement>('main.page-publique')!;
+
+    it('personnalisée : logo (texte alternatif = nom affiché, taille limitée) et couleurs en variables CSS', async () => {
+      service.lire.mockReturnValue(
+        of({
+          ...FORMULAIRE,
+          apparence: {
+            nomAffiche: 'Coopérative de Kaolack',
+            logoUrl: 'http://localhost:4200/api/public/logos/2f1c',
+            couleurPrincipale: '#ffd600',
+            couleurTexte: '#000000',
+          },
+        }),
+      );
+      const element = await creer();
+      expect(page(element).style.getPropertyValue('--bt-marque')).toBe('#FFD600');
+      expect(page(element).style.getPropertyValue('--bt-sur-marque')).toBe('#000000');
+      const logo = element.querySelector<HTMLImageElement>('app-bandeau-apparence img')!;
+      // Hôte reçu ignoré : le chemin du logo est chargé depuis l'API.
+      expect(logo.getAttribute('src')).toBe(`${environment.apiUrl}/api/public/logos/2f1c`);
+      expect(logo.getAttribute('alt')).toBe('Coopérative de Kaolack');
+      expect(logo.classList).toContain('logo-apparence');
+      expect(element.querySelector('app-bandeau-apparence .nom-apparence')!.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('sans personnalisation (couleur Batulo, pas de logo) : aucune variable ni bandeau, apparence inchangée', async () => {
+      service.lire.mockReturnValue(
+        of({ ...FORMULAIRE, apparence: { nomAffiche: 'Sahel Data', couleurPrincipale: '#005CBB', couleurTexte: '#FFFFFF' } }),
+      );
+      const element = await creer();
+      expect(page(element).getAttribute('style') ?? '').not.toContain('--bt-marque');
+      expect(element.querySelector('app-bandeau-apparence img')).toBeNull();
+      expect(element.textContent).not.toContain('Sahel Data');
+    });
+
+    it('valeurs dangereuses ignorées : couleur hors format, logo javascript:', async () => {
+      service.lire.mockReturnValue(
+        of({
+          ...FORMULAIRE,
+          apparence: { nomAffiche: 'X', logoUrl: 'javascript:alert(1)', couleurPrincipale: 'red;background:url(x)', couleurTexte: '#FFFFFF' },
+        }),
+      );
+      const element = await creer();
+      expect(page(element).getAttribute('style') ?? '').toBe('');
+      expect(element.querySelector('app-bandeau-apparence img')).toBeNull();
     });
   });
 });

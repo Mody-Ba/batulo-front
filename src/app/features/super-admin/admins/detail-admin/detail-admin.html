@@ -40,6 +40,28 @@
 
           <dt>Créée le</dt>
           <dd>{{ d.admin.dateCreation | date: 'longDate' }}</dd>
+
+          @if (d.personnalisation; as p) {
+            <dt>Nom affiché</dt>
+            <dd>{{ p.nomEffectif }}{{ p.nomAffiche ? '' : ' (nom de l’entreprise)' }}</dd>
+
+            <dt>Couleur</dt>
+            <dd class="couleur-entreprise">
+              @if (couleurSure(p.couleurEffective); as couleur) {
+                <span class="pastille-couleur" [style.background]="couleur" aria-hidden="true"></span>
+              }
+              {{ p.couleurEffective }}{{ p.couleurPrincipale ? '' : ' (couleur Batulo)' }}
+            </dd>
+
+            <dt>Logo</dt>
+            <dd>
+              @if (urlLogo(p.logo?.url); as url) {
+                <img class="logo-entreprise" [src]="url" [alt]="'Logo de ' + p.nomEffectif" />
+              } @else {
+                Aucun
+              }
+            </dd>
+          }
         </dl>
       </article>
 

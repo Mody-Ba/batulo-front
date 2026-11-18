@@ -9,6 +9,8 @@ import { accueilNecessaire, ApercuResponse } from '../../../core/models/sondage.
 import { SondageService } from '../../../core/services/sondage.service';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { AccueilSondage } from '../../../shared/formulaire/accueil/accueil-sondage';
+import { variablesApparence } from '../../../shared/formulaire/apparence/apparence';
+import { BandeauApparence } from '../../../shared/formulaire/apparence/bandeau-apparence';
 import { FormulaireSondage } from '../../../shared/formulaire/formulaire-sondage';
 
 export type Appareil = 'ordinateur' | 'telephone';
@@ -30,6 +32,7 @@ export type Appareil = 'ordinateur' | 'telephone';
     MessageErreur,
     AccueilSondage,
     FormulaireSondage,
+    BandeauApparence,
   ],
   template: `
     <section class="conteneur-page">
@@ -65,7 +68,9 @@ export type Appareil = 'ordinateur' | 'telephone';
 
       @if (apercu(); as a) {
         <div class="scene" [class.telephone]="appareil() === 'telephone'">
-          <div class="cadre">
+          <!-- Couleurs de l'entreprise limitées au cadre : le reste de la page garde celles de Batulo. -->
+          <div class="cadre" [style]="variablesApparence()">
+            <app-bandeau-apparence [apparence]="a.apparence" />
             @if (accueilAffiche()) {
               <app-accueil-sondage [contenu]="a" mode="apercu" [niveauTitre]="2" (commencer)="accueilPasse.set(true)" />
             } @else {
@@ -149,6 +154,8 @@ export class ApercuSondage {
     return !!a && accueilNecessaire(a) && !this.accueilPasse();
   });
   protected readonly apercu = signal<ApercuResponse | null>(null);
+  /** Couleur de l'entreprise (variables CSS du cadre), seulement si elle est valide et personnalisée. */
+  protected readonly variablesApparence = computed(() => variablesApparence(this.apercu()?.apparence));
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
 
