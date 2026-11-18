@@ -15,6 +15,8 @@ export function ouvrirDialogueCondition(dialog: MatDialog, donnees: DonneesCondi
       width: '720px',
       maxWidth: 'calc(100vw - 32px)',
       autoFocus: 'first-tabbable',
+      // Fermeture gérée par la boîte (confirmation si des règles ne sont pas enregistrées).
+      disableClose: true,
     })
     .afterClosed();
 }

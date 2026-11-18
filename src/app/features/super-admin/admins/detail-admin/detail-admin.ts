@@ -16,6 +16,8 @@ import { SuperAdminService } from '../../../../core/services/super-admin.service
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { ActionsAdmin, libelleGestionnaires } from '../actions-admin';
+import { couleurValide } from '../../../../core/utils/couleur';
+import { urlLogoSure } from '../../../../shared/formulaire/apparence/apparence';
 
 /** Détail d'un admin : entreprise, compte de l'admin, abonnement (jours restants) et actions. */
 @Component({
@@ -49,6 +51,9 @@ export class DetailAdmin {
   private readonly identifiant = computed(() => Number(this.id()));
 
   protected readonly detail = signal<AdminDetailResponse | null>(null);
+  /** Apparence de l'entreprise (lecture seule) : seules une couleur #RRGGBB et une URL http(s) sont affichées. */
+  protected readonly urlLogo = urlLogoSure;
+  protected readonly couleurSure = (couleur: string | null | undefined) => (couleurValide(couleur) ? couleur : null);
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
 

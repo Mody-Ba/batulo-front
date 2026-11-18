@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
+  computed,
   DestroyRef,
   effect,
   ElementRef,
@@ -21,6 +22,8 @@ import { FormulairePublicService } from '../../../core/services/formulaire-publi
 import { codeErreur, corpsErreur, messageErreur } from '../../../core/utils/erreur-http';
 import { accueilNecessaire } from '../../../core/models/sondage.model';
 import { AccueilSondage, DepartQuestionnaire, RepriseBrouillon } from '../../../shared/formulaire/accueil/accueil-sondage';
+import { BandeauApparence } from '../../../shared/formulaire/apparence/bandeau-apparence';
+import { variablesApparence } from '../../../shared/formulaire/apparence/apparence';
 import { FormulaireSondage, ReponsesParQuestion } from '../../../shared/formulaire/formulaire-sondage';
 import { ReponseQuestionRequest } from '../../../shared/formulaire/reponses';
 import { memoireRepondant } from './memoire-repondant';
@@ -98,7 +101,7 @@ export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndi
  */
 @Component({
   selector: 'app-formulaire-public',
-  imports: [DatePipe, AccueilSondage, FormulaireSondage],
+  imports: [DatePipe, AccueilSondage, FormulaireSondage, BandeauApparence],
   templateUrl: './formulaire-public.html',
   styleUrl: './formulaire-public.scss',
 })
@@ -114,6 +117,13 @@ export class FormulairePublic {
   readonly jeton = input.required<string>();
 
   protected readonly etat = signal<Etat>({ type: 'chargement' });
+  /** Apparence de l'entreprise, une fois le sondage lu (aucune avant : écrans de chargement et d'erreur Batulo). */
+  protected readonly apparence = computed(() => {
+    const e = this.etat();
+    return 'formulaire' in e ? (e.formulaire.apparence ?? null) : null;
+  });
+  /** Couleur de l'entreprise (variables CSS), seulement si elle est valide et personnalisée. */
+  protected readonly variablesApparence = computed(() => variablesApparence(this.apparence()));
   protected readonly envoiEnCours = signal(false);
   /** Erreur d'envoi qui garde le formulaire (429, réseau, inattendue). */
   protected readonly erreurEnvoi = signal<string | null>(null);

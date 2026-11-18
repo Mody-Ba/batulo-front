@@ -1,0 +1,71 @@
+.zone-logo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+}
+
+.titre-carte {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.logo-actuel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-3);
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+// Fond en damier discret : un logo transparent reste visible.
+.image-logo {
+  max-width: min(100%, 240px);
+  max-height: 96px;
+  padding: var(--bt-espace-2);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: repeating-conic-gradient(var(--mat-sys-surface-container) 0 25%, var(--mat-sys-surface) 0 50%) 50% / 16px 16px;
+  object-fit: contain;
+}
+
+.actions-logo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-2);
+}
+
+.zone-depot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-5) var(--bt-espace-4);
+  border: 2px dashed var(--mat-sys-outline);
+  border-radius: var(--bt-rayon);
+  text-align: center;
+
+  &.survol {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-primary-container);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  mat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.erreur-logo {
+  margin: 0;
+  color: var(--mat-sys-error);
+}

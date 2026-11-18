@@ -5,7 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ConnexionResponse } from '../models/auth.model';
 import { AuthService } from '../services/auth.service';
-import { authInterceptor } from './auth.interceptor';
+import { authInterceptor, origineApi } from './auth.interceptor';
 
 const API = environment.apiUrl;
 
@@ -170,5 +170,18 @@ describe('authInterceptor', () => {
       .flush({ code: 'ACCES_REFUSE', message: 'Non.' }, { status: 403, statusText: 'Forbidden' });
 
     expect(router.navigateByUrl).not.toHaveBeenCalled();
+  });
+});
+
+describe('origine de l’API (seule à recevoir le jeton)', () => {
+  it('apiUrl absolue (npm start, production) : son origine', () => {
+    expect(origineApi('http://localhost:8090', 'http://localhost:4200')).toBe('http://localhost:8090');
+    expect(origineApi('https://api.batulo.example/', 'https://batulo.example')).toBe('https://api.batulo.example');
+  });
+
+  it('apiUrl vide (reseau-local, proxy /api) : l’origine de la page, sans exception', () => {
+    expect(origineApi('', 'http://192.168.2.69:4200')).toBe('http://192.168.2.69:4200');
+    // Une autre origine ne recevrait donc pas le jeton.
+    expect(new URL('http://exemple.test/api/x').origin).not.toBe(origineApi('', 'http://192.168.2.69:4200'));
   });
 });

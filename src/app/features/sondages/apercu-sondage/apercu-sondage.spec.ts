@@ -47,4 +47,15 @@ describe('Aperçu : page d’accueil', () => {
     expect(el.querySelector('app-accueil-sondage')).toBeNull();
     expect(el.querySelector('app-formulaire-sondage')).not.toBeNull();
   });
+
+  it('apparence de l’entreprise limitée au cadre du formulaire : bandeau et couleurs ; la page garde celles de Batulo', async () => {
+    const { el } = await afficher({
+      ...APERCU,
+      apparence: { nomAffiche: 'Coopérative de Kaolack', logoUrl: 'https://api.batulo.test/api/public/logos/2f1c', couleurPrincipale: '#1E6B52', couleurTexte: '#FFFFFF' },
+    });
+    const cadre = el.querySelector<HTMLElement>('.cadre')!;
+    expect(cadre.style.getPropertyValue('--bt-marque')).toBe('#1E6B52');
+    expect(cadre.querySelector('app-bandeau-apparence img')!.getAttribute('alt')).toBe('Coopérative de Kaolack');
+    expect(el.querySelector<HTMLElement>('.conteneur-page')!.style.getPropertyValue('--bt-marque')).toBe('');
+  });
 });

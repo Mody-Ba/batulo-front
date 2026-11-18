@@ -34,7 +34,6 @@ import { ControlesNumerique } from '../formulaires-types';
     @if (configuration().hasError('bornesInversees')) {
       <p class="erreur-config" role="alert">Le minimum doit être inférieur ou égal au maximum.</p>
     }
-    <div class="apercu-reponse" aria-hidden="true"><span class="faux-champ court">0</span></div>
   `,
 })
 export class QuestionNumerique {

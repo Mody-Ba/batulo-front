@@ -2,9 +2,6 @@
 
 <form (submit)="$event.preventDefault(); valider()" novalidate>
   <mat-dialog-content>
-    <div class="zone-erreur" tabindex="-1">
-      <app-message-erreur [erreur]="erreur()" titre="La condition n’a pas été enregistrée" parDefaut="La condition n’a pas pu être enregistrée." />
-    </div>
 
     @if (sources.length === 0) {
       <p class="texte-aide" role="status">
@@ -141,14 +138,32 @@
     }
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <button matButton type="button" mat-dialog-close>Annuler</button>
+  <mat-dialog-actions class="actions-condition">
+    @if (erreur(); as e) {
+      <div class="erreur-enregistrement" role="alert" tabindex="-1">
+        <mat-icon fontIcon="error" aria-hidden="true" />
+        <div>
+          <p class="titre-erreur">La condition n’a pas été enregistrée</p>
+          <p>{{ e.message }}</p>
+          @if (e.detail) {
+            <p class="detail-erreur">{{ e.detail }}</p>
+          }
+        </div>
+      </div>
+    }
+    @if (sources.length && modifiee() && !enCours()) {
+      <p class="non-enregistree" role="status">
+        <mat-icon fontIcon="edit_note" aria-hidden="true" />Pas encore enregistrée
+      </p>
+    }
+    <span class="espace"></span>
+    <button matButton type="button" (click)="fermer()" [disabled]="enCours()">Annuler</button>
     @if (sources.length) {
-      <button matButton="filled" type="submit" [disabled]="enCours()">
+      <button matButton="filled" type="submit" class="bouton-principal enregistrer" [disabled]="enCours()">
         @if (enCours()) {
           <mat-spinner diameter="20" aria-label="Enregistrement de la condition" />
         } @else {
-          Enregistrer la condition
+          <ng-container><mat-icon fontIcon="check" aria-hidden="true" />Enregistrer la condition</ng-container>
         }
       </button>
     }

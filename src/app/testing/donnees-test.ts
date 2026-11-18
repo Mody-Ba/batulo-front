@@ -4,6 +4,7 @@ import {
   PaiementMobileResponse,
   StatutPaiementMobileResponse,
 } from '../core/models/abonnement.model';
+import { PersonnalisationResponse } from '../core/models/personnalisation.model';
 import { DemandeAbonnementResponse } from '../core/models/demande-abonnement.model';
 import { GestionnaireResponse } from '../core/models/gestionnaire.model';
 import {
@@ -35,6 +36,27 @@ export function abonnementDeTest(modifs: Partial<AbonnementResponse> = {}): Abon
     joursRestants: 23,
     montant: 1,
     devise: 'cad',
+    ...modifs,
+  };
+}
+
+/** Premiers octets d'un PNG et d'un JPEG (le reste n'est pas lu par la vérification du front). */
+export const OCTETS_PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13];
+export const OCTETS_JPEG = [0xff, 0xd8, 0xff, 0xe0, 0, 16];
+
+/** Fichier choisi par l'utilisateur ; `taille` : complété par des zéros. */
+export function fichierDeTest(octets: number[], nom = 'logo.png', type = 'image/png', taille?: number): File {
+  const contenu = taille ? new Uint8Array(taille).map((_, i) => octets[i] ?? 0) : new Uint8Array(octets);
+  return new File([contenu], nom, { type });
+}
+
+/** Personnalisation sans réglage (couleur Batulo, nom de l'entreprise, pas de logo), champs vides absents. */
+export function personnalisationDeTest(modifs: Partial<PersonnalisationResponse> = {}): PersonnalisationResponse {
+  return {
+    nomEntreprise: 'Sahel Data',
+    nomEffectif: 'Sahel Data',
+    couleurEffective: '#005CBB',
+    couleurTexte: '#FFFFFF',
     ...modifs,
   };
 }

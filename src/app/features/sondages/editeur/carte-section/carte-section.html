@@ -55,6 +55,13 @@
         (retirer)="retirerCondition()"
       />
     }
+    @if (peutAjouterCondition()) {
+      <div class="ligne-condition">
+        <button matButton="tonal" type="button" class="ajouter-condition" (click)="editerCondition()">
+          <mat-icon fontIcon="alt_route" aria-hidden="true" />Ajouter une condition à la section
+        </button>
+      </div>
+    }
     <app-message-erreur [erreur]="auto.erreur()" parDefaut="La section n’a pas pu être enregistrée." />
     <app-message-erreur [erreur]="erreurAction()" titre="Action refusée" parDefaut="Cette action n’a pas pu être faite." />
   </div>
@@ -113,7 +120,7 @@
     >
       <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre la section</span>
     </button>
-    @if (position() > 0) {
+    @if (peutAjouterCondition() || section().condition) {
       <button mat-menu-item type="button" (click)="editerCondition()">
         <mat-icon fontIcon="alt_route" aria-hidden="true" />
         <span>{{ section().condition ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>

@@ -14,8 +14,14 @@ import { AuthService, MESSAGE_SESSION_EXPIREE } from '../services/auth.service';
 import { codeErreur } from '../utils/erreur-http';
 import { SANS_AUTHENTIFICATION } from './contexte-http';
 
-/** Origine de l'API Batulo : la seule à recevoir le jeton. */
-const ORIGINE_API = new URL(environment.apiUrl).origin;
+/**
+ * Origine de l'API Batulo : la seule à recevoir le jeton. apiUrl vide (configuration reseau-local, appels relatifs
+ * /api/... passés par le proxy de ng serve) : l'API est servie par l'origine de la page elle-même.
+ */
+export function origineApi(apiUrl: string, originePage: string): string {
+  return new URL(apiUrl || '/', originePage).origin;
+}
+const ORIGINE_API = origineApi(environment.apiUrl, window.location.origin);
 
 /**
  * Routes publiques : aucune session en jeu. Un 401 y a un sens métier (identifiants faux,

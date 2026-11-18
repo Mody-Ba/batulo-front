@@ -1,4 +1,5 @@
-<main class="page-publique" id="contenu">
+<main class="page-publique" id="contenu" [style]="variablesApparence()">
+  <app-bandeau-apparence [apparence]="apparence()" />
   @switch (etat().type) {
     @case ('chargement') {
       <p class="chargement" role="status" aria-live="polite">Chargement du sondage…</p>

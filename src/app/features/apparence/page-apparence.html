@@ -1,0 +1,108 @@
+<section class="conteneur-page">
+  <app-entete-page
+    titre="Apparence"
+    icone="palette"
+    sousTitre="Logo, couleur et nom montrés aux répondants sur les formulaires et dans les rapports PDF"
+  />
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’apparence" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" parDefaut="L’apparence n’a pas pu être chargée.">
+    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  </app-message-erreur>
+
+  @if (personnalisation(); as p) {
+    @if (raisonLectureSeule(); as raison) {
+      <app-encadre type="info" icone="visibility"><p>{{ raison }}</p></app-encadre>
+    }
+
+    <div class="grille-apparence">
+      <div class="reglages">
+        <app-zone-logo
+          [logo]="p.logo"
+          [nom]="p.nomEffectif"
+          [modifiable]="modifiable()"
+          (misAJour)="logoMisAJour($event)"
+          (apercuChange)="logoLocal.set($event)"
+        />
+
+        <section class="carte-section" aria-labelledby="titre-couleur-nom">
+          <h2 id="titre-couleur-nom" class="titre-carte">Couleur et nom</h2>
+          @if (modifiable()) {
+            <form class="formulaire-apparence" (submit)="$event.preventDefault(); enregistrer()" novalidate>
+              <div class="ligne-couleur">
+                <label class="selecteur-couleur">
+                  <span class="visuellement-cache">Choisir la couleur principale</span>
+                  <input #selecteur type="color" [value]="couleurSelecteur()" (input)="couleurChoisie($event)" />
+                </label>
+                <mat-form-field class="champ-couleur">
+                  <mat-label>Couleur principale</mat-label>
+                  <input
+                    matInput
+                    [formControl]="couleur"
+                    (blur)="normaliserSaisie()"
+                    placeholder="Couleur Batulo (#005CBB)"
+                    autocomplete="off"
+                    spellcheck="false"
+                    maxlength="7"
+                  />
+                  <mat-hint>Code hexadécimal #RRGGBB ; vide : couleur Batulo ({{ couleurDefaut }}).</mat-hint>
+                  @if (couleur.hasError('pattern')) {
+                    <mat-error>Format attendu : # suivi de 6 chiffres ou lettres de A à F (ex. #1E6B52).</mat-error>
+                  }
+                </mat-form-field>
+                <button matButton type="button" (click)="couleurParDefaut()" [disabled]="couleur.value === ''">
+                  Couleur par défaut
+                </button>
+              </div>
+
+              <mat-form-field>
+                <mat-label>Nom affiché sur les formulaires (facultatif)</mat-label>
+                <input matInput [formControl]="nomAffiche" [maxlength]="nomMax" autocomplete="organization" />
+                <mat-hint>Vide : « {{ p.nomEntreprise }} ». Montré à côté du logo et dans les rapports.</mat-hint>
+                @if (nomAffiche.hasError('maxlength')) {
+                  <mat-error>{{ nomMax }} caractères au plus.</mat-error>
+                }
+              </mat-form-field>
+
+              <app-message-erreur [erreur]="erreurEnregistrement()" titre="L’apparence n’a pas été enregistrée" parDefaut="L’apparence n’a pas pu être enregistrée." />
+
+              <div class="actions">
+                <button matButton="filled" type="submit" [disabled]="enregistrement()">
+                  @if (enregistrement()) {
+                    <mat-spinner diameter="20" aria-label="Enregistrement" />
+                  } @else {
+                    Enregistrer
+                  }
+                </button>
+              </div>
+            </form>
+          } @else {
+            <dl class="valeurs">
+              <dt>Couleur principale</dt>
+              <dd>
+                <span class="pastille" [style.background]="couleurApercu()" aria-hidden="true"></span>
+                {{ p.couleurEffective }}{{ p.couleurPrincipale ? '' : ' (couleur Batulo)' }}
+              </dd>
+              <dt>Nom affiché</dt>
+              <dd>{{ p.nomEffectif }}{{ p.nomAffiche ? '' : ' (nom de l’entreprise)' }}</dd>
+            </dl>
+          }
+        </section>
+      </div>
+
+      <section class="carte-section apercu" aria-labelledby="titre-apercu">
+        <h2 id="titre-apercu" class="titre-carte">Aperçu du formulaire</h2>
+        <app-apercu-apparence
+          [nom]="nomApercu()"
+          [logoUrl]="logoApercu()"
+          [couleur]="couleurApercu()"
+          [couleurTexte]="couleurTexteApercu()"
+        />
+      </section>
+    </div>
+  }
+</section>

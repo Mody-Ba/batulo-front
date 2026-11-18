@@ -122,6 +122,11 @@
 
   <div class="pied">
     <mat-slide-toggle formControlName="obligatoire">Obligatoire</mat-slide-toggle>
+    @if (peutAjouterCondition()) {
+      <button matButton="tonal" type="button" class="ajouter-condition" (click)="editerCondition()">
+        <mat-icon fontIcon="alt_route" aria-hidden="true" />Ajouter une condition
+      </button>
+    }
     <span class="espace"></span>
     <app-etat-enregistrement [etat]="auto.etat()" (reessayer)="reessayer()" />
     <button
@@ -143,10 +148,12 @@
       <button mat-menu-item type="button" (click)="descendre()" [disabled]="position() >= nombreEnregistrees() - 1">
         <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre</span>
       </button>
-      <button mat-menu-item type="button" (click)="editerCondition()">
-        <mat-icon fontIcon="alt_route" aria-hidden="true" />
-        <span>{{ condition() ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
-      </button>
+      @if (peutAjouterCondition() || condition()) {
+        <button mat-menu-item type="button" (click)="editerCondition()">
+          <mat-icon fontIcon="alt_route" aria-hidden="true" />
+          <span>{{ condition() ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
+        </button>
+      }
       @if (autresSections().length) {
         <button
           mat-menu-item
