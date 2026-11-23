@@ -10,15 +10,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router, RouterLink } from '@angular/router';
 import { CreationSondageRequest, FormulaireResponse } from '../../../core/models/sondage.model';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../../core/services/auth.service';
 import { SondageService } from '../../../core/services/sondage.service';
 import { REGLES_SONDAGE } from '../../../core/utils/regles-question';
 import { nonVide } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
-import { MESSAGE_SANS_PERMISSION } from '../droits-sondage';
+import { messageSansPermission } from '../droits-sondage';
 import { ChoixFormulaire } from './choix-formulaire/choix-formulaire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export type ModeCreation = 'vide' | 'source';
 
@@ -29,8 +30,7 @@ export type ModeCreation = 'vide' | 'source';
  */
 @Component({
   selector: 'app-creation-sondage',
-  imports: [
-    TextFieldModule,
+  imports: [TranslocoPipe, TextFieldModule,
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -57,10 +57,10 @@ export class CreationSondage {
   /** Pourquoi la création est impossible (affichage seulement : le serveur décide). */
   protected readonly interdit = computed(() => {
     if (this.auth.lectureSeule()) {
-      return MESSAGE_LECTURE_SEULE;
+      return messageLectureSeule();
     }
     return this.auth.role() === 'GESTIONNAIRE' && !this.auth.utilisateur()?.peutCreerSondages
-      ? MESSAGE_SANS_PERMISSION
+      ? messageSansPermission()
       : null;
   });
 

@@ -5,6 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { REGLES_SONDAGE } from '../../../../../core/utils/regles-question';
 import { ControlesEchelle } from '../formulaires-types';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 const CRANS_5 = [1, 2, 3, 4, 5];
 const CRANS_10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -13,37 +14,37 @@ const CRANS_10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 @Component({
   selector: 'app-question-echelle',
   styleUrl: '../_configuration.scss',
-  imports: [ReactiveFormsModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule],
+  imports: [TranslocoPipe, ReactiveFormsModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule],
   template: `
     <div [formGroup]="configuration()">
       <div class="choix-etendue">
-        <span [id]="idEtendue">Étendue</span>
+        <span [id]="idEtendue">{{ 'editeur.types.etendue' | transloco }}</span>
         <mat-button-toggle-group
           formControlName="max"
           [attr.aria-labelledby]="idEtendue"
           [hideSingleSelectionIndicator]="true"
         >
-          <mat-button-toggle [value]="5">1 à 5</mat-button-toggle>
-          <mat-button-toggle [value]="10">1 à 10</mat-button-toggle>
+          <mat-button-toggle [value]="5">{{ 'editeur.types.unA' | transloco: { max: 5 } }}</mat-button-toggle>
+          <mat-button-toggle [value]="10">{{ 'editeur.types.unA' | transloco: { max: 10 } }}</mat-button-toggle>
         </mat-button-toggle-group>
       </div>
       <div class="ligne-champs">
-        <mat-form-field>
-          <mat-label>Libellé du 1 (facultatif)</mat-label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'editeur.types.libelleDu' | transloco: { n: 1 } }}</mat-label>
           <input
             matInput
             formControlName="libelleMin"
             [maxlength]="regles.libelleConfigMax"
-            placeholder="Pas du tout d’accord"
+            [placeholder]="'editeur.types.pasDuTout' | transloco"
           />
         </mat-form-field>
-        <mat-form-field>
-          <mat-label>Libellé du {{ configuration().controls.max.value }} (facultatif)</mat-label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'editeur.types.libelleDu' | transloco: { n: configuration().controls.max.value } }}</mat-label>
           <input
             matInput
             formControlName="libelleMax"
             [maxlength]="regles.libelleConfigMax"
-            placeholder="Tout à fait d’accord"
+            [placeholder]="'editeur.types.toutAFait' | transloco"
           />
         </mat-form-field>
       </div>

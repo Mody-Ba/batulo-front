@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -11,12 +11,14 @@ import { MotDePasseService } from '../../../core/services/mot-de-passe.service';
 import { nonVide } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { texteServeur } from '../../../core/i18n/traduire';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Demande d'un lien de réinitialisation (même réponse que le compte existe ou non). */
 @Component({
   selector: 'app-mot-de-passe-oublie',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, SelecteurLangue, ReactiveFormsModule,
     RouterLink,
     MatCardModule,
     MatFormFieldModule,
@@ -40,8 +42,12 @@ export class MotDePasseOublie {
 
   protected readonly enCours = signal(false);
   protected readonly erreur = signal<unknown>(null);
-  /** Message du serveur une fois la demande envoyée. */
-  protected readonly confirmation = signal<string | null>(null);
+  /** Message du serveur une fois la demande envoyée (traduit hors du français : texteServeur). */
+  private readonly messageRecu = signal<string | null>(null);
+  protected readonly envoyee = signal(false);
+  protected readonly confirmation = computed(() =>
+    this.envoyee() ? texteServeur('auth.oublie.confirmation', this.messageRecu()) : null,
+  );
 
   protected envoyer(): void {
     if (this.formulaire.invalid || this.enCours()) {
@@ -56,7 +62,8 @@ export class MotDePasseOublie {
       .subscribe({
         next: (reponse) => {
           this.enCours.set(false);
-          this.confirmation.set(reponse.message);
+          this.messageRecu.set(reponse.message);
+          this.envoyee.set(true);
         },
         error: (erreur: unknown) => {
           this.enCours.set(false);

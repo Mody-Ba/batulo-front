@@ -22,7 +22,7 @@
   td {
     padding: var(--bt-espace-2) var(--bt-espace-3);
     border-bottom: 1px solid var(--mat-sys-outline-variant);
-    text-align: right;
+    text-align: end;
     font-variant-numeric: tabular-nums;
   }
 
@@ -33,7 +33,7 @@
   }
 
   tbody th {
-    text-align: left;
+    text-align: start;
     font-weight: 500;
   }
 

@@ -25,6 +25,8 @@ import {
   reponsesAEnvoyer,
   ValeurReponse,
 } from './reponses';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { traduire, traduirePluriel } from '../../core/i18n/traduire';
 
 /** Ce qu'il faut pour afficher un formulaire (aperçu F5b, formulaire public F6). */
 export interface ContenuFormulaire {
@@ -47,7 +49,7 @@ export type ReponsesParQuestion = Record<number, ValeurReponse>;
  */
 @Component({
   selector: 'app-formulaire-sondage',
-  imports: [QuestionRepondant],
+  imports: [TranslocoPipe, QuestionRepondant],
   templateUrl: './formulaire-sondage.html',
   // Styles des champs en une seule copie (et non une par composant de champ), limités à app-formulaire-sondage.
   styleUrls: [
@@ -336,14 +338,14 @@ export class FormulaireSondage {
 export function texteAnnonce(apparues: readonly QuestionAffichee[], masquees: number): string {
   const morceaux: string[] = [];
   if (apparues.length === 1) {
-    morceaux.push(`Nouvelle question affichée : « ${apparues[0].libelle} ».`);
+    morceaux.push(traduire('public.annonce.uneApparue', { libelle: apparues[0].libelle }));
   } else if (apparues.length > 1) {
-    morceaux.push(`${apparues.length} nouvelles questions affichées.`);
+    morceaux.push(traduirePluriel('public.annonce.apparues', apparues.length));
   }
   if (masquees === 1) {
-    morceaux.push('Une question n’est plus affichée.');
+    morceaux.push(traduire('public.annonce.uneMasquee'));
   } else if (masquees > 1) {
-    morceaux.push(`${masquees} questions ne sont plus affichées.`);
+    morceaux.push(traduirePluriel('public.annonce.masquees', masquees));
   }
   return morceaux.join(' ');
 }

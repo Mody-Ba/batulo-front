@@ -10,7 +10,7 @@ export const routes: Routes = [
     // Vitrine publique pour un visiteur ; un compte connecté va à son accueil (tableau de bord ou page imposée).
     path: '',
     pathMatch: 'full',
-    title: 'Batulo · Sondages et enquêtes terrain',
+    title: 'titres.vitrine',
     canActivate: [inviteGuard],
     loadComponent: () => import('./features/vitrine/vitrine').then((m) => m.Vitrine),
   },
@@ -18,20 +18,20 @@ export const routes: Routes = [
   // ---------- Pages publiques (sans mise en page) ----------
   {
     path: 'connexion',
-    title: 'Connexion · Batulo',
+    title: 'titres.connexion',
     canActivate: [inviteGuard],
     loadComponent: () => import('./features/auth/connexion/connexion').then((m) => m.Connexion),
   },
   {
     path: 'inscription',
-    title: 'Créer un compte · Batulo',
+    title: 'titres.inscription',
     canActivate: [inviteGuard],
     loadComponent: () =>
       import('./features/auth/inscription/inscription').then((m) => m.Inscription),
   },
   {
     path: 'mot-de-passe-oublie',
-    title: 'Mot de passe oublié · Batulo',
+    title: 'titres.motDePasseOublie',
     canActivate: [inviteGuard],
     loadComponent: () =>
       import('./features/auth/mot-de-passe-oublie/mot-de-passe-oublie').then(
@@ -41,7 +41,7 @@ export const routes: Routes = [
   {
     // Adresse du lien envoyé par courriel (batulo.mot-de-passe.url-reinitialisation du backend).
     path: 'reinitialiser-mot-de-passe',
-    title: 'Nouveau mot de passe · Batulo',
+    title: 'titres.nouveauMotDePasse',
     loadComponent: () =>
       import('./features/auth/reinitialiser-mot-de-passe/reinitialiser-mot-de-passe').then(
         (m) => m.ReinitialiserMotDePasse,
@@ -50,7 +50,7 @@ export const routes: Routes = [
   {
     // Connecté, même avec un mot de passe temporaire.
     path: 'changer-mot-de-passe',
-    title: 'Changer le mot de passe · Batulo',
+    title: 'titres.changerMotDePasse',
     canActivate: [connecteGuard],
     loadComponent: () =>
       import('./features/auth/changer-mot-de-passe/changer-mot-de-passe').then(
@@ -62,7 +62,7 @@ export const routes: Routes = [
   {
     // Lien public d'un sondage (PUBLIC_FORM_URL du backend) : le même pour toutes les versions.
     path: 's/:jeton',
-    title: 'Répondre au sondage · Batulo',
+    title: 'public.titres.repondre',
     loadComponent: () =>
       import('./features/public/formulaire-public/formulaire-public').then((m) => m.FormulairePublic),
   },
@@ -76,13 +76,13 @@ export const routes: Routes = [
     children: [
       {
         path: 'acces-refuse',
-        title: 'Accès refusé · Batulo',
+        title: 'titres.accesRefuse',
         loadComponent: () =>
           import('./features/erreurs/acces-refuse/acces-refuse').then((m) => m.AccesRefuse),
       },
       {
         path: 'compte-suspendu',
-        title: 'Accès suspendu · Batulo',
+        title: 'titres.accesSuspendu',
         loadComponent: () =>
           import('./features/erreurs/compte-suspendu/compte-suspendu').then(
             (m) => m.CompteSuspendu,
@@ -114,7 +114,7 @@ export const routes: Routes = [
       {
         // Apparence des formulaires de l'entreprise : modifiable par l'admin, en lecture seule pour ses gestionnaires.
         path: 'apparence',
-        title: 'Apparence · Batulo',
+        title: 'titres.apparence',
         canActivate: [roleGuard('ADMIN', 'GESTIONNAIRE')],
         loadComponent: () => import('./features/apparence/page-apparence').then((m) => m.PageApparence),
       },

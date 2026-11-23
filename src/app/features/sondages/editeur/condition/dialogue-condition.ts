@@ -27,6 +27,8 @@ import {
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { codeErreur, messageErreur } from '../../../../core/utils/erreur-http';
 import { CibleCondition, SourceCondition, sourcesPossibles } from './condition-editeur';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesCondition {
   sondage: SondageResponse;
@@ -62,10 +64,9 @@ type Saisie = string | number | boolean | null;
 
 /** Au-delà, l'enregistrement est déclaré sans réponse (au lieu d'un bouton qui tourne sans fin). */
 export const DELAI_ENREGISTREMENT_CONDITION_MS = 20_000;
-export const MESSAGE_SANS_REPONSE = 'Le serveur n’a pas répondu : la condition n’a pas été enregistrée. Réessayez.';
-export const MESSAGE_NON_ENREGISTREE =
-  'Le serveur a répondu sans la condition : elle n’a pas été enregistrée. Réessayez ; si cela se reproduit, signalez le détail ci-dessous.';
-export const MESSAGE_REGLES_INCOMPLETES = 'Une règle est incomplète : complétez les champs signalés en rouge, puis enregistrez.';
+export const messageSansReponse = (): string => traduire('editeur.condition.sansReponse');
+export const messageNonEnregistree = (): string => traduire('editeur.condition.reponseSansCondition');
+export const messageReglesIncompletes = (): string => traduire('editeur.condition.reglesIncompletes');
 
 /** Condition de la cible (question ou section) dans le sondage renvoyé par le serveur. */
 export function conditionDeLaCible(sondage: SondageResponse, cible: CibleCondition): ConditionAffichage | null {
@@ -85,14 +86,14 @@ export function erreurEnregistrement(erreur: unknown): ErreurEnregistrement {
   if (erreur instanceof HttpErrorResponse) {
     const code = codeErreur(erreur);
     return {
-      message: messageErreur(erreur, 'La condition n’a pas pu être enregistrée.'),
+      message: messageErreur(erreur, traduire('editeur.condition.erreur')),
       detail: `HTTP ${erreur.status}${code ? ` · ${code}` : ''} · ${erreur.url ?? ''}`.trim(),
     };
   }
   if (erreur instanceof Error && erreur.name === 'TimeoutError') {
-    return { message: MESSAGE_SANS_REPONSE, detail: null };
+    return { message: messageSansReponse(), detail: null };
   }
-  return { message: erreur instanceof Error ? erreur.message : 'La condition n’a pas pu être enregistrée.', detail: null };
+  return { message: erreur instanceof Error ? erreur.message : traduire('editeur.condition.erreur'), detail: null };
 }
 
 interface ControlesRegle {
@@ -115,8 +116,7 @@ const vide = (v: unknown) => v === null || v === undefined || (typeof v === 'str
  */
 @Component({
   selector: 'app-dialogue-condition',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -142,7 +142,7 @@ export class DialogueCondition {
   protected readonly sources: SourceCondition[] = sourcesPossibles(this.donnees.sondage, this.donnees.cible);
   /** Sources groupées par section (optgroup). */
   protected readonly groupes = this.sources.reduce<{ titre: string; sources: SourceCondition[] }[]>((groupes, source) => {
-    const titre = `Section ${source.numeroSection} : ${source.section.titre}`;
+    const titre = traduire('editeur.question.sectionCible', { numero: source.numeroSection, titre: source.section.titre });
     const dernier = groupes.at(-1);
     if (dernier?.titre === titre) {
       dernier.sources.push(source);
@@ -200,9 +200,9 @@ export class DialogueCondition {
       return;
     }
     confirmer(this.dialog, {
-      titre: 'Fermer sans enregistrer ?',
-      message: 'Les règles de cette condition d’affichage ne sont pas enregistrées : elles seront perdues.',
-      action: 'Fermer sans enregistrer',
+      titre: traduire('editeur.condition.fermerTitre'),
+      message: traduire('editeur.condition.fermerMessage'),
+      action: traduire('editeur.condition.fermerAction'),
       destructive: true,
     }).subscribe((ok) => {
       if (ok) {
@@ -252,7 +252,7 @@ export class DialogueCondition {
       return;
     }
     if (this.regles.invalid) {
-      this.montrerErreur({ message: MESSAGE_REGLES_INCOMPLETES, detail: null });
+      this.montrerErreur({ message: messageReglesIncompletes(), detail: null });
       return;
     }
     const demande = this.requete();
@@ -266,7 +266,7 @@ export class DialogueCondition {
         map((sondage) => {
           const enregistree = conditionDeLaCible(sondage, this.donnees.cible);
           if (!enregistree || enregistree.regles.length !== demande.regles.length) {
-            throw new Error(MESSAGE_NON_ENREGISTREE);
+            throw new Error(messageNonEnregistree());
           }
           return sondage;
         }),
@@ -311,16 +311,16 @@ export class DialogueCondition {
       return null;
     }
     if (e['source']) {
-      return 'Choisissez la question dont dépend l’affichage.';
+      return traduire('editeur.condition.choisirQuestion');
     }
     if (e['operateur']) {
-      return 'Choisissez une condition.';
+      return traduire('editeur.condition.choisirCondition');
     }
     if (e['valeur']) {
-      return this.genre(groupe) === 'options' ? 'Choisissez au moins une option.' : 'Indiquez la valeur attendue.';
+      return traduire(this.genre(groupe) === 'options' ? 'editeur.condition.choisirOption' : 'editeur.condition.indiquerValeur');
     }
     if (e['intervalle']) {
-      return 'La première borne doit être inférieure ou égale à la seconde.';
+      return traduire('editeur.condition.bornes');
     }
     return null;
   }

@@ -11,7 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { questionDeTest, sectionDeTest, sondageDeTest } from '../../../../testing/donnees-test';
 import { CarteQuestion } from '../carte-question/carte-question';
 import { EditeurSondageStore } from '../editeur-sondage.store';
-import { MESSAGE_NON_ENREGISTREE } from './dialogue-condition';
+import { messageNonEnregistree } from './dialogue-condition';
 
 /**
  * Parcours complet de la boîte de condition, comme dans l'éditeur : vraie carte, vrai store, vrai service HTTP, vrai
@@ -96,7 +96,7 @@ describe('Boîte de condition : du clic au serveur, puis à l’éditeur', () =>
     expect(boite()).not.toBeNull();
     const erreur = boite()!.querySelector('mat-dialog-actions .erreur-enregistrement')!;
     expect(erreur.getAttribute('role')).toBe('alert');
-    expect(erreur.textContent).toContain(MESSAGE_NON_ENREGISTREE);
+    expect(erreur.textContent).toContain(messageNonEnregistree());
     expect(fixture.nativeElement.querySelector('app-resume-condition')).toBeNull();
   });
 

@@ -1,10 +1,11 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ReponseResponse } from '../../../core/models/statistiques.model';
 import { QuestionResponse, SondageResponse } from '../../../core/models/sondage.model';
 import { formaterReponse, ReponseMiseEnForme } from './formater-reponse';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesDialogueReponse {
   reponse: ReponseResponse;
@@ -22,46 +23,45 @@ interface LigneDetail {
 /** Détail d'une réponse, question par question, dans l'ordre du sondage ; « Sans réponse » si la question est vide. */
 @Component({
   selector: 'app-dialogue-reponse',
-  imports: [DatePipe, MatButtonModule, MatDialogModule],
+  imports: [TranslocoPipe, DateLPipe,  MatButtonModule, MatDialogModule],
   template: `
-    <h2 mat-dialog-title>Réponse n° {{ donnees.reponse.id }}</h2>
+    <h2 mat-dialog-title>{{ 'sondages.reponse.titre' | transloco: { id: donnees.reponse.id } }}</h2>
     <mat-dialog-content>
       <p class="texte-aide">
-        Envoyée le {{ donnees.reponse.dateSoumission | date: 'd MMMM y à HH:mm' }}
-        · version {{ donnees.reponse.version }}
+        {{ 'sondages.reponse.envoyee' | transloco: { date: (donnees.reponse.dateSoumission | dateL: 'longHeure'), version: donnees.reponse.version } }}
       </p>
       <dl class="detail">
         @for (ligne of lignes; track ligne.numero) {
           @if (ligne.section) {
-            <h3 class="section">{{ ligne.section }}</h3>
+            <h3 class="section" dir="auto">{{ ligne.section }}</h3>
           }
           <div class="question">
-            <dt>{{ ligne.numero }}. {{ ligne.libelle }}</dt>
+            <dt>{{ ligne.numero }}. <span dir="auto">{{ ligne.libelle }}</span></dt>
             <dd>
               @if (ligne.valeur; as v) {
                 @if (v.liste) {
                   <ol>
                     @for (element of v.liste; track $index) {
-                      <li>{{ element }}</li>
+                      <li dir="auto">{{ element }}</li>
                     }
                   </ol>
                 } @else if (v.paires) {
                   <table class="paires">
-                    <caption class="visuellement-cache">Réponses par ligne</caption>
+                    <caption class="visuellement-cache">{{ 'sondages.reponse.parLigne' | transloco }}</caption>
                     <tbody>
                       @for (paire of v.paires; track paire[0]) {
                         <tr>
-                          <th scope="row">{{ paire[0] }}</th>
-                          <td>{{ paire[1] }}</td>
+                          <th scope="row" dir="auto">{{ paire[0] }}</th>
+                          <td dir="auto">{{ paire[1] }}</td>
                         </tr>
                       }
                     </tbody>
                   </table>
                 } @else {
-                  <span class="texte">{{ v.texte }}</span>
+                  <span class="texte" dir="auto">{{ v.texte }}</span>
                 }
               } @else {
-                <span class="sans-reponse">Sans réponse</span>
+                <span class="sans-reponse">{{ 'sondages.reponse.sansReponse' | transloco }}</span>
               }
             </dd>
           </div>
@@ -69,7 +69,7 @@ interface LigneDetail {
       </dl>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button matButton="filled" type="button" mat-dialog-close cdkFocusInitial>Fermer</button>
+      <button matButton="filled" type="button" mat-dialog-close cdkFocusInitial>{{ 'commun.fermer' | transloco }}</button>
     </mat-dialog-actions>
   `,
   styles: `
@@ -109,13 +109,13 @@ interface LigneDetail {
 
     ol {
       margin: 0;
-      padding-left: var(--bt-espace-6);
+      padding-inline-start: var(--bt-espace-6);
     }
 
     .paires th {
-      padding-right: var(--bt-espace-4);
+      padding-inline-end: var(--bt-espace-4);
       font-weight: 500;
-      text-align: left;
+      text-align: start;
     }
   `,
 })

@@ -9,6 +9,7 @@ import { AdminDetailResponse, CompteAdmin } from '../../../../core/models/super-
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesDialogueAdmin {
   /** Absent : création. */
@@ -22,8 +23,7 @@ export interface DonneesDialogueAdmin {
  */
 @Component({
   selector: 'app-dialogue-admin',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,

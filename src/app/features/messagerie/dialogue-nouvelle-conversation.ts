@@ -14,6 +14,8 @@ import { MessagerieService } from '../../core/services/messagerie.service';
 import { SuperAdminService } from '../../core/services/super-admin.service';
 import { DELAI_RECHERCHE_MS } from '../../core/utils/recherche';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
+import { traduire } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Un interlocuteur proposé : seuls ceux que le backend autorise. */
 export interface InterlocuteurPropose {
@@ -31,33 +33,33 @@ export interface InterlocuteurPropose {
  */
 @Component({
   selector: 'app-dialogue-nouvelle-conversation',
-  imports: [MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressBarModule, MessageErreur],
+  imports: [TranslocoPipe, MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatProgressBarModule, MessageErreur],
   template: `
-    <h2 mat-dialog-title>Nouvelle conversation</h2>
+    <h2 mat-dialog-title>{{ 'messagerie.nouvelle' | transloco }}</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="recherche">
-        <mat-label>{{ estSuperAdmin ? 'Rechercher un admin ou une entreprise' : 'Rechercher un gestionnaire' }}</mat-label>
+        <mat-label>{{ (estSuperAdmin ? 'messagerie.dialogue.rechercherAdmin' : 'messagerie.dialogue.rechercherGestionnaire') | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="search" aria-hidden="true" />
         <input matInput type="search" [value]="recherche()" (input)="recherche.set($any($event.target).value)" />
       </mat-form-field>
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des interlocuteurs" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'messagerie.dialogue.chargement' | transloco" />
         }
       </div>
       <app-message-erreur [erreur]="erreur()" />
 
-      <ul class="interlocuteurs" aria-label="Interlocuteurs">
+      <ul class="interlocuteurs" [attr.aria-label]="'messagerie.dialogue.interlocuteurs' | transloco">
         @for (i of proposes(); track i.id ?? 'batulo') {
           <li>
             <button type="button" class="interlocuteur" (click)="choisir(i)" [disabled]="ouverture()">
               <mat-icon [fontIcon]="i.id === null ? 'support_agent' : 'person'" aria-hidden="true" />
               <span class="texte">
-                <span class="nom">{{ i.nom }}</span>
+                <span class="nom" dir="auto">{{ i.nom }}</span>
                 <span class="detail">
                   {{ i.detail }}
                   @if (i.inactif) {
-                    · désactivé
+                    · {{ 'messagerie.dialogue.desactive' | transloco }}
                   }
                 </span>
               </span>
@@ -65,13 +67,13 @@ export interface InterlocuteurPropose {
           </li>
         } @empty {
           @if (!chargement()) {
-            <li class="vide" role="status">Aucun interlocuteur ne correspond.</li>
+            <li class="vide" role="status">{{ 'messagerie.dialogue.aucun' | transloco }}</li>
           }
         }
       </ul>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button matButton type="button" mat-dialog-close>Annuler</button>
+      <button matButton type="button" mat-dialog-close>{{ 'commun.annuler' | transloco }}</button>
     </mat-dialog-actions>
   `,
   styles: `
@@ -96,7 +98,7 @@ export interface InterlocuteurPropose {
       border-radius: var(--bt-rayon);
       background: none;
       color: inherit;
-      text-align: left;
+      text-align: start;
       cursor: pointer;
 
       &:hover {
@@ -147,7 +149,7 @@ export class DialogueNouvelleConversation {
       return this.trouves();
     }
     const terme = normaliser(this.recherche());
-    const batulo: InterlocuteurPropose = { id: null, nom: 'Batulo', detail: 'L’équipe Batulo (abonnement, assistance)', inactif: false };
+    const batulo: InterlocuteurPropose = { id: null, nom: 'Batulo', detail: traduire('messagerie.dialogue.detailBatulo'), inactif: false };
     return !terme || normaliser('batulo').includes(terme) ? [batulo, ...this.trouves()] : this.trouves();
   });
 

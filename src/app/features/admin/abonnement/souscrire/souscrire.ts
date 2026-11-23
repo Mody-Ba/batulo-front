@@ -1,4 +1,3 @@
-import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -43,10 +42,10 @@ import {
 } from '../../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { StripeService } from '../../../../core/services/stripe.service';
+import { localeStripe, StripeService } from '../../../../core/services/stripe.service';
 import {
-  MESSAGE_PAIEMENT_INATTENDU,
-  MESSAGE_STRIPE_INDISPONIBLE,
+  messagePaiementInattendu,
+  messageStripeIndisponible,
   messageErreurStripe,
 } from '../../../../core/utils/stripe-erreurs';
 import { montantEnClair } from '../../../../core/utils/montant';
@@ -56,6 +55,10 @@ import { EntetePage } from '../../../../shared/components/entete-page/entete-pag
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { PaiementMobile } from '../paiement-mobile/paiement-mobile';
 import { activerAbonnement, MESSAGE_RECONNEXION } from '../paiement-mobile/suivi-paiement-mobile';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
+import { texteServeur, traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 type Etape = 'formule' | 'paiement' | 'mobile' | 'succes';
 type ChampCarte = 'numero' | 'expiration' | 'code';
@@ -65,9 +68,8 @@ const CHAMPS_INCOMPLETS: Record<ChampCarte, boolean> = { numero: false, expirati
 
 /** Délai avant la redirection vers le tableau de bord après le paiement. */
 export const DELAI_REDIRECTION_MS = 4000;
-export const MESSAGE_CARTE_INCOMPLETE = 'Complétez les informations de la carte.';
-export const MESSAGE_PAIEMENT_EN_TRAITEMENT =
-  'Votre banque traite encore le paiement. Vérifiez à nouveau dans quelques instants.';
+export const messageCarteIncomplete = (): string => traduire('abonnement.carte.incomplete');
+export const messagePaiementEnTraitement = (): string => traduire('abonnement.carte.enTraitement');
 export { MESSAGE_RECONNEXION };
 
 /**
@@ -80,10 +82,7 @@ export { MESSAGE_RECONNEXION };
  */
 @Component({
   selector: 'app-souscrire',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    UpperCasePipe,
+  imports: [TranslocoPipe, MontantLPipe, DateLPipe, 
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -115,13 +114,14 @@ export class Souscrire {
   readonly moyen = input<string | undefined>(undefined);
 
   protected readonly libellesFormule = LIBELLES_FORMULE;
+  protected readonly applications = APPLICATIONS_MOBILES;
   protected readonly montant = montantEnClair;
   protected readonly moyens: readonly { moyen: MoyenPaiement; libelle: string; detail: string; icone: string }[] = [
-    { moyen: 'carte', libelle: 'Carte bancaire', detail: 'Visa, Mastercard…, paiement sécurisé par Stripe', icone: 'credit_card' },
+    { moyen: 'carte', libelle: 'abonnement.souscrire.carte', detail: 'abonnement.souscrire.carteDetail', icone: 'credit_card' },
     {
       moyen: 'mobile',
-      libelle: `Application mobile (${APPLICATIONS_MOBILES}…)`,
-      detail: 'Depuis votre téléphone, en ouguiyas',
+      libelle: 'abonnement.souscrire.mobile',
+      detail: 'abonnement.souscrire.mobileDetail',
       icone: 'smartphone',
     },
   ];
@@ -188,6 +188,15 @@ export class Souscrire {
   private readonly conteneurCode = viewChild<ElementRef<HTMLElement>>('conteneurCode');
   private readonly teinteErreur = viewChild<ElementRef<HTMLElement>>('teinteErreur');
   private readonly teinteAttenuee = viewChild<ElementRef<HTMLElement>>('teinteAttenuee');
+
+  /** Libellé et durée du serveur en français, traduits dans les autres langues (comme la vitrine). */
+  protected libelleFormule(f: FormuleResponse): string {
+    return texteServeur(`vitrine.tarifs.libelle.${f.formule}`, f.libelle);
+  }
+
+  protected dureeFormule(f: FormuleResponse): string {
+    return texteServeur(`vitrine.tarifs.duree.${f.formule}`, f.duree);
+  }
 
   constructor() {
     this.chargerFormules();
@@ -286,7 +295,7 @@ export class Souscrire {
     }
     this.preparation.set(false);
     if (!stripe) {
-      this.erreurPaiement.set(MESSAGE_STRIPE_INDISPONIBLE);
+      this.erreurPaiement.set(messageStripeIndisponible());
       return;
     }
     this.intention.set(intention);
@@ -313,7 +322,7 @@ export class Souscrire {
     this.nomTitulaire.markAsTouched();
     const complets = this.champsComplets();
     if (this.nomTitulaire.invalid || !complets.numero || !complets.expiration || !complets.code) {
-      this.erreurPaiement.set(MESSAGE_CARTE_INCOMPLETE);
+      this.erreurPaiement.set(messageCarteIncomplete());
       return;
     }
 
@@ -334,7 +343,7 @@ export class Souscrire {
         },
       });
     } catch {
-      this.finPaiementEchoue(MESSAGE_STRIPE_INDISPONIBLE);
+      this.finPaiementEchoue(messageStripeIndisponible());
       return;
     }
 
@@ -348,9 +357,9 @@ export class Souscrire {
     } else if (paymentIntent?.status === 'processing') {
       this.paiementEnCours.set(false);
       this.paiementAVerifier.set(paymentIntent.id);
-      this.erreurPaiement.set(MESSAGE_PAIEMENT_EN_TRAITEMENT);
+      this.erreurPaiement.set(messagePaiementEnTraitement());
     } else {
-      this.finPaiementEchoue(MESSAGE_PAIEMENT_INATTENDU);
+      this.finPaiementEchoue(messagePaiementInattendu());
     }
   }
 
@@ -450,7 +459,7 @@ export class Souscrire {
     conteneurCode: HTMLElement,
   ): void {
     const style = this.styleStripe();
-    const elements = stripe.elements({ locale: 'fr-CA' });
+    const elements = stripe.elements({ locale: localeStripe() });
     this.numero = elements.create('cardNumber', { style, showIcon: true });
     this.expiration = elements.create('cardExpiry', { style });
     this.code = elements.create('cardCvc', { style });
@@ -473,10 +482,10 @@ export class Souscrire {
   }
 
   private majChamp(champ: ChampCarte, evenement: StripeElementChangeEvent): void {
-    // Message de saisie déjà en français (locale fr-CA).
+    // Message de saisie déjà dans la langue de l'interface (localeStripe).
     this.erreursChamps.update((e) => ({ ...e, [champ]: evenement.error?.message ?? null }));
     this.champsComplets.update((c) => ({ ...c, [champ]: evenement.complete }));
-    if (this.erreurPaiement() === MESSAGE_CARTE_INCOMPLETE) {
+    if (this.erreurPaiement() === messageCarteIncomplete()) {
       this.erreurPaiement.set(null);
     }
   }

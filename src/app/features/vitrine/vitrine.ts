@@ -5,6 +5,7 @@ import { BarreVitrine } from './barre-vitrine/barre-vitrine';
 import { ANNEE_COPYRIGHT, COURRIEL_CONTACT, ETAPES, FAQ, FONCTIONNALITES } from './contenu-vitrine';
 import { HerosVitrine } from './heros-vitrine/heros-vitrine';
 import { TarifsVitrine } from './tarifs-vitrine/tarifs-vitrine';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Vitrine publique de Batulo (« / » pour un visiteur ; un compte connecté est renvoyé vers son accueil par
@@ -13,7 +14,7 @@ import { TarifsVitrine } from './tarifs-vitrine/tarifs-vitrine';
  */
 @Component({
   selector: 'app-vitrine',
-  imports: [RouterLink, BarreVitrine, HerosVitrine, TarifsVitrine],
+  imports: [TranslocoPipe, RouterLink, BarreVitrine, HerosVitrine, TarifsVitrine],
   templateUrl: './vitrine.html',
   styleUrl: './vitrine.scss',
 })

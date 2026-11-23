@@ -1,40 +1,38 @@
-<h2 mat-dialog-title>Condition d’affichage de {{ donnees.nomCible }}</h2>
+<h2 mat-dialog-title>{{ 'editeur.condition.titre' | transloco: { cible: donnees.nomCible } }}</h2>
 
 <form (submit)="$event.preventDefault(); valider()" novalidate>
   <mat-dialog-content>
 
     @if (sources.length === 0) {
       <p class="texte-aide" role="status">
-        Aucune question enregistrée n’est placée avant {{ donnees.nomCible }} : une condition ne peut dépendre que
-        d’une question qui la précède.
+        {{ 'editeur.condition.aucuneSource' | transloco: { cible: donnees.nomCible } }}
       </p>
     } @else {
       <p class="texte-aide">
-        {{ donnees.cible.type === 'section' ? 'Cette section' : 'Cette question' }} ne sera affichée qu’aux répondants dont les réponses vérifient ces règles.
-        Seules les questions placées avant sont proposées.
+        {{ (donnees.cible.type === 'section' ? 'editeur.condition.aideSection' : 'editeur.condition.aideQuestion') | transloco }}
       </p>
 
       @if (regles.length > 1) {
-        <mat-radio-group class="combinaison" [formControl]="combinaison" aria-label="Combinaison des règles">
-          <mat-radio-button value="ET">Toutes les règles (ET)</mat-radio-button>
-          <mat-radio-button value="OU">Au moins une règle (OU)</mat-radio-button>
+        <mat-radio-group class="combinaison" [formControl]="combinaison" [attr.aria-label]="'editeur.condition.combinaison' | transloco">
+          <mat-radio-button value="ET">{{ 'editeur.condition.et' | transloco }}</mat-radio-button>
+          <mat-radio-button value="OU">{{ 'editeur.condition.ou' | transloco }}</mat-radio-button>
         </mat-radio-group>
       }
 
       @for (groupe of regles.controls; track groupe; let i = $index) {
         <fieldset class="regle" [formGroup]="groupe">
           <legend>
-            {{ i === 0 ? 'Afficher si' : combinaison.value === 'OU' ? 'ou si' : 'et si' }}
-            <span class="visuellement-cache">(règle {{ i + 1 }})</span>
+            {{ (i === 0 ? 'editeur.condition.afficherSi' : combinaison.value === 'OU' ? 'editeur.condition.ouSi' : 'editeur.condition.etSi') | transloco }}
+            <span class="visuellement-cache">{{ 'editeur.condition.regleN' | transloco: { n: i + 1 } }}</span>
           </legend>
           <div class="champs">
-            <mat-form-field class="champ-source">
-              <mat-label>Question</mat-label>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-source">
+              <mat-label>{{ 'statistiques.croise.question' | transloco }}</mat-label>
               <mat-select [id]="'source-regle-' + i" formControlName="questionId">
                 @for (g of groupes; track g.titre) {
                   <mat-optgroup [label]="g.titre">
                     @for (s of g.sources; track s.question.id) {
-                      <mat-option [value]="s.question.id">{{ s.numero }}. {{ s.question.libelle || '(sans libellé)' }}</mat-option>
+                      <mat-option [value]="s.question.id">{{ s.numero }}. <span dir="auto">{{ s.question.libelle || ('editeur.condition.sansLibelle' | transloco) }}</span></mat-option>
                     }
                   </mat-optgroup>
                 }
@@ -42,8 +40,8 @@
             </mat-form-field>
 
             @if (source(groupe); as src) {
-              <mat-form-field class="champ-operateur">
-                <mat-label>Condition</mat-label>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-operateur">
+                <mat-label>{{ 'editeur.condition.condition' | transloco }}</mat-label>
                 <mat-select formControlName="operateur">
                   @for (op of operateurs(groupe); track op) {
                     <mat-option [value]="op">{{ libelleOperateur(op, src.type) }}</mat-option>
@@ -53,63 +51,63 @@
 
               @switch (genre(groupe)) {
                 @case ('option') {
-                  <mat-form-field class="champ-valeur">
-                    <mat-label>Option</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+                    <mat-label>{{ 'statistiques.carte.option' | transloco }}</mat-label>
                     <mat-select formControlName="valeur">
                       @for (o of src.options; track o.id) {
-                        <mat-option [value]="o.valeur">{{ o.libelle }}</mat-option>
+                        <mat-option [value]="o.valeur" dir="auto">{{ o.libelle }}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                 }
                 @case ('options') {
-                  <mat-form-field class="champ-valeur">
-                    <mat-label>Options</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+                    <mat-label>{{ 'editeur.condition.options' | transloco }}</mat-label>
                     <mat-select formControlName="valeurs" multiple>
                       @for (o of src.options; track o.id) {
-                        <mat-option [value]="o.valeur">{{ o.libelle }}</mat-option>
+                        <mat-option [value]="o.valeur" dir="auto">{{ o.libelle }}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                 }
                 @case ('booleen') {
-                  <mat-form-field class="champ-valeur">
-                    <mat-label>Réponse</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+                    <mat-label>{{ 'statistiques.graphique.reponse' | transloco }}</mat-label>
                     <mat-select formControlName="valeur">
-                      <mat-option [value]="true">Oui</mat-option>
-                      <mat-option [value]="false">Non</mat-option>
+                      <mat-option [value]="true">{{ 'public.champs.oui' | transloco }}</mat-option>
+                      <mat-option [value]="false">{{ 'public.champs.non' | transloco }}</mat-option>
                     </mat-select>
                   </mat-form-field>
                 }
                 @case ('nombre') {
-                  <mat-form-field class="champ-valeur">
-                    <mat-label>Valeur</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+                    <mat-label>{{ 'statistiques.graphique.valeur' | transloco }}</mat-label>
                     <input matInput type="number" formControlName="valeur" />
                   </mat-form-field>
                 }
                 @case ('date') {
-                  <mat-form-field class="champ-valeur">
-                    <mat-label>Date</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+                    <mat-label>{{ 'abonnement.mon.date' | transloco }}</mat-label>
                     <input matInput type="date" formControlName="valeur" />
                   </mat-form-field>
                 }
                 @case ('intervalle-nombre') {
-                  <mat-form-field class="champ-borne">
-                    <mat-label>De</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
+                    <mat-label>{{ 'editeur.condition.de' | transloco }}</mat-label>
                     <input matInput type="number" formControlName="min" />
                   </mat-form-field>
-                  <mat-form-field class="champ-borne">
-                    <mat-label>À (compris)</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
+                    <mat-label>{{ 'editeur.condition.aCompris' | transloco }}</mat-label>
                     <input matInput type="number" formControlName="max" />
                   </mat-form-field>
                 }
                 @case ('intervalle-date') {
-                  <mat-form-field class="champ-borne">
-                    <mat-label>Du</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
+                    <mat-label>{{ 'statistiques.filtres.du' | transloco }}</mat-label>
                     <input matInput type="date" formControlName="min" />
                   </mat-form-field>
-                  <mat-form-field class="champ-borne">
-                    <mat-label>Au (compris)</mat-label>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
+                    <mat-label>{{ 'editeur.condition.auCompris' | transloco }}</mat-label>
                     <input matInput type="date" formControlName="max" />
                   </mat-form-field>
                 }
@@ -117,7 +115,7 @@
             }
 
             @if (regles.length > 1) {
-              <button matIconButton type="button" class="retirer" (click)="retirerRegle(i)" [attr.aria-label]="'Retirer la règle ' + (i + 1)">
+              <button matIconButton type="button" class="retirer" (click)="retirerRegle(i)" [attr.aria-label]="'editeur.condition.retirerRegle' | transloco: { n: i + 1 }">
                 <mat-icon fontIcon="delete" aria-hidden="true" />
               </button>
             }
@@ -130,10 +128,10 @@
 
       @if (regles.length < maxRegles) {
         <button matButton type="button" (click)="ajouterRegle()">
-          <mat-icon fontIcon="add" aria-hidden="true" />Ajouter une règle
+          <mat-icon fontIcon="add" aria-hidden="true" />{{ 'editeur.condition.ajouterRegle' | transloco }}
         </button>
       } @else {
-        <p class="texte-aide">{{ maxRegles }} règles au plus.</p>
+        <p class="texte-aide">{{ 'editeur.condition.reglesMax' | transloco: { max: maxRegles } }}</p>
       }
     }
   </mat-dialog-content>
@@ -143,7 +141,7 @@
       <div class="erreur-enregistrement" role="alert" tabindex="-1">
         <mat-icon fontIcon="error" aria-hidden="true" />
         <div>
-          <p class="titre-erreur">La condition n’a pas été enregistrée</p>
+          <p class="titre-erreur">{{ 'editeur.condition.nonEnregistree' | transloco }}</p>
           <p>{{ e.message }}</p>
           @if (e.detail) {
             <p class="detail-erreur">{{ e.detail }}</p>
@@ -153,17 +151,17 @@
     }
     @if (sources.length && modifiee() && !enCours()) {
       <p class="non-enregistree" role="status">
-        <mat-icon fontIcon="edit_note" aria-hidden="true" />Pas encore enregistrée
+        <mat-icon fontIcon="edit_note" aria-hidden="true" />{{ 'editeur.condition.pasEncore' | transloco }}
       </p>
     }
     <span class="espace"></span>
-    <button matButton type="button" (click)="fermer()" [disabled]="enCours()">Annuler</button>
+    <button matButton type="button" (click)="fermer()" [disabled]="enCours()">{{ 'commun.annuler' | transloco }}</button>
     @if (sources.length) {
       <button matButton="filled" type="submit" class="bouton-principal enregistrer" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Enregistrement de la condition" />
+          <mat-spinner diameter="20" [attr.aria-label]="'editeur.condition.enregistrement' | transloco" />
         } @else {
-          <ng-container><mat-icon fontIcon="check" aria-hidden="true" />Enregistrer la condition</ng-container>
+          <ng-container><mat-icon fontIcon="check" aria-hidden="true" />{{ 'editeur.condition.enregistrer' | transloco }}</ng-container>
         }
       </button>
     }

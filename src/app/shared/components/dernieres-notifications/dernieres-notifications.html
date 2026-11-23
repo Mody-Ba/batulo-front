@@ -1,17 +1,17 @@
 <div class="entete-section">
-  <h2>Dernières notifications</h2>
-  <a matButton routerLink="/notifications">Tout voir</a>
+  <h2>{{ 'notifications.dernieres' | transloco }}</h2>
+  <a matButton routerLink="/notifications">{{ 'commun.toutVoir' | transloco }}</a>
 </div>
 <div class="zone-progression">
   @if (chargement()) {
-    <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'notifications.chargement' | transloco" />
   }
 </div>
-<app-message-erreur [erreur]="erreur()" parDefaut="Les notifications n’ont pas pu être chargées.">
-  <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+<app-message-erreur [erreur]="erreur()" [parDefaut]="'notifications.erreurChargement' | transloco">
+  <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
 </app-message-erreur>
 @if (!chargement() && !erreur() && notifications().length === 0) {
-  <p class="etat-vide">Aucune notification.</p>
+  <p class="etat-vide">{{ 'notifications.aucune' | transloco }}</p>
 }
 <ul class="liste-notifications">
   @for (n of notifications(); track n.id) {
@@ -20,12 +20,12 @@
       <div>
         <p class="titre-notification">
           @if (!n.lue) {
-            <span class="visuellement-cache">Non lue : </span>
+            <span class="visuellement-cache">{{ 'notifications.nonLuePrefixe' | transloco }}</span>
           }
           {{ n.titre }}
         </p>
         <p class="cellule-secondaire">{{ n.message }}</p>
-        <p class="cellule-secondaire">{{ n.dateCreation | date: 'd MMM, HH:mm' }}</p>
+        <p class="cellule-secondaire">{{ n.dateCreation | dateL: 'jourHeure' }}</p>
       </div>
     </li>
   }

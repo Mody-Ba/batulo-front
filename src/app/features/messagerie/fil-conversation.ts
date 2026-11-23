@@ -27,13 +27,15 @@ import {
   MessageInterneResponse,
   nomInterlocuteur,
 } from '../../core/models/messagerie.model';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../core/services/auth.service';
 import { MessagerieService } from '../../core/services/messagerie.service';
 import { aLeCode } from '../../core/utils/erreur-http';
 import { interrogationPeriodique } from '../../core/utils/interrogation';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { EtatMessagerie } from './etat-messagerie';
 import { MessageConversation } from './message-conversation';
+import { traduire } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Relecture des derniers messages du fil ouvert. */
 export const INTERVALLE_FIL_MS = 10_000;
@@ -47,8 +49,7 @@ export const TAILLE_FIL = 30;
  */
 @Component({
   selector: 'app-fil-conversation',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
     MatFormFieldModule,
@@ -77,7 +78,7 @@ export class FilConversation {
   );
   protected readonly titre = computed(() => {
     const c = this.conversation();
-    return c ? nomInterlocuteur(c.interlocuteur) : 'Conversation';
+    return c ? nomInterlocuteur(c.interlocuteur) : traduire('messagerie.conversation');
   });
 
   protected readonly messages = signal<MessageInterneResponse[]>([]);
@@ -100,7 +101,7 @@ export class FilConversation {
     const batulo = c !== null && estConversationBatulo(c);
     return !batulo && (this.refusServeur() || this.auth.lectureSeule());
   });
-  protected readonly messageLectureSeule = `${MESSAGE_LECTURE_SEULE} Vous pouvez toujours écrire à Batulo.`;
+  protected readonly messageLectureSeule = (): string => `${messageLectureSeule()} ${traduire('messagerie.ecrireBatuloToujours')}`;
 
   private readonly zone = viewChild<ElementRef<HTMLElement>>('zone');
 

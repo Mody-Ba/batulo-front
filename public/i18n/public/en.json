@@ -1,0 +1,157 @@
+{
+  "public": {
+    "erreurs": {
+      "injoignable": "The Batulo server cannot be reached. Check your connection and try again.",
+      "inattendue": "An unexpected error occurred. Please try again.",
+      "serveur": "The server ran into a problem. Try again in a moment.",
+      "validation": "Some information is invalid:",
+      "detailChamp": "{{champ}}: {{message}}"
+    },
+    "erreursApi": {
+      "SONDAGE_INTROUVABLE": "This survey cannot be found.",
+      "SONDAGE_FERME": "This survey no longer accepts responses.",
+      "SONDAGE_NON_OUVERT": "This survey is not open yet.",
+      "DEJA_REPONDU": "You have already answered this survey from this device.",
+      "REPONSES_INVALIDES": "Some answers need to be corrected.",
+      "CONSENTEMENT_REQUIS": "Tick the consent box to send your answers.",
+      "JETON_REPONDANT_INVALIDE": "This survey accepts only one response per device: reload the page and try again.",
+      "TROP_DE_REQUETES": "Too many requests in a short time. Wait a moment and try again.",
+      "INTROUVABLE": "This address does not exist.",
+      "ERREUR_INTERNE": "An unexpected error occurred.",
+      "REQUETE_INVALIDE": "The request is missing or malformed."
+    },
+    "commun": {
+      "allerAuContenu": "Skip to content"
+    },
+    "langue": {
+      "libelle": "Language"
+    },
+    "etat": {
+      "chargement": "Loading the survey…",
+      "nonOuvert": "It does not accept responses yet.",
+      "revenir": "Come back once it opens, using the same link.",
+      "ferme": "It no longer accepts responses. Thank you for your interest.",
+      "dejaRepondu": "Your answers have already been sent from this device. This survey accepts only one response per device.",
+      "introuvable": "This link does not match any survey. Check that it is complete, or ask the person who sent it to you again.",
+      "tropDeRequetes": "Too many requests from your connection.",
+      "injoignable": "The survey could not be loaded. Check your Internet connection."
+    },
+    "fermeLe": "This survey closes on {{date}}.",
+    "brouillon": {
+      "repris": "Your answers in progress have been restored.",
+      "effacer": "Clear everything and start over"
+    },
+    "confirmation": {
+      "merci": "Thank you!",
+      "message": "Thank you, your response has been recorded.",
+      "envoyeLe": "Sent on {{date}}.",
+      "nouvelle": "New response",
+      "collecte": "Field collection: the form starts empty again for the next person.",
+      "fermer": "You can close this page."
+    },
+    "reessayer": "Try again",
+    "pied": "Survey made with Batulo",
+    "titresIndisponible": {
+      "non-ouvert": "This survey is not open yet",
+      "ferme": "This survey is closed",
+      "deja-repondu": "You have already answered",
+      "introuvable": "Link not found",
+      "trop-de-requetes": "Too many requests",
+      "injoignable": "Cannot connect",
+      "inattendu": "The survey cannot be displayed"
+    },
+    "titres": {
+      "sondage": "{{titre}} · Batulo",
+      "repondre": "Answer the survey · Batulo"
+    },
+    "envoi": {
+      "injoignable": "Your answers could not be sent: check your connection, then try again. They are kept on this device.",
+      "gardees": "Your answers are kept on this device."
+    },
+    "formulaire": {
+      "obligatoire": "Required answer",
+      "aucuneQuestion": "This form has no questions yet.",
+      "sectionSur": "Section {{numero}} of {{total}}",
+      "aCorriger": "Some answers need to be corrected before continuing.",
+      "apercuValide": "Your answers are valid. Nothing was sent: this is a preview.",
+      "precedent": "Previous",
+      "envoiEnCours": "Sending…",
+      "verifier": "Check (preview, nothing is sent)",
+      "envoyer": "Send my answers",
+      "suivant": "Next",
+      "noteApercu": "Preview: you can answer to try out the form; nothing is saved.",
+      "recommencer": "Start over"
+    },
+    "accueil": {
+      "objet": "Purpose of the survey",
+      "confidentialite": "Confidentiality of responses",
+      "consentement": "Consent",
+      "accepte": "I agree to take part in this survey.",
+      "reprendre": "Resume the questionnaire",
+      "sectionSur": "(section {{numero}} of {{total}})",
+      "recommencer": "Start from scratch",
+      "commencer": "Start the questionnaire",
+      "cochez": "Tick the consent box to start.",
+      "gardees": "Your answers in progress are kept on this device. “Start from scratch” clears them.",
+      "apercu": "Preview of the welcome page: nothing is saved."
+    },
+    "reponses": {
+      "obligatoire": "This question is required.",
+      "longueurMax": {
+        "one": "{{n}} character at most.",
+        "other": "{{n}} characters at most."
+      },
+      "nombre": "The answer must be a number.",
+      "entier": "The answer must be a whole number.",
+      "decimales": {
+        "one": "{{n}} decimal place at most.",
+        "other": "{{n}} decimal places at most."
+      },
+      "entre": "The value must be between {{min}} and {{max}}.",
+      "auMoins": "The value must be at least {{min}}.",
+      "auPlus": "The value must be at most {{max}}.",
+      "dateMin": "The date must be {{date}} or later.",
+      "dateMax": "The date must be {{date}} or earlier.",
+      "matrice": "Choose an answer for each row."
+    },
+    "annonce": {
+      "uneApparue": "New question shown: “{{libelle}}”.",
+      "apparues": {
+        "one": "{{n}} new question shown.",
+        "other": "{{n}} new questions shown."
+      },
+      "uneMasquee": "One question is no longer shown.",
+      "masquees": {
+        "one": "{{n}} question is no longer shown.",
+        "other": "{{n}} questions are no longer shown."
+      }
+    },
+    "question": {
+      "obligatoire": "(required)"
+    },
+    "champs": {
+      "oui": "Yes",
+      "non": "No",
+      "monter": "Move “{{libelle}}” up (position {{position}})",
+      "descendre": "Move “{{libelle}}” down (position {{position}})",
+      "garderOrdre": "Keep this order",
+      "deplace": "“{{libelle}}” is now in position {{position}} of {{total}}.",
+      "classementGarde": "Ranking saved in your answers.",
+      "deA": "From {{min}} to {{max}}",
+      "auMoins": "At least {{min}}",
+      "auPlus": "At most {{max}}",
+      "decimales": {
+        "one": "{{n}} decimal place at most",
+        "other": "{{n}} decimal places at most"
+      },
+      "entier": "Whole number",
+      "duAu": "From {{du}} to {{au}}",
+      "aPartirDu": "From {{date}}",
+      "jusquau": "Until {{date}}",
+      "compteur": "{{longueur}} / {{max}} characters"
+    },
+    "apparence": {
+      "logo": "Organization logo"
+    }
+  }
+}

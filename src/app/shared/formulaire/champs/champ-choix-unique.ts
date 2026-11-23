@@ -11,7 +11,7 @@ import { ChampBase } from './champ-base';
       @for (option of question().options; track option.id) {
         <label class="choix">
           <input type="radio" [name]="idBase()" [attr.name]="idBase()" [value]="option.valeur" [formControl]="$any(controle())" />
-          <span>{{ option.libelle }}</span>
+          <span dir="auto">{{ option.libelle }}</span>
         </label>
       }
     </div>

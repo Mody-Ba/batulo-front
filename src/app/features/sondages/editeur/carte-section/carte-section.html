@@ -7,13 +7,13 @@
           type="button"
           class="poignee"
           cdkDragHandle
-          [attr.aria-label]="'Déplacer la section ' + (position() + 1) + ' (glisser, ou menu Monter / Descendre)'"
+          [attr.aria-label]="'editeur.section.deplacer' | transloco: { numero: position() + 1 }"
         >
           <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
         </button>
       }
       <h2 class="rang-section" [id]="'titre-section-' + section().id">
-        Section {{ position() + 1 }} sur {{ nombreSections() }}
+        {{ 'public.formulaire.sectionSur' | transloco: { numero: position() + 1, total: nombreSections() } }}
       </h2>
       <span class="espace"></span>
       <app-etat-enregistrement [etat]="auto.etat()" (reessayer)="auto.maintenant()" />
@@ -22,21 +22,21 @@
         type="button"
         [matMenuTriggerFor]="menu"
         [disabled]="!store.modifiable()"
-        [attr.aria-label]="'Actions de la section ' + (position() + 1)"
+        [attr.aria-label]="'editeur.section.actions' | transloco: { numero: position() + 1 }"
       >
         <mat-icon fontIcon="more_vert" aria-hidden="true" />
       </button>
     </div>
 
-    <mat-form-field class="champ-titre">
-      <mat-label>Titre de la section</mat-label>
-      <input matInput formControlName="titre" [maxlength]="regles.titreSectionMax" autocomplete="off" required />
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-titre">
+      <mat-label>{{ 'editeur.section.titre' | transloco }}</mat-label>
+      <input matInput formControlName="titre" [maxlength]="regles.titreSectionMax" autocomplete="off" required dir="auto" />
       @if (formulaire.controls.titre.hasError('required')) {
-        <mat-error>Le titre de la section est obligatoire.</mat-error>
+        <mat-error>{{ 'editeur.section.titreObligatoire' | transloco }}</mat-error>
       }
     </mat-form-field>
-    <mat-form-field class="champ-description">
-      <mat-label>Description (facultative)</mat-label>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-description">
+      <mat-label>{{ 'sondages.creation.description' | transloco }}</mat-label>
       <textarea
         matInput
         formControlName="description"
@@ -58,16 +58,16 @@
     @if (peutAjouterCondition()) {
       <div class="ligne-condition">
         <button matButton="tonal" type="button" class="ajouter-condition" (click)="editerCondition()">
-          <mat-icon fontIcon="alt_route" aria-hidden="true" />Ajouter une condition à la section
+          <mat-icon fontIcon="alt_route" aria-hidden="true" />{{ 'editeur.section.ajouterCondition' | transloco }}
         </button>
       </div>
     }
-    <app-message-erreur [erreur]="auto.erreur()" parDefaut="La section n’a pas pu être enregistrée." />
-    <app-message-erreur [erreur]="erreurAction()" titre="Action refusée" parDefaut="Cette action n’a pas pu être faite." />
+    <app-message-erreur [erreur]="auto.erreur()" [parDefaut]="'editeur.section.erreur' | transloco" />
+    <app-message-erreur [erreur]="erreurAction()" [titre]="'editeur.actionRefusee' | transloco" [parDefaut]="'editeur.actionImpossible' | transloco" />
   </div>
 
   @if (elements().length === 0) {
-    <p class="etat-vide">Aucune question dans cette section.</p>
+    <p class="etat-vide">{{ 'editeur.section.aucuneQuestion' | transloco }}</p>
   }
 
   <div
@@ -100,17 +100,17 @@
   @if (store.modifiable()) {
     <div class="actions-section">
       <button matButton="tonal" type="button" (click)="ajouterQuestion()" [disabled]="limiteAtteinte()">
-        <mat-icon fontIcon="add_circle" aria-hidden="true" />Ajouter une question
+        <mat-icon fontIcon="add_circle" aria-hidden="true" />{{ 'editeur.section.ajouterQuestion' | transloco }}
       </button>
       @if (limiteAtteinte()) {
-        <span class="texte-aide">{{ regles.questionsMaxParSection }} questions au plus par section.</span>
+        <span class="texte-aide">{{ 'editeur.section.questionsMax' | transloco: { max: regles.questionsMaxParSection } }}</span>
       }
     </div>
   }
 
   <mat-menu #menu="matMenu" xPosition="before">
     <button mat-menu-item type="button" (click)="deplacerSection(position() - 1)" [disabled]="position() === 0">
-      <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>Monter la section</span>
+      <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>{{ 'editeur.section.monter' | transloco }}</span>
     </button>
     <button
       mat-menu-item
@@ -118,16 +118,16 @@
       (click)="deplacerSection(position() + 1)"
       [disabled]="position() >= nombreSections() - 1"
     >
-      <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre la section</span>
+      <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>{{ 'editeur.section.descendre' | transloco }}</span>
     </button>
     @if (peutAjouterCondition() || section().condition) {
       <button mat-menu-item type="button" (click)="editerCondition()">
         <mat-icon fontIcon="alt_route" aria-hidden="true" />
-        <span>{{ section().condition ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
+        <span>{{ (section().condition ? 'editeur.condition.modifierMenu' : 'editeur.condition.ajouterMenu') | transloco }}</span>
       </button>
     }
     <button mat-menu-item type="button" class="action-danger" (click)="supprimer()">
-      <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la section</span>
+      <mat-icon fontIcon="delete" aria-hidden="true" /><span>{{ 'editeur.section.supprimer' | transloco }}</span>
     </button>
   </mat-menu>
 </section>

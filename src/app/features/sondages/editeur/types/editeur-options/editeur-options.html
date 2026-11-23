@@ -4,7 +4,7 @@
   [cdkDropListDisabled]="options().disabled"
   (cdkDropListDropped)="deposer($event)"
   role="list"
-  aria-label="Options"
+  [attr.aria-label]="'editeur.condition.options' | transloco"
 >
   @for (option of options().controls; track option; let i = $index) {
     <div class="option" cdkDrag cdkDragLockAxis="y" role="listitem" [formGroup]="option">
@@ -14,7 +14,7 @@
         class="poignee"
         cdkDragHandle
         [disabled]="options().disabled"
-        [attr.aria-label]="'Déplacer l’option ' + (i + 1) + ' (ou Alt + flèches)'"
+        [attr.aria-label]="'editeur.options.deplacer' | transloco: { n: i + 1 }"
         (keydown.alt.arrowup)="$event.preventDefault(); deplacer(i, i - 1)"
         (keydown.alt.arrowdown)="$event.preventDefault(); deplacer(i, i + 1)"
       >
@@ -25,26 +25,27 @@
       } @else {
         <mat-icon class="marqueur" [fontIcon]="icones[marqueur() === 'case' ? 'case' : 'rond']" aria-hidden="true" />
       }
-      <mat-form-field class="champ-libelle">
-        <mat-label>Option {{ i + 1 }}</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-libelle">
+        <mat-label>{{ 'editeur.options.option' | transloco: { n: i + 1 } }}</mat-label>
         <input
           #champLibelle
           matInput
+          dir="auto"
           formControlName="libelle"
           [maxlength]="regles.libelleOptionMax"
           autocomplete="off"
           (keydown.enter)="entree($event, i)"
         />
         @if (option.controls.libelle.hasError('required')) {
-          <mat-error>Le libellé est obligatoire.</mat-error>
+          <mat-error>{{ 'editeur.options.libelleObligatoire' | transloco }}</mat-error>
         }
       </mat-form-field>
       @if (afficherValeurs()) {
-        <mat-form-field class="champ-valeur">
-          <mat-label>Valeur</mat-label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
+          <mat-label>{{ 'statistiques.graphique.valeur' | transloco }}</mat-label>
           <input matInput formControlName="valeur" [maxlength]="regles.valeurOptionMax" autocomplete="off" spellcheck="false" />
           @if (!option.controls.id.value && !option.controls.valeur.value) {
-            <mat-hint>Générée depuis le libellé</mat-hint>
+            <mat-hint>{{ 'editeur.options.generee' | transloco }}</mat-hint>
           }
         </mat-form-field>
       }
@@ -53,7 +54,7 @@
         type="button"
         (click)="supprimer(i)"
         [disabled]="options().disabled"
-        [attr.aria-label]="'Supprimer l’option ' + (i + 1)"
+        [attr.aria-label]="'editeur.options.supprimer' | transloco: { n: i + 1 }"
       >
         <mat-icon fontIcon="close" aria-hidden="true" />
       </button>
@@ -67,9 +68,9 @@
 
 <div class="actions-liste">
   <button matButton type="button" (click)="ajouter()" [disabled]="options().disabled">
-    <mat-icon fontIcon="add" aria-hidden="true" />Ajouter une option
+    <mat-icon fontIcon="add" aria-hidden="true" />{{ 'editeur.options.ajouter' | transloco }}
   </button>
   <mat-slide-toggle [checked]="afficherValeurs()" (change)="afficherValeurs.set($event.checked)">
-    Valeurs pour les statistiques
+    {{ 'editeur.options.valeurs' | transloco }}
   </mat-slide-toggle>
 </div>

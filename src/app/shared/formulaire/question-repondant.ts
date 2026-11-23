@@ -15,6 +15,7 @@ import { ChampOuiNon } from './champs/champ-oui-non';
 import { ChampTexteCourt } from './champs/champ-texte-court';
 import { ChampTexteLong } from './champs/champ-texte-long';
 import { messageReponse, ValeurReponse } from './reponses';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Types à un seul champ de saisie : libellé <label for>. Les autres sont des groupes : <fieldset> et <legend>. */
 const TYPES_SAISIE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>(['TEXTE_COURT', 'TEXTE_LONG', 'NUMERIQUE', 'DATE']);
@@ -26,8 +27,7 @@ const TYPES_SAISIE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>(['TEXTE_CO
  */
 @Component({
   selector: 'app-question-repondant',
-  imports: [
-    NgTemplateOutlet,
+  imports: [TranslocoPipe, NgTemplateOutlet,
     ChampChoixUnique,
     ChampChoixMultiple,
     ChampOuiNon,
@@ -41,16 +41,16 @@ const TYPES_SAISIE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>(['TEXTE_CO
   ],
   template: `
     <ng-template #libelle>
-      <span class="numero">{{ numero() }}.</span> {{ question().libelle }}
+      <span class="numero">{{ numero() }}. </span><span dir="auto">{{ question().libelle }}</span>
       @if (question().obligatoire) {
         <span class="obligatoire" aria-hidden="true">*</span>
-        <span class="visuellement-cache">(obligatoire)</span>
+        <span class="visuellement-cache">{{ 'public.question.obligatoire' | transloco }}</span>
       }
     </ng-template>
 
     <ng-template #contenu>
       @if (question().aide) {
-        <p class="aide" [id]="idBase() + '-aide'">{{ question().aide }}</p>
+        <p class="aide" dir="auto" [id]="idBase() + '-aide'">{{ question().aide }}</p>
       }
       @switch (question().type) {
         @case ('CHOIX_UNIQUE') {
@@ -119,6 +119,10 @@ const TYPES_SAISIE: ReadonlySet<TypeQuestion> = new Set<TypeQuestion>(['TEXTE_CO
       &.en-erreur {
         border-color: var(--mat-sys-error);
         box-shadow: inset 4px 0 0 var(--mat-sys-error);
+
+        :host-context([dir='rtl']) & {
+          box-shadow: inset -4px 0 0 var(--mat-sys-error);
+        }
       }
     }
 

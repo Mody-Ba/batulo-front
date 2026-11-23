@@ -1,4 +1,3 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +19,7 @@ import {
   VersionResponse,
 } from '../../../core/models/sondage.model';
 import { AssignationService } from '../../../core/services/assignation.service';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../../core/services/auth.service';
 import { SondageService } from '../../../core/services/sondage.service';
 import { messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
@@ -34,6 +33,11 @@ import {
   DialogueAssignerGestionnaires,
   DonneesAssignerGestionnaires,
 } from '../dialogue-assigner-gestionnaires/dialogue-assigner-gestionnaires';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { NombreLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Fiche d'un sondage : informations, collecte, versions et, pour l'admin, les gestionnaires assignés (assigner,
@@ -41,9 +45,7 @@ import {
  */
 @Component({
   selector: 'app-detail-sondage',
-  imports: [
-    DatePipe,
-    DecimalPipe,
+  imports: [PlurielPipe, TranslocoPipe, NombreLPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -64,7 +66,7 @@ export class DetailSondage {
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
-  protected readonly messageLectureSeule = MESSAGE_LECTURE_SEULE;
+  protected readonly messageLectureSeule = messageLectureSeule;
   protected readonly nomComplet = nomComplet;
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
@@ -215,15 +217,15 @@ export class DetailSondage {
       .pipe(filter((liste): liste is AssignationResponse[] => !!liste))
       .subscribe((liste) => {
         this.assignations.set(liste);
-        this.snackBar.open('Assignations enregistrées.', 'Fermer', { duration: 5000 });
+        this.snackBar.open(traduire('gestionnaires.detail.assignationsEnregistrees'), traduire('commun.fermer'), { duration: 5000 });
       });
   }
 
   protected retirer(sondage: SondageResponse, assignation: AssignationResponse): void {
     confirmer(this.dialog, {
-      titre: 'Retirer cette assignation ?',
-      message: `${nomComplet(assignation)} ne verra plus « ${sondage.titre} » (toutes ses versions), sauf s’il en a créé une. Il en sera notifié.`,
-      action: 'Retirer',
+      titre: traduire('gestionnaires.detail.retirerTitre'),
+      message: traduire('sondages.fiche.retirerMessage', { nom: nomComplet(assignation), titre: sondage.titre }),
+      action: traduire('commun.retirer'),
       destructive: true,
     })
       .pipe(
@@ -235,9 +237,9 @@ export class DetailSondage {
           this.assignations.update((liste) =>
             liste.filter((a) => a.gestionnaireId !== assignation.gestionnaireId),
           );
-          this.snackBar.open('Assignation retirée.', 'Fermer', { duration: 5000 });
+          this.snackBar.open(traduire('gestionnaires.detail.assignationRetiree'), traduire('commun.fermer'), { duration: 5000 });
         },
-        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 }),
       });
   }
 }

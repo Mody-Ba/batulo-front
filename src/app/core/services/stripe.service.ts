@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import type { Stripe } from '@stripe/stripe-js';
+import type { Stripe, StripeElementLocale } from '@stripe/stripe-js';
+import { langueCourante } from '../i18n/traduire';
+
+/** Langue des champs et des messages de Stripe : celle de l'interface (fr-CA, en, ar). */
+export function localeStripe(): StripeElementLocale {
+  const langue = langueCourante();
+  return langue === 'fr' ? 'fr-CA' : langue;
+}
 
 /**
  * Chargement de Stripe.js. La version « pure » n'injecte le script de js.stripe.com qu'au premier
@@ -14,7 +21,7 @@ export class StripeService {
     let instance = this.instances.get(clePublique);
     if (!instance) {
       instance = import('@stripe/stripe-js/pure').then(({ loadStripe }) =>
-        loadStripe(clePublique, { locale: 'fr-CA' }),
+        loadStripe(clePublique, { locale: localeStripe() }),
       );
       // Échec (réseau, bloqueur) : on pourra réessayer.
       instance.catch(() => this.instances.delete(clePublique));

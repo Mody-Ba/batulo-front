@@ -12,6 +12,7 @@ import { AccueilSondage } from '../../../shared/formulaire/accueil/accueil-sonda
 import { variablesApparence } from '../../../shared/formulaire/apparence/apparence';
 import { BandeauApparence } from '../../../shared/formulaire/apparence/bandeau-apparence';
 import { FormulaireSondage } from '../../../shared/formulaire/formulaire-sondage';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export type Appareil = 'ordinateur' | 'telephone';
 
@@ -23,8 +24,7 @@ export type Appareil = 'ordinateur' | 'telephone';
  */
 @Component({
   selector: 'app-apercu-sondage',
-  imports: [
-    RouterLink,
+  imports: [TranslocoPipe, RouterLink,
     MatButtonModule,
     MatButtonToggleModule,
     MatIconModule,
@@ -38,32 +38,32 @@ export type Appareil = 'ordinateur' | 'telephone';
     <section class="conteneur-page">
       <div class="barre">
         <a matButton [routerLink]="['/sondages', id()]" class="retour">
-          <mat-icon fontIcon="arrow_back" aria-hidden="true" />Fiche du sondage
+          <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'sondages.diffuser.fiche' | transloco }}
         </a>
-        <h1 class="titre-page">Aperçu</h1>
+        <h1 class="titre-page">{{ 'sondages.apercu.titre' | transloco }}</h1>
         <span class="espace"></span>
         <mat-button-toggle-group
-          aria-label="Taille de l’aperçu"
+          [attr.aria-label]="'sondages.apercu.taille' | transloco"
           [value]="appareil()"
           (change)="appareil.set($event.value)"
           [hideSingleSelectionIndicator]="true"
         >
           <mat-button-toggle value="ordinateur">
-            <mat-icon fontIcon="computer" aria-hidden="true" />Ordinateur
+            <mat-icon fontIcon="computer" aria-hidden="true" />{{ 'sondages.apercu.ordinateur' | transloco }}
           </mat-button-toggle>
           <mat-button-toggle value="telephone">
-            <mat-icon fontIcon="smartphone" aria-hidden="true" />Téléphone
+            <mat-icon fontIcon="smartphone" aria-hidden="true" />{{ 'sondages.apercu.telephone' | transloco }}
           </mat-button-toggle>
         </mat-button-toggle-group>
       </div>
 
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’aperçu" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.apercu.chargement' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="L’aperçu n’a pas pu être chargé.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.apercu.erreur' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
 
       @if (apercu(); as a) {
@@ -94,13 +94,13 @@ export type Appareil = 'ordinateur' | 'telephone';
       }
 
       .mat-icon {
-        margin-right: var(--bt-espace-1);
+        margin-inline-end: var(--bt-espace-1);
         vertical-align: middle;
       }
     }
 
     .retour {
-      margin-left: calc(-1 * var(--bt-espace-3));
+      margin-inline-start: calc(-1 * var(--bt-espace-3));
     }
 
     .titre-page {

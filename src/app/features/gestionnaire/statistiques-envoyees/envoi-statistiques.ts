@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +9,8 @@ import { StatistiquesService } from '../../../core/services/statistiques.service
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { parametresUrl } from '../../sondages/statistiques/filtres-url';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Gestionnaire : un envoi de statistiques à son admin (GET /api/envois-statistiques/{id}) : sondage, portée et filtres,
@@ -18,39 +19,39 @@ import { parametresUrl } from '../../sondages/statistiques/filtres-url';
  */
 @Component({
   selector: 'app-envoi-statistiques',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <a matButton routerLink="/gestionnaire/statistiques-envoyees" class="retour">
-        <mat-icon fontIcon="arrow_back" aria-hidden="true" />Statistiques envoyées
+        <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.statistiquesEnvoyees' | transloco }}
       </a>
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’envoi" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statsEnvoyees.chargementEnvoi' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Cet envoi n’a pas pu être chargé.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'statsEnvoyees.erreurEnvoi' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
 
       @if (envoi(); as e) {
         <app-entete-page [titre]="e.sondageTitre" icone="outbox" [sousTitre]="resume(e)">
           <a matButton="filled" [routerLink]="['/sondages', e.sondageId, 'statistiques']" [queryParams]="filtres()">
-            <mat-icon fontIcon="insights" aria-hidden="true" />Voir ces statistiques
+            <mat-icon fontIcon="insights" aria-hidden="true" />{{ 'statsEnvoyees.voir' | transloco }}
           </a>
         </app-entete-page>
         <div class="carte-section envoi">
-          <p>Envoyées à votre admin le <strong>{{ e.dateEnvoi | date: 'd MMMM y à HH:mm' }}</strong>.</p>
+          <p>{{ 'statsEnvoyees.envoyeesLe' | transloco: { date: (e.dateEnvoi | dateL: 'longHeure') } }}</p>
           <p role="status">
             @if (e.consulteLe) {
-              Consultées par votre admin le {{ e.consulteLe | date: 'd MMMM y à HH:mm' }}.
+              {{ 'statsEnvoyees.consulteesLe' | transloco: { date: (e.consulteLe | dateL: 'longHeure') } }}
             } @else {
-              Pas encore consultées par votre admin.
+              {{ 'statsEnvoyees.pasConsultees' | transloco }}
             }
           </p>
           @if (e.commentaire) {
-            <p class="libelle">Votre commentaire</p>
-            <blockquote>{{ e.commentaire }}</blockquote>
+            <p class="libelle">{{ 'statsEnvoyees.votreCommentaire' | transloco }}</p>
+            <blockquote dir="auto">{{ e.commentaire }}</blockquote>
           }
         </div>
       }
@@ -77,8 +78,8 @@ import { parametresUrl } from '../../sondages/statistiques/filtres-url';
 
       blockquote {
         margin: 0;
-        padding-left: var(--bt-espace-3);
-        border-left: 3px solid var(--mat-sys-outline-variant);
+        padding-inline-start: var(--bt-espace-3);
+        border-inline-start: 3px solid var(--mat-sys-outline-variant);
         white-space: pre-line;
         overflow-wrap: anywhere;
       }

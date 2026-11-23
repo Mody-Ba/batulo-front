@@ -1,6 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { variablesApparence } from '../../shared/formulaire/apparence/apparence';
 import { BandeauApparence } from '../../shared/formulaire/apparence/bandeau-apparence';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Aperçu en direct de l'en-tête du formulaire public : bandeau (logo et nom), bord du titre, barre de progression,
@@ -9,26 +10,29 @@ import { BandeauApparence } from '../../shared/formulaire/apparence/bandeau-appa
  */
 @Component({
   selector: 'app-apercu-apparence',
-  imports: [BandeauApparence],
+  imports: [TranslocoPipe, BandeauApparence],
   template: `
     <figure class="apercu-apparence" [style]="variables()">
       <div class="cadre-apercu">
         <app-bandeau-apparence [apparence]="{ nomAffiche: nom(), logoUrl: logoUrl() }" />
         <div class="entete-exemple" aria-hidden="true">
-          <p class="titre-exemple">Titre de votre sondage</p>
-          <p class="texte-exemple">Trois minutes pour nous aider à mieux vous servir.</p>
+          <p class="titre-exemple">{{ 'apparence.apercuExemple.titre' | transloco }}</p>
+          <p class="texte-exemple">{{ 'apparence.apercuExemple.texte' | transloco }}</p>
           <div class="progression-exemple"><span></span></div>
           <div class="choix-exemple">
-            <span class="choisi">Option choisie</span>
-            <span>Autre option</span>
+            <span class="choisi">{{ 'apparence.apercuExemple.choisie' | transloco }}</span>
+            <span>{{ 'apparence.apercuExemple.autre' | transloco }}</span>
           </div>
-          <span class="bouton-exemple">Suivant →</span>
+          <span class="bouton-exemple">{{ 'public.formulaire.suivant' | transloco }} <span class="fleche">→</span></span>
         </div>
       </div>
       <figcaption class="texte-aide">
-        Aperçu : {{ logoUrl() ? 'logo et « ' + nom() + ' » en en-tête' : 'sans logo, pas de bandeau' }} ;
-        boutons, progression et choix
-        {{ variables() ? 'en ' + couleur() + ', texte ' + (couleurTexte() === '#000000' ? 'noir' : 'blanc') : 'aux couleurs Batulo' }}.
+        {{ logoUrl() ? ('apparence.apercuLegende.avecLogo' | transloco: { nom: nom() }) : ('apparence.apercuLegende.sansLogo' | transloco) }}
+        {{
+          variables()
+            ? ('apparence.apercuLegende.couleur' | transloco: { couleur: couleur(), texte: ((couleurTexte() === '#000000' ? 'apparence.apercuLegende.noir' : 'apparence.apercuLegende.blanc') | transloco) })
+            : ('apparence.apercuLegende.batulo' | transloco)
+        }}
       </figcaption>
     </figure>
   `,

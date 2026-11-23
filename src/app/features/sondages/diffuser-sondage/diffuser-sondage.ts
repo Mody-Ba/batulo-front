@@ -16,6 +16,8 @@ import { Encadre } from '../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { PartageMessage } from './partage-message';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Tailles proposées pour le QR code (le backend accepte de 100 à 1000 pixels). */
 export const TAILLES_QR = [300, 600, 1000] as const;
@@ -28,8 +30,7 @@ export const TAILLES_QR = [300, 600, 1000] as const;
  */
 @Component({
   selector: 'app-diffuser-sondage',
-  imports: [
-    RouterLink,
+  imports: [TranslocoPipe, RouterLink,
     MatButtonModule,
     MatButtonToggleModule,
     MatFormFieldModule,
@@ -107,8 +108,8 @@ export class DiffuserSondage {
   protected copier(lien: LienSondageResponse): void {
     const copie = this.clipboard.copy(lien.url);
     this.snackBar.open(
-      copie ? 'Lien copié.' : 'La copie a échoué : sélectionnez le lien et copiez-le.',
-      'Fermer',
+      traduire(copie ? 'sondages.diffuser.copie' : 'sondages.diffuser.copieEchouee'),
+      traduire('commun.fermer'),
       { duration: 4000 },
     );
   }

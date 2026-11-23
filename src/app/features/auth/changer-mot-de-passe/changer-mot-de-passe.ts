@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,6 +17,10 @@ import {
 } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Changement du mot de passe : obligatoire après un mot de passe temporaire (les gardes y
@@ -25,8 +28,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
  */
 @Component({
   selector: 'app-changer-mot-de-passe',
-  imports: [
-    DatePipe,
+  imports: [TranslocoPipe, SelecteurLangue, DateLPipe, 
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,
@@ -77,7 +79,7 @@ export class ChangerMotDePasse {
     this.auth.changerMotDePasse(this.formulaire.getRawValue()).subscribe({
       next: () => {
         this.enCours.set(false);
-        this.snackBar.open('Votre mot de passe a été modifié.', 'Fermer', { duration: 5000 });
+        this.snackBar.open(traduire('auth.changer.modifie'), traduire('commun.fermer'), { duration: 5000 });
         void this.router.navigateByUrl(this.auth.urlAccueil());
       },
       error: (erreur: unknown) => {

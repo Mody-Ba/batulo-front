@@ -17,6 +17,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { messageErreurListe, REGLES_SONDAGE } from '../../../../../core/utils/regles-question';
 import { ControleOption, creerControleOption } from '../formulaires-types';
+import { traduire } from '../../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Marqueur affiché devant chaque option (aperçu de ce que verra le répondant). */
 export type MarqueurOption = 'rond' | 'case' | 'rang';
@@ -33,8 +35,7 @@ const ICONES: Record<Exclude<MarqueurOption, 'rang'>, string> = {
  */
 @Component({
   selector: 'app-editeur-options',
-  imports: [
-    CdkDrag,
+  imports: [TranslocoPipe, CdkDrag,
     CdkDragHandle,
     CdkDropList,
     ReactiveFormsModule,
@@ -61,7 +62,7 @@ export class EditeurOptions {
   private readonly champsLibelle = viewChildren<ElementRef<HTMLInputElement>>('champLibelle');
 
   protected erreurListe(): string | null {
-    return messageErreurListe(this.options(), 'options');
+    return messageErreurListe(this.options(), traduire('editeur.options.elements'));
   }
 
   protected ajouter(apres?: number): void {

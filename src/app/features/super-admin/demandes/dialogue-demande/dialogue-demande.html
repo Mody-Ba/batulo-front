@@ -1,63 +1,62 @@
-<h2 mat-dialog-title>Demande de {{ demande.entreprise }}</h2>
+<h2 mat-dialog-title>{{ 'superAdmin.demande.titre' | transloco: { entreprise: demande.entreprise } }}</h2>
 
 <form [formGroup]="formulaire" (ngSubmit)="enregistrer()" novalidate>
   <mat-dialog-content>
     <dl class="liste-details">
-      <dt>Statut</dt>
+      <dt>{{ 'abonnement.mon.statut' | transloco }}</dt>
       <dd>
         <span class="pastille-statut" [class]="'demande-' + demande.statut">{{ libellesStatut[demande.statut] }}</span>
       </dd>
 
-      <dt>Admin</dt>
+      <dt>{{ 'superAdmin.detail.admin' | transloco }}</dt>
       <dd>
         <a [routerLink]="['/super-admin/admins', demande.adminId]" mat-dialog-close>{{ demande.adminNom }}</a>
-        <span class="cellule-secondaire">{{ demande.adminCourriel }}</span>
+        <span class="cellule-secondaire" dir="ltr">{{ demande.adminCourriel }}</span>
       </dd>
 
-      <dt>Formule souhaitée</dt>
+      <dt>{{ 'demandes.formuleSouhaitee' | transloco }}</dt>
       <dd>{{ libellesFormule[demande.formuleSouhaitee] }}</dd>
 
-      <dt>Formule actuelle</dt>
+      <dt>{{ 'superAdmin.demande.formuleActuelle' | transloco }}</dt>
       <dd>
-        {{ demande.formuleActuelle ? libellesFormule[demande.formuleActuelle] : 'Aucune (jamais payé)' }}
+        {{ demande.formuleActuelle ? libellesFormule[demande.formuleActuelle] : ('superAdmin.detail.aucuneFormule' | transloco) }}
         <span class="pastille-statut" [class]="'statut-' + demande.statutAbonnement">
           {{ libellesStatutAbonnement[demande.statutAbonnement] }}
         </span>
       </dd>
 
-      <dt>Envoyée le</dt>
-      <dd>{{ demande.dateDemande | date: 'd MMMM y à HH:mm' }}</dd>
+      <dt>{{ 'superAdmin.demandes.envoyeeLe' | transloco }}</dt>
+      <dd>{{ demande.dateDemande | dateL: 'longHeure' }}</dd>
     </dl>
 
-    <h3>Message de l’admin</h3>
-    <p class="message">{{ demande.message }}</p>
+    <h3>{{ 'superAdmin.demande.messageAdmin' | transloco }}</h3>
+    <p class="message" dir="auto">{{ demande.message }}</p>
 
     @if (demande.statut !== 'EN_ATTENTE') {
-      <h3>Réponse</h3>
+      <h3>{{ 'demandes.reponse' | transloco }}</h3>
       @if (demande.reponse) {
-        <p class="message">{{ demande.reponse }}</p>
+        <p class="message" dir="auto">{{ demande.reponse }}</p>
       } @else {
-        <p class="texte-aide">Sans message.</p>
+        <p class="texte-aide">{{ 'superAdmin.demande.sansMessage' | transloco }}</p>
       }
       <p class="texte-aide">{{ mentionTraitement }}</p>
     } @else if (!dejaTraitee()) {
-      <h3 id="titre-reponse">Votre réponse</h3>
+      <h3 id="titre-reponse">{{ 'superAdmin.demande.votreReponse' | transloco }}</h3>
       <p class="texte-aide">
-        Accepter n’a aucun effet sur l’abonnement : l’admin choisit et paie lui-même la formule depuis sa page
-        Abonnement. Votre réponse est postée dans sa conversation avec Batulo et l’admin en est notifié.
+        {{ 'superAdmin.demande.aide' | transloco }}
       </p>
 
       <mat-radio-group formControlName="statut" class="decision" aria-labelledby="titre-reponse">
-        <mat-radio-button value="TRAITEE">Accepter</mat-radio-button>
-        <mat-radio-button value="REFUSEE">Refuser</mat-radio-button>
+        <mat-radio-button value="TRAITEE">{{ 'superAdmin.demande.accepter' | transloco }}</mat-radio-button>
+        <mat-radio-button value="REFUSEE">{{ 'superAdmin.demande.refuser' | transloco }}</mat-radio-button>
       </mat-radio-group>
       @if (formulaire.controls.statut.touched && formulaire.controls.statut.hasError('required')) {
-        <p class="erreur-champ" role="alert">Choisissez d’accepter ou de refuser la demande.</p>
+        <p class="erreur-champ" role="alert">{{ 'superAdmin.demande.choisissez' | transloco }}</p>
       }
 
       <div class="formulaire">
-        <mat-form-field>
-          <mat-label>Message à l’admin</mat-label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'superAdmin.demande.messageA' | transloco }}</mat-label>
           <textarea
             matInput
             formControlName="reponse"
@@ -66,12 +65,12 @@
             [required]="messageObligatoire()"
             cdkTextareaAutosize
           ></textarea>
-          <mat-hint>{{ messageObligatoire() ? 'Obligatoire pour un refus' : 'Facultatif' }}</mat-hint>
+          <mat-hint>{{ (messageObligatoire() ? 'superAdmin.demande.obligatoireRefus' : 'commun.facultatif') | transloco }}</mat-hint>
           <mat-hint align="end">{{ formulaire.controls.reponse.value.length }} / {{ longueurMax }}</mat-hint>
           @if (formulaire.controls.reponse.hasError('required')) {
-            <mat-error>Expliquez à l’admin pourquoi sa demande est refusée.</mat-error>
+            <mat-error>{{ 'superAdmin.demande.expliquez' | transloco }}</mat-error>
           } @else if (formulaire.controls.reponse.hasError('maxlength')) {
-            <mat-error>{{ longueurMax }} caractères au plus.</mat-error>
+            <mat-error>{{ 'public.reponses.longueurMax' | pluriel: longueurMax }}</mat-error>
           }
         </mat-form-field>
       </div>
@@ -82,16 +81,16 @@
 
   <mat-dialog-actions align="end">
     @if (demande.statut === 'EN_ATTENTE' && !dejaTraitee()) {
-      <button matButton type="button" (click)="fermer()" [disabled]="enCours()">Annuler</button>
+      <button matButton type="button" (click)="fermer()" [disabled]="enCours()">{{ 'commun.annuler' | transloco }}</button>
       <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Envoi de la réponse" />
+          <mat-spinner diameter="20" [attr.aria-label]="'superAdmin.demande.envoi' | transloco" />
         } @else {
-          Envoyer la réponse
+          {{ 'superAdmin.demande.envoyer' | transloco }}
         }
       </button>
     } @else {
-      <button matButton="filled" type="button" (click)="fermer()" cdkFocusInitial>Fermer</button>
+      <button matButton="filled" type="button" (click)="fermer()" cdkFocusInitial>{{ 'commun.fermer' | transloco }}</button>
     }
   </mat-dialog-actions>
 </form>

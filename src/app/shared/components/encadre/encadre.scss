@@ -6,7 +6,7 @@
   margin: var(--bt-espace-4) 0 0;
   padding: var(--bt-espace-3) var(--bt-espace-4);
   border-radius: var(--bt-rayon);
-  border-left: 4px solid currentColor;
+  border-inline-start: 4px solid currentColor;
   font: var(--mat-sys-body-medium);
 }
 
@@ -51,7 +51,7 @@
 
     ul {
       margin: var(--bt-espace-2) 0 0;
-      padding-left: 1.25rem;
+      padding-inline-start: 1.25rem;
     }
 
     .mat-mdc-button-base {

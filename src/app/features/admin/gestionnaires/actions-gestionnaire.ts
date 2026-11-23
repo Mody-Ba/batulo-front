@@ -10,6 +10,7 @@ import {
   DialogueGestionnaire,
   DonneesDialogueGestionnaire,
 } from './dialogue-gestionnaire/dialogue-gestionnaire';
+import { traduire } from '../../../core/i18n/traduire';
 
 /**
  * Actions sur un gestionnaire, communes à la liste et au détail : confirmation si besoin, appel,
@@ -25,13 +26,13 @@ export class ActionsGestionnaire {
   creer(): Observable<GestionnaireResponse> {
     return this.ouvrirFormulaire({}).pipe(
       tap((g) =>
-        this.informer(`${nomComplet(g)} a été créé. Un mot de passe temporaire a été envoyé à ${g.courriel}.`),
+        this.informer(traduire('gestionnaires.actions.cree', { nom: nomComplet(g), courriel: g.courriel })),
       ),
     );
   }
 
   modifier(gestionnaire: GestionnaireResponse): Observable<GestionnaireResponse> {
-    return this.ouvrirFormulaire({ gestionnaire }).pipe(tap(() => this.informer('Modifications enregistrées.')));
+    return this.ouvrirFormulaire({ gestionnaire }).pipe(tap(() => this.informer(traduire('commun.modificationsEnregistrees'))));
   }
 
   /** Désactiver demande une confirmation ; activer, non. */
@@ -39,33 +40,36 @@ export class ActionsGestionnaire {
     if (!gestionnaire.actif) {
       return this.executer(
         this.service.activer(gestionnaire.id),
-        `${nomComplet(gestionnaire)} est de nouveau actif.`,
+        traduire('gestionnaires.actions.reactive', { nom: nomComplet(gestionnaire) }),
       );
     }
     return confirmer(this.dialog, {
-      titre: 'Désactiver ce gestionnaire ?',
-      message: `${nomComplet(gestionnaire)} ne pourra plus se connecter. Ses sondages et ses assignations sont conservés ; vous pourrez le réactiver.`,
-      action: 'Désactiver',
+      titre: traduire('gestionnaires.actions.desactiverTitre'),
+      message: traduire('gestionnaires.actions.desactiverMessage', { nom: nomComplet(gestionnaire) }),
+      action: traduire('commun.desactiver'),
       destructive: true,
     }).pipe(
       filter(Boolean),
       switchMap(() =>
-        this.executer(this.service.desactiver(gestionnaire.id), `${nomComplet(gestionnaire)} est désactivé.`),
+        this.executer(
+          this.service.desactiver(gestionnaire.id),
+          traduire('gestionnaires.actions.desactive', { nom: nomComplet(gestionnaire) }),
+        ),
       ),
     );
   }
 
   renvoyerMotDePasse(gestionnaire: GestionnaireResponse): Observable<GestionnaireResponse> {
     return confirmer(this.dialog, {
-      titre: 'Renvoyer un mot de passe temporaire ?',
-      message: `Un nouveau mot de passe, valable 24 heures, sera envoyé à ${gestionnaire.courriel}. L’ancien ne fonctionnera plus.`,
-      action: 'Renvoyer',
+      titre: traduire('gestionnaires.actions.renvoyerTitre'),
+      message: traduire('gestionnaires.actions.renvoyerMessage', { courriel: gestionnaire.courriel }),
+      action: traduire('commun.renvoyer'),
     }).pipe(
       filter(Boolean),
       switchMap(() =>
         this.executer(
           this.service.renvoyerMotDePasseTemporaire(gestionnaire.id),
-          `Mot de passe temporaire envoyé à ${gestionnaire.courriel}.`,
+          traduire('gestionnaires.actions.motDePasseEnvoye', { courriel: gestionnaire.courriel }),
         ),
       ),
     );
@@ -74,14 +78,17 @@ export class ActionsGestionnaire {
   /** Émet true une fois supprimé. */
   supprimer(gestionnaire: GestionnaireResponse): Observable<true> {
     return confirmer(this.dialog, {
-      titre: 'Supprimer ce gestionnaire ?',
-      message: `${nomComplet(gestionnaire)} sera supprimé définitivement. Cette action est irréversible. Pour lui couper l’accès sans rien perdre, désactivez-le plutôt.`,
-      action: 'Supprimer',
+      titre: traduire('gestionnaires.actions.supprimerTitre'),
+      message: traduire('gestionnaires.actions.supprimerMessage', { nom: nomComplet(gestionnaire) }),
+      action: traduire('commun.supprimer'),
       destructive: true,
     }).pipe(
       filter(Boolean),
       switchMap(() =>
-        this.executer(this.service.supprimer(gestionnaire.id), `${nomComplet(gestionnaire)} a été supprimé.`),
+        this.executer(
+          this.service.supprimer(gestionnaire.id),
+          traduire('gestionnaires.actions.supprime', { nom: nomComplet(gestionnaire) }),
+        ),
       ),
       map(() => true as const),
     );
@@ -93,8 +100,8 @@ export class ActionsGestionnaire {
       tap(() =>
         this.informer(
           autorise
-            ? `${nomComplet(gestionnaire)} peut maintenant créer des sondages.`
-            : `${nomComplet(gestionnaire)} ne peut plus créer de sondages.`,
+            ? traduire('gestionnaires.actions.permissionDonnee', { nom: nomComplet(gestionnaire) })
+            : traduire('gestionnaires.actions.permissionRetiree', { nom: nomComplet(gestionnaire) }),
         ),
       ),
       catchError((erreur: unknown) => {
@@ -126,6 +133,6 @@ export class ActionsGestionnaire {
   }
 
   private informer(message: string): void {
-    this.snackBar.open(message, 'Fermer', { duration: 6000 });
+    this.snackBar.open(message, traduire('commun.fermer'), { duration: 6000 });
   }
 }

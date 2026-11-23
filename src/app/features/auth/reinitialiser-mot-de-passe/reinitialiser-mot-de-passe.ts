@@ -19,12 +19,14 @@ import {
 } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { texteServeur } from '../../../core/i18n/traduire';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Page du lien reçu par courriel : /reinitialiser-mot-de-passe?jeton=... */
 @Component({
   selector: 'app-reinitialiser-mot-de-passe',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, SelecteurLangue, ReactiveFormsModule,
     RouterLink,
     MatCardModule,
     MatFormFieldModule,
@@ -82,9 +84,9 @@ export class ReinitialiserMotDePasse {
         this.enCours.set(false);
         // Le serveur a fermé toutes les sessions du compte, y compris celle de cet onglet.
         if (this.auth.estConnecte()) {
-          this.auth.terminerSession(reponse.message);
+          this.auth.terminerSession(texteServeur('auth.reinitialiser.reussi', reponse.message));
         } else {
-          this.auth.preparerMessageConnexion(reponse.message);
+          this.auth.preparerMessageConnexion(texteServeur('auth.reinitialiser.reussi', reponse.message));
           void this.router.navigateByUrl('/connexion');
         }
       },

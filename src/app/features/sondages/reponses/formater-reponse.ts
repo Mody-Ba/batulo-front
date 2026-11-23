@@ -5,6 +5,7 @@ import {
   TypeQuestion,
 } from '../../../core/models/sondage.model';
 import { formaterDate } from '../../../shared/formulaire/reponses';
+import { formaterNombre, traduire } from '../../../core/i18n/traduire';
 
 /** Valeur d'une réponse mise en forme : un texte, une liste ordonnée (classement) ou des paires (matrice). */
 export interface ReponseMiseEnForme {
@@ -13,7 +14,6 @@ export interface ReponseMiseEnForme {
   paires?: [string, string][];
 }
 
-const nombres = new Intl.NumberFormat('fr-CA', { maximumFractionDigits: 4 });
 
 /**
  * Met en forme une valeur telle qu'enregistrée (codes d'options, true/false, AAAA-MM-JJ, objet de matrice...) avec
@@ -33,17 +33,17 @@ export function formaterReponse(
     case 'CHOIX_UNIQUE':
       return { texte: libelle(valeur) };
     case 'CHOIX_MULTIPLE':
-      return { texte: (Array.isArray(valeur) ? valeur : [valeur]).map(libelle).join(', ') };
+      return { texte: (Array.isArray(valeur) ? valeur : [valeur]).map(libelle).join(traduire('commun.separateurListe')) };
     case 'CLASSEMENT':
       return { liste: (Array.isArray(valeur) ? valeur : [valeur]).map(libelle) };
     case 'OUI_NON':
-      return { texte: valeur === true || valeur === 'true' ? 'Oui' : 'Non' };
+      return { texte: traduire(valeur === true || valeur === 'true' ? 'public.champs.oui' : 'public.champs.non') };
     case 'ECHELLE': {
       const max = (question?.configuration as Partial<ConfigurationEchelle> | undefined)?.max;
-      return { texte: max ? `${valeur} sur ${max}` : String(valeur) };
+      return { texte: max ? traduire('sondages.reponses.surMax', { valeur, max }) : String(valeur) };
     }
     case 'NUMERIQUE':
-      return { texte: typeof valeur === 'number' ? nombres.format(valeur) : String(valeur) };
+      return { texte: typeof valeur === 'number' ? formaterNombre(valeur, { maximumFractionDigits: 4 }) : String(valeur) };
     case 'DATE':
       return { texte: typeof valeur === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(valeur) ? formaterDate(valeur) : String(valeur) };
     case 'MATRICE': {

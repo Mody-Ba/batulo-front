@@ -2,9 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   codeErreur,
   detailsErreur,
-  MESSAGE_INJOIGNABLE,
-  MESSAGE_SERVEUR,
-  MESSAGE_VALIDATION,
+  messageInjoignable,
+  messageServeur,
+  messageValidation,
   messageErreur,
 } from './erreur-http';
 
@@ -25,7 +25,7 @@ describe('erreur-http', () => {
       code: 'VALIDATION',
       message: 'courriel : le courriel n’est pas valide ; motDePasse : trop court',
     });
-    expect(messageErreur(e)).toBe(MESSAGE_VALIDATION);
+    expect(messageErreur(e)).toBe(messageValidation());
     expect(detailsErreur(e)).toEqual([
       'Courriel : le courriel n’est pas valide',
       'Mot de passe : trop court',
@@ -33,11 +33,11 @@ describe('erreur-http', () => {
   });
 
   it('serveur injoignable', () => {
-    expect(messageErreur(erreur(0, null))).toBe(MESSAGE_INJOIGNABLE);
+    expect(messageErreur(erreur(0, null))).toBe(messageInjoignable());
   });
 
   it('erreur 5xx sans corps', () => {
-    expect(messageErreur(erreur(502, '<html>Bad gateway</html>'))).toBe(MESSAGE_SERVEUR);
+    expect(messageErreur(erreur(502, '<html>Bad gateway</html>'))).toBe(messageServeur());
   });
 
   it('message par défaut sinon', () => {

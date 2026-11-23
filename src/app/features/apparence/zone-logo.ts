@@ -12,6 +12,8 @@ import { confirmer } from '../../shared/components/dialogue-confirmation/dialogu
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { urlLogoSure } from '../../shared/formulaire/apparence/apparence';
 import { tailleEnClair, verifierLogo } from './validation-logo';
+import { traduire } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Logo de l'entreprise : zone de dépôt (glisser-déposer ou « Choisir un fichier »), vérification avant envoi (PNG ou
@@ -21,7 +23,7 @@ import { tailleEnClair, verifierLogo } from './validation-logo';
  */
 @Component({
   selector: 'app-zone-logo',
-  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule, MessageErreur],
+  imports: [TranslocoPipe, MatButtonModule, MatIconModule, MatProgressSpinnerModule, MessageErreur],
   templateUrl: './zone-logo.html',
   styleUrl: './zone-logo.scss',
 })
@@ -125,7 +127,7 @@ export class ZoneLogo {
           this.envoi.set(false);
           this.annuler();
           this.misAJour.emit(personnalisation);
-          this.snackBar.open('Logo enregistré.', 'Fermer', { duration: 4000 });
+          this.snackBar.open(traduire('apparence.logo.enregistre'), traduire('commun.fermer'), { duration: 4000 });
         },
         error: (erreur: unknown) => {
           this.envoi.set(false);
@@ -136,9 +138,9 @@ export class ZoneLogo {
 
   protected supprimer(): void {
     confirmer(this.dialog, {
-      titre: 'Supprimer le logo ?',
-      message: 'Il disparaîtra des formulaires et des rapports. Vous pourrez en ajouter un autre ensuite.',
-      action: 'Supprimer le logo',
+      titre: traduire('apparence.logo.supprimerTitre'),
+      message: traduire('apparence.logo.supprimerMessage'),
+      action: traduire('apparence.logo.supprimerAction'),
       destructive: true,
     })
       .pipe(filter(Boolean))
@@ -149,7 +151,7 @@ export class ZoneLogo {
           .subscribe({
             next: (personnalisation) => {
               this.misAJour.emit(personnalisation);
-              this.snackBar.open('Logo supprimé.', 'Fermer', { duration: 4000 });
+              this.snackBar.open(traduire('apparence.logo.supprime'), traduire('commun.fermer'), { duration: 4000 });
             },
             error: (erreur: unknown) => this.erreurServeur.set(erreur),
           }),

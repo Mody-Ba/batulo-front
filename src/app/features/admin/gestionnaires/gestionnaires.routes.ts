@@ -6,13 +6,13 @@ export const routes: Routes = [
     // ?page=&taille=
     path: '',
     pathMatch: 'full',
-    title: 'Gestionnaires · Batulo',
+    title: 'titres.gestionnaires',
     loadComponent: () =>
       import('./liste-gestionnaires/liste-gestionnaires').then((m) => m.ListeGestionnaires),
   },
   {
     path: ':id',
-    title: 'Gestionnaire · Batulo',
+    title: 'titres.gestionnaire',
     loadComponent: () =>
       import('./detail-gestionnaire/detail-gestionnaire').then((m) => m.DetailGestionnaire),
   },

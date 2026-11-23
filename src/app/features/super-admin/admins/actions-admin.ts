@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { inject, Injectable, LOCALE_ID } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, EMPTY, filter, map, Observable, switchMap, tap } from 'rxjs';
@@ -14,13 +13,12 @@ import { SuperAdminService } from '../../../core/services/super-admin.service';
 import { messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { DialogueAdmin, DonneesDialogueAdmin } from './dialogue-admin/dialogue-admin';
+import { traduire, traduirePluriel } from '../../../core/i18n/traduire';
+import { dateEnClair } from '../../../core/i18n/formats.pipes';
 
-/** « 3 gestionnaires », « 1 gestionnaire », « aucun gestionnaire ». */
+/** « 3 gestionnaires », « 1 gestionnaire », « aucun gestionnaire » (dans la langue courante). */
 export function libelleGestionnaires(nombre: number): string {
-  if (nombre === 0) {
-    return 'aucun gestionnaire';
-  }
-  return nombre === 1 ? '1 gestionnaire' : `${nombre} gestionnaires`;
+  return nombre === 0 ? traduire('superAdmin.actions.aucunGestionnaire') : traduirePluriel('superAdmin.actions.gestionnaires', nombre);
 }
 
 /**
@@ -33,23 +31,17 @@ export class ActionsAdmin {
   private readonly service = inject(SuperAdminService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly dates = new DatePipe(inject(LOCALE_ID));
 
   /** Émet le compte créé (pour ouvrir son détail). */
   creer(): Observable<CompteAdmin> {
     return this.ouvrirFormulaire({}).pipe(
       map(compteDepuisDetail),
-      tap((admin) =>
-        this.informer(
-          `${admin.entreprise} a été créée. Un mot de passe temporaire a été envoyé à ${admin.courriel} ; ` +
-            'l’abonnement attend le paiement de l’admin.',
-        ),
-      ),
+      tap((admin) => this.informer(traduire('superAdmin.actions.creee', { entreprise: admin.entreprise, courriel: admin.courriel }))),
     );
   }
 
   modifier(admin: CompteAdmin): Observable<AdminDetailResponse> {
-    return this.ouvrirFormulaire({ admin }).pipe(tap(() => this.informer('Modifications enregistrées.')));
+    return this.ouvrirFormulaire({ admin }).pipe(tap(() => this.informer(traduire('commun.modificationsEnregistrees'))));
   }
 
   /**
@@ -60,28 +52,30 @@ export class ActionsAdmin {
     if (!admin.actif) {
       return this.executer(
         this.service.activerAdmin(admin.id),
-        `${admin.entreprise} est de nouveau active, avec ses gestionnaires.`,
+        traduire('superAdmin.actions.reactivee', { entreprise: admin.entreprise }),
       );
     }
     const gestionnaires =
       nombreGestionnaires === undefined
-        ? ' Ses gestionnaires seront bloqués aussi.'
+        ? traduire('superAdmin.actions.gestionnairesBloques')
         : nombreGestionnaires === 0
           ? ''
-          : ` Ses ${libelleGestionnaires(nombreGestionnaires)} seront bloqués aussi.`;
+          : traduirePluriel('superAdmin.actions.nGestionnairesBloques', nombreGestionnaires);
     return confirmer(this.dialog, {
-      titre: 'Désactiver cette entreprise ?',
-      message:
-        `${nomComplet(admin)} (${admin.entreprise}) ne pourra plus se connecter.${gestionnaires} ` +
-        'Les sondages de l’entreprise n’accepteront plus de réponses. Rien n’est supprimé ; vous pourrez la réactiver.',
-      action: 'Désactiver',
+      titre: traduire('superAdmin.actions.desactiverTitre'),
+      message: traduire('superAdmin.actions.desactiverMessage', {
+        nom: nomComplet(admin),
+        entreprise: admin.entreprise,
+        gestionnaires: gestionnaires ? ` ${gestionnaires}` : '',
+      }),
+      action: traduire('commun.desactiver'),
       destructive: true,
     }).pipe(
       filter(Boolean),
       switchMap(() =>
         this.executer(
           this.service.desactiverAdmin(admin.id),
-          `${admin.entreprise} est désactivée, avec ses gestionnaires.`,
+          traduire('superAdmin.actions.desactivee', { entreprise: admin.entreprise }),
         ),
       ),
     );
@@ -89,17 +83,19 @@ export class ActionsAdmin {
 
   renvoyerMotDePasse(admin: CompteAdmin): Observable<MotDePasseTemporaireResponse> {
     return confirmer(this.dialog, {
-      titre: 'Renvoyer un mot de passe temporaire ?',
-      message: `Un nouveau mot de passe, valable 24 heures, sera envoyé à ${admin.courriel}. L’ancien ne fonctionnera plus.`,
-      action: 'Renvoyer',
+      titre: traduire('gestionnaires.actions.renvoyerTitre'),
+      message: traduire('gestionnaires.actions.renvoyerMessage', { courriel: admin.courriel }),
+      action: traduire('commun.renvoyer'),
     }).pipe(
       filter(Boolean),
       switchMap(() =>
         this.service.renvoyerMotDePasseTemporaire(admin.id).pipe(
           tap((reponse) =>
             this.informer(
-              `Mot de passe temporaire envoyé à ${reponse.courriel}, valable jusqu’au ` +
-                `${this.dates.transform(reponse.expireLe, 'd MMMM y à HH:mm')}.`,
+              traduire('superAdmin.actions.motDePasseEnvoye', {
+                courriel: reponse.courriel,
+                date: dateEnClair(reponse.expireLe, 'longHeure'),
+              }),
             ),
           ),
           catchError((erreur: unknown) => {
@@ -116,24 +112,27 @@ export class ActionsAdmin {
     const nom = admin.entreprise;
     const gestionnaires =
       nombreGestionnaires === undefined
-        ? 'ses gestionnaires'
+        ? traduire('superAdmin.actions.contenu.sesGestionnaires')
         : nombreGestionnaires === 0
           ? null
-          : `ses ${libelleGestionnaires(nombreGestionnaires)}`;
-    const contenu = ['son admin', gestionnaires, 'ses sondages et leurs réponses', 'son abonnement et ses paiements']
+          : traduirePluriel('superAdmin.actions.contenu.nGestionnaires', nombreGestionnaires);
+    const contenu = [
+      traduire('superAdmin.actions.contenu.admin'),
+      gestionnaires,
+      traduire('superAdmin.actions.contenu.sondages'),
+      traduire('superAdmin.actions.contenu.abonnement'),
+    ]
       .filter((partie): partie is string => !!partie)
-      .join(', ');
+      .join(traduire('commun.separateurListe'));
     return confirmer(this.dialog, {
-      titre: 'Supprimer cette entreprise ?',
-      message:
-        `L’entreprise « ${nom} » sera supprimée définitivement, avec ${contenu}. Cette action est irréversible. ` +
-        'Pour lui couper l’accès sans rien perdre, désactivez-la plutôt.',
-      action: 'Supprimer définitivement',
+      titre: traduire('superAdmin.actions.supprimerTitre'),
+      message: traduire('superAdmin.actions.supprimerMessage', { nom, contenu }),
+      action: traduire('superAdmin.actions.supprimerDefinitivement'),
       destructive: true,
       saisieAttendue: nom,
     }).pipe(
       filter(Boolean),
-      switchMap(() => this.executer(this.service.supprimerAdmin(admin.id), `${nom} a été supprimée.`)),
+      switchMap(() => this.executer(this.service.supprimerAdmin(admin.id), traduire('superAdmin.actions.supprimee', { nom }))),
       map(() => true as const),
     );
   }
@@ -160,6 +159,6 @@ export class ActionsAdmin {
   }
 
   private informer(message: string): void {
-    this.snackBar.open(message, 'Fermer', { duration: 6000 });
+    this.snackBar.open(message, traduire('commun.fermer'), { duration: 6000 });
   }
 }

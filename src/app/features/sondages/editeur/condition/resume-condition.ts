@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { ConditionAffichage, SondageResponse } from '../../../../core/models/sondage.model';
 import { resumeCondition } from './condition-editeur';
 import { DialogueCondition, DonneesCondition } from './dialogue-condition';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Ouvre la boîte de condition ; émet le sondage à jour une fois la condition enregistrée (rien si annulée). */
 export function ouvrirDialogueCondition(dialog: MatDialog, donnees: DonneesCondition): Observable<SondageResponse | undefined> {
@@ -27,18 +29,18 @@ export function ouvrirDialogueCondition(dialog: MatDialog, donnees: DonneesCondi
  */
 @Component({
   selector: 'app-resume-condition',
-  imports: [MatButtonModule, MatIconModule],
+  imports: [TranslocoPipe, MatButtonModule, MatIconModule],
   template: `
     <div class="resume-condition" role="note">
       <mat-icon fontIcon="alt_route" aria-hidden="true" />
-      <p><strong>Visible si :</strong> {{ texte() }}</p>
+      <p><strong>{{ 'editeur.condition.visibleSi' | transloco }} </strong><bdi>{{ texte() }}</bdi></p>
       @if (modifiable()) {
         <span class="actions-condition">
-          <button matButton type="button" (click)="modifier.emit()" [attr.aria-label]="'Modifier la condition de ' + nomCible()">
-            Modifier
+          <button matButton type="button" (click)="modifier.emit()" [attr.aria-label]="'editeur.condition.modifierDe' | transloco: { cible: nomCible() }">
+            {{ 'commun.modifier' | transloco }}
           </button>
-          <button matButton type="button" (click)="retirer.emit()" [attr.aria-label]="'Retirer la condition de ' + nomCible()">
-            Retirer
+          <button matButton type="button" (click)="retirer.emit()" [attr.aria-label]="'editeur.condition.retirerDe' | transloco: { cible: nomCible() }">
+            {{ 'commun.retirer' | transloco }}
           </button>
         </span>
       }
@@ -52,7 +54,7 @@ export function ouvrirDialogueCondition(dialog: MatDialog, donnees: DonneesCondi
       gap: var(--bt-espace-1) var(--bt-espace-2);
       margin: var(--bt-espace-2) 0;
       padding: var(--bt-espace-2) var(--bt-espace-3);
-      border-left: 3px solid var(--mat-sys-tertiary);
+      border-inline-start: 3px solid var(--mat-sys-tertiary);
       border-radius: 4px;
       background: var(--mat-sys-surface-container);
 
@@ -76,7 +78,7 @@ export function ouvrirDialogueCondition(dialog: MatDialog, donnees: DonneesCondi
 export class ResumeCondition {
   readonly condition = input.required<ConditionAffichage>();
   readonly sondage = input<SondageResponse | null>(null);
-  readonly nomCible = input('cette question');
+  readonly nomCible = input(traduire('editeur.condition.cetteQuestion'));
   readonly modifiable = input(false);
   readonly modifier = output<void>();
   readonly retirer = output<void>();

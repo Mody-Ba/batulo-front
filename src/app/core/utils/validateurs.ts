@@ -5,7 +5,8 @@ import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@ang
 /** Même règle que ReglesMotDePasse côté serveur : 8 caractères au moins, une lettre et un chiffre. */
 export const REGEX_MOT_DE_PASSE = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 export const TAILLE_MAX_MOT_DE_PASSE = 72;
-export const AIDE_MOT_DE_PASSE = 'Au moins 8 caractères, dont une lettre et un chiffre.';
+/** Clé de traduction de l'aide (règle du mot de passe). */
+export const AIDE_MOT_DE_PASSE = 'commun.aideMotDePasse';
 
 /** Comme @NotBlank côté serveur : un texte fait seulement d'espaces est considéré comme vide. */
 export const nonVide: ValidatorFn = (controle: AbstractControl): ValidationErrors | null =>

@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { FiltresStatistiques, SeparateurDecimal, ValeursExport } from '../../../core/models/statistiques.model';
 import { ExportService, FichierExporte } from '../../../core/services/export.service';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export type ChoixExport = 'reponses-csv' | 'reponses-xlsx' | 'statistiques-pdf' | 'statistiques-xlsx';
 
@@ -25,49 +26,49 @@ export interface DonneesExport {
  */
 @Component({
   selector: 'app-dialogue-export',
-  imports: [FormsModule, MatButtonModule, MatDialogModule, MatProgressSpinnerModule, MatRadioModule, MessageErreur],
+  imports: [TranslocoPipe, FormsModule, MatButtonModule, MatDialogModule, MatProgressSpinnerModule, MatRadioModule, MessageErreur],
   template: `
-    <h2 mat-dialog-title>Exporter</h2>
+    <h2 mat-dialog-title>{{ 'statistiques.page.exporter' | transloco }}</h2>
     <mat-dialog-content>
-      <app-message-erreur [erreur]="erreur()" titre="L’export a échoué" parDefaut="L’export n’a pas pu être créé." />
-      <p class="texte-aide">Filtres appliqués : {{ donnees.resume.join(' · ') }}.</p>
+      <app-message-erreur [erreur]="erreur()" [titre]="'statistiques.export.echec' | transloco" [parDefaut]="'statistiques.export.erreur' | transloco" />
+      <p class="texte-aide">{{ 'statistiques.export.filtres' | transloco: { filtres: donnees.resume.join(' · ') } }}</p>
 
       <fieldset>
-        <legend>Fichier</legend>
-        <mat-radio-group [(ngModel)]="choix" class="colonne" aria-label="Fichier à exporter">
-          <mat-radio-button value="statistiques-pdf">Rapport des statistiques (PDF)</mat-radio-button>
-          <mat-radio-button value="statistiques-xlsx">Statistiques (Excel : un onglet par question)</mat-radio-button>
-          <mat-radio-button value="reponses-csv">Réponses brutes (CSV)</mat-radio-button>
-          <mat-radio-button value="reponses-xlsx">Réponses brutes (Excel)</mat-radio-button>
+        <legend>{{ 'statistiques.export.fichier' | transloco }}</legend>
+        <mat-radio-group [(ngModel)]="choix" class="colonne" [attr.aria-label]="'statistiques.export.fichierAExporter' | transloco">
+          <mat-radio-button value="statistiques-pdf">{{ 'statistiques.export.pdf' | transloco }}</mat-radio-button>
+          <mat-radio-button value="statistiques-xlsx">{{ 'statistiques.export.xlsx' | transloco }}</mat-radio-button>
+          <mat-radio-button value="reponses-csv">{{ 'statistiques.export.csv' | transloco }}</mat-radio-button>
+          <mat-radio-button value="reponses-xlsx">{{ 'statistiques.export.reponsesXlsx' | transloco }}</mat-radio-button>
         </mat-radio-group>
       </fieldset>
 
       @if (choix === 'reponses-csv' || choix === 'reponses-xlsx') {
         <fieldset>
-          <legend>Valeurs des choix</legend>
-          <mat-radio-group [(ngModel)]="valeurs" class="colonne" aria-label="Valeurs des choix">
-            <mat-radio-button value="LIBELLES">Libellés (« Kayes »), pour lire</mat-radio-button>
-            <mat-radio-button value="CODES">Codes (« kayes »), pour analyser</mat-radio-button>
+          <legend>{{ 'statistiques.export.valeurs' | transloco }}</legend>
+          <mat-radio-group [(ngModel)]="valeurs" class="colonne" [attr.aria-label]="'statistiques.export.valeurs' | transloco">
+            <mat-radio-button value="LIBELLES">{{ 'statistiques.export.libelles' | transloco }}</mat-radio-button>
+            <mat-radio-button value="CODES">{{ 'statistiques.export.codes' | transloco }}</mat-radio-button>
           </mat-radio-group>
         </fieldset>
       }
       @if (choix === 'reponses-csv') {
         <fieldset>
-          <legend>Format des nombres</legend>
-          <mat-radio-group [(ngModel)]="separateur" class="colonne" aria-label="Format des nombres">
-            <mat-radio-button value="VIRGULE">Excel en français (« ; » et virgule décimale)</mat-radio-button>
-            <mat-radio-button value="POINT">Python, R… (« , » et point décimal)</mat-radio-button>
+          <legend>{{ 'statistiques.export.formatNombres' | transloco }}</legend>
+          <mat-radio-group [(ngModel)]="separateur" class="colonne" [attr.aria-label]="'statistiques.export.formatNombres' | transloco">
+            <mat-radio-button value="VIRGULE">{{ 'statistiques.export.virgule' | transloco }}</mat-radio-button>
+            <mat-radio-button value="POINT">{{ 'statistiques.export.point' | transloco }}</mat-radio-button>
           </mat-radio-group>
         </fieldset>
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button matButton type="button" mat-dialog-close [disabled]="enCours()">Annuler</button>
+      <button matButton type="button" mat-dialog-close [disabled]="enCours()">{{ 'commun.annuler' | transloco }}</button>
       <button matButton="filled" type="button" class="bouton-principal" (click)="exporter()" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Export en cours" />
+          <mat-spinner diameter="20" [attr.aria-label]="'statistiques.croise.exportEnCours' | transloco" />
         } @else {
-          Télécharger
+          {{ 'statistiques.export.telecharger' | transloco }}
         }
       </button>
     </mat-dialog-actions>

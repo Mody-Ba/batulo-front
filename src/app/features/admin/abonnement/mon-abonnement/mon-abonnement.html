@@ -1,6 +1,6 @@
 <section class="conteneur-page">
   <app-entete-page
-    titre="Mon abonnement"
+    [titre]="'abonnement.mon.titre' | transloco"
     icone="card_membership"
     [sousTitre]="abonnement()?.entreprise ?? null"
   >
@@ -10,50 +10,43 @@
         routerLink="/admin/abonnement/souscrire"
         [queryParams]="{ formule: abonnement()?.formule }"
       >
-        <mat-icon fontIcon="autorenew" aria-hidden="true" />Renouveler
+        <mat-icon fontIcon="autorenew" aria-hidden="true" />{{ 'bandeau.renouveler' | transloco }}
       </a>
     }
     <a matButton="outlined" routerLink="/admin/abonnement/demandes">
-      <mat-icon fontIcon="upgrade" aria-hidden="true" />Demander une autre formule
+      <mat-icon fontIcon="upgrade" aria-hidden="true" />{{ 'abonnement.mon.demanderAutre' | transloco }}
     </a>
   </app-entete-page>
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’abonnement" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'admin.tdb.chargementAbonnement' | transloco" />
     }
   </div>
 
-  <app-message-erreur [erreur]="erreur()" parDefaut="L’abonnement n’a pas pu être chargé.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'abonnement.mon.erreur' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (abonnement(); as abonnement) {
     @if (expire()) {
       <app-encadre type="erreur" role="status" icone="event_busy">
-        <p>
-          Votre abonnement a expiré le {{ abonnement.dateExpiration | date: 'longDate' }} : l’accès
-          est en lecture seule. Renouvelez-le pour modifier à nouveau vos sondages.
-        </p>
+        <p>{{ 'abonnement.mon.expire' | transloco: { date: (abonnement.dateExpiration | dateL: 'longDate') } }}</p>
       </app-encadre>
     } @else if (enAlerte()) {
       <app-encadre type="avertissement" role="status" icone="schedule">
-        <p>
-          Votre abonnement expire dans {{ abonnement.joursRestants }}
-          jour{{ (abonnement.joursRestants ?? 0) > 1 ? 's' : '' }}. Renouvelez-le pour éviter toute
-          interruption.
-        </p>
+        <p>{{ 'abonnement.mon.alerte' | pluriel: abonnement.joursRestants }}</p>
       </app-encadre>
     }
 
     <div class="cartes">
       <article class="carte">
-        <h2>Détail</h2>
+        <h2>{{ 'abonnement.mon.detail' | transloco }}</h2>
         <dl class="details">
-          <dt>Formule</dt>
-          <dd>{{ abonnement.formule ? libellesFormule[abonnement.formule] : 'Aucune' }}</dd>
+          <dt>{{ 'abonnement.mon.formule' | transloco }}</dt>
+          <dd>{{ abonnement.formule ? libellesFormule[abonnement.formule] : ('abonnement.mon.aucune' | transloco) }}</dd>
 
-          <dt>Statut</dt>
+          <dt>{{ 'abonnement.mon.statut' | transloco }}</dt>
           <dd>
             <span class="pastille-statut" [class]="'statut-' + abonnement.statut">
               {{ libellesStatut[abonnement.statut] }}
@@ -61,47 +54,47 @@
           </dd>
 
           @if (abonnement.dateDebut) {
-            <dt>Début</dt>
-            <dd>{{ abonnement.dateDebut | date: 'longDate' }}</dd>
+            <dt>{{ 'abonnement.mon.debut' | transloco }}</dt>
+            <dd>{{ abonnement.dateDebut | dateL: 'longDate' }}</dd>
           }
           @if (abonnement.dateExpiration) {
-            <dt>Expiration</dt>
-            <dd>{{ abonnement.dateExpiration | date: 'longDate' }} à {{ abonnement.dateExpiration | date: 'HH:mm' }}</dd>
+            <dt>{{ 'abonnement.mon.expiration' | transloco }}</dt>
+            <dd>{{ abonnement.dateExpiration | dateL: 'longHeure' }}</dd>
           }
           @if (abonnement.joursRestants !== null) {
-            <dt>Jours restants</dt>
-            <dd [class.important]="enAlerte()">{{ abonnement.joursRestants }}</dd>
+            <dt>{{ 'abonnement.mon.joursRestants' | transloco }}</dt>
+            <dd [class.important]="enAlerte()">{{ abonnement.joursRestants | nombreL }}</dd>
           }
         </dl>
       </article>
 
       <article class="carte" aria-labelledby="titre-paiements">
-        <h2 id="titre-paiements">Paiements</h2>
+        <h2 id="titre-paiements">{{ 'abonnement.mon.paiements' | transloco }}</h2>
         <div class="zone-progression">
           @if (chargementPaiements()) {
-            <mat-progress-bar mode="indeterminate" aria-label="Chargement des paiements" />
+            <mat-progress-bar mode="indeterminate" [attr.aria-label]="'abonnement.mon.chargementPaiements' | transloco" />
           }
         </div>
-        <app-message-erreur [erreur]="erreurPaiements()" parDefaut="L’historique des paiements n’a pas pu être chargé.">
-          <p><button matButton type="button" (click)="chargerPaiements()">Réessayer</button></p>
+        <app-message-erreur [erreur]="erreurPaiements()" [parDefaut]="'abonnement.mon.erreurPaiements' | transloco">
+          <p><button matButton type="button" (click)="chargerPaiements()">{{ 'commun.reessayer' | transloco }}</button></p>
         </app-message-erreur>
         @if (!chargementPaiements() && !erreurPaiements() && totalPaiements() === 0) {
-          <p class="texte-aide">Aucun paiement pour le moment.</p>
+          <p class="texte-aide">{{ 'abonnement.mon.aucunPaiement' | transloco }}</p>
         } @else if (paiements().length) {
           <table class="historique">
-            <caption class="visuellement-cache">Historique des paiements, du plus récent au plus ancien</caption>
+            <caption class="visuellement-cache">{{ 'abonnement.mon.historique' | transloco }}</caption>
             <thead>
               <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Formule</th>
-                <th scope="col">Moyen</th>
-                <th scope="col" class="colonne-montant">Montant</th>
+                <th scope="col">{{ 'abonnement.mon.date' | transloco }}</th>
+                <th scope="col">{{ 'abonnement.mon.formule' | transloco }}</th>
+                <th scope="col">{{ 'abonnement.mon.moyen' | transloco }}</th>
+                <th scope="col" class="colonne-montant">{{ 'abonnement.mon.montant' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (p of paiements(); track p.id) {
                 <tr>
-                  <td>{{ p.datePaiement | date: 'd MMM y' }}</td>
+                  <td>{{ p.datePaiement | dateL: 'court' }}</td>
                   <td>{{ libellesFormule[p.formule] }}</td>
                   <td>{{ p.fournisseur ? libellesFournisseur[p.fournisseur] : '—' }}</td>
                   <td class="colonne-montant">{{ montant(p.montant, p.devise, true) }}</td>
@@ -116,7 +109,7 @@
               [pageSize]="taillePaiements()"
               [pageSizeOptions]="taillesPaiements"
               (page)="changerPagePaiements($event)"
-              aria-label="Pagination des paiements"
+              [attr.aria-label]="'abonnement.mon.pagination' | transloco"
             />
           }
         }
@@ -124,10 +117,7 @@
     </div>
 
     <app-encadre type="info" icone="info">
-      <p>
-        Renouveler prolonge votre abonnement à partir de sa date d’expiration actuelle : vous ne
-        perdez aucun jour. Sans renouvellement, l’abonnement s’arrête de lui-même à cette date.
-      </p>
+      <p>{{ 'abonnement.mon.info' | transloco }}</p>
     </app-encadre>
   }
 </section>

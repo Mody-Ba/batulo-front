@@ -1,10 +1,10 @@
 <section class="conteneur-page">
   <a matButton routerLink="/sondages" class="retour">
-    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.sondages' | transloco }}
   </a>
 
   @if (sondage(); as s) {
-    <app-entete-page [titre]="s.titre" icone="ballot">
+    <app-entete-page [titre]="s.titre" icone="ballot" dir="auto">
       <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
     </app-entete-page>
   }
@@ -22,11 +22,11 @@
       />
       <div class="actions-stat">
         <button matButton="outlined" type="button" (click)="exporter(s)">
-          <mat-icon fontIcon="download" aria-hidden="true" />Exporter
+          <mat-icon fontIcon="download" aria-hidden="true" />{{ 'statistiques.page.exporter' | transloco }}
         </button>
         @if (peutEnvoyer()) {
           <button matButton="filled" type="button" (click)="envoyer(s)">
-            <mat-icon fontIcon="send" aria-hidden="true" />Envoyer les statistiques à l’admin
+            <mat-icon fontIcon="send" aria-hidden="true" />{{ 'statistiques.page.envoyer' | transloco }}
           </button>
         }
       </div>
@@ -35,44 +35,44 @@
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Calcul des statistiques" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statistiques.calcul' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="Les statistiques n’ont pas pu être calculées.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'statistiques.page.erreur' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (statistiques(); as st) {
-    <section class="resume" aria-label="Résumé">
+    <section class="resume" [attr.aria-label]="'statistiques.page.resume' | transloco">
       <div class="tuile-stat">
         <span class="valeur">{{ nombre(st.resume.nombreReponses) }}</span>{{ ' ' }}
-        <span class="libelle">réponse{{ st.resume.nombreReponses > 1 ? 's' : '' }}</span>
+        <span class="libelle">{{ 'statistiques.page.reponses' | pluriel: st.resume.nombreReponses }}</span>
       </div>
       <div class="tuile-stat">
-        <span class="valeur petite">{{ st.resume.premiereReponse ? (st.resume.premiereReponse | date: 'd MMM y') : '—' }}</span>{{ ' ' }}
-        <span class="libelle">première réponse</span>
+        <span class="valeur petite">{{ st.resume.premiereReponse ? (st.resume.premiereReponse | dateL: 'court') : '—' }}</span>{{ ' ' }}
+        <span class="libelle">{{ 'statistiques.page.premiere' | transloco }}</span>
       </div>
       <div class="tuile-stat">
-        <span class="valeur petite">{{ st.resume.derniereReponse ? (st.resume.derniereReponse | date: 'd MMM y') : '—' }}</span>{{ ' ' }}
-        <span class="libelle">dernière réponse</span>
+        <span class="valeur petite">{{ st.resume.derniereReponse ? (st.resume.derniereReponse | dateL: 'court') : '—' }}</span>{{ ' ' }}
+        <span class="libelle">{{ 'statistiques.page.derniere' | transloco }}</span>
       </div>
       <div class="tuile-stat">
-        <span class="valeur petite">{{ st.lignee ? 'Toutes' : 'Version ' + st.versions.join(', ') }}</span>{{ ' ' }}
-        <span class="libelle">{{ st.lignee ? 'versions ' + st.versions.join(', ') : 'portée' }}</span>
+        <span class="valeur petite">{{ st.lignee ? ('statistiques.page.toutes' | transloco) : ('statistiques.filtres.version' | transloco: { version: st.versions.join(', ') }) }}</span>{{ ' ' }}
+        <span class="libelle">{{ st.lignee ? ('statistiques.page.versionsListe' | transloco: { versions: st.versions.join(', ') }) : ('statistiques.page.portee' | transloco) }}</span>
       </div>
     </section>
     @if (st.resume.petitEffectif && st.resume.nombreReponses > 0) {
       <p class="avertissement" role="note">
-        <span aria-hidden="true">⚠</span> Moins de 5 réponses avec ces filtres : résultats à interpréter avec prudence.
+        <span aria-hidden="true">⚠</span> {{ 'statistiques.page.petitEffectif' | transloco }}
       </p>
     }
 
     @if (st.resume.nombreReponses === 0) {
-      <p class="etat-vide" role="status">Aucune réponse avec ces filtres.</p>
+      <p class="etat-vide" role="status">{{ 'statistiques.page.aucune' | transloco }}</p>
     } @else {
       @for (g of groupes(); track $index) {
-        <section class="groupe" [attr.aria-label]="'Section ' + g.section">
-          <h2 class="titre-section">{{ g.section }}</h2>
+        <section class="groupe" [attr.aria-label]="'statistiques.section' | transloco: { titre: g.section }">
+          <h2 class="titre-section" dir="auto">{{ g.section }}</h2>
           @for (q of g.questions; track q.question.questionId) {
             <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="identifiant()" [filtres]="filtres()" [totalReponses]="totalUneVersion(st)" />
           }

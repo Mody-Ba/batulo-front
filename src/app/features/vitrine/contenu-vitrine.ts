@@ -1,5 +1,5 @@
 /**
- * Textes de la vitrine publique (« / » pour un visiteur). Ils décrivent ce que Batulo fait réellement (règles du
+ * Textes de la vitrine publique (« / » pour un visiteur), sous forme de clés de traduction (public/i18n). Ils décrivent ce que Batulo fait réellement (règles du
  * backend) : ne rien promettre de plus. Les prix ne sont jamais écrits ici : ils viennent de GET /api/abonnements/formules.
  */
 
@@ -15,11 +15,11 @@ export interface SectionVitrine {
 }
 
 export const SECTIONS_VITRINE: readonly SectionVitrine[] = [
-  { id: 'fonctionnalites', libelle: 'Fonctionnalités' },
-  { id: 'comment-ca-marche', libelle: 'Comment ça marche' },
-  { id: 'tarifs', libelle: 'Tarifs' },
-  { id: 'faq', libelle: 'FAQ' },
-  { id: 'contact', libelle: 'Contact' },
+  { id: 'fonctionnalites', libelle: 'vitrine.sections.fonctionnalites' },
+  { id: 'comment-ca-marche', libelle: 'vitrine.sections.comment_ca_marche' },
+  { id: 'tarifs', libelle: 'vitrine.sections.tarifs' },
+  { id: 'faq', libelle: 'vitrine.sections.faq' },
+  { id: 'contact', libelle: 'vitrine.sections.contact' },
 ];
 
 export interface Fonctionnalite {
@@ -31,33 +31,33 @@ export interface Fonctionnalite {
 export const FONCTIONNALITES: readonly Fonctionnalite[] = [
   {
     icone: 'dynamic_form',
-    titre: 'Formulaires dynamiques',
-    texte: 'Dix types de questions : choix, oui/non, échelle, nombre, date, texte, classement, grille. Sections, glisser-déposer et enregistrement automatique.',
+    titre: 'vitrine.fonctionnalites.dynamic_form.titre',
+    texte: 'vitrine.fonctionnalites.dynamic_form.texte',
   },
   {
     icone: 'qr_code_2',
-    titre: 'Partage par lien et QR code',
-    texte: 'Chaque sondage publié a son lien. Imprimez son QR code ; les répondants n’ont besoin d’aucun compte.',
+    titre: 'vitrine.fonctionnalites.qr_code_2.titre',
+    texte: 'vitrine.fonctionnalites.qr_code_2.texte',
   },
   {
     icone: 'smartphone',
-    titre: 'Collecte terrain sur téléphone',
-    texte: 'Formulaire pensé pour le téléphone, plusieurs réponses depuis le même appareil, réponses en cours gardées sur l’appareil.',
+    titre: 'vitrine.fonctionnalites.smartphone.titre',
+    texte: 'vitrine.fonctionnalites.smartphone.texte',
   },
   {
     icone: 'insights',
-    titre: 'Statistiques et tableaux croisés',
-    texte: 'Graphiques par question calculés à partir des dernières réponses, filtres par période et par critère, tableaux croisés.',
+    titre: 'vitrine.fonctionnalites.insights.titre',
+    texte: 'vitrine.fonctionnalites.insights.texte',
   },
   {
     icone: 'download',
-    titre: 'Exports Excel, CSV et PDF',
-    texte: 'Téléchargez les réponses brutes pour Excel, Python ou R, et un rapport PDF prêt à partager.',
+    titre: 'vitrine.fonctionnalites.download.titre',
+    texte: 'vitrine.fonctionnalites.download.texte',
   },
   {
     icone: 'groups',
-    titre: 'Gestionnaires de l’entreprise',
-    texte: 'Créez les comptes de votre équipe, choisissez qui crée des sondages et assignez-leur ceux à suivre.',
+    titre: 'vitrine.fonctionnalites.groups.titre',
+    texte: 'vitrine.fonctionnalites.groups.texte',
   },
 ];
 
@@ -67,10 +67,10 @@ export interface Etape {
 }
 
 export const ETAPES: readonly Etape[] = [
-  { titre: 'Créez votre compte et abonnez-vous', texte: 'Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle et payez par carte bancaire ou par application mobile (Bankily, Masrvi, Sedad).' },
-  { titre: 'Construisez votre sondage', texte: 'Ajoutez sections et questions, prévisualisez sur ordinateur et sur téléphone, puis publiez.' },
-  { titre: 'Partagez le lien', texte: 'Envoyez le lien ou affichez le QR code ; collectez aussi sur le terrain depuis un téléphone.' },
-  { titre: 'Analysez et exportez', texte: 'Suivez les résultats, croisez les réponses, exportez en Excel, CSV ou PDF.' },
+  { titre: 'vitrine.etapes.e1.titre', texte: 'vitrine.etapes.e1.texte' },
+  { titre: 'vitrine.etapes.e2.titre', texte: 'vitrine.etapes.e2.texte' },
+  { titre: 'vitrine.etapes.e3.titre', texte: 'vitrine.etapes.e3.texte' },
+  { titre: 'vitrine.etapes.e4.titre', texte: 'vitrine.etapes.e4.texte' },
 ];
 
 export interface QuestionFaq {
@@ -80,30 +80,30 @@ export interface QuestionFaq {
 
 export const FAQ: readonly QuestionFaq[] = [
   {
-    question: 'Faut-il un compte pour répondre à un sondage ?',
-    reponse: 'Non. Les répondants ouvrent simplement le lien ou scannent le QR code, sur ordinateur ou sur téléphone.',
+    question: 'vitrine.faq.q1.question',
+    reponse: 'vitrine.faq.q1.reponse',
   },
   {
-    question: 'Les réponses sont-elles confidentielles ?',
+    question: 'vitrine.faq.q2.question',
     reponse:
-      'Une réponse n’est liée à aucun compte : seules les informations demandées par le sondage sont enregistrées. Les résultats ne sont visibles que par l’admin de votre entreprise et les gestionnaires concernés.',
+      'vitrine.faq.q2.reponse',
   },
   {
-    question: 'Comment se fait le paiement ?',
+    question: 'vitrine.faq.q3.question',
     reponse:
-      'Par carte bancaire, avec un paiement sécurisé par Stripe, en dollars canadiens, ou par application mobile (Bankily, Masrvi, Sedad), en ouguiyas. Pour un mois ou pour un an.',
+      'vitrine.faq.q3.reponse',
   },
   {
-    question: 'Puis-je annuler ?',
+    question: 'vitrine.faq.q4.question',
     reponse:
-      'Il n’y a pas de renouvellement automatique : chaque période est payée à part. Sans renouvellement, l’abonnement expire et votre espace reste consultable en lecture seule.',
+      'vitrine.faq.q4.reponse',
   },
   {
-    question: 'Puis-je travailler en équipe ?',
-    reponse: 'Oui. L’admin crée les comptes de ses gestionnaires, leur donne ou non le droit de créer des sondages et leur assigne ceux à suivre.',
+    question: 'vitrine.faq.q5.question',
+    reponse: 'vitrine.faq.q5.reponse',
   },
   {
-    question: 'Peut-on répondre sans connexion Internet ?',
-    reponse: 'Les réponses en cours sont gardées sur l’appareil, mais l’envoi demande une connexion.',
+    question: 'vitrine.faq.q6.question',
+    reponse: 'vitrine.faq.q6.reponse',
   },
 ];

@@ -18,6 +18,8 @@ import {
   VALIDATEURS_NOUVEAU_MOT_DE_PASSE,
 } from '../../../core/utils/validateurs';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Inscription de l'admin d'une entreprise. Le backend crée l'entreprise, le compte et un
@@ -26,8 +28,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
  */
 @Component({
   selector: 'app-inscription',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, SelecteurLangue, ReactiveFormsModule,
     RouterLink,
     MatCardModule,
     MatFormFieldModule,
@@ -106,7 +107,7 @@ export class Inscription {
           if (compteCree) {
             // Compte créé, connexion automatique impossible : on laisse l'utilisateur se connecter.
             this.auth.preparerMessageConnexion(
-              'Votre compte a été créé. Connectez-vous pour choisir votre abonnement.',
+              'auth.inscription.compteCree',
             );
             void this.router.navigateByUrl('/connexion');
             return;

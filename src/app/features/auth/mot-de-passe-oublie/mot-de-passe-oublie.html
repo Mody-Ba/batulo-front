@@ -1,11 +1,12 @@
 <mat-card class="carte-auth" appearance="outlined">
   <mat-card-header>
     <div class="en-tete-auth">
-      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
-      <h1>Mot de passe oublié</h1>
-      <p class="sous-titre">
-        Indiquez votre courriel : vous recevrez un lien pour choisir un nouveau mot de passe.
-      </p>
+      <div class="haut-auth">
+        <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+        <app-selecteur-langue />
+      </div>
+      <h1>{{ 'auth.oublie.titre' | transloco }}</h1>
+      <p class="sous-titre">{{ 'auth.oublie.sousTitre' | transloco }}</p>
     </div>
   </mat-card-header>
 
@@ -13,20 +14,20 @@
     @if (confirmation(); as message) {
       <app-encadre type="succes" role="status" icone="mark_email_read">
         <p>{{ message }}</p>
-        <p>Pensez à vérifier vos courriels indésirables.</p>
+        <p>{{ 'auth.oublie.indesirables' | transloco }}</p>
       </app-encadre>
       <div class="actions-auth">
-        <a mat-flat-button routerLink="/connexion">Retour à la connexion</a>
-        <button mat-button type="button" (click)="confirmation.set(null)">
-          Renvoyer un lien
+        <a mat-flat-button routerLink="/connexion">{{ 'auth.retourConnexion' | transloco }}</a>
+        <button mat-button type="button" (click)="envoyee.set(false)">
+          {{ 'auth.oublie.renvoyer' | transloco }}
         </button>
       </div>
     } @else {
       <app-message-erreur [erreur]="erreur()" />
 
       <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="envoyer()" novalidate>
-        <mat-form-field>
-          <mat-label>Courriel</mat-label>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+          <mat-label>{{ 'commun.champs.courriel' | transloco }}</mat-label>
           <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
           <input
             matInput
@@ -37,24 +38,24 @@
             required
           />
           @if (formulaire.controls.courriel.hasError('required')) {
-            <mat-error>Le courriel est obligatoire.</mat-error>
+            <mat-error>{{ 'commun.erreurs.courrielObligatoire' | transloco }}</mat-error>
           } @else if (formulaire.controls.courriel.hasError('email')) {
-            <mat-error>Le courriel n’est pas valide.</mat-error>
+            <mat-error>{{ 'commun.erreurs.courrielInvalide' | transloco }}</mat-error>
           } @else if (formulaire.controls.courriel.hasError('maxlength')) {
-            <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+            <mat-error>{{ 'commun.erreurs.courrielTropLong' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
           @if (enCours()) {
-            <mat-spinner diameter="20" aria-label="Envoi en cours" />
+            <mat-spinner diameter="20" [attr.aria-label]="'commun.envoiEnCours' | transloco" />
           } @else {
-            Recevoir le lien
+            {{ 'auth.oublie.recevoir' | transloco }}
           }
         </button>
       </form>
 
-      <p class="lien-bas"><a routerLink="/connexion">Retour à la connexion</a></p>
+      <p class="lien-bas"><a routerLink="/connexion">{{ 'auth.retourConnexion' | transloco }}</a></p>
     }
   </mat-card-content>
 </mat-card>

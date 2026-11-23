@@ -1,6 +1,7 @@
 import { Component, computed, effect, input, signal } from '@angular/core';
 import { ApparenceResponse } from '../../../core/models/personnalisation.model';
 import { urlLogoSure } from './apparence';
+import { traduire } from '../../../core/i18n/traduire';
 
 /**
  * Bandeau à l'image de l'entreprise, en haut du formulaire public et de l'aperçu : seulement s'il y a un logo (sans
@@ -14,7 +15,7 @@ import { urlLogoSure } from './apparence';
       @if (!illisible()) {
         <div class="bandeau-apparence">
           <img [src]="url" [alt]="nom()" class="logo-apparence" decoding="async" (error)="illisible.set(true)" />
-          <span class="nom-apparence" aria-hidden="true">{{ nom() }}</span>
+          <span class="nom-apparence" aria-hidden="true" dir="auto">{{ nom() }}</span>
         </div>
       }
     }
@@ -52,7 +53,7 @@ import { urlLogoSure } from './apparence';
 export class BandeauApparence {
   readonly apparence = input<Pick<ApparenceResponse, 'nomAffiche' | 'logoUrl'> | null | undefined>(null);
   protected readonly logo = computed(() => urlLogoSure(this.apparence()?.logoUrl));
-  protected readonly nom = computed(() => this.apparence()?.nomAffiche?.trim() || 'Logo de l’organisation');
+  protected readonly nom = computed(() => this.apparence()?.nomAffiche?.trim() || traduire('public.apparence.logo'));
   /** Image introuvable ou illisible : pas d'icône cassée devant le répondant, le bandeau est retiré. */
   protected readonly illisible = signal(false);
 

@@ -1,4 +1,3 @@
-import { CurrencyPipe, DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +16,12 @@ import { TableauDeBordResponse } from '../../../core/models/tableau-de-bord.mode
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { DernieresNotifications } from '../../../shared/components/dernieres-notifications/dernieres-notifications';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { NombreLPipe } from '../../../core/i18n/formats.pipes';
+import { MontantLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Tableau de bord de l'admin : chiffres de l'entreprise (GET /api/admin/tableau-de-bord), abonnement et dernières
@@ -24,11 +29,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
  */
 @Component({
   selector: 'app-tableau-de-bord',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    DecimalPipe,
-    UpperCasePipe,
+  imports: [PlurielPipe, TranslocoPipe, MontantLPipe, NombreLPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -52,7 +53,7 @@ export class TableauDeBord {
   protected readonly expire = computed(() => this.abonnement()?.statut === 'EXPIRE');
   protected readonly titre = computed(() => {
     const prenom = this.auth.utilisateur()?.prenom;
-    return prenom ? `Bonjour ${prenom}` : 'Tableau de bord';
+    return prenom ? traduire('accueil.bonjourPrenom', { prenom }) : traduire('menu.tableauDeBord');
   });
 
   protected readonly chiffres = signal<TableauDeBordResponse | null>(null);

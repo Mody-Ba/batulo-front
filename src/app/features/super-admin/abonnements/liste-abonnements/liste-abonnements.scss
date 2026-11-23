@@ -14,6 +14,10 @@ tr.en-alerte {
 
   td:first-child {
     box-shadow: inset 4px 0 0 var(--bt-attente-texte);
+
+    :host-context([dir='rtl']) & {
+      box-shadow: inset -4px 0 0 var(--bt-attente-texte);
+    }
   }
 }
 
@@ -38,7 +42,7 @@ tr.en-alerte {
 
   &.en-alerte {
     border-color: var(--bt-attente-texte);
-    border-left-width: 4px;
+    border-inline-start-width: 4px;
     background: var(--bt-attente-fond);
   }
 }

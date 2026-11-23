@@ -1,3 +1,5 @@
+import { libelles } from '../i18n/traduire';
+
 /** Statut effectif de l'abonnement d'une entreprise (enum StatutAbonnement du backend). */
 export type StatutAbonnement =
   | 'EN_ATTENTE_PAIEMENT'
@@ -6,23 +8,20 @@ export type StatutAbonnement =
   | 'EXPIRE'
   | 'DESACTIVE';
 
-export const LIBELLES_STATUT_ABONNEMENT: Record<StatutAbonnement, string> = {
-  EN_ATTENTE_PAIEMENT: 'En attente de paiement',
-  ACTIF: 'Actif',
-  EXPIRE_BIENTOT: 'Expire bientôt',
-  EXPIRE: 'Expiré',
-  DESACTIVE: 'Désactivé',
-};
+export const LIBELLES_STATUT_ABONNEMENT = libelles<StatutAbonnement>('statutsAbonnement', [
+  'EN_ATTENTE_PAIEMENT',
+  'ACTIF',
+  'EXPIRE_BIENTOT',
+  'EXPIRE',
+  'DESACTIVE',
+]);
 
 /** Formules d'abonnement (enum Formule du backend). */
 export type Formule = 'MENSUEL' | 'ANNUEL';
 
 export const FORMULES: readonly Formule[] = ['MENSUEL', 'ANNUEL'];
 
-export const LIBELLES_FORMULE: Record<Formule, string> = {
-  MENSUEL: 'Formule mensuelle',
-  ANNUEL: 'Formule annuelle',
-};
+export const LIBELLES_FORMULE = libelles<Formule>('formules', ['MENSUEL', 'ANNUEL']);
 
 /** Seuil d'alerte avant l'expiration (batulo.abonnement.jours-alerte-expiration du backend). */
 export const JOURS_ALERTE_EXPIRATION = 7;
@@ -46,10 +45,7 @@ export interface FormuleResponse {
 /** Prestataire qui a encaissé un paiement (enum FournisseurPaiement du backend). */
 export type FournisseurPaiement = 'STRIPE' | 'MOOSYL';
 
-export const LIBELLES_FOURNISSEUR: Record<FournisseurPaiement, string> = {
-  STRIPE: 'Carte',
-  MOOSYL: 'Mobile',
-};
+export const LIBELLES_FOURNISSEUR = libelles<FournisseurPaiement>('fournisseurs', ['STRIPE', 'MOOSYL']);
 
 /** Moyen de paiement choisi à la souscription (?moyen= dans l'URL). */
 export type MoyenPaiement = 'carte' | 'mobile';

@@ -15,7 +15,7 @@ import {
   PersonnalisationRequest,
   PersonnalisationResponse,
 } from '../../core/models/personnalisation.model';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../core/services/auth.service';
 import { PersonnalisationService } from '../../core/services/personnalisation.service';
 import { couleurTexte, couleurValide, normaliserCouleur } from '../../core/utils/couleur';
 import { Encadre } from '../../shared/components/encadre/encadre';
@@ -23,8 +23,11 @@ import { EntetePage } from '../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { ApercuApparence } from './apercu-apparence';
 import { ZoneLogo } from './zone-logo';
+import { traduire } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../core/i18n/formats.pipes';
 
-export const MESSAGE_GESTIONNAIRE = 'Seul l’admin de votre entreprise peut modifier l’apparence des formulaires.';
+export const messageGestionnaire = (): string => traduire('apparence.gestionnaire');
 
 /** Champ hexadécimal : vide (couleur par défaut) ou #RRGGBB. */
 const formatCouleur = Validators.pattern(/^(#[0-9A-Fa-f]{6})?$/);
@@ -36,8 +39,7 @@ const formatCouleur = Validators.pattern(/^(#[0-9A-Fa-f]{6})?$/);
  */
 @Component({
   selector: 'app-page-apparence',
-  imports: [
-    ReactiveFormsModule,
+  imports: [PlurielPipe, TranslocoPipe, ReactiveFormsModule,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -72,7 +74,7 @@ export class PageApparence {
   /** Admin dont l'abonnement n'a pas expiré : seul à pouvoir modifier. */
   protected readonly modifiable = computed(() => this.auth.role() === 'ADMIN' && !this.auth.lectureSeule());
   protected readonly raisonLectureSeule = computed(() =>
-    this.auth.role() !== 'ADMIN' ? MESSAGE_GESTIONNAIRE : this.auth.lectureSeule() ? MESSAGE_LECTURE_SEULE : null,
+    this.auth.role() !== 'ADMIN' ? messageGestionnaire() : this.auth.lectureSeule() ? messageLectureSeule() : null,
   );
 
   readonly nomAffiche = new FormControl('', { nonNullable: true, validators: [Validators.maxLength(NOM_AFFICHE_MAX)] });
@@ -179,7 +181,7 @@ export class PageApparence {
     }
     const demande = this.modifications();
     if (Object.keys(demande).length === 0) {
-      this.snackBar.open('Aucune modification à enregistrer.', 'Fermer', { duration: 4000 });
+      this.snackBar.open(traduire('apparence.aucuneModification'), traduire('commun.fermer'), { duration: 4000 });
       return;
     }
     this.enregistrement.set(true);
@@ -191,7 +193,7 @@ export class PageApparence {
         next: (personnalisation) => {
           this.enregistrement.set(false);
           this.appliquer(personnalisation);
-          this.snackBar.open('Apparence enregistrée.', 'Fermer', { duration: 4000 });
+          this.snackBar.open(traduire('apparence.enregistree'), traduire('commun.fermer'), { duration: 4000 });
         },
         error: (erreur: unknown) => {
           this.enregistrement.set(false);

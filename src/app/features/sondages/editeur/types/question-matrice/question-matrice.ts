@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 import { REGLES_SONDAGE } from '../../../../../core/utils/regles-question';
 import { EditeurListeTextes } from '../editeur-liste-textes/editeur-liste-textes';
 import { ControlesMatrice } from '../formulaires-types';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * MATRICE : une grille où chaque ligne reçoit une réponse parmi les colonnes. 1 à 30 lignes, 2 à 10 colonnes,
@@ -10,29 +11,28 @@ import { ControlesMatrice } from '../formulaires-types';
  */
 @Component({
   selector: 'app-question-matrice',
-  imports: [EditeurListeTextes],
+  imports: [TranslocoPipe, EditeurListeTextes],
   template: `
     <div class="grille-matrice">
       <app-editeur-liste-textes
         [liste]="configuration().controls.lignes"
-        titre="Lignes"
-        libelleElement="Ligne"
-        element="une ligne"
-        elements="lignes"
+        titre="editeur.matrice.lignes"
+        libelleElement="editeur.matrice.ligne"
+        element="editeur.matrice.uneLigne"
+        elements="editeur.matrice.lignesMin"
         [max]="regles.matriceLignesMax"
       />
       <app-editeur-liste-textes
         [liste]="configuration().controls.colonnes"
-        titre="Colonnes"
-        libelleElement="Colonne"
-        element="une colonne"
-        elements="colonnes"
+        titre="editeur.matrice.colonnes"
+        libelleElement="editeur.matrice.colonne"
+        element="editeur.matrice.uneColonne"
+        elements="editeur.matrice.colonnesMin"
         [max]="regles.matriceColonnesMax"
       />
     </div>
     <p class="texte-aide">
-      De 1 à {{ regles.matriceLignesMax }} lignes et de {{ regles.matriceColonnesMin }} à
-      {{ regles.matriceColonnesMax }} colonnes. Chaque ligne reçoit une réponse parmi les colonnes.
+      {{ 'editeur.matrice.aide' | transloco: { lignesMax: regles.matriceLignesMax, colonnesMin: regles.matriceColonnesMin, colonnesMax: regles.matriceColonnesMax } }}
     </p>
   `,
   styles: `

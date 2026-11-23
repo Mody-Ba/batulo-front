@@ -1,6 +1,6 @@
 <header class="barre">
   <div class="interieur">
-    <a class="marque" href="#haut" (click)="choisir($event, 'haut')" aria-label="Batulo, haut de la page">
+    <a class="marque" href="#haut" (click)="choisir($event, 'haut')" [attr.aria-label]="'vitrine.barre.haut' | transloco">
       <span class="material-icons logo" aria-hidden="true">ballot</span>
       <span>Batulo</span>
     </a>
@@ -13,18 +13,19 @@
       (click)="basculer()"
     >
       <span class="material-icons" aria-hidden="true">{{ menuOuvert() ? 'close' : 'menu' }}</span>
-      <span class="visuellement-cache">Menu</span>
+      <span class="visuellement-cache">{{ 'vitrine.barre.menu' | transloco }}</span>
     </button>
 
-    <nav id="menu-vitrine" class="menu" [class.ouvert]="menuOuvert()" aria-label="Sections de la page">
+    <nav id="menu-vitrine" class="menu" [class.ouvert]="menuOuvert()" [attr.aria-label]="'vitrine.barre.sections' | transloco">
       <ul class="liens">
         @for (s of sections; track s.id) {
-          <li><a [href]="'#' + s.id" (click)="choisir($event, s.id)">{{ s.libelle }}</a></li>
+          <li><a [href]="'#' + s.id" (click)="choisir($event, s.id)">{{ s.libelle | transloco }}</a></li>
         }
       </ul>
       <div class="actions">
-        <a class="bouton contour" routerLink="/connexion">Connexion</a>
-        <a class="bouton plein" routerLink="/inscription">Créer un compte</a>
+        <app-selecteur-langue />
+        <a class="bouton contour" routerLink="/connexion">{{ 'auth.connexion.titre' | transloco }}</a>
+        <a class="bouton plein" routerLink="/inscription">{{ 'auth.connexion.creerCompte' | transloco }}</a>
       </div>
     </nav>
   </div>

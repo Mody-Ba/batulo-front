@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +20,10 @@ import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { OngletsSondage } from '../onglets-sondage/onglets-sondage';
 import { DialogueReponse, DonneesDialogueReponse } from './dialogue-reponse';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { formaterNombre, traduire, traduirePluriel } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Onglet « Réponses » : réponses de la version affichée, ou de toutes les versions (?lignee=true), les plus récentes
@@ -29,8 +32,7 @@ import { DialogueReponse, DonneesDialogueReponse } from './dialogue-reponse';
  */
 @Component({
   selector: 'app-liste-reponses',
-  imports: [
-    DatePipe,
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatButtonToggleModule,
@@ -139,7 +141,7 @@ export class ListeReponses {
           width: '640px',
           maxWidth: 'calc(100vw - 16px)',
         }),
-      error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+      error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 }),
     });
   }
 
@@ -151,11 +153,10 @@ export class ListeReponses {
   /** « 7 questions répondues sur 9 » (le total n'est connu que pour la version affichée). */
   protected resume(reponse: ReponseResponse, sondage: SondageResponse): string {
     const repondues = reponse.valeurs.length;
-    const texte = `${repondues} question${repondues > 1 ? 's' : ''} répondue${repondues > 1 ? 's' : ''}`;
     if (reponse.sondageId !== sondage.id) {
-      return texte;
+      return traduirePluriel('sondages.reponses.repondues', repondues);
     }
     const total = sondage.sections.reduce((n, s) => n + s.questions.length, 0);
-    return `${texte} sur ${total}`;
+    return traduirePluriel('sondages.reponses.reponduesSur', repondues, { total: formaterNombre(total) });
   }
 }

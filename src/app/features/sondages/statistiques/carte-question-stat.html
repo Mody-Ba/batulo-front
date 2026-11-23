@@ -1,84 +1,85 @@
 <article class="carte-stat" [attr.aria-labelledby]="'stat-' + question().questionId">
   <header class="entete">
-    <h3 [id]="'stat-' + question().questionId"><span class="numero">{{ numero() }}.</span> {{ question().libelle }}</h3>
+    <h3 [id]="'stat-' + question().questionId"><span class="numero">{{ numero() }}.</span> <span dir="auto">{{ question().libelle }}</span></h3>
     <p class="effectifs">
-      {{ nombre(question().nombreRepondants) }} répondant{{ question().nombreRepondants > 1 ? 's' : '' }}
-      · {{ nombre(question().sansReponse) }} sans réponse
+      {{ 'statistiques.carte.repondants' | pluriel: question().nombreRepondants }}
+      · {{ 'statistiques.carte.sansReponse' | pluriel: question().sansReponse }}
     </p>
     @if (question().conditionnelle && question().vues != null) {
       <p class="vue-par">
         <span class="material-icons" aria-hidden="true">alt_route</span>
-        Question conditionnelle : vue par {{ nombre(question().vues!) }} répondant{{ question().vues! > 1 ? 's' : '' }}
         @if (totalReponses() != null) {
-          sur {{ nombre(totalReponses()!) }}
+          {{ 'statistiques.carte.vueParSur' | pluriel: question().vues! : { total: nombre(totalReponses()!) } }}
+        } @else {
+          {{ 'statistiques.carte.vuePar' | pluriel: question().vues! }}
         }
-        <span class="texte-aide">(pourcentages calculés sur ceux qui ont répondu)</span>
+        <span class="texte-aide">{{ 'statistiques.carte.pourcentagesRepondu' | transloco }}</span>
       </p>
     }
     @if (question().petitEffectif && question().nombreRepondants > 0) {
       <p class="avertissement" role="note">
-        <span aria-hidden="true">⚠</span> Moins de 5 répondants : résultats à interpréter avec prudence.
+        <span aria-hidden="true">⚠</span> {{ 'statistiques.carte.petitEffectif' | transloco }}
       </p>
     }
   </header>
 
   @if (question().nombreRepondants === 0) {
-    <p class="vide">Aucune réponse à cette question avec ces filtres.</p>
+    <p class="vide">{{ 'statistiques.carte.aucune' | transloco }}</p>
   } @else {
     @switch (question().type) {
       @case ('CHOIX_UNIQUE') {
-        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'statistiques.carte.reponsesA' | transloco: { libelle: question().libelle }" />
       }
       @case ('OUI_NON') {
-        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'statistiques.carte.reponsesA' | transloco: { libelle: question().libelle }" />
       }
       @case ('CHOIX_MULTIPLE') {
-        <p class="note">Plusieurs choix possibles : les parts dépassent 100 % au total.</p>
-        <app-barres-horizontales [barres]="barresOptions()" [titre]="'Réponses à « ' + question().libelle + ' »'" />
+        <p class="note">{{ 'statistiques.carte.plusieursChoix' | transloco }}</p>
+        <app-barres-horizontales [barres]="barresOptions()" [titre]="'statistiques.carte.reponsesA' | transloco: { libelle: question().libelle }" />
       }
       @case ('CLASSEMENT') {
-        <p class="note">Du mieux classé au moins bien classé (rang moyen : 1 = toujours premier).</p>
+        <p class="note">{{ 'statistiques.carte.classementNote' | transloco }}</p>
         <app-barres-horizontales
           [barres]="barresClassement()"
-          [titre]="'Classement de « ' + question().libelle + ' »'"
-          enteteLibelle="Option"
-          enteteValeur="Rang moyen et nombre de premières places"
+          [titre]="'statistiques.carte.classementDe' | transloco: { libelle: question().libelle }"
+          [enteteLibelle]="'statistiques.carte.option' | transloco"
+          [enteteValeur]="'statistiques.carte.enteteRang' | transloco"
         />
       }
       @case ('ECHELLE') {
         <ng-container *ngTemplateOutlet="indicateurs" />
-        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'Notes données à « ' + question().libelle + ' »'" enteteLibelle="Note" />
+        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'statistiques.carte.notesDonnees' | transloco: { libelle: question().libelle }" [enteteLibelle]="'statistiques.carte.note' | transloco" />
       }
       @case ('NUMERIQUE') {
         <ng-container *ngTemplateOutlet="indicateurs" />
-        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'Distribution de « ' + question().libelle + ' »'" />
+        <app-colonnes [colonnes]="colonnesNumerique()" [titre]="'statistiques.carte.distribution' | transloco: { libelle: question().libelle }" />
       }
       @case ('DATE') {
         @if (question().dates; as d) {
           <p class="note">
-            Du {{ d.min | date: 'd MMMM y' }} au {{ d.max | date: 'd MMMM y' }}, par {{ d.granularite === 'JOUR' ? 'jour' : 'mois' }}.
+            {{ (d.granularite === 'JOUR' ? 'statistiques.carte.datesParJour' : 'statistiques.carte.datesParMois') | transloco: { du: (d.min | dateL: 'long'), au: (d.max | dateL: 'long') } }}
           </p>
         }
-        <app-colonnes [colonnes]="colonnesDates()" [titre]="'Dates données à « ' + question().libelle + ' »'" enteteLibelle="Période" />
+        <app-colonnes [colonnes]="colonnesDates()" [titre]="'statistiques.carte.datesDonnees' | transloco: { libelle: question().libelle }" [enteteLibelle]="'statistiques.carte.periode' | transloco" />
       }
       @case ('MATRICE') {
         @if (question().matrice; as m) {
           <div class="defilement">
             <table class="matrice">
-              <caption class="visuellement-cache">Réponses par ligne à « {{ question().libelle }} » (nombre et part de la ligne)</caption>
+              <caption class="visuellement-cache">{{ 'statistiques.carte.matriceCaption' | transloco: { libelle: question().libelle } }}</caption>
               <thead>
                 <tr>
                   <td></td>
                   @for (c of m.colonnes; track c) {
-                    <th scope="col">{{ c }}</th>
+                    <th scope="col" dir="auto">{{ c }}</th>
                   }
-                  <th scope="col">Répondants</th>
+                  <th scope="col">{{ 'statistiques.carte.repondantsCol' | transloco }}</th>
                 </tr>
               </thead>
               <tbody>
                 @for (l of m.lignes; track l.ligne) {
                   <tr>
-                    <th scope="row">{{ l.ligne }}</th>
+                    <th scope="row" dir="auto">{{ l.ligne }}</th>
                     @for (cel of l.cellules; track cel.colonne) {
                       <td [style.background]="fond(cel.pourcentage)">
                         <span class="part">{{ pourcentage(cel.pourcentage) }}</span>
@@ -98,8 +99,8 @@
           <ul class="textes" [attr.aria-busy]="chargementTextes() || null">
             @for (t of page.contenu; track $index) {
               <li>
-                <p>{{ t.texte }}</p>
-                <span class="date">{{ t.dateSoumission | date: 'd MMM y, HH:mm' }}</span>
+                <p dir="auto">{{ t.texte }}</p>
+                <span class="date">{{ t.dateSoumission | dateL: 'courtHeure' }}</span>
               </li>
             }
           </ul>
@@ -108,9 +109,9 @@
           }
           @if (page.totalPages > 1) {
             <div class="pagination-textes">
-              <button type="button" (click)="changerPageTextes(page.page - 1)" [disabled]="page.page === 0 || chargementTextes()">Précédents</button>
-              <span role="status">Page {{ page.page + 1 }} sur {{ page.totalPages }} ({{ nombre(page.totalElements) }} textes)</span>
-              <button type="button" (click)="changerPageTextes(page.page + 1)" [disabled]="page.page >= page.totalPages - 1 || chargementTextes()">Suivants</button>
+              <button type="button" (click)="changerPageTextes(page.page - 1)" [disabled]="page.page === 0 || chargementTextes()">{{ 'statistiques.carte.precedents' | transloco }}</button>
+              <span role="status">{{ 'statistiques.carte.pageTextes' | pluriel: page.totalElements : { page: page.page + 1, total: page.totalPages } }}</span>
+              <button type="button" (click)="changerPageTextes(page.page + 1)" [disabled]="page.page >= page.totalPages - 1 || chargementTextes()">{{ 'statistiques.carte.suivants' | transloco }}</button>
             </div>
           }
         }
@@ -121,10 +122,10 @@
   <ng-template #indicateurs>
     @if (question().numerique; as n) {
       <dl class="indicateurs">
-        <div><dt>Moyenne</dt><dd>{{ decimal(n.moyenne) }}</dd></div>
-        <div><dt>Médiane</dt><dd>{{ decimal(n.mediane) }}</dd></div>
-        <div><dt>Minimum</dt><dd>{{ decimal(n.min) }}</dd></div>
-        <div><dt>Maximum</dt><dd>{{ decimal(n.max) }}</dd></div>
+        <div><dt>{{ 'statistiques.carte.moyenne' | transloco }}</dt><dd>{{ decimal(n.moyenne) }}</dd></div>
+        <div><dt>{{ 'statistiques.carte.mediane' | transloco }}</dt><dd>{{ decimal(n.mediane) }}</dd></div>
+        <div><dt>{{ 'statistiques.carte.minimum' | transloco }}</dt><dd>{{ decimal(n.min) }}</dd></div>
+        <div><dt>{{ 'statistiques.carte.maximum' | transloco }}</dt><dd>{{ decimal(n.max) }}</dd></div>
       </dl>
     }
   </ng-template>

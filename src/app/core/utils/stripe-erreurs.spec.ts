@@ -1,7 +1,7 @@
 import type { StripeError } from '@stripe/stripe-js';
 import {
-  MESSAGE_PAIEMENT_INATTENDU,
-  MESSAGE_STRIPE_INDISPONIBLE,
+  messagePaiementInattendu,
+  messageStripeIndisponible,
   messageErreurStripe,
 } from './stripe-erreurs';
 
@@ -35,7 +35,7 @@ describe('messageErreurStripe', () => {
   });
 
   it('Stripe injoignable', () => {
-    expect(messageErreurStripe(erreur({ type: 'api_connection_error' }))).toBe(MESSAGE_STRIPE_INDISPONIBLE);
+    expect(messageErreurStripe(erreur({ type: 'api_connection_error' }))).toBe(messageStripeIndisponible());
   });
 
   it('erreur de saisie : message de Stripe (déjà en français)', () => {
@@ -46,8 +46,8 @@ describe('messageErreurStripe', () => {
 
   it('jamais le message anglais d’une erreur inconnue', () => {
     expect(messageErreurStripe(erreur({ type: 'api_error', message: 'Something went wrong' }))).toBe(
-      MESSAGE_PAIEMENT_INATTENDU,
+      messagePaiementInattendu(),
     );
-    expect(messageErreurStripe(null)).toBe(MESSAGE_PAIEMENT_INATTENDU);
+    expect(messageErreurStripe(null)).toBe(messagePaiementInattendu());
   });
 });

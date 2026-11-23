@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +19,7 @@ import {
   SondageGestionnaireResponse,
 } from '../../../../core/models/sondage.model';
 import { AssignationService } from '../../../../core/services/assignation.service';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../../../core/services/auth.service';
 import { GestionnaireService } from '../../../../core/services/gestionnaire.service';
 import { messageErreur } from '../../../../core/utils/erreur-http';
 import { confirmer } from '../../../../shared/components/dialogue-confirmation/dialogue-confirmation';
@@ -31,14 +30,16 @@ import {
   DialogueAssignerSondages,
   DonneesAssignerSondages,
 } from '../dialogue-assigner-sondages/dialogue-assigner-sondages';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 const TAILLE_SONDAGES = 10;
 
 /** Détail d'un gestionnaire : compte, actions, et ses sondages (créés ou assignés). */
 @Component({
   selector: 'app-detail-gestionnaire',
-  imports: [
-    DatePipe,
+  imports: [TranslocoPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -61,7 +62,7 @@ export class DetailGestionnaire {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
-  protected readonly messageLectureSeule = MESSAGE_LECTURE_SEULE;
+  protected readonly messageLectureSeule = messageLectureSeule;
   protected readonly nomComplet = nomComplet;
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
@@ -176,16 +177,16 @@ export class DetailGestionnaire {
       .afterClosed()
       .pipe(filter(Boolean))
       .subscribe(() => {
-        this.snackBar.open('Assignations enregistrées.', 'Fermer', { duration: 5000 });
+        this.snackBar.open(traduire('gestionnaires.detail.assignationsEnregistrees'), traduire('commun.fermer'), { duration: 5000 });
         this.chargerSondages();
       });
   }
 
   protected retirerAssignation(g: GestionnaireResponse, sondage: SondageGestionnaireResponse): void {
     confirmer(this.dialog, {
-      titre: 'Retirer cette assignation ?',
-      message: `${nomComplet(g)} ne verra plus le sondage « ${sondage.titre} » (toutes ses versions). Il en sera notifié.`,
-      action: 'Retirer',
+      titre: traduire('gestionnaires.detail.retirerTitre'),
+      message: traduire('gestionnaires.detail.retirerMessage', { nom: nomComplet(g), titre: sondage.titre }),
+      action: traduire('commun.retirer'),
       destructive: true,
     })
       .pipe(
@@ -194,10 +195,10 @@ export class DetailGestionnaire {
       )
       .subscribe({
         next: () => {
-          this.snackBar.open('Assignation retirée.', 'Fermer', { duration: 5000 });
+          this.snackBar.open(traduire('gestionnaires.detail.assignationRetiree'), traduire('commun.fermer'), { duration: 5000 });
           this.chargerSondages();
         },
-        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 }),
       });
   }
 }

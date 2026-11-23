@@ -19,7 +19,7 @@ import { ChampBase } from './champ-base';
       </div>
       @for (ligne of lignes(); track ligne; let i = $index) {
         <div class="matrice-ligne" role="radiogroup" [attr.aria-labelledby]="idBase() + '-ligne-' + i">
-          <span class="matrice-libelle" [id]="idBase() + '-ligne-' + i">{{ ligne }}</span>
+          <span class="matrice-libelle" dir="auto" [id]="idBase() + '-ligne-' + i">{{ ligne }}</span>
           <div class="matrice-choix">
             @for (colonne of colonnes(); track colonne) {
               <label class="choix">

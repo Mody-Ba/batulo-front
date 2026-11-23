@@ -17,19 +17,18 @@ import { StatutPaiementMobileResponse } from '../../../../core/models/abonnement
 import { AbonnementService } from '../../../../core/services/abonnement.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { interrogationPeriodique } from '../../../../core/utils/interrogation';
+import { traduire } from '../../../../core/i18n/traduire';
 
 /** Relecture du statut d'un paiement mobile. */
 export const INTERVALLE_SUIVI_MS = 3000;
 /** Sans fin de session connue (page de retour, expireLe absent) : arrêt après 10 minutes. */
 export const DUREE_MAX_SUIVI_MS = 10 * 60_000;
 
-export const MESSAGE_RECONNEXION = 'Votre paiement est enregistré. Reconnectez-vous pour accéder à Batulo.';
-export const MESSAGE_ECHEC_MOBILE =
-  'Le paiement n’a pas abouti : il a été refusé, annulé, ou la session de paiement a expiré. Votre abonnement n’a pas changé.';
-export const MESSAGE_EXPIRE_MOBILE =
-  'La session de paiement a expiré sans paiement confirmé. Votre abonnement n’a pas changé : relancez un paiement.';
-export const MESSAGE_ATTENTE_LONGUE =
-  'Le paiement n’est pas encore confirmé. Si vous avez payé, vérifiez à nouveau dans quelques instants ; sinon, relancez un paiement.';
+/** Clé du message de /connexion quand le nouveau jeton n'a pas pu être obtenu après un paiement. */
+export const MESSAGE_RECONNEXION = 'abonnement.reconnexion';
+export const messageEchecMobile = (): string => traduire('abonnement.mobile.echec');
+export const messageExpireMobile = (): string => traduire('abonnement.mobile.expire');
+export const messageAttenteLongue = (): string => traduire('abonnement.mobile.attenteLongue');
 
 /** Un statut relu, ou la fin du suivi sans réponse définitive (session expirée ou attente trop longue). */
 export type EvenementSuivi =

@@ -1,25 +1,25 @@
-<h2 class="titre-etape visuellement-cache" tabindex="-1">Paiement par application mobile</h2>
+<h2 class="titre-etape visuellement-cache" tabindex="-1">{{ 'abonnement.mobile.titre' | transloco }}</h2>
 
 <div class="resume">
   <div>
-    <p class="resume-formule">{{ libellesFormule[formule()] }} · application mobile</p>
+    <p class="resume-formule">{{ libellesFormule[formule()] }} · {{ 'abonnement.mobile.application' | transloco }}</p>
     @if (session(); as s) {
       <p class="resume-montant">{{ montant(s.montant, s.devise) }}</p>
     }
   </div>
-  <button matButton type="button" (click)="changerFormule.emit()">Changer de formule</button>
+  <button matButton type="button" (click)="changerFormule.emit()">{{ 'abonnement.souscrire.changerFormule' | transloco }}</button>
 </div>
 
 @switch (etat()) {
   @case ('creation') {
-    <mat-progress-bar mode="indeterminate" aria-label="Préparation du paiement mobile" />
-    <p class="texte-aide" role="status">Préparation de la page de paiement…</p>
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'abonnement.mobile.preparation' | transloco" />
+    <p class="texte-aide" role="status">{{ 'abonnement.mobile.preparationPage' | transloco }}</p>
   }
 
   @case ('erreur') {
-    <app-message-erreur [erreur]="erreur()" parDefaut="Le paiement mobile n’a pas pu être préparé. Réessayez." />
+    <app-message-erreur [erreur]="erreur()" [parDefaut]="'abonnement.mobile.erreurPreparation' | transloco" />
     <div class="actions">
-      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">{{ 'commun.reessayer' | transloco }}</button>
     </div>
   }
 
@@ -27,9 +27,9 @@
     @if (session(); as s) {
       <div class="paiement">
         <div class="bloc-qr">
-          <app-code-qr [texte]="s.checkoutUrl" libelle="Code QR de la page de paiement mobile" />
-          <p>Scannez ce code avec l’appareil photo de votre téléphone, puis payez avec {{ applications }}…</p>
-          <p class="revenir">Une fois payé, revenez sur cette page.</p>
+          <app-code-qr [texte]="s.checkoutUrl" [libelle]="'abonnement.mobile.qr' | transloco" />
+          <p>{{ 'abonnement.mobile.scannez' | transloco: { applications: applications } }}</p>
+          <p class="revenir">{{ 'abonnement.mobile.revenez' | transloco }}</p>
         </div>
 
         <div class="bloc-infos">
@@ -37,16 +37,16 @@
           @if (s.expireLe) {
             <p class="expiration">
               <mat-icon fontIcon="schedule" aria-hidden="true" />
-              Valable jusqu’à {{ s.expireLe | date: 'HH:mm' }}
+              {{ 'abonnement.mobile.valable' | transloco: { heure: (s.expireLe | dateL: 'heure') } }}
             </p>
           }
           <!-- Même onglet : la session (sessionStorage) est encore là quand Moosyl renvoie sur Batulo. -->
           <a matButton="filled" class="bouton-principal bouton-large" [href]="s.checkoutUrl">
-            <mat-icon fontIcon="smartphone" aria-hidden="true" />Payer sur ce téléphone
+            <mat-icon fontIcon="smartphone" aria-hidden="true" />{{ 'abonnement.mobile.payerTelephone' | transloco }}
           </a>
           <p class="en-cours" role="status">
             <mat-spinner diameter="18" aria-hidden="true" />
-            Paiement en cours… Cette page se met à jour dès que le paiement est confirmé.
+            {{ 'abonnement.mobile.enCours' | transloco }}
           </p>
         </div>
       </div>
@@ -54,16 +54,16 @@
   }
 
   @case ('echoue') {
-    <app-encadre type="erreur" role="alert" icone="error"><p>{{ messageEchec }}</p></app-encadre>
+    <app-encadre type="erreur" role="alert" icone="error"><p>{{ messageEchec() }}</p></app-encadre>
     <div class="actions">
-      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">{{ 'commun.reessayer' | transloco }}</button>
     </div>
   }
 
   @case ('expire') {
-    <app-encadre type="avertissement" role="alert" icone="timer_off"><p>{{ messageExpire }}</p></app-encadre>
+    <app-encadre type="avertissement" role="alert" icone="timer_off"><p>{{ messageExpire() }}</p></app-encadre>
     <div class="actions">
-      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">Réessayer</button>
+      <button matButton="filled" type="button" class="bouton-principal" (click)="demarrer()">{{ 'commun.reessayer' | transloco }}</button>
     </div>
   }
 }

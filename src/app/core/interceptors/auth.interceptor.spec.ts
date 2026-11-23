@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { ConnexionResponse } from '../models/auth.model';
 import { AuthService } from '../services/auth.service';
 import { authInterceptor, origineApi } from './auth.interceptor';
+import { traduire } from '../i18n/traduire';
 
 const API = environment.apiUrl;
 
@@ -116,7 +117,7 @@ describe('authInterceptor', () => {
 
     expect(erreurRecue).not.toBeNull();
     expect(auth.estConnecte()).toBe(false);
-    expect(auth.messageConnexion()).toContain('session a expiré');
+    expect(traduire(auth.messageConnexion() ?? '')).toContain('session a expiré');
     expect(router.navigateByUrl).toHaveBeenCalledWith('/connexion');
   });
 

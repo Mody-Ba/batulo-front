@@ -5,7 +5,7 @@ import { fournirPaginateurFrancais } from '../../core/utils/paginateur-francais'
 export const routes: Routes = [
   {
     path: '',
-    title: 'Notifications · Batulo',
+    title: 'titres.notifications',
     providers: [fournirPaginateurFrancais()],
     loadComponent: () => import('./page-notifications').then((m) => m.PageNotifications),
   },

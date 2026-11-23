@@ -6,12 +6,12 @@ export const routes: Routes = [
     // ?recherche=&statut=&page=&taille=
     path: '',
     pathMatch: 'full',
-    title: 'Admins et entreprises · Batulo',
+    title: 'titres.admins',
     loadComponent: () => import('./liste-admins/liste-admins').then((m) => m.ListeAdmins),
   },
   {
     path: ':id',
-    title: 'Entreprise · Batulo',
+    title: 'titres.entreprise',
     loadComponent: () => import('./detail-admin/detail-admin').then((m) => m.DetailAdmin),
   },
 ];

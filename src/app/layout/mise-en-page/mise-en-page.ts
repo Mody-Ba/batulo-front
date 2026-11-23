@@ -11,6 +11,7 @@ import { BandeauAbonnement } from '../bandeau-abonnement/bandeau-abonnement';
 import { BarreHaut } from '../barre-haut/barre-haut';
 import { LIENS_PAR_ROLE } from '../menu-lateral/liens-navigation';
 import { MenuLateral } from '../menu-lateral/menu-lateral';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** En dessous de cette largeur, le menu latéral devient un tiroir (mode « over »). */
 const REQUETE_PETIT_ECRAN = '(max-width: 959.98px)';
@@ -18,8 +19,7 @@ const REQUETE_PETIT_ECRAN = '(max-width: 959.98px)';
 /** Cadre des pages connectées : barre du haut, menu latéral selon le rôle, contenu. */
 @Component({
   selector: 'app-mise-en-page',
-  imports: [
-    RouterOutlet,
+  imports: [TranslocoPipe, RouterOutlet,
     MatSidenavModule,
     BarreHaut,
     BandeauAbonnement,

@@ -19,7 +19,7 @@ import {
 } from '../../../../testing/donnees-test';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StripeService } from '../../../../core/services/stripe.service';
-import { DELAI_REDIRECTION_MS, MESSAGE_CARTE_INCOMPLETE, MESSAGE_RECONNEXION, Souscrire } from './souscrire';
+import { DELAI_REDIRECTION_MS, messageCarteIncomplete, MESSAGE_RECONNEXION, Souscrire } from './souscrire';
 
 registerLocaleData(localeFrCa);
 
@@ -177,7 +177,7 @@ describe('Souscrire (parcours de paiement)', () => {
     await allerAuPaiement();
     await payer();
     expect(stripe.confirmCardPayment).not.toHaveBeenCalled();
-    expect(texte()).toContain(MESSAGE_CARTE_INCOMPLETE);
+    expect(texte()).toContain(messageCarteIncomplete());
   });
 
   it('succès : confirmation Stripe, puis Batulo, rafraîchissement du jeton et redirection', async () => {

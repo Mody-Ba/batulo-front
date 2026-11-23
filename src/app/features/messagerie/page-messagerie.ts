@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +16,9 @@ import { EntetePage } from '../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { DialogueNouvelleConversation } from './dialogue-nouvelle-conversation';
 import { EtatMessagerie } from './etat-messagerie';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
+import { traduire, traduirePluriel } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Relecture de la liste des conversations. */
 export const INTERVALLE_LISTE_MS = 30_000;
@@ -27,7 +29,7 @@ export const INTERVALLE_LISTE_MS = 30_000;
  */
 @Component({
   selector: 'app-page-messagerie',
-  imports: [DatePipe, RouterLink, RouterOutlet, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, RouterOutlet, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
   providers: [EtatMessagerie],
   templateUrl: './page-messagerie.html',
   styleUrl: './page-messagerie.scss',
@@ -47,7 +49,7 @@ export class PageMessagerie {
   protected readonly ouvertureEnCours = signal(false);
 
   protected readonly titreNouvelle = computed(() =>
-    this.auth.role() === 'GESTIONNAIRE' ? 'Écrire à mon admin' : 'Nouvelle conversation',
+    traduire(this.auth.role() === 'GESTIONNAIRE' ? 'messagerie.ecrireAdmin' : 'messagerie.nouvelle'),
   );
 
   constructor() {
@@ -97,7 +99,7 @@ export class PageMessagerie {
         },
         error: (erreur: unknown) => {
           this.ouvertureEnCours.set(false);
-          this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+          this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
         },
       });
       return;
@@ -119,12 +121,12 @@ export class PageMessagerie {
       parties.push(c.interlocuteur.entreprise);
     }
     if (c.nonLus > 0) {
-      parties.push(`${c.nonLus} non lu${c.nonLus > 1 ? 's' : ''}`);
+      parties.push(traduirePluriel('messagerie.nonLus', c.nonLus));
     }
     if (c.dernierMessage) {
-      parties.push(`${c.dernierMessage.recu ? '' : 'Vous : '}${c.dernierMessage.extrait}`);
+      parties.push(`${c.dernierMessage.recu ? '' : traduire('messagerie.vous') + ' '}${c.dernierMessage.extrait}`);
     }
-    return parties.join(', ');
+    return parties.join(traduire('commun.separateurListe'));
   }
 
   private ouvrir(conversation: ConversationResponse): void {

@@ -2,6 +2,7 @@ import { Component, input, output, viewChild } from '@angular/core';
 import { MatChipListbox, MatChipsModule } from '@angular/material/chips';
 import { LIBELLES_STATUT_ABONNEMENT, StatutAbonnement } from '../../../core/models/abonnement.model';
 import { STATUTS_ABONNEMENT } from '../../../core/models/super-admin.model';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Pastilles de filtre par statut d'abonnement (« Tous » + les cinq statuts). Le parent garde le statut
@@ -9,15 +10,15 @@ import { STATUTS_ABONNEMENT } from '../../../core/models/super-admin.model';
  */
 @Component({
   selector: 'app-filtre-statut-abonnement',
-  imports: [MatChipsModule],
+  imports: [TranslocoPipe, MatChipsModule],
   template: `
     <mat-chip-listbox
-      aria-label="Filtrer par statut d’abonnement"
+      [attr.aria-label]="'abonnement.filtrerParStatut' | transloco"
       [value]="statut() ?? 'tous'"
       (change)="choisir($event.value)"
       [hideSingleSelectionIndicator]="true"
     >
-      <mat-chip-option value="tous">Tous</mat-chip-option>
+      <mat-chip-option value="tous">{{ 'commun.tous' | transloco }}</mat-chip-option>
       @for (s of statuts; track s) {
         <mat-chip-option [value]="s">{{ libelles[s] }}</mat-chip-option>
       }

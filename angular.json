@@ -46,7 +46,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "520kB",
+                  "maximumWarning": "500kB",
                   "maximumError": "1MB"
                 },
                 {
@@ -92,7 +92,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "providersFile": "src/test-providers.ts"
+          }
         }
       }
     }

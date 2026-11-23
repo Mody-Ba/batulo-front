@@ -10,7 +10,7 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        title: 'Tableau de bord · Batulo',
+        title: 'titres.tableauDeBord',
         loadComponent: () => import('./tableau-de-bord/tableau-de-bord').then((m) => m.TableauDeBord),
       },
       {
@@ -25,13 +25,13 @@ export const routes: Routes = [
         // ?page=&taille=
         path: 'statistiques-recues',
         pathMatch: 'full',
-        title: 'Statistiques reçues · Batulo',
+        title: 'titres.statistiquesRecues',
         loadComponent: () =>
           import('./statistiques-recues/liste-statistiques-recues').then((m) => m.ListeStatistiquesRecues),
       },
       {
         path: 'statistiques-recues/:envoiId',
-        title: 'Statistiques reçues · Batulo',
+        title: 'titres.statistiquesRecues',
         loadComponent: () => import('./statistiques-recues/statistiques-recues').then((m) => m.StatistiquesRecues),
       },
     ],

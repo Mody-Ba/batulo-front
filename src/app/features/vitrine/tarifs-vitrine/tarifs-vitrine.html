@@ -1,14 +1,14 @@
 @if (chargement()) {
-  <div class="grille" role="status" aria-label="Chargement des tarifs">
+  <div class="grille" role="status" [attr.aria-label]="'vitrine.tarifs.chargement' | transloco">
     <div class="carte emplacement" aria-hidden="true"></div>
     <div class="carte emplacement" aria-hidden="true"></div>
   </div>
 } @else if (erreur()) {
   <div class="erreur" role="alert">
-    <p>Les tarifs n’ont pas pu être chargés.</p>
+    <p>{{ 'vitrine.tarifs.erreur' | transloco }}</p>
     <div class="actions">
-      <button type="button" class="bouton contour" (click)="charger()">Réessayer</button>
-      <a class="bouton plein" routerLink="/inscription">Créer un compte</a>
+      <button type="button" class="bouton contour" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button>
+      <a class="bouton plein" routerLink="/inscription">{{ 'auth.connexion.creerCompte' | transloco }}</a>
     </div>
   </div>
 } @else if (formules(); as liste) {
@@ -16,29 +16,29 @@
     @for (f of liste; track f.formule) {
       <li class="carte" [class.en-avant]="f.formule === 'ANNUEL' && annuelAvantageux()">
         @if (f.formule === 'ANNUEL' && annuelAvantageux()) {
-          <p class="pastille">Le plus avantageux</p>
+          <p class="pastille">{{ 'vitrine.tarifs.avantageux' | transloco }}</p>
         }
-        <h3>{{ f.libelle }}</h3>
+        <h3>{{ libelle(f) }}</h3>
         <p class="prix">
           <span class="montant">{{ prix(f) }}</span>
-          <span class="devise">{{ f.devise }} / {{ f.duree }}</span>
+          <span class="devise">{{ f.devise }} / {{ duree(f) }}</span>
         </p>
         @if (f.prixMobile != null && f.deviseMobile) {
-          <p class="prix-mobile">ou <strong>{{ montant(f.prixMobile, f.deviseMobile) }}</strong> par paiement mobile</p>
+          <p class="prix-mobile">{{ 'vitrine.tarifs.ou' | transloco }} <strong>{{ montant(f.prixMobile, f.deviseMobile) }}</strong> {{ 'vitrine.tarifs.parMobile' | transloco }}</p>
         }
         <ul class="inclus">
-          <li><span class="material-icons" aria-hidden="true">check</span>Toutes les fonctionnalités</li>
-          <li><span class="material-icons" aria-hidden="true">check</span>Gestionnaires de votre entreprise</li>
-          <li><span class="material-icons" aria-hidden="true">check</span>Carte bancaire ou paiement mobile, sans renouvellement automatique</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.inclus1' | transloco }}</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.inclus2' | transloco }}</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.inclus3' | transloco }}</li>
         </ul>
         <a class="bouton" [class.plein]="f.formule === 'ANNUEL'" [class.contour]="f.formule !== 'ANNUEL'" routerLink="/inscription">
-          Commencer
+          {{ 'vitrine.commencer' | transloco }}
         </a>
       </li>
     }
   </ul>
   <p class="moyens">
     <span class="material-icons" aria-hidden="true">smartphone</span>
-    Payez par carte bancaire ou par application mobile : {{ applications }}.
+    {{ 'vitrine.tarifs.moyens' | transloco: { applications: applications } }}
   </p>
 }

@@ -5,67 +5,67 @@
     <!-- Chiffres de l'entreprise -->
     <article class="carte-section chiffres" aria-labelledby="titre-chiffres">
       <div class="entete-section">
-        <h2 id="titre-chiffres">En chiffres</h2>
+        <h2 id="titre-chiffres">{{ 'admin.tdb.enChiffres' | transloco }}</h2>
       </div>
       <div class="zone-progression">
         @if (chargementChiffres()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des chiffres" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'admin.tdb.chargementChiffres' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreurChiffres()" parDefaut="Les chiffres n’ont pas pu être chargés.">
-        <p><button matButton type="button" (click)="chargerChiffres()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreurChiffres()" [parDefaut]="'admin.tdb.erreurChiffres' | transloco">
+        <p><button matButton type="button" (click)="chargerChiffres()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
       @if (chiffres(); as c) {
         <div class="groupes-chiffres">
           <section class="groupe" aria-labelledby="titre-gestionnaires">
-            <h3 id="titre-gestionnaires">Gestionnaires</h3>
+            <h3 id="titre-gestionnaires">{{ 'menu.gestionnaires' | transloco }}</h3>
             <ul class="tuiles">
               <li>
                 <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: true }">
-                  <span class="valeur">{{ c.gestionnaires.actifs | number }}</span>&ngsp;
-                  <span class="libelle">Actif{{ c.gestionnaires.actifs > 1 ? 's' : '' }}</span>
+                  <span class="valeur">{{ c.gestionnaires.actifs | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.actifs' | pluriel: c.gestionnaires.actifs }}</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: false }">
-                  <span class="valeur">{{ c.gestionnaires.desactives | number }}</span>&ngsp;
-                  <span class="libelle">Désactivé{{ c.gestionnaires.desactives > 1 ? 's' : '' }}</span>
+                  <span class="valeur">{{ c.gestionnaires.desactives | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.desactives' | pluriel: c.gestionnaires.desactives }}</span>
                 </a>
               </li>
             </ul>
           </section>
           <section class="groupe" aria-labelledby="titre-sondages">
-            <h3 id="titre-sondages">Sondages</h3>
+            <h3 id="titre-sondages">{{ 'menu.sondages' | transloco }}</h3>
             <ul class="tuiles">
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'NON_COMMENCE' }">
-                  <span class="valeur">{{ c.sondages.NON_COMMENCE | number }}</span>&ngsp;
-                  <span class="libelle">Non commencés</span>&ngsp;
-                  <span class="precision">brouillons compris</span>
+                  <span class="valeur">{{ c.sondages.NON_COMMENCE | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.nonCommences' | transloco }}</span>&ngsp;
+                  <span class="precision">{{ 'admin.tdb.brouillonsCompris' | transloco }}</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'EN_COURS' }">
-                  <span class="valeur">{{ c.sondages.EN_COURS | number }}</span>&ngsp;
-                  <span class="libelle">En cours</span>
+                  <span class="valeur">{{ c.sondages.EN_COURS | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.enCours' | transloco }}</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'TERMINE' }">
-                  <span class="valeur">{{ c.sondages.TERMINE | number }}</span>&ngsp;
-                  <span class="libelle">Terminés</span>
+                  <span class="valeur">{{ c.sondages.TERMINE | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.termines' | transloco }}</span>
                 </a>
               </li>
             </ul>
           </section>
           <section class="groupe" aria-labelledby="titre-reponses">
-            <h3 id="titre-reponses">Réponses</h3>
+            <h3 id="titre-reponses">{{ 'admin.tdb.reponses' | transloco }}</h3>
             <ul class="tuiles">
               <li>
                 <span class="tuile">
-                  <span class="valeur">{{ c.nombreTotalReponses | number }}</span>&ngsp;
-                  <span class="libelle">Reçues au total</span>&ngsp;
-                  <span class="precision">toutes versions</span>
+                  <span class="valeur">{{ c.nombreTotalReponses | nombreL }}</span>&ngsp;
+                  <span class="libelle">{{ 'admin.tdb.recuesTotal' | transloco }}</span>&ngsp;
+                  <span class="precision">{{ 'admin.tdb.toutesVersions' | transloco }}</span>
                 </span>
               </li>
             </ul>
@@ -77,7 +77,7 @@
     <!-- Abonnement -->
     <article class="carte-section abonnement" [class.alerte]="enAlerte() && !expire()" [class.expire]="expire()">
       <div class="entete-section">
-        <h2>Abonnement</h2>
+        <h2>{{ 'menu.abonnement' | transloco }}</h2>
         @if (abonnement(); as a) {
           <span class="pastille-statut" [class]="'statut-' + a.statut">{{ libellesStatut[a.statut] }}</span>
         }
@@ -88,20 +88,21 @@
         }
         @if (a.joursRestants !== null && !expire()) {
           <p class="jours">
-            <span class="nombre">{{ a.joursRestants }}</span>
-            jour{{ a.joursRestants > 1 ? 's' : '' }} restant{{ a.joursRestants > 1 ? 's' : '' }}
+            <span class="nombre">{{ a.joursRestants | nombreL }}</span>
+            {{ 'admin.tdb.joursRestants' | pluriel: a.joursRestants }}
           </p>
         }
         @if (a.dateExpiration) {
           <p class="cellule-secondaire">
-            {{ expire() ? 'Expiré le' : 'Expire le' }} {{ a.dateExpiration | date: 'longDate' }}
             @if (expire()) {
-              : accès en lecture seule.
+              {{ 'bandeau.expireLe' | transloco: { date: (a.dateExpiration | dateL: 'longDate') } }}
+            } @else {
+              {{ 'bandeau.expirera' | transloco: { date: (a.dateExpiration | dateL: 'longDate') } }}
             }
           </p>
         }
         @if (a.montant !== null && a.devise) {
-          <p class="cellule-secondaire">Dernier paiement : {{ a.montant | currency: (a.devise | uppercase) }}</p>
+          <p class="cellule-secondaire">{{ 'admin.tdb.dernierPaiement' | transloco: { montant: (a.montant | montantL: a.devise) } }}</p>
         }
         <div class="actions">
           <a
@@ -109,12 +110,12 @@
             routerLink="/admin/abonnement/souscrire"
             [queryParams]="{ formule: a.formule }"
           >
-            <mat-icon fontIcon="autorenew" aria-hidden="true" />Renouveler
+            <mat-icon fontIcon="autorenew" aria-hidden="true" />{{ 'bandeau.renouveler' | transloco }}
           </a>
-          <a matButton routerLink="/admin/abonnement">Voir le détail</a>
+          <a matButton routerLink="/admin/abonnement">{{ 'admin.tdb.voirDetail' | transloco }}</a>
         </div>
       } @else {
-        <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’abonnement" />
+        <mat-progress-bar mode="indeterminate" [attr.aria-label]="'admin.tdb.chargementAbonnement' | transloco" />
       }
     </article>
 
@@ -123,13 +124,13 @@
 
     <!-- Accès rapides -->
     <article class="carte-section raccourcis">
-      <h2>Accès rapides</h2>
+      <h2>{{ 'accueil.accesRapides' | transloco }}</h2>
       <div class="liens">
         <a matButton="outlined" routerLink="/admin/gestionnaires">
-          <mat-icon fontIcon="group" aria-hidden="true" />Gestionnaires
+          <mat-icon fontIcon="group" aria-hidden="true" />{{ 'menu.gestionnaires' | transloco }}
         </a>
         <a matButton="outlined" routerLink="/sondages">
-          <mat-icon fontIcon="ballot" aria-hidden="true" />Sondages
+          <mat-icon fontIcon="ballot" aria-hidden="true" />{{ 'menu.sondages' | transloco }}
         </a>
       </div>
     </article>

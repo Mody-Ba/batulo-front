@@ -1,3 +1,4 @@
+import { libelles } from '../i18n/traduire';
 import { Role } from './role.model';
 
 /** Type d'un message : écrit par une personne, ou posté automatiquement par Batulo. */
@@ -6,11 +7,11 @@ export type TypeMessage = 'TEXTE' | 'STATISTIQUES' | 'DEMANDE_ABONNEMENT' | 'REP
 /** Côté de la conversation qui a écrit (lu / non lu par côté). */
 export type CoteConversation = 'ADMIN' | 'GESTIONNAIRE' | 'PLATEFORME';
 
-export const LIBELLES_TYPE_MESSAGE: Record<Exclude<TypeMessage, 'TEXTE'>, string> = {
-  STATISTIQUES: 'Statistiques envoyées',
-  DEMANDE_ABONNEMENT: 'Demande d’augmentation d’abonnement',
-  REPONSE_DEMANDE: 'Réponse à une demande d’abonnement',
-};
+export const LIBELLES_TYPE_MESSAGE = libelles<Exclude<TypeMessage, 'TEXTE'>>('typesMessage', [
+  'STATISTIQUES',
+  'DEMANDE_ABONNEMENT',
+  'REPONSE_DEMANDE',
+]);
 
 /** Longueur maximale d'un message (MessageRequest du backend). */
 export const MESSAGE_MAX = 5000;

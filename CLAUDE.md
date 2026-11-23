@@ -40,7 +40,9 @@ Frontend Angular de Batulo, plateforme SaaS de sondages (B2B).
 - Dernière version stable d'Angular (22.x), composants **standalone**, **signals** (`signal`, `computed`,
   `input`, `output`), contrôle de flux `@if/@for/@switch`, **Reactive Forms** (`NonNullableFormBuilder`),
   **Angular Material** (Material 3, thème dans `src/styles.scss`, champs `outline` + `subscriptSizing: 'dynamic'`).
-- Tous les textes en **français** (apostrophe typographique ’), locale `fr-CA`.
+- Interface en **trois langues** (français, anglais, arabe) : **aucun texte en dur**, tout passe par une clé de
+  `public/i18n/` (voir « Langues de l'interface »). Le français reste la langue de référence (apostrophe typographique ’,
+  format `fr-CA`) ; dates, nombres et montants suivent la langue courante (pipes `dateL`, `nombreL`, `montantL`).
 - **Modèles TypeScript séparés par domaine** dans `core/models/` (copie exacte des JSON du backend).
 - **Un service HTTP par domaine** dans `core/services/`, URL tirée de `environment.apiUrl` (jamais écrite ailleurs).
 - **Responsive, mobile d'abord** (impératif pour le formulaire public F6) : pas de largeur fixe, cibles tactiles
@@ -62,9 +64,12 @@ src/app/
                    super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie, personnalisation)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
+    i18n/          langues.ts (fr, en, ar, dir, locales), langue.service.ts (choix, RTL), traduire.ts (traduire, pluriels,
+                   libelles), formats.pipes.ts (dateL, nombreL, montantL, pourcentL, pluriel), chargeur-traductions.ts,
+                   titre-traduit.ts (titres de page), fournir-i18n.ts
     utils/         couleur.ts (#RRGGBB, contraste WCAG), erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
                    (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch),
-                   interrogation.ts (interrogation périodique arrêtée onglet caché), montant.ts (montants fr-CA,
+                   interrogation.ts (interrogation périodique arrêtée onglet caché), montant.ts (montants selon la langue,
                    MRU sans décimales), redirection.ts (?retour= : chemins internes seulement)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
@@ -72,7 +77,7 @@ src/app/
                    public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »),
                    apparence/ (personnalisation de l'entreprise)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
-                   filtre-statut-abonnement, echeance-abonnement, dernieres-notifications
+                   filtre-statut-abonnement, echeance-abonnement, dernieres-notifications, selecteur-langue
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
   testing/         données partagées par les tests unitaires (donnees-test.ts)
 ```
@@ -103,7 +108,7 @@ src/app/
 - Pages : `/admin/abonnement` (Mon abonnement ; redirige vers `souscrire` si EN_ATTENTE_PAIEMENT) et
   `/admin/abonnement/souscrire?formule=MENSUEL|ANNUEL` (choix -> paiement -> succès). Pas de bouton d'annulation.
 - Parcours : `POST /paiement/intention { formule }` -> `StripeService.charger(clePublique)` (`@stripe/stripe-js/pure`,
-  locale `fr-CA`, Stripe.js chargé seulement à ce moment) -> champs `cardNumber`, `cardExpiry`, `cardCvc` ->
+  locale de l'interface (`localeStripe()` : fr-CA, en, ar), Stripe.js chargé seulement à ce moment) -> champs `cardNumber`, `cardExpiry`, `cardCvc` ->
   `stripe.confirmCardPayment(clientSecret)` -> si `succeeded` : `POST /paiement/confirmer { paymentIntentId }`
   -> `auth.rafraichir()` (le statut est dans le jeton ; échec = `terminerSession`) -> « Vous êtes bien abonné »
   -> `/admin` après 4 s.
@@ -111,7 +116,7 @@ src/app/
 - Paiement accepté par Stripe mais non confirmé par Batulo (réseau, `PAIEMENT_NON_REUSSI`) : ne jamais reproposer
   la carte (double paiement) ; seulement « Vérifier à nouveau » (`/confirmer` est idempotent).
 - Erreurs Stripe traduites dans `core/utils/stripe-erreurs.ts` (`decline_code`, puis `code`, puis message
-  localisé pour les erreurs de saisie ; jamais un message anglais).
+  localisé pour les erreurs de saisie ; toujours dans la langue de l’interface, clés `stripe.*`).
 - `AbonnementService.abonnement` (signal) alimente le bandeau de l'admin (`layout/bandeau-abonnement`) : chargé
   par la mise en page pour le rôle ADMIN, mis à jour par `/confirmer`, vidé à la déconnexion. Alerte à 7 jours ou
   moins (`abonnementEnAlerte`), erreur si EXPIRE ; masqué sur `/admin/abonnement/**`.
@@ -145,7 +150,7 @@ src/app/
   connexion puis retour sur cette page (`?retour=`) ; l'ordinateur voit le succès par son propre suivi.
 - Code QR : bibliothèque `uqr` (ESM, sans dépendance), `encode()` chargé par `import()` dans `code-qr.ts` (chunk à part
   d'environ 10 ko), dessiné en SVG (un tracé, sans innerHTML), noir sur blanc avec 4 modules de marge, `role="img"`.
-- Montants : `montantEnClair()` (Intl fr-CA) ; MRU par son code et sans décimales inutiles (« 40 MRU »). Historique
+- Montants : `montantEnClair()` (Intl, langue courante) ; MRU par son code et sans décimales inutiles (« 40 MRU »). Historique
   des paiements : colonne « Moyen » (Carte / Mobile, `LIBELLES_FOURNISSEUR`) et montant avec le code de sa devise.
 - Vitrine : sous chaque prix, « ou N MRU par paiement mobile » (`prixMobile`, jamais écrit dans le front) et mention
   des applications (`APPLICATIONS_MOBILES`) ; étapes et FAQ mentionnent les deux moyens.
@@ -217,10 +222,9 @@ src/app/
   aussi). Seule une question enregistrée sans modification en attente change de section (`peutChangerDeSection` :
   sa carte est recréée dans la section d'arrivée). Au clavier : Monter/Descendre et « Déplacer vers une autre
   section » dans le menu de la question.
-- Budget initial porté à 520 ko (avertissement), **provisoirement** : `MAT_FORM_FIELD_DEFAULT_OPTIONS` dans
-  `app.config.ts` place `@angular/forms` et le champ Material (environ 128 ko) dans le bundle initial, qui grossit avec
-  chaque usage des formulaires. **À optimiser avant la mise en ligne** (sortir ces paquets du bundle initial sans
-  perdre l'apparence des champs dans les boîtes de dialogue), puis revenir à 500 ko.
+- Budget initial : 500 ko (avertissement). `@angular/forms` et le champ Material ne sont plus dans le bundle initial :
+  pas de `MAT_FORM_FIELD_DEFAULT_OPTIONS` dans `app.config.ts`, chaque `<mat-form-field>` porte
+  `appearance="outline" subscriptSizing="dynamic"` (à reprendre sur tout nouveau champ). Bundle initial : environ 375 ko.
 
 ## Cycle de vie d'un sondage (F5b)
 - États affichés (`etatSondage`, `libelleEtatSondage`) : Brouillon (jamais publié), Planifié (publié, NON_COMMENCE),
@@ -457,14 +461,81 @@ src/app/
   remplacer avant la mise en ligne) : ne décrire que ce que Batulo fait (pas de renouvellement automatique, envoi
   qui demande une connexion, etc.).
 - Tarifs : jamais écrits dans le front, lus dans `GET /api/abonnements/formules` (route publique : prix par carte et
-  `prixMobile` en MRU), formatés par `Intl.NumberFormat('fr-CA')` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
+  `prixMobile` en MRU), formatés par `Intl.NumberFormat(localeIntl())` ; annuel mis en avant seulement s'il coûte moins que douze mois ; erreur -> « Réessayer ».
 - Liens de section (`href="#id"`) gérés par la page : défilement (doux sauf `prefers-reduced-motion`), focus sur le
   titre, `scroll-margin-top` sous la barre ; un lien partagé `/#tarifs` y mène au chargement. Lien d'évitement
   « Aller au contenu ».
 
+
+## Langues de l'interface (phase 4, étape 3, partie 1)
+- **Transloco** (`@jsverse/transloco`, seule bibliothèque ajoutée) : changement de langue à l'exécution, sans
+  rechargement. Langues dans `core/i18n/langues.ts` : `fr` (fr-CA), `en` (en-CA), `ar` (RTL, Intl `ar-u-nu-latn` :
+  **chiffres occidentaux** 1 234). Seule l'interface est traduite ; le contenu saisi par les admins (titres, questions,
+  options) s'affiche tel quel, avec `dir="auto"` pour qu'un texte français reste lisible dans une page arabe.
+- Fichiers (hors bundle, servis depuis `public/`, chargés à la demande) : `public/i18n/{fr,en,ar}.json` (application) et
+  `public/i18n/public/{fr,en,ar}.json` (clés `public.*` seulement : formulaire du répondant, sélecteur de langue, messages
+  d'erreur communs, codes d'erreur vus par le répondant). `/s/:jeton` ne charge que le petit fichier ; le reste de
+  l'application charge les deux, fusionnés ; en quittant `/s/`, le fichier principal est ajouté (`LangueService`).
+- Choix : `LangueService` (`core/i18n/langue.service.ts`) : `localStorage` `batulo.langue` (via `stockage-local.ts`),
+  sinon la langue du navigateur si fr, en ou ar (`fr-CA`, `en-US`, `ar-MR` compris), sinon le français. Appliquée avant
+  le premier affichage (`provideAppInitializer`). Au changement : textes, données de format d'Angular (en-CA et ar
+  chargées par `import()`, fr-CA dans le bundle), `lang` et `dir` sur `<html>`, `Directionality` du CDK (Material :
+  menus, dialogues, sidenav, champs).
+- Sélecteur `shared/components/selecteur-langue` (élément `<select>` natif, sans Material : utilisable dans la vitrine et
+  le formulaire public) : barre du haut (classe `compact-telephone` : bouton rond de 44 px sous 600 px), barre de la
+  vitrine, pages d'authentification (`.haut-auth`), formulaire public (`.barre-langue`). Noms dans leur langue
+  (Français, English, العربية, `lang` sur chaque option).
+- **RTL** : propriétés CSS **logiques** obligatoires (`margin-inline-start`, `padding-inline-end`,
+  `border-inline-start`, `inset-inline-start`, `text-align: start|end` ; jamais left/right) ; ombres internes de côté :
+  variante `:host-context([dir='rtl'])`. Icônes directionnelles en miroir par `styles.scss` (`arrow_back`,
+  `arrow_forward`, `chevron_*`, `send`, `logout`, `open_in_new`, `drive_file_move`, `alt_route`) ; flèches texte (← →)
+  dans `<span class="fleche">`. Ajouter à cette liste toute nouvelle icône qui indique un sens.
+- Dans les gabarits : `{{ 'cle' | transloco }}`, avec paramètres `{{ 'cle' | transloco: { nom: x } }}` (texte
+  `{{nom}}`), attributs `[attr.aria-label]="'cle' | transloco"`, `[titre]="'cle' | transloco"` ; pluriels
+  `{{ 'cle' | pluriel: n }}` (nombre formaté passé sous `n`). Importer `TranslocoPipe` (et `PlurielPipe`).
+- Dans le TypeScript (snackbars, confirmations, messages calculés) : `traduire('cle', params)`,
+  `traduirePluriel('cle', n)`, `traduireSiConnu` (null si absente) ; lus dans un `computed()` ou un gabarit, ils suivent
+  la langue (signal). Libellés de codes (rôles, statuts…) : `libelles('prefixe', codes)` (objet à accesseurs, même usage
+  qu'un `Record`). Constantes de messages : des fonctions (`messageLectureSeule()`), jamais une chaîne figée au
+  chargement. Messages laissés pour la page de connexion (`terminerSession`, `preparerMessageConnexion`) : des clés.
+- Pluriels : groupe `cle.one` / `cle.other` en fr et en ; en arabe `zero`, `one`, `two`, `few`, `many`, `other`
+  (Intl.PluralRules ; `other` obligatoire, repli).
+- Formats : pipes `dateL` (formats nommés `long`, `court`, `longHeure`, `courtHeure`, `jourHeure`, `heure`, ou formats
+  d'Angular), `nombreL`, `montantL`, `pourcentL` ; hors gabarit `dateEnClair()`, `formaterNombre()`, `montantEnClair()`,
+  `localeIntl()`. Ne jamais écrire `'fr-CA'` ni utiliser les pipes `date`/`number`/`currency` d'Angular (figés sur
+  `LOCALE_ID`).
+- Erreurs du backend : `messageApi(code, message)` (`erreur-http.ts`, utilisé par `messageErreur`) : en français le
+  message du serveur (plus précis : dates, noms) ; dans les autres langues la traduction du code (`erreursApi.CODE`, ou
+  `public.erreursApi.CODE` pour les codes vus par le répondant), sinon le message du serveur en secours. Messages de
+  succès fixes du serveur : `texteServeur(cle, recu)`.
+- Titres de page : `title` des routes = clé (`titres.*`, `public.titres.*`), traduite par `TitreTraduit`
+  (`TitleStrategy`) et réappliquée au changement de langue ; une page peut imposer le sien (`personnaliser(() => …)`).
+- Tests : `src/test-providers.ts` charge les vraies traductions (françaises par défaut, aussi hors TestBed) ;
+  `traductions.spec.ts` vérifie les mêmes clés et les mêmes paramètres dans les trois langues, le placement des clés
+  `public.*` et l'apostrophe typographique ; `langue.service.spec.ts` (RTL, mémorisation), `selecteur-langue.spec.ts`,
+  `formats.spec.ts` (dates, nombres, montants, pluriels, erreurs par code), `titre-traduit.spec.ts`.
+
+### Ajouter un texte
+1. Choisir une clé par domaine (`auth.*`, `sondages.*`, `editeur.*`, `statistiques.*`…, `commun.*` pour les textes
+   partagés) ; `public.*` si le texte peut apparaître sur `/s/:jeton` ou dans `shared/formulaire/`.
+2. L'ajouter **dans les trois fichiers** de la même paire (`public/i18n/*.json` ou `public/i18n/public/*.json`), au même
+   endroit de l'arbre, avec les mêmes `{{paramètres}}` ; pluriel : `one` et `other` (fr, en) et les formes arabes utiles.
+3. L'utiliser par le pipe `transloco` / `pluriel` ou `traduire()` ; jamais de texte en dur.
+4. `npx ng test --watch=false` : `traductions.spec.ts` échoue si une langue manque.
+
+### Ajouter une langue
+1. `core/i18n/langues.ts` : `Langue`, entrée de `LANGUES` (code, nom dans la langue, `dir`, `localeAngular`,
+   `localeIntl`).
+2. `langue.service.ts` : données de format d'Angular dans `DONNEES_LOCALES` (`import('@angular/common/locales/xx')`) ;
+   `src/test-providers.ts` : `registerLocaleData` et `TRADUCTIONS`.
+3. Créer `public/i18n/xx.json` et `public/i18n/public/xx.json` (copie du français, traduite) ; ajouter le fichier dans
+   `FICHIERS` de `traductions.spec.ts`, et dans `FORMATS_DATE` (`formats.pipes.ts`) ses motifs de dates.
+4. Stripe : vérifier que la langue est acceptée par `localeStripe()` (`stripe.service.ts`).
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
-  Afficher le `message` (déjà en français) avec `<app-message-erreur [erreur]="…">` ; une erreur `VALIDATION`
+  Afficher l'erreur avec `<app-message-erreur [erreur]="…">` (message traduit par son code, voir « Langues de
+  l'interface ») ; une erreur `VALIDATION`
   (« champ : message ; champ : message ») est détaillée champ par champ par `detailsErreur()`.
 - Règle du mot de passe : 8 caractères au moins, une lettre et un chiffre, 72 au plus (`validateurs.ts`).
 - Accès selon l'abonnement (AccesAbonnementInterceptor) : EN_ATTENTE_PAIEMENT -> seulement `/api/auth/**`,
@@ -483,6 +554,11 @@ src/app/
 - `apparence.nomAffiche` (formulaire public, aperçu) à `null` quand l'admin n'a rien saisi : le front pourra alors montrer
   le nom affiché seul, sans logo (aujourd'hui le bandeau n'apparaît qu'avec un logo, car le nom de l'entreprise y est
   toujours renvoyé par défaut).
+- Langues : envoyer un code (et ses paramètres) avec chaque texte produit par le serveur et montré tel quel, pour que le
+  front le traduise : `erreurs[]` par question des réponses refusées (REPONSES_INVALIDES), titre et message des
+  notifications, contenu des messages automatiques, `raisonFermeture` de la collecte, messages de succès
+  (`MessageResponse`). Aujourd'hui ils restent en français dans les trois langues (sauf les messages de succès connus,
+  traduits par le front : `texteServeur`). Les courriels et les rapports PDF/XLSX restent en français.
 - Exposer, pour chaque question des statistiques, le nombre de réponses aux versions qui contiennent la question
   (`reponsesAuxVersions` de `StatistiqueServiceImpl`, ou les réponses où elle était masquée) : le front pourra alors
   afficher « vue par X répondants sur Y » aussi en vue « toutes les versions ».
@@ -518,6 +594,10 @@ src/app/
   (noms à revérifier dans l'OpenAPI).
 - [x] **Phase 4, étape 1 – Questions conditionnelles** : conditions d'affichage dans l'éditeur (questions et sections),
   évaluation en direct dans l'aperçu et le formulaire public, « vue par » dans les statistiques (voir la section dédiée).
+
+- [x] **Phase 4, étape 3 (partie 1) – Langues de l'interface** : français, anglais, arabe (RTL) avec Transloco, sélecteur
+  (barre du haut, vitrine, pages de connexion, formulaire public), erreurs du backend par code, formats selon la langue.
+  Le contenu des sondages n'est pas encore traduit (partie 2).
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

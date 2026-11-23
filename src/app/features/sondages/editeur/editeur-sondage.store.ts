@@ -20,6 +20,7 @@ import { REGLES_SONDAGE } from '../../../core/utils/regles-question';
 import { situationVersions } from '../cycle-de-vie/versions';
 import { droitsSondage, raisonLectureSeule } from '../droits-sondage';
 import { EtatEnregistrement } from './enregistrement-auto';
+import { traduire } from '../../../core/i18n/traduire';
 
 /** Refus du serveur qui rendent tout l'éditeur en lecture seule. */
 const CODES_VERROU = [
@@ -231,7 +232,7 @@ export class EditeurSondageStore {
   private get id(): number {
     const sondage = this.sondage();
     if (!sondage) {
-      throw new Error('Aucun sondage chargé.');
+      throw new Error(traduire('editeur.store.aucunSondage'));
     }
     return sondage.id;
   }
@@ -310,7 +311,7 @@ export class EditeurSondageStore {
     ).pipe(
       map(() => {
         if (!creee) {
-          throw new Error('La question créée est introuvable dans la réponse du serveur.');
+          throw new Error(traduire('editeur.store.questionCreeeIntrouvable'));
         }
         return creee;
       }),
@@ -324,7 +325,7 @@ export class EditeurSondageStore {
       map((sondage) => {
         const question = sondage.sections.flatMap((s) => s.questions).find((q) => q.id === questionId);
         if (!question) {
-          throw new Error('La question modifiée est introuvable dans la réponse du serveur.');
+          throw new Error(traduire('editeur.store.questionModifieeIntrouvable'));
         }
         return question;
       }),

@@ -8,7 +8,7 @@
 .evitement {
   position: absolute;
   top: -100px;
-  left: var(--bt-espace-4);
+  inset-inline-start: var(--bt-espace-4);
   z-index: 20;
   padding: var(--bt-espace-2) var(--bt-espace-4);
   border-radius: 8px;

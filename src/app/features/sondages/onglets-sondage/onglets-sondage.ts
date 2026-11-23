@@ -1,5 +1,6 @@
 import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Onglets de la fiche d'un sondage (une adresse par onglet : retour arrière et lien direct) : Fiche, Réponses,
@@ -7,12 +8,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
  */
 @Component({
   selector: 'app-onglets-sondage',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [TranslocoPipe, RouterLink, RouterLinkActive],
   template: `
-    <nav class="onglets" aria-label="Rubriques du sondage">
-      <a [routerLink]="['/sondages', id()]" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">Fiche</a>
-      <a [routerLink]="['/sondages', id(), 'reponses']" routerLinkActive="actif" ariaCurrentWhenActive="page">Réponses</a>
-      <a [routerLink]="['/sondages', id(), 'statistiques']" routerLinkActive="actif" ariaCurrentWhenActive="page">Statistiques</a>
+    <nav class="onglets" [attr.aria-label]="'sondages.onglets.rubriques' | transloco">
+      <a [routerLink]="['/sondages', id()]" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">{{ 'sondages.onglets.fiche' | transloco }}</a>
+      <a [routerLink]="['/sondages', id(), 'reponses']" routerLinkActive="actif" ariaCurrentWhenActive="page">{{ 'admin.tdb.reponses' | transloco }}</a>
+      <a [routerLink]="['/sondages', id(), 'statistiques']" routerLinkActive="actif" ariaCurrentWhenActive="page">{{ 'sondages.onglets.statistiques' | transloco }}</a>
     </nav>
   `,
   styles: `

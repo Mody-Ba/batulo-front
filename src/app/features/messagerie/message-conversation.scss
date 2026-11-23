@@ -12,15 +12,15 @@
   }
 
   &.recu {
-    margin-right: auto;
-    border-bottom-left-radius: 4px;
+    margin-inline-end: auto;
+    border-end-start-radius: 4px;
     background: var(--mat-sys-surface-container-high);
     color: var(--mat-sys-on-surface);
   }
 
   &.envoye {
-    margin-left: auto;
-    border-bottom-right-radius: 4px;
+    margin-inline-start: auto;
+    border-end-end-radius: 4px;
     background: var(--mat-sys-primary-container);
     color: var(--mat-sys-on-primary-container);
   }

@@ -26,6 +26,8 @@ import { MessageErreur } from '../../../../shared/components/message-erreur/mess
 import { EditeurSondageStore } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
 import { EtatEnregistrementIndicateur } from '../etat-enregistrement/etat-enregistrement';
+import { formaterNombre, traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Nombre de bornes de tranches accepté par le backend (1 à 19, soit 2 à 20 tranches). */
 export const TRANCHES_MAX = 19;
@@ -56,8 +58,7 @@ function bornesValides(controle: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-critere-question',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, ReactiveFormsModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatFormFieldModule,
@@ -166,10 +167,10 @@ export class CritereQuestion implements OnInit {
   protected erreurBornes(): string | null {
     const bornes = this.formulaire.controls.bornes;
     if (bornes.hasError('nombreBornes')) {
-      return `De 1 à ${TRANCHES_MAX} bornes.`;
+      return traduire('editeur.critere.nombreBornes', { max: TRANCHES_MAX });
     }
     if (bornes.hasError('bornesNonCroissantes')) {
-      return 'Les bornes doivent être strictement croissantes.';
+      return traduire('editeur.critere.croissantes');
     }
     return null;
   }
@@ -180,11 +181,11 @@ export class CritereQuestion implements OnInit {
     if (!bornes.length) {
       return '';
     }
-    const tranches = [`moins de ${bornes[0]}`];
+    const tranches = [traduire('editeur.critere.moinsDe', { borne: formaterNombre(bornes[0]) })];
     for (let i = 1; i < bornes.length; i++) {
-      tranches.push(`${bornes[i - 1]} à ${bornes[i]}`);
+      tranches.push(traduire('editeur.critere.entre', { de: formaterNombre(bornes[i - 1]), a: formaterNombre(bornes[i]) }));
     }
-    tranches.push(`${bornes[bornes.length - 1]} et plus`);
+    tranches.push(traduire('editeur.critere.etPlus', { borne: formaterNombre(bornes[bornes.length - 1]) }));
     return tranches.join(' · ');
   }
 

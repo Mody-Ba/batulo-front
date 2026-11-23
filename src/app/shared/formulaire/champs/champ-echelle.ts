@@ -18,8 +18,8 @@ import { ChampBase } from './champ-base';
     </div>
     @if (config().libelleMin || config().libelleMax) {
       <div class="extremes" aria-hidden="true">
-        <span>1 : {{ config().libelleMin }}</span>
-        <span>{{ max() }} : {{ config().libelleMax }}</span>
+        <span dir="auto">1 : {{ config().libelleMin }}</span>
+        <span dir="auto">{{ max() }} : {{ config().libelleMax }}</span>
       </div>
     }
   `,

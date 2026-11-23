@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { CritereResponse, FiltresStatistiques, GranulariteDate } from '../../../core/models/statistiques.model';
 import { decouperCritere, filtresActifs } from './filtres-url';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Filtre actif, affiché en pastille retirable (« Région = Kayes »). */
 interface Pastille {
@@ -21,7 +22,7 @@ interface Pastille {
  */
 @Component({
   selector: 'app-filtres-statistiques',
-  imports: [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule],
+  imports: [TranslocoPipe, MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule],
   templateUrl: './filtres-statistiques.html',
   styleUrl: './filtres-statistiques.scss',
 })

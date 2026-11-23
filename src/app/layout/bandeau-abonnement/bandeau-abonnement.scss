@@ -39,7 +39,7 @@
   // Séparateur visuel entre les informations, sauf au début d'une ligne.
   > * + *::before {
     content: '·';
-    margin-right: var(--bt-espace-3);
+    margin-inline-end: var(--bt-espace-3);
   }
 }
 

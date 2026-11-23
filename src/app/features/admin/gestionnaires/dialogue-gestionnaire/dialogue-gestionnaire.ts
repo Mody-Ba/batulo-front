@@ -9,6 +9,7 @@ import { GestionnaireResponse } from '../../../../core/models/gestionnaire.model
 import { GestionnaireService } from '../../../../core/services/gestionnaire.service';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesDialogueGestionnaire {
   /** Absent : création. */
@@ -21,8 +22,7 @@ export interface DonneesDialogueGestionnaire {
  */
 @Component({
   selector: 'app-dialogue-gestionnaire',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,

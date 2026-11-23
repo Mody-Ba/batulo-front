@@ -1,9 +1,9 @@
 <section class="carte-section croisement" aria-labelledby="titre-croisement">
   <div class="entete-section">
-    <h2 id="titre-croisement">Tableau croisé</h2>
+    <h2 id="titre-croisement">{{ 'statistiques.croise.titre' | transloco }}</h2>
     @if (croisement()) {
       <button matButton="outlined" type="button" [matMenuTriggerFor]="menuExport" [disabled]="exportEnCours()">
-        {{ exportEnCours() ? 'Export en cours…' : 'Exporter le tableau' }}
+        {{ (exportEnCours() ? 'statistiques.croise.exportEnCours' : 'statistiques.croise.exporter') | transloco }}
       </button>
       <mat-menu #menuExport="matMenu">
         <button mat-menu-item type="button" (click)="exporter('PDF')">PDF</button>
@@ -14,48 +14,47 @@
 
   @if (croisables().length === 0 || criteres().length === 0) {
     <p class="texte-aide">
-      Le tableau croisé demande une question à choix, oui / non, échelle ou nombre, et au moins un critère d’analyse
-      (à définir sur une question dans l’éditeur du sondage).
+      {{ 'statistiques.croise.condition' | transloco }}
     </p>
   } @else {
     <div class="choix">
-      <mat-form-field>
-        <mat-label>Question</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'statistiques.croise.question' | transloco }}</mat-label>
         <mat-select [value]="cleQuestion()" (selectionChange)="cleQuestion.set($event.value)">
           @for (q of croisables(); track q.cle) {
-            <mat-option [value]="q.cle">{{ q.libelle }}</mat-option>
+            <mat-option [value]="q.cle" dir="auto">{{ q.libelle }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
-      <mat-form-field>
-        <mat-label>Par (critère)</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'statistiques.croise.par' | transloco }}</mat-label>
         <mat-select [value]="clePar()" (selectionChange)="clePar.set($event.value)">
           @for (c of criteres(); track c.cle) {
-            <mat-option [value]="c.cle">{{ c.libelle }}</mat-option>
+            <mat-option [value]="c.cle" dir="auto">{{ c.libelle }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
       @if (croisement()?.lignes) {
         <mat-button-toggle-group
-          aria-label="Valeurs affichées"
+          [attr.aria-label]="'statistiques.croise.valeursAffichees' | transloco"
           [value]="mode()"
           (change)="mode.set($event.value)"
           [hideSingleSelectionIndicator]="true"
         >
-          <mat-button-toggle value="nombres">Nombres</mat-button-toggle>
-          <mat-button-toggle value="ligne">% ligne</mat-button-toggle>
-          <mat-button-toggle value="colonne">% colonne</mat-button-toggle>
+          <mat-button-toggle value="nombres">{{ 'statistiques.croise.nombres' | transloco }}</mat-button-toggle>
+          <mat-button-toggle value="ligne">{{ 'statistiques.croise.pctLigne' | transloco }}</mat-button-toggle>
+          <mat-button-toggle value="colonne">{{ 'statistiques.croise.pctColonne' | transloco }}</mat-button-toggle>
         </mat-button-toggle-group>
       }
     </div>
 
     <div class="zone-progression">
       @if (chargement()) {
-        <mat-progress-bar mode="indeterminate" aria-label="Calcul du tableau croisé" />
+        <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statistiques.croise.calcul' | transloco" />
       }
     </div>
-    <app-message-erreur [erreur]="erreur()" parDefaut="Le tableau croisé n’a pas pu être calculé.">
-      <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+    <app-message-erreur [erreur]="erreur()" [parDefaut]="'statistiques.croise.erreur' | transloco">
+      <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
     </app-message-erreur>
 
     @if (croisement(); as x) {
@@ -63,28 +62,28 @@
         <div class="defilement">
           <table class="tableau">
             <caption class="visuellement-cache">
-              « {{ x.question.libelle }} » par « {{ x.par.libelle }} » :
-              {{ mode() === 'nombres' ? 'nombres de répondants' : mode() === 'ligne' ? 'pourcentages de ligne' : 'pourcentages de colonne' }}
+              {{ 'statistiques.croise.caption' | transloco: { question: x.question.libelle, par: x.par.libelle } }}
+              {{ (mode() === 'nombres' ? 'statistiques.croise.modeNombres' : mode() === 'ligne' ? 'statistiques.croise.modeLigne' : 'statistiques.croise.modeColonne') | transloco }}
             </caption>
             <thead>
               <tr>
                 <td></td>
                 @for (c of x.colonnes; track $index) {
                   <th scope="col" [class.petit]="c.petitEffectif">
-                    {{ c.libelle }}
-                    <span class="effectif-colonne">{{ nombre(c.nombreRepondants) }} rép.@if (c.petitEffectif) { ⚠}</span>
+                    <span dir="auto">{{ c.libelle }}</span>
+                    <span class="effectif-colonne">{{ 'statistiques.croise.rep' | transloco: { n: nombre(c.nombreRepondants) } }}@if (c.petitEffectif) { ⚠}</span>
                   </th>
                 }
-                <th scope="col">Total</th>
+                <th scope="col">{{ 'statistiques.croise.total' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (l of lignes; track l.valeur) {
                 <tr>
-                  <th scope="row">{{ l.libelle }}</th>
+                  <th scope="row" dir="auto">{{ l.libelle }}</th>
                   @for (cel of l.cellules; track $index) {
-                    <td [class.petit]="cel.petitEffectif" [attr.title]="cel.petitEffectif ? 'Petit effectif : à interpréter avec prudence' : null">
-                      {{ valeur(cel) }}@if (cel.petitEffectif) {<span class="visuellement-cache"> (petit effectif)</span>}
+                    <td [class.petit]="cel.petitEffectif" [attr.title]="cel.petitEffectif ? ('statistiques.croise.petitEffectifTitre' | transloco) : null">
+                      {{ valeur(cel) }}@if (cel.petitEffectif) {<span class="visuellement-cache"> {{ 'statistiques.croise.petitEffectif' | transloco }}</span>}
                     </td>
                   }
                   <td class="total">{{ nombre(l.total) }}</td>
@@ -98,21 +97,21 @@
       @if (x.numerique; as colonnes) {
         <div class="defilement">
           <table class="tableau">
-            <caption class="visuellement-cache">Statistiques de « {{ x.question.libelle }} » par « {{ x.par.libelle }} »</caption>
+            <caption class="visuellement-cache">{{ 'statistiques.croise.captionNumerique' | transloco: { question: x.question.libelle, par: x.par.libelle } }}</caption>
             <thead>
               <tr>
-                <th scope="col">{{ x.par.libelle }}</th>
-                <th scope="col">Répondants</th>
-                <th scope="col">Moyenne</th>
-                <th scope="col">Médiane</th>
-                <th scope="col">Min</th>
-                <th scope="col">Max</th>
+                <th scope="col" dir="auto">{{ x.par.libelle }}</th>
+                <th scope="col">{{ 'statistiques.carte.repondantsCol' | transloco }}</th>
+                <th scope="col">{{ 'statistiques.carte.moyenne' | transloco }}</th>
+                <th scope="col">{{ 'statistiques.carte.mediane' | transloco }}</th>
+                <th scope="col">{{ 'statistiques.croise.min' | transloco }}</th>
+                <th scope="col">{{ 'statistiques.croise.max' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (n of colonnes; track $index) {
                 <tr [class.petit]="n.petitEffectif">
-                  <th scope="row">{{ libelleColonne(x, n.colonne) }}@if (n.petitEffectif) { ⚠}</th>
+                  <th scope="row" dir="auto">{{ libelleColonne(x, n.colonne) }}@if (n.petitEffectif) { ⚠}</th>
                   <td>{{ nombre(n.nombre) }}</td>
                   <td>{{ decimal(n.moyenne) }}</td>
                   <td>{{ decimal(n.mediane) }}</td>
@@ -124,7 +123,7 @@
           </table>
         </div>
       }
-      <p class="texte-aide legende">⚠ Moins de 5 répondants : résultats à interpréter avec prudence.</p>
+      <p class="texte-aide legende">⚠ {{ 'statistiques.carte.petitEffectif' | transloco }}</p>
     }
   }
 </section>

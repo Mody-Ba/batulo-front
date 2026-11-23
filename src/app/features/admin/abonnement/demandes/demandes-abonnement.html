@@ -1,53 +1,51 @@
 <section class="conteneur-page">
   <a matButton routerLink="/admin/abonnement" class="retour">
-    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Mon abonnement
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'abonnement.mon.titre' | transloco }}
   </a>
   <app-entete-page
-    titre="Demandes d’augmentation"
+    [titre]="'demandes.titre' | transloco"
     icone="upgrade"
-    sousTitre="Demandez à Batulo de passer à une autre formule. Votre demande arrive aussi dans votre conversation avec Batulo."
+    [sousTitre]="'demandes.sousTitre' | transloco"
   />
 
   <app-encadre type="info" icone="credit_card" role="status">
-    Une demande ne change pas votre abonnement : une fois acceptée, vous payez vous-même la formule par carte,
-    depuis « S’abonner ».
+    {{ 'demandes.info' | transloco }}
   </app-encadre>
 
   <div class="disposition">
     <section class="carte" aria-labelledby="titre-nouvelle">
-      <h2 id="titre-nouvelle">Nouvelle demande</h2>
+      <h2 id="titre-nouvelle">{{ 'demandes.nouvelle' | transloco }}</h2>
       @if (enAttente(); as d) {
         <p role="status">
-          Votre demande du {{ d.dateDemande | date: 'd MMMM y' }} ({{ libellesFormule[d.formuleSouhaitee] }}) est en
-          attente de réponse. Vous pourrez en faire une autre une fois qu’elle aura été traitée.
+          {{ 'demandes.enAttente' | transloco: { date: (d.dateDemande | dateL: 'long'), formule: libellesFormule[d.formuleSouhaitee] } }}
         </p>
       } @else if (demandes() !== null) {
         <form [formGroup]="formulaire" (ngSubmit)="envoyer()" class="formulaire">
           <fieldset>
-            <legend>Formule souhaitée</legend>
-            <mat-button-toggle-group formControlName="formuleSouhaitee" aria-label="Formule souhaitée" [hideSingleSelectionIndicator]="true">
+            <legend>{{ 'demandes.formuleSouhaitee' | transloco }}</legend>
+            <mat-button-toggle-group formControlName="formuleSouhaitee" [attr.aria-label]="'demandes.formuleSouhaitee' | transloco" [hideSingleSelectionIndicator]="true">
               @for (f of formules; track f) {
                 <mat-button-toggle [value]="f">{{ libellesFormule[f] }}</mat-button-toggle>
               }
             </mat-button-toggle-group>
             @if (formulaire.controls.formuleSouhaitee.touched && formulaire.controls.formuleSouhaitee.invalid) {
-              <p class="erreur-champ" role="alert">Choisissez une formule.</p>
+              <p class="erreur-champ" role="alert">{{ 'demandes.choisissezFormule' | transloco }}</p>
             }
           </fieldset>
 
           <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Votre message</mat-label>
+            <mat-label>{{ 'demandes.votreMessage' | transloco }}</mat-label>
             <textarea matInput formControlName="message" rows="5" [maxlength]="max"></textarea>
             <mat-hint align="end">{{ formulaire.controls.message.value.length }} / {{ max }}</mat-hint>
             @if (formulaire.controls.message.invalid) {
-              <mat-error>Expliquez votre besoin en quelques mots.</mat-error>
+              <mat-error>{{ 'demandes.expliquez' | transloco }}</mat-error>
             }
           </mat-form-field>
 
-          <app-message-erreur [erreur]="erreurEnvoi()" parDefaut="La demande n’a pas pu être envoyée." />
+          <app-message-erreur [erreur]="erreurEnvoi()" [parDefaut]="'demandes.erreurEnvoi' | transloco" />
           <p class="actions">
             <button matButton="filled" type="submit" [disabled]="envoiEnCours()" [attr.aria-busy]="envoiEnCours()">
-              <mat-icon fontIcon="send" aria-hidden="true" />{{ envoiEnCours() ? 'Envoi…' : 'Envoyer la demande' }}
+              <mat-icon fontIcon="send" aria-hidden="true" />{{ (envoiEnCours() ? 'commun.envoi' : 'demandes.envoyer') | transloco }}
             </button>
           </p>
         </form>
@@ -55,18 +53,18 @@
     </section>
 
     <section class="carte" aria-labelledby="titre-demandes">
-      <h2 id="titre-demandes">Mes demandes</h2>
+      <h2 id="titre-demandes">{{ 'demandes.mesDemandes' | transloco }}</h2>
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des demandes" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'demandes.chargement' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Vos demandes n’ont pas pu être chargées.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'demandes.erreurChargement' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
       @if (demandes(); as liste) {
         @if (liste.length === 0) {
-          <p class="etat-vide" role="status">Aucune demande pour le moment.</p>
+          <p class="etat-vide" role="status">{{ 'demandes.aucune' | transloco }}</p>
         } @else {
           <ul class="demandes">
             @for (d of liste; track d.id) {
@@ -81,28 +79,28 @@
                   <span class="formule">{{ libellesFormule[d.formuleSouhaitee] }}</span>
                   <span class="pastille-statut demande-{{ d.statut }}">{{ libellesStatut[d.statut] }}</span>
                 </p>
-                <p class="date">Demandée le {{ d.dateDemande | date: 'd MMMM y à HH:mm' }}</p>
-                <p class="message">« {{ d.message }} »</p>
+                <p class="date">{{ 'demandes.demandeeLe' | transloco: { date: (d.dateDemande | dateL: 'longHeure') } }}</p>
+                <p class="message" dir="auto">« {{ d.message }} »</p>
                 @if (d.statut !== 'EN_ATTENTE') {
                   <p class="reponse">
-                    <strong>Réponse{{ d.traiteeParNom ? ' de ' + d.traiteeParNom : '' }}</strong>
+                    <strong>{{ d.traiteeParNom ? ('demandes.reponseDe' | transloco: { nom: d.traiteeParNom }) : ('demandes.reponse' | transloco) }}</strong>
                     @if (d.dateTraitement) {
-                      , le {{ d.dateTraitement | date: 'd MMMM y' }}
+                      {{ 'demandes.le' | transloco: { date: (d.dateTraitement | dateL: 'long') } }}
                     }
-                    :
-                    {{ d.reponse || 'aucun message.' }}
+                    {{ 'demandes.deuxPoints' | transloco }}
+                    <span dir="auto">{{ d.reponse || ('demandes.aucunMessage' | transloco) }}</span>
                   </p>
                 }
                 @if (d.statut === 'TRAITEE') {
                   <a matButton="tonal" routerLink="/admin/abonnement/souscrire" [queryParams]="{ formule: d.formuleSouhaitee }">
-                    <mat-icon fontIcon="credit_card" aria-hidden="true" />Payer la {{ libellesFormule[d.formuleSouhaitee] | lowercase }}
+                    <mat-icon fontIcon="credit_card" aria-hidden="true" />{{ 'demandes.payer' | transloco: { formule: (libellesFormule[d.formuleSouhaitee] | lowercase) } }}
                   </a>
                 }
               </li>
             }
           </ul>
           @if (total() > liste.length) {
-            <p class="texte-aide">Les {{ liste.length }} demandes les plus récentes sont affichées.</p>
+            <p class="texte-aide">{{ 'demandes.plusRecentes' | pluriel: liste.length }}</p>
           }
         }
       }

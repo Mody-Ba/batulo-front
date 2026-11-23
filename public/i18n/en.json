@@ -1,0 +1,1804 @@
+{
+  "abonnement": {
+    "echeance": {
+      "aujourdhui": "Expires today",
+      "demain": "Expires tomorrow",
+      "dans": {
+        "one": "Expires in {{n}} day",
+        "other": "Expires in {{n}} days"
+      },
+      "jamaisPaye": "Never paid",
+      "aucun": "No subscription"
+    },
+    "filtrerParStatut": "Filter by subscription status",
+    "mon": {
+      "titre": "My subscription",
+      "demanderAutre": "Request another plan",
+      "erreur": "The subscription could not be loaded.",
+      "expire": "Your subscription expired on {{date}}: access is read-only. Renew it to edit your surveys again.",
+      "alerte": {
+        "one": "Your subscription expires in {{n}} day. Renew it to avoid any interruption.",
+        "other": "Your subscription expires in {{n}} days. Renew it to avoid any interruption."
+      },
+      "detail": "Details",
+      "formule": "Plan",
+      "aucune": "None",
+      "statut": "Status",
+      "debut": "Start",
+      "expiration": "Expiry",
+      "joursRestants": "Days left",
+      "paiements": "Payments",
+      "chargementPaiements": "Loading payments",
+      "erreurPaiements": "Payment history could not be loaded.",
+      "aucunPaiement": "No payments yet.",
+      "historique": "Payment history, most recent first",
+      "date": "Date",
+      "moyen": "Method",
+      "montant": "Amount",
+      "pagination": "Payments pagination",
+      "info": "Renewing extends your subscription from its current expiry date: you don’t lose any days. Without renewal, the subscription simply ends on that date."
+    },
+    "souscrire": {
+      "titreRenouveler": "Renew my subscription",
+      "titreAbonner": "Subscribe to Batulo",
+      "etape1": "Step 1 of 2: plan and payment method",
+      "etape2": "Step 2 of 2: payment",
+      "retour": "Back to my subscription",
+      "choixFormule": "Choose a plan",
+      "ajoutExpire": "The new period will be added to your current subscription from the payment date (it expired on {{date}}).",
+      "ajout": "The new period will be added to your current subscription from {{date}}: you don’t lose any days.",
+      "chargementFormules": "Loading plans",
+      "moyen": "Payment method",
+      "carte": "Bank card",
+      "carteDetail": "Visa, Mastercard…, payment secured by Stripe",
+      "mobile": "Mobile app ({{applications}}…)",
+      "mobileDetail": "From your phone, in ouguiyas",
+      "pour": "for {{duree}}",
+      "economie": "Save {{montant}} compared with 12 months",
+      "preparation": "Preparing the payment",
+      "continuerMobile": "Continue to mobile payment",
+      "continuer": "Continue to payment",
+      "paiementCarte": "Card payment",
+      "changerFormule": "Change plan",
+      "test1": "Stripe test mode: card",
+      "test2": ", a future date and any code. No real amount is charged.",
+      "infosCarte": "Card details",
+      "nomCarte": "Name on card",
+      "nomCarteObligatoire": "The name on the card is required.",
+      "numero": "Card number",
+      "expiration": "Expiry (MM / YY)",
+      "code": "Security code",
+      "aVerifier": "Your card was accepted by Stripe: do not pay a second time. Batulo still has to validate the payment.",
+      "verificationEnCours": "Checking",
+      "paiementEnCours": "Payment in progress",
+      "payer": "Pay {{montant}}",
+      "securite": "Payment secured by Stripe. Your card details never pass through Batulo."
+    },
+    "verifierANouveau": "Check again",
+    "succes": {
+      "titre": "You are now subscribed",
+      "activeJusquau": "{{formule}} active until {{date}}.",
+      "active": "{{formule}} active",
+      "redirection": "Redirecting to your dashboard…",
+      "allerTdb": "Go to the dashboard"
+    },
+    "mobile": {
+      "titre": "Payment by mobile app",
+      "application": "mobile app",
+      "preparation": "Preparing the mobile payment",
+      "preparationPage": "Preparing the payment page…",
+      "erreurPreparation": "The mobile payment could not be prepared. Please try again.",
+      "qr": "QR code of the mobile payment page",
+      "codeQr": "QR code",
+      "scannez": "Scan this code with your phone’s camera, then pay with {{applications}}…",
+      "revenez": "Once paid, come back to this page.",
+      "valable": "Valid until {{heure}}",
+      "payerTelephone": "Pay on this phone",
+      "enCours": "Payment in progress… This page updates as soon as the payment is confirmed.",
+      "qrEchec": "The QR code could not be displayed: use the button below.",
+      "qrPreparation": "Preparing the QR code",
+      "echec": "The payment did not go through: it was refused, cancelled, or the payment session expired. Your subscription has not changed.",
+      "expire": "The payment session expired without a confirmed payment. Your subscription has not changed: start a new payment.",
+      "attenteLongue": "The payment is not confirmed yet. If you paid, check again in a few moments; otherwise, start a new payment."
+    },
+    "retour": {
+      "titre": "Mobile payment",
+      "enCours": "Payment in progress…",
+      "attente": "We are waiting for your payment to be confirmed. This page updates automatically.",
+      "active": "Subscription activated",
+      "recu": "Payment of {{montant}} received:",
+      "nonAbouti": "Payment not completed",
+      "pasConfirme": "Payment not confirmed yet",
+      "introuvable": "Payment not found",
+      "introuvableTexte": "This payment cannot be found for your company. If you paid, check your subscription; otherwise, start a new payment.",
+      "payer": "Pay my subscription",
+      "statutIndisponible": "Payment status unavailable",
+      "erreurStatut": "The payment status could not be read."
+    },
+    "reconnexion": "Your payment has been recorded. Sign in again to access Batulo.",
+    "carte": {
+      "incomplete": "Complete the card details.",
+      "enTraitement": "Your bank is still processing the payment. Check again in a few moments."
+    }
+  },
+  "admin": {
+    "tdb": {
+      "enChiffres": "In figures",
+      "chargementChiffres": "Loading figures",
+      "erreurChiffres": "Figures could not be loaded.",
+      "actifs": {
+        "one": "Active",
+        "other": "Active"
+      },
+      "desactives": {
+        "one": "Disabled",
+        "other": "Disabled"
+      },
+      "nonCommences": "Not started",
+      "brouillonsCompris": "drafts included",
+      "enCours": "In progress",
+      "termines": "Finished",
+      "reponses": "Responses",
+      "recuesTotal": "Received in total",
+      "toutesVersions": "all versions",
+      "joursRestants": {
+        "one": "day left",
+        "other": "days left"
+      },
+      "dernierPaiement": "Last payment: {{montant}}",
+      "voirDetail": "View details",
+      "chargementAbonnement": "Loading the subscription"
+    }
+  },
+  "apparence": {
+    "sousTitre": "Logo, color and name shown to respondents on forms and in PDF reports",
+    "chargement": "Loading the appearance",
+    "erreurChargement": "The appearance could not be loaded.",
+    "couleurEtNom": "Color and name",
+    "choisirCouleur": "Choose the main color",
+    "couleurPrincipale": "Main color",
+    "placeholderCouleur": "Batulo color (#005CBB)",
+    "aideCouleur": "Hexadecimal code #RRGGBB; empty: Batulo color ({{defaut}}).",
+    "formatCouleur": "Expected format: # followed by 6 digits or letters from A to F (e.g. #1E6B52).",
+    "couleurDefaut": "Default color",
+    "nomAffiche": "Name shown on forms (optional)",
+    "aideNom": "Empty: “{{nom}}”. Shown next to the logo and in reports.",
+    "nonEnregistree": "The appearance was not saved",
+    "erreurEnregistrement": "The appearance could not be saved.",
+    "apercu": "Form preview",
+    "gestionnaire": "Only your company’s admin can change the appearance of forms.",
+    "aucuneModification": "No changes to save.",
+    "enregistree": "Appearance saved.",
+    "logo": {
+      "format": "The logo must be a PNG or JPEG image.",
+      "vide": "This file is empty.",
+      "enregistre": "Logo saved.",
+      "supprime": "Logo deleted.",
+      "mo": "{{n}} MB",
+      "ko": "{{n}} KB",
+      "tropGros": "The logo must not exceed {{max}} (this file is {{taille}}).",
+      "apercuChoisi": "Preview of the chosen logo: {{nom}}",
+      "pasEnregistre": "not saved yet",
+      "envoi": "Uploading the logo",
+      "enregistrer": "Save this logo",
+      "illisible": "The logo is saved but its image could not be loaded from {{url}}. Check that the Batulo API responds, then reload the page.",
+      "entreprise": "Company logo",
+      "remplacer": "Replace",
+      "aucun": "No logo: forms are shown without a banner.",
+      "glissezAutre": "Drag another logo here, or",
+      "glissez": "Drag your logo here, or",
+      "choisir": "Choose a file",
+      "regles": "PNG or JPEG, 1 MB and 2000 × 2000 px at most.",
+      "nonEnregistre": "The logo was not saved",
+      "erreurEnregistrement": "The logo could not be saved.",
+      "supprimerTitre": "Delete the logo?",
+      "supprimerMessage": "It will disappear from forms and reports. You can add another one afterwards.",
+      "supprimerAction": "Delete the logo"
+    },
+    "apercuExemple": {
+      "titre": "Your survey title",
+      "texte": "Three minutes to help us serve you better.",
+      "choisie": "Chosen option",
+      "autre": "Another option"
+    },
+    "apercuLegende": {
+      "avecLogo": "Preview: logo and “{{nom}}” in the header;",
+      "sansLogo": "Preview: no logo, no banner;",
+      "couleur": "buttons, progress and choices in {{couleur}}, {{texte}} text.",
+      "noir": "black",
+      "blanc": "white",
+      "batulo": "buttons, progress and choices in Batulo colors."
+    }
+  },
+  "auth": {
+    "connexion": {
+      "titre": "Sign in",
+      "sousTitre": "Access your survey workspace.",
+      "oublie": "Forgot your password?",
+      "enCours": "Signing in",
+      "seConnecter": "Sign in",
+      "pasDeCompte": "Your company doesn’t have an account yet?",
+      "creerCompte": "Create an account"
+    },
+    "inscription": {
+      "titre": "Create your company’s account",
+      "sousTitre": "You will be the workspace administrator. It will be activated once the subscription is paid.",
+      "nomEntreprise": "Company name (optional)",
+      "nomEntrepriseAide": "Default: “Entreprise de First Last”.",
+      "enCours": "Creating the account",
+      "creer": "Create the account",
+      "dejaCompte": "Already have an account?",
+      "compteCree": "Your account has been created. Sign in to choose your subscription."
+    },
+    "oublie": {
+      "titre": "Forgot password",
+      "sousTitre": "Enter your email: you will receive a link to choose a new password.",
+      "indesirables": "Remember to check your spam folder.",
+      "renvoyer": "Send another link",
+      "recevoir": "Get the link",
+      "confirmation": "If an account exists for this email, a reset link has just been sent to it."
+    },
+    "retourConnexion": "Back to sign in",
+    "reinitialiser": {
+      "titre": "New password",
+      "sousTitre": "Choose your account password.",
+      "lienIncomplet": "This link is incomplete. Open the link received by email, or request a new one.",
+      "nouveauLien": "Request a new link",
+      "enregistrer": "Save the password",
+      "reussi": "Your password has been changed. Sign in with the new one."
+    },
+    "changer": {
+      "securite": "Account security",
+      "temporaire": "You are using a temporary password. Choose your own password to access Batulo.",
+      "valableJusquau": "The temporary password is valid until {{date}}.",
+      "motDePasseTemporaire": "Temporary password",
+      "motDePasseActuel": "Current password",
+      "actuelObligatoire": "The current password is required.",
+      "confirmation": "Confirm the new password",
+      "confirmationDifferente": "The confirmation does not match the new password.",
+      "modifie": "Your password has been changed."
+    },
+    "sessionExpiree": "Your session has expired. Please sign in again."
+  },
+  "commun": {
+    "champs": {
+      "courriel": "Email",
+      "motDePasse": "Password",
+      "nouveauMotDePasse": "New password",
+      "confirmation": "Confirmation",
+      "prenom": "First name",
+      "nom": "Last name",
+      "confirmationMotDePasse": "Confirm password"
+    },
+    "erreurs": {
+      "courrielObligatoire": "Email is required.",
+      "courrielInvalide": "The email is not valid.",
+      "courrielTropLong": "The email must not exceed 255 characters.",
+      "motDePasseObligatoire": "Password is required.",
+      "motDePasseTropLong": "The password must not exceed 72 characters.",
+      "nouveauMotDePasseObligatoire": "The new password is required.",
+      "max100": "100 characters at most.",
+      "max150": "150 characters at most.",
+      "prenomObligatoire": "First name is required.",
+      "nomObligatoire": "Last name is required.",
+      "confirmationObligatoire": "Confirmation is required.",
+      "confirmationDifferente": "The confirmation does not match the password.",
+      "max255": "255 characters at most."
+    },
+    "masquerMotDePasse": "Hide password",
+    "afficherMotDePasse": "Show password",
+    "envoiEnCours": "Sending",
+    "enregistrementEnCours": "Saving",
+    "fermer": "Close",
+    "confirmation": {
+      "tapezAvant": "To confirm, type ",
+      "tapezApres": " below.",
+      "texte": "Confirmation text"
+    },
+    "annuler": "Cancel",
+    "reessayer": "Try again",
+    "toutVoir": "View all",
+    "tous": "All",
+    "paginateur": {
+      "parPage": "Items per page",
+      "suivante": "Next page",
+      "precedente": "Previous page",
+      "premiere": "First page",
+      "derniere": "Last page",
+      "intervalle": "{{debut}} – {{fin}} of {{total}}",
+      "vide": "0 of {{total}}"
+    },
+    "aVenir": {
+      "texte": "This section will be available soon.",
+      "titre": "Coming soon"
+    },
+    "lectureSeule": "Subscription expired: read-only.",
+    "aideMotDePasse": "At least 8 characters, including a letter and a digit.",
+    "masquerMotsDePasse": "Hide passwords",
+    "afficherMotsDePasse": "Show passwords",
+    "retourAccueil": "Back to home",
+    "retirer": "Remove",
+    "enregistrer": "Save",
+    "envoi": "Sending…",
+    "modificationsEnregistrees": "Changes saved.",
+    "desactiver": "Disable",
+    "activer": "Enable",
+    "renvoyer": "Send again",
+    "supprimer": "Delete",
+    "rechercher": "Search",
+    "effacerRecherche": "Clear search",
+    "modifier": "Edit",
+    "etat": "State",
+    "actions": "Actions",
+    "actionsPour": "Actions for {{nom}}",
+    "chargement": "Loading…",
+    "separateurListe": ", ",
+    "facultatif": "Optional"
+  },
+  "accueil": {
+    "abonnementEntreprise": "Company subscription:",
+    "accesRapides": "Quick access",
+    "bonjourPrenom": "Hello {{prenom}}",
+    "bonjour": "Hello"
+  },
+  "erreurs": {
+    "accesRefuse": {
+      "titre": "Access denied",
+      "texte": "Your role does not allow access to this page."
+    },
+    "suspendu": {
+      "titreDesactive": "Access suspended",
+      "titreNonActif": "Subscription not active",
+      "desactive": "Your company has been disabled by Batulo: no access is possible for now. Contact Batulo to find out more.",
+      "enAttente": "Your company’s subscription has not been paid yet. Your administrator must choose a plan so you can access Batulo.",
+      "ouvert": "Your access is open again."
+    },
+    "champs": {
+      "prenom": "First name",
+      "nom": "Last name",
+      "courriel": "Email",
+      "motDePasse": "Password",
+      "motDePasseActuel": "Current password",
+      "nouveauMotDePasse": "New password",
+      "confirmationMotDePasse": "Confirmation",
+      "nomEntreprise": "Company",
+      "jeton": "Link",
+      "jetonRafraichissement": "Session"
+    }
+  },
+  "demandes": {
+    "titre": "Upgrade requests",
+    "sousTitre": "Ask Batulo to switch to another plan. Your request also appears in your conversation with Batulo.",
+    "info": "A request does not change your subscription: once accepted, you pay for the plan yourself by card, from “Subscribe”.",
+    "nouvelle": "New request",
+    "enAttente": "Your request of {{date}} ({{formule}}) is awaiting a reply. You can make another one once it has been handled.",
+    "formuleSouhaitee": "Desired plan",
+    "choisissezFormule": "Choose a plan.",
+    "votreMessage": "Your message",
+    "expliquez": "Explain your need in a few words.",
+    "erreurEnvoi": "The request could not be sent.",
+    "envoyer": "Send the request",
+    "mesDemandes": "My requests",
+    "chargement": "Loading requests",
+    "erreurChargement": "Your requests could not be loaded.",
+    "aucune": "No requests yet.",
+    "demandeeLe": "Requested on {{date}}",
+    "reponseDe": "Reply from {{nom}}",
+    "reponse": "Reply",
+    "le": ", on {{date}}",
+    "deuxPoints": ":",
+    "aucunMessage": "no message.",
+    "payer": "Pay for the {{formule}}",
+    "plusRecentes": {
+      "one": "The {{n}} most recent request is shown.",
+      "other": "The {{n}} most recent requests are shown."
+    },
+    "envoyee": "Request sent to Batulo. You will be notified of the reply."
+  },
+  "editeur": {
+    "store": {
+      "aucunSondage": "No survey loaded.",
+      "questionCreeeIntrouvable": "The created question cannot be found in the server’s response.",
+      "questionModifieeIntrouvable": "The edited question cannot be found in the server’s response."
+    },
+    "toutEnregistre": "Everything is saved",
+    "lectureSeule": "Read-only",
+    "criteresModifiables": "The questions’ analysis criteria remain editable.",
+    "supprimerBrouillon": "Delete the draft",
+    "modifierTitre": "Edit “{{titre}}”",
+    "descriptionAide": "Shown to respondents at the start of the survey.",
+    "erreurEnTete": "The header could not be saved.",
+    "accueil": {
+      "titre": "Welcome page",
+      "aide": "Shown to the respondent before the questions. Left empty and without consent, the questionnaire opens directly.",
+      "objet": "Purpose of the survey (optional)",
+      "objetAide": "Why this survey, what the answers will be used for.",
+      "confidentialite": "Confidentiality of responses (optional)",
+      "confidentialiteAide": "Anonymity, retention and use of data.",
+      "consentement": "Require the respondent’s consent",
+      "consentementAide": "The respondent ticks a box before starting; the date is kept with their response.",
+      "texteConsentement": "Consent checkbox text",
+      "texteConsentementAide": "For example: “I have read this information and agree to take part.”",
+      "texteConsentementRequis": "Write the consent checkbox text.",
+      "erreur": "The welcome page could not be saved."
+    },
+    "aucuneSection": "This survey has no sections yet. Questions are organized into sections.",
+    "ajouterPremiereSection": "Add a first section",
+    "ajouterSection": "Add a section",
+    "sectionsMax": "{{max}} sections at most.",
+    "modificationsEnAttente": "Some changes are not saved yet: fix them or wait for “Everything is saved”.",
+    "titreSection": "Section {{numero}}",
+    "supprimerBrouillonTitre": "Delete this draft?",
+    "supprimerBrouillonMessage": "“{{titre}}” will be permanently deleted, along with its sections and questions. This cannot be undone.",
+    "brouillonSupprime": "Draft deleted.",
+    "quitterTitre": "Leave the editor?",
+    "quitterNonEnregistres": {
+      "one": "One item is not saved (to fix or in progress). These changes will be lost.",
+      "other": "{{n}} items are not saved (to fix or in progress). These changes will be lost."
+    },
+    "quitterEnCours": "Saving is in progress: wait for it to finish so you don’t lose anything.",
+    "quitterQuandMeme": "Leave anyway",
+    "section": {
+      "deplacer": "Move section {{numero}} (drag, or Move up / Move down menu)",
+      "actions": "Section {{numero}} actions",
+      "titre": "Section title",
+      "titreObligatoire": "The section title is required.",
+      "ajouterCondition": "Add a condition to the section",
+      "erreur": "The section could not be saved.",
+      "aucuneQuestion": "No questions in this section.",
+      "ajouterQuestion": "Add a question",
+      "questionsMax": "{{max}} questions at most per section.",
+      "monter": "Move the section up",
+      "descendre": "Move the section down",
+      "supprimer": "Delete the section",
+      "nomCible": "section {{numero}}",
+      "supprimerTitre": "Delete this section?",
+      "supprimerVide": "The section “{{titre}}” will be deleted.",
+      "supprimerAvec": {
+        "one": "The section “{{titre}}” will be deleted along with its question.",
+        "other": "The section “{{titre}}” will be deleted along with its {{n}} questions."
+      },
+      "supprimee": "Section deleted."
+    },
+    "actionRefusee": "Action refused",
+    "actionImpossible": "This action could not be done.",
+    "condition": {
+      "modifierMenu": "Edit the display condition",
+      "ajouterMenu": "Add a display condition",
+      "enregistree": "Display condition saved.",
+      "retireeSection": "Display condition removed: the section is always shown.",
+      "retireeQuestion": "Display condition removed: the question is always shown.",
+      "questionIntrouvable": "Question not found",
+      "regleEntre": "{{libelle}} between {{min}} and {{max}}",
+      "lienOu": " or ",
+      "lienEt": " and ",
+      "visibleSi": "Visible if:",
+      "modifierDe": "Edit the condition of {{cible}}",
+      "retirerDe": "Remove the condition of {{cible}}",
+      "cetteQuestion": "this question",
+      "titre": "Display condition of {{cible}}",
+      "aucuneSource": "No saved question is placed before {{cible}}: a condition can only depend on a question that comes before it.",
+      "aideSection": "This section will only be shown to respondents whose answers meet these rules. Only the questions placed before are offered.",
+      "aideQuestion": "This question will only be shown to respondents whose answers meet these rules. Only the questions placed before are offered.",
+      "combinaison": "Combining the rules",
+      "et": "All rules (AND)",
+      "ou": "At least one rule (OR)",
+      "afficherSi": "Show if",
+      "ouSi": "or if",
+      "etSi": "and if",
+      "regleN": "(rule {{n}})",
+      "sansLibelle": "(no text)",
+      "condition": "Condition",
+      "options": "Options",
+      "de": "From",
+      "aCompris": "To (inclusive)",
+      "auCompris": "To (inclusive)",
+      "retirerRegle": "Remove rule {{n}}",
+      "ajouterRegle": "Add a rule",
+      "reglesMax": "{{max}} rules at most.",
+      "nonEnregistree": "The condition was not saved",
+      "pasEncore": "Not saved yet",
+      "enregistrement": "Saving the condition",
+      "enregistrer": "Save the condition",
+      "sansReponse": "The server did not respond: the condition was not saved. Try again.",
+      "reponseSansCondition": "The server responded without the condition: it was not saved. Try again; if it happens again, report the details below.",
+      "reglesIncompletes": "A rule is incomplete: fill in the fields marked in red, then save.",
+      "erreur": "The condition could not be saved.",
+      "fermerTitre": "Close without saving?",
+      "fermerMessage": "The rules of this display condition are not saved: they will be lost.",
+      "fermerAction": "Close without saving",
+      "choisirQuestion": "Choose the question the display depends on.",
+      "choisirCondition": "Choose a condition.",
+      "choisirOption": "Choose at least one option.",
+      "indiquerValeur": "Enter the expected value.",
+      "bornes": "The first bound must be less than or equal to the second."
+    },
+    "question": {
+      "aria": "Question {{numero}}",
+      "deplacer": "Move question {{numero}} (drag, or Move up / Move down menu)",
+      "libelleObligatoire": "The question text is required.",
+      "type": "Type",
+      "aide": "Help text (optional)",
+      "aideAide": "Shown under the question, to clarify what is expected.",
+      "nonEnregistree": "Question {{numero}} was not saved",
+      "erreur": "This question could not be saved.",
+      "obligatoire": "Required",
+      "ajouterCondition": "Add a condition",
+      "actions": "Question {{numero}} actions",
+      "monter": "Move up",
+      "descendre": "Move down",
+      "versSection": "Move to another section",
+      "supprimer": "Delete the question",
+      "sectionCible": "Section {{numero}}: {{titre}}",
+      "nomCibleSection": "question {{numero}} of section {{section}}",
+      "nomCible": "question {{numero}}",
+      "perteOptions": {
+        "one": "its option",
+        "other": "its {{n}} options"
+      },
+      "perteGrille": "the grid’s rows and columns",
+      "et": " and ",
+      "changerTypeTitre": "Switch to “{{type}}”?",
+      "changerTypeMessage": "This question will lose {{pertes}}.",
+      "changerType": "Change type",
+      "supprimerTitre": "Delete this question?",
+      "supprimerMessage": "“{{libelle}}” will be deleted.",
+      "supprimerSans": "This question will be deleted.",
+      "deplacee": "Question moved.",
+      "supprimee": "Question deleted."
+    },
+    "critere": {
+      "aria": "Analysis criterion of the question",
+      "titre": "Analysis criterion",
+      "aide": "Lets you compare statistics according to the answers to this question (e.g. by region). Never shown to the respondent; editable even after publication. A sensitive criterion (sex, age…) should be an optional question.",
+      "tranches": "Ranges",
+      "egales": "5 equal ranges",
+      "personnalisees": "Custom bounds",
+      "sansBornes": "Equal ranges are computed between the question’s minimum and maximum, which it does not have: set them, or choose custom bounds.",
+      "borne": "Bound {{n}}",
+      "borneObligatoire": "The bound is required.",
+      "supprimerBorne": "Delete bound {{n}}",
+      "ajouterBorne": "Add a bound",
+      "apercu": "Ranges: {{tranches}}.",
+      "regrouper": "Group by",
+      "annee": "Year",
+      "erreur": "The criterion could not be saved.",
+      "nombreBornes": "From 1 to {{max}} bounds.",
+      "croissantes": "Bounds must be strictly increasing.",
+      "moinsDe": "less than {{borne}}",
+      "entre": "{{de}} to {{a}}",
+      "etPlus": "{{borne}} and more"
+    },
+    "liste": {
+      "deplacer": "Move {{element}} {{n}} (or Alt + arrows)",
+      "texteObligatoire": "The text is required.",
+      "supprimer": "Delete {{element}} {{n}}",
+      "ajouter": "Add {{element}}"
+    },
+    "matrice": {
+      "lignes": "Rows",
+      "ligne": "Row",
+      "uneLigne": "a row",
+      "lignesMin": "rows",
+      "colonnes": "Columns",
+      "colonne": "Column",
+      "uneColonne": "a column",
+      "colonnesMin": "columns",
+      "aide": "From 1 to {{lignesMax}} rows and from {{colonnesMin}} to {{colonnesMax}} columns. Each row gets one answer among the columns."
+    },
+    "options": {
+      "deplacer": "Move option {{n}} (or Alt + arrows)",
+      "option": "Option {{n}}",
+      "libelleObligatoire": "The label is required.",
+      "generee": "Generated from the label",
+      "supprimer": "Delete option {{n}}",
+      "ajouter": "Add an option",
+      "valeurs": "Values for statistics",
+      "elements": "options"
+    },
+    "regles": {
+      "optionsMin": "Add at least {{min}} options.",
+      "valeurEnDouble": "The value “{{valeur}}” is used by two options.",
+      "nombreElements": "From {{min}} to {{max}} {{element}}.",
+      "doublon": "“{{texte}}” appears twice."
+    },
+    "types": {
+      "dateMin": "Earliest date (optional)",
+      "dateMax": "Latest date (optional)",
+      "datesInversees": "The earliest date must be on or before the latest date.",
+      "etendue": "Range",
+      "unA": "1 to {{max}}",
+      "libelleDu": "Label for {{n}} (optional)",
+      "pasDuTout": "Strongly disagree",
+      "toutAFait": "Strongly agree",
+      "minimum": "Minimum (optional)",
+      "maximum": "Maximum (optional)",
+      "decimales": "Decimal places",
+      "decimalesAide": "From 0 (whole number) to {{max}}",
+      "decimalesObligatoire": "The number of decimal places is required.",
+      "decimalesInvalide": "A whole number from 0 to {{max}}.",
+      "bornesInversees": "The minimum must be less than or equal to the maximum.",
+      "apercuReponses": "Answers preview",
+      "ouiNonAide": "Nothing to configure: the respondent chooses Yes or No.",
+      "longueurMax": "Maximum length",
+      "caracteres": "characters",
+      "de1A": "From 1 to {{max}}",
+      "longueurObligatoire": "The maximum length is required.",
+      "nombreEntier": "A whole number.",
+      "entre1Et": "Between 1 and {{max}} characters.",
+      "reponseCourt": "Short answer",
+      "reponseLong": "Long answer"
+    },
+    "etat": {
+      "enregistre": "Saved",
+      "modifie": "Unsaved changes",
+      "invalide": "Fix before saving",
+      "enregistrement": "Saving…",
+      "erreur": "Saving failed"
+    }
+  },
+  "superAdmin": {
+    "entrepriseDe": "Entreprise de {{nom}}",
+    "tdb": {
+      "sousTitre": "Overview of Batulo’s client companies",
+      "entreprises": "Companies",
+      "auTotal": "In total",
+      "septJours": "7 days or less",
+      "toutesDemandes": "All requests",
+      "enAttenteReponse": "Awaiting reply"
+    },
+    "admins": {
+      "sousTitre": "Each client company, its admin, its subscription and its team.",
+      "nouvel": "New admin",
+      "aideRecherche": "Company, admin’s first name, last name or email",
+      "chargement": "Loading companies",
+      "erreur": "The list of companies could not be loaded.",
+      "desactiverEntreprise": "Disable the company",
+      "activerEntreprise": "Enable the company",
+      "aucune": "No companies yet. Create an admin to open a company’s account.",
+      "pagination": "Companies pagination",
+      "aucuneStatutRecherche": "No company with status “{{statut}}” matches “{{terme}}”.",
+      "aucuneStatut": "No company with status “{{statut}}”.",
+      "aucuneRecherche": "No company matches “{{terme}}”.",
+      "aucuneFiltre": "No companies.",
+      "sansAbonnement": "No subscription"
+    },
+    "actions": {
+      "aucunGestionnaire": "no managers",
+      "gestionnaires": {
+        "one": "{{n}} manager",
+        "other": "{{n}} managers"
+      },
+      "creee": "{{entreprise}} has been created. A temporary password has been sent to {{courriel}}; the subscription is awaiting the admin’s payment.",
+      "reactivee": "{{entreprise}} is active again, along with its managers.",
+      "gestionnairesBloques": "Its managers will be blocked too.",
+      "nGestionnairesBloques": {
+        "one": "Its manager will be blocked too.",
+        "other": "Its {{n}} managers will be blocked too."
+      },
+      "desactiverTitre": "Disable this company?",
+      "desactiverMessage": "{{nom}} ({{entreprise}}) will no longer be able to sign in.{{gestionnaires}} The company’s surveys will no longer accept responses. Nothing is deleted; you can reactivate it.",
+      "desactivee": "{{entreprise}} is disabled, along with its managers.",
+      "motDePasseEnvoye": "Temporary password sent to {{courriel}}, valid until {{date}}.",
+      "contenu": {
+        "sesGestionnaires": "its managers",
+        "nGestionnaires": {
+          "one": "its manager",
+          "other": "its {{n}} managers"
+        },
+        "admin": "its admin",
+        "sondages": "its surveys and their responses",
+        "abonnement": "its subscription and payments"
+      },
+      "supprimerTitre": "Delete this company?",
+      "supprimerMessage": "The company “{{nom}}” will be permanently deleted, along with {{contenu}}. This cannot be undone. To cut off its access without losing anything, disable it instead.",
+      "supprimerDefinitivement": "Delete permanently",
+      "supprimee": "{{nom}} has been deleted."
+    },
+    "detail": {
+      "chargement": "Loading the admin",
+      "erreur": "This admin could not be loaded.",
+      "adminNom": "Admin: {{nom}}",
+      "active": "Active",
+      "desactivee": "Disabled",
+      "creeeLe": "Created on",
+      "nomAffiche": "Display name",
+      "nomEntreprise": "(company name)",
+      "couleur": "Color",
+      "couleurBatulo": "(Batulo color)",
+      "logo": "Logo",
+      "logoDe": "{{nom}} logo",
+      "aucun": "None",
+      "admin": "Admin",
+      "defini": "Set by the admin",
+      "aucuneFormule": "None (never paid)",
+      "dernierPaiement": "Last payment"
+    },
+    "dialogue": {
+      "modifier": "Edit the admin",
+      "aide": "The company and its admin account will be created. A temporary password, valid for 24 hours, will be sent by email; the subscription will remain awaiting payment until the admin pays online.",
+      "nomEntreprise": "Company name",
+      "nomEntrepriseAide": "Optional. Default: “Entreprise de First Last”.",
+      "nomEntrepriseObligatoire": "The company name is required.",
+      "prenom": "Admin’s first name",
+      "nom": "Admin’s last name",
+      "courriel": "Admin’s email",
+      "creer": "Create the admin"
+    },
+    "abonnements": {
+      "sousTitre": "Each company’s subscription, from the nearest expiry to the furthest; never-paid ones last.",
+      "chargement": "Loading subscriptions",
+      "erreur": "The list of subscriptions could not be loaded.",
+      "aucunStatut": "No subscription with status “{{statut}}”.",
+      "aucune": "No companies yet.",
+      "aucuneFormule": "No plan",
+      "caption": "Company subscriptions",
+      "pagination": "Subscriptions pagination"
+    },
+    "demandes": {
+      "sousTitre": "Upgrade requests sent by admins. Your reply has no effect on the subscription: the admin pays for the plan themselves.",
+      "filtrer": "Filter by request status",
+      "toutes": "All",
+      "erreurOuverture": "This request could not be opened.",
+      "erreur": "The list of requests could not be loaded.",
+      "actuelle": "Current: {{formule}}",
+      "repondreA": "Reply to the request from {{entreprise}}",
+      "voirDe": "View the request from {{entreprise}}",
+      "repondre": "Reply",
+      "voir": "View",
+      "aucuneEnAttente": "No pending requests.",
+      "aucuneAcceptee": "No accepted requests.",
+      "aucuneRefusee": "No refused requests.",
+      "caption": "Subscription upgrade requests",
+      "envoyeeLe": "Sent on",
+      "pagination": "Requests pagination",
+      "filtre": {
+        "EN_ATTENTE": "Pending",
+        "TRAITEE": "Accepted",
+        "REFUSEE": "Refused"
+      },
+      "acceptee": "Request from {{entreprise}} accepted; the admin is notified.",
+      "refusee": "Request from {{entreprise}} refused; the admin is notified.",
+      "aucuneFormule": "none"
+    },
+    "demande": {
+      "par": "by {{nom}}",
+      "le": "on {{date}}",
+      "titre": "Request from {{entreprise}}",
+      "formuleActuelle": "Current plan",
+      "messageAdmin": "Admin’s message",
+      "sansMessage": "No message.",
+      "votreReponse": "Your reply",
+      "aide": "Accepting has no effect on the subscription: the admin chooses and pays for the plan themselves from their Subscription page. Your reply is posted in their conversation with Batulo and the admin is notified.",
+      "accepter": "Accept",
+      "refuser": "Refuse",
+      "choisissez": "Choose to accept or refuse the request.",
+      "messageA": "Message to the admin",
+      "obligatoireRefus": "Required for a refusal",
+      "expliquez": "Explain to the admin why their request is refused.",
+      "envoi": "Sending the reply",
+      "envoyer": "Send the reply"
+    }
+  },
+  "erreursApi": {
+    "ABONNEMENT_EXPIRE": "The company’s subscription is not active: this is read-only.",
+    "ABONNEMENT_EN_ATTENTE_PAIEMENT": "The subscription is awaiting payment.",
+    "ABONNEMENT_DESACTIVE": "The company’s access is disabled.",
+    "ABONNEMENT_INTROUVABLE": "No subscription for this company.",
+    "ACCES_REFUSE": "Your role does not allow access to this resource.",
+    "ACTION_RESERVEE_ADMIN": "Only the company admin can make this change.",
+    "ACTION_RESERVEE_CREATEUR": "You can view this survey, but only its creator and the admin can edit, publish or close it.",
+    "ADMIN_INTROUVABLE": "Admin account not found.",
+    "ASSIGNATION_INTROUVABLE": "This survey is not assigned to this manager.",
+    "BROUILLON_EXISTANT": "A new version is already being prepared: edit its draft.",
+    "COMPTE_DESACTIVE": "Your account or company has been disabled. Contact your administrator.",
+    "CONFLIT": "The operation violates a data constraint.",
+    "CONVERSATION_INTROUVABLE": "This conversation cannot be found.",
+    "COULEUR_INVALIDE": "The color must be in hexadecimal #RRGGBB format (e.g. #1E6B52).",
+    "COURRIEL_DEJA_UTILISE": "This email is already used by an account.",
+    "CRITERE_INVALIDE": "This filter does not match any analysis criterion of this survey.",
+    "CROISEMENT_INVALIDE": "This cross-tabulation is not possible: only choice, yes/no, scale and numeric questions can be crossed with another criterion.",
+    "DATES_INVALIDES": "These dates are not valid: closing must come after opening and after now, and an open survey’s opening date can no longer change.",
+    "DEMANDE_DEJA_TRAITEE": "This request has already been answered.",
+    "DEMANDE_EN_COURS": "A request is already awaiting Batulo’s reply: you can write to Batulo in Messages.",
+    "DEMANDE_INTROUVABLE": "This request cannot be found.",
+    "ENTREPRISE_DESACTIVEE": "Your company has been disabled: payment is not possible. Contact Batulo.",
+    "ENVOI_INTROUVABLE": "This statistics submission cannot be found.",
+    "FICHIER_MANQUANT": "No file was received.",
+    "FICHIER_TROP_GROS": "The file is too large.",
+    "FORMAT_INVALIDE": "This export format is not available.",
+    "GESTIONNAIRE_CREATEUR": "This manager created this survey: they can already see it.",
+    "GESTIONNAIRE_DESACTIVE": "This manager is disabled: reactivate them before assigning a survey.",
+    "GESTIONNAIRE_INTROUVABLE": "This manager cannot be found in your company.",
+    "IDENTIFIANTS_INVALIDES": "Incorrect email or password.",
+    "INTERLOCUTEUR_INTROUVABLE": "You cannot write to this account.",
+    "JETON_INVALIDE": "This link is invalid, expired or already used. Request a new link.",
+    "JETON_RAFRAICHISSEMENT_INVALIDE": "Session expired or revoked: sign in again.",
+    "LIMITE_ATTEINTE": "The limit has been reached (maximum number of sections or questions).",
+    "LOGO_DIMENSIONS": "The logo is too large (in pixels).",
+    "LOGO_FORMAT_INVALIDE": "The logo must be a PNG or JPEG image.",
+    "LOGO_ILLISIBLE": "The logo is unreadable or damaged: save it again as PNG or JPEG (RGB colors).",
+    "LOGO_INTROUVABLE": "This logo does not exist.",
+    "LOGO_VIDE": "The logo file is empty.",
+    "METHODE_NON_AUTORISEE": "This action is not allowed at this address.",
+    "MOOSYL_ERREUR": "The mobile payment service ran into a problem. Try again in a moment.",
+    "MOTS_DE_PASSE_DIFFERENTS": "The password and its confirmation do not match.",
+    "MOT_DE_PASSE_ACTUEL_INCORRECT": "The current password is incorrect.",
+    "MOT_DE_PASSE_IDENTIQUE": "The new password must differ from the current one.",
+    "MOT_DE_PASSE_TEMPORAIRE": "Choose a new password to continue.",
+    "MOT_DE_PASSE_TEMPORAIRE_EXPIRE": "Your temporary password has expired (24 h). Ask your administrator for a new one or use “forgot password”.",
+    "NON_AUTHENTIFIE": "You must be signed in.",
+    "NOTIFICATION_INTROUVABLE": "This notification cannot be found.",
+    "ORDRE_INVALIDE": "The new order is invalid: reload the page.",
+    "PAIEMENT_INTROUVABLE": "This payment cannot be found.",
+    "PAIEMENT_INVALIDE": "This payment does not match your company’s subscription.",
+    "PAIEMENT_NON_REUSSI": "The payment was not validated. The subscription is unchanged.",
+    "PAIEMENT_MOBILE_NON_CONFIGURE": "Mobile payment is not available yet.",
+    "PARAMETRE_INVALIDE": "A request parameter is invalid.",
+    "PARAMETRE_MANQUANT": "A required parameter is missing.",
+    "PERIODE_INVALIDE": "The “from” date must be on or before the “to” date.",
+    "PERMISSION_SONDAGES_REQUISE": "Your admin has not given you permission to create or edit surveys.",
+    "POSITION_INVALIDE": "This position is not valid.",
+    "QUESTION_INTROUVABLE": "This question cannot be found.",
+    "QUESTION_NON_TEXTE": "This is not a free-text question.",
+    "REPONSE_OBLIGATOIRE": "Explain the refusal to the admin in the reply.",
+    "SECTION_INTROUVABLE": "This section cannot be found.",
+    "SONDAGE_BROUILLON": "This survey is a draft: it has never been published.",
+    "SONDAGE_INCOMPLET": "The survey is incomplete: each section must contain at least one question.",
+    "SONDAGE_NON_EN_COURS": "This survey is not in progress.",
+    "SONDAGE_NON_TERMINE": "Statistics can only be sent for a finished survey.",
+    "SONDAGE_PUBLIE": "This survey is published: its content can no longer change. Create a new version to edit it.",
+    "SONDAGE_TERMINE": "This survey is finished.",
+    "STATUT_INVALIDE": "A request is either processed or refused.",
+    "STRIPE_ERREUR": "The card payment service ran into a problem. Try again in a moment.",
+    "STRIPE_MODE_TEST_REQUIS": "Only Stripe test keys are accepted during development.",
+    "STRIPE_NON_CONFIGURE": "Card payment is not configured.",
+    "SUPER_ADMIN_PROTEGE": "The super admin account cannot be viewed, edited, disabled or deleted here.",
+    "TEXTE_CONSENTEMENT_REQUIS": "Consent is required: enter the checkbox text.",
+    "UTILISATEUR_INTROUVABLE": "Account not found.",
+    "VALEUR_OPTION_EN_DOUBLE": "Two options of the same question have the same value.",
+    "VERSION_INTROUVABLE": "This survey version cannot be found.",
+    "VERSION_OBSOLETE": "This is not the latest version: start from the most recent one."
+  },
+  "gestionnaires": {
+    "actions": {
+      "cree": "{{nom}} has been created. A temporary password has been sent to {{courriel}}.",
+      "reactive": "{{nom}} is active again.",
+      "desactiverTitre": "Disable this manager?",
+      "desactiverMessage": "{{nom}} will no longer be able to sign in. Their surveys and assignments are kept; you can reactivate them.",
+      "desactive": "{{nom}} is disabled.",
+      "renvoyerTitre": "Send a new temporary password?",
+      "renvoyerMessage": "A new password, valid for 24 hours, will be sent to {{courriel}}. The old one will no longer work.",
+      "motDePasseEnvoye": "Temporary password sent to {{courriel}}.",
+      "supprimerTitre": "Delete this manager?",
+      "supprimerMessage": "{{nom}} will be permanently deleted. This cannot be undone. To cut off their access without losing anything, disable them instead.",
+      "supprime": "{{nom}} has been deleted.",
+      "permissionDonnee": "{{nom}} can now create surveys.",
+      "permissionRetiree": "{{nom}} can no longer create surveys."
+    },
+    "liste": {
+      "sousTitre": "Your team’s accounts: access, permission to create surveys and assignments.",
+      "nouveau": "New manager",
+      "aideRecherche": "First name, last name or email",
+      "filtrerEtat": "Filter by state",
+      "actifs": "Active",
+      "desactives": "Disabled",
+      "chargement": "Loading managers",
+      "erreur": "The list of managers could not be loaded.",
+      "renvoyerMotDePasse": "Send a new temporary password",
+      "autoriser": "Allow {{nom}} to create surveys",
+      "peutCreer": "Can create surveys",
+      "aucun": "No managers yet. Create one to entrust them with surveys.",
+      "caption": "Company managers",
+      "creationSondages": "Survey creation",
+      "pagination": "Managers pagination",
+      "aucunRecherche": {
+        "tous": "No manager matches “{{terme}}”.",
+        "actifs": "No active manager matches “{{terme}}”.",
+        "desactives": "No disabled manager matches “{{terme}}”."
+      },
+      "aucunFiltre": {
+        "tous": "No managers.",
+        "actifs": "No active managers.",
+        "desactives": "No disabled managers."
+      }
+    },
+    "detail": {
+      "chargement": "Loading the manager",
+      "erreur": "This manager could not be loaded.",
+      "compte": "Account",
+      "temporaire": "Temporary",
+      "valableJusquau": "Valid until {{date}}",
+      "defini": "Set by the manager",
+      "autorisee": "Allowed",
+      "bloquee": "Blocked",
+      "creeLe": "Created on",
+      "sesSondages": "Their surveys",
+      "activezDabord": "Enable this manager first.",
+      "assigner": "Assign surveys",
+      "chargementSondages": "Loading their surveys",
+      "erreurSondages": "Their surveys could not be loaded.",
+      "aucunSondage": "No surveys created or assigned.",
+      "ligneSondage": "Version {{version}} · {{relation}} · edited on {{date}}",
+      "retirer": "Remove the assignment",
+      "retirerDe": "Remove the assignment of “{{titre}}”",
+      "pagination": "Their surveys pagination",
+      "assignationsEnregistrees": "Assignments saved.",
+      "retirerTitre": "Remove this assignment?",
+      "retirerMessage": "{{nom}} will no longer see the survey “{{titre}}” (all its versions). They will be notified.",
+      "assignationRetiree": "Assignment removed."
+    },
+    "dialogue": {
+      "modifier": "Edit the manager",
+      "aide": "A temporary password, valid for 24 hours, will be sent to them by email. They won’t be able to create surveys until you allow it.",
+      "creer": "Create the manager"
+    }
+  },
+  "assignation": {
+    "aideGestionnaire": "{{nom}} will be able to see these surveys, follow their collection and view their statistics, for all their versions. They will receive a notification and an email.",
+    "chargementSondages": "Loading surveys",
+    "erreurSondages": "Surveys could not be loaded.",
+    "sondagesAssignes": {
+      "one": "{{n}} survey assigned.",
+      "other": "{{n}} surveys assigned."
+    },
+    "nonAssignes": "Not assigned:",
+    "aucunAutre": "No other survey to assign.",
+    "rechercherSondage": "Search for a survey",
+    "sondagesAAssigner": "Surveys to assign",
+    "ligneSondage": "Version {{version}} · {{etat}}",
+    "aucunCorrespond": "No survey matches “{{terme}}”.",
+    "limite": "Only the {{limite}} most recently edited surveys are offered.",
+    "enCours": "Assigning",
+    "assigner": "Assign",
+    "aideSondage": "The chosen managers will see “{{titre}}” (all its versions) and follow its collection and statistics. They will receive a notification and an email.",
+    "aucunAutreGestionnaire": "No other active manager to assign.",
+    "gestionnairesAAssigner": "Managers to assign"
+  },
+  "menu": {
+    "tableauDeBord": "Dashboard",
+    "admins": "Admins and companies",
+    "abonnements": "Subscriptions",
+    "demandesAbonnement": "Subscription requests",
+    "messagerie": "Messages",
+    "notifications": "Notifications",
+    "abonnement": "Subscription",
+    "gestionnaires": "Managers",
+    "sondages": "Surveys",
+    "statistiquesRecues": "Received statistics",
+    "apparence": "Appearance",
+    "mesSondages": "My surveys",
+    "statistiquesEnvoyees": "Sent statistics",
+    "principal": "Main menu",
+    "nonLus": {
+      "one": "({{n}} unread)",
+      "other": "({{n}} unread)"
+    },
+    "nonLues": {
+      "one": "({{n}} unread)",
+      "other": "({{n}} unread)"
+    }
+  },
+  "layout": {
+    "abonnementExpireGestionnaire": "Your company’s subscription has expired: access is read-only. Your administrator must renew it."
+  },
+  "bandeau": {
+    "votreAbonnement": "Your subscription",
+    "expireLe": "Expired on {{date}}: read-only access.",
+    "expirera": "Expires on {{date}}",
+    "renouveler": "Renew",
+    "joursRestants": {
+      "one": "{{n}} day left",
+      "other": "{{n}} days left"
+    }
+  },
+  "barre": {
+    "ouvrirMenu": "Open the menu",
+    "accueil": "Batulo, home",
+    "compteDe": "{{nom}}’s account",
+    "changerMotDePasse": "Change password",
+    "seDeconnecter": "Sign out"
+  },
+  "messagerie": {
+    "ecrireBatuloToujours": "You can still write to Batulo.",
+    "conversations": "Conversations",
+    "chargement": "Loading conversations",
+    "erreur": "Conversations could not be loaded.",
+    "aucune": "No conversations yet.",
+    "vous": "You:",
+    "aucunMessage": "No messages",
+    "ecrireAdmin": "Write to my admin",
+    "nouvelle": "New conversation",
+    "nonLus": {
+      "one": "{{n}} unread",
+      "other": "{{n}} unread"
+    },
+    "liens": {
+      "voirEnvoi": "View my submission",
+      "voirEnvois": "View my submissions",
+      "voirDemande": "View the request"
+    },
+    "retour": "Back to conversations",
+    "equipeBatulo": "Batulo team",
+    "chargementMessages": "Loading messages",
+    "erreurMessages": "Messages could not be loaded.",
+    "plusAnciens": "Older messages",
+    "aucunMessageFil": "No messages. Write the first one.",
+    "messages": "Messages",
+    "erreurEnvoi": "The message could not be sent.",
+    "aideSaisie": "Ctrl + Enter (or ⌘ + Enter) to send",
+    "ecrivez": "Write a message.",
+    "envoyer": "Send",
+    "automatique": "Automatic message",
+    "lu": "Read",
+    "envoye": "Sent",
+    "messageDe": "Message from {{nom}}",
+    "dialogue": {
+      "rechercherAdmin": "Search for an admin or a company",
+      "rechercherGestionnaire": "Search for a manager",
+      "chargement": "Loading contacts",
+      "interlocuteurs": "Contacts",
+      "desactive": "disabled",
+      "aucun": "No contact matches.",
+      "detailBatulo": "The Batulo team (subscription, support)"
+    },
+    "choisissez": "Choose a conversation to read its messages.",
+    "conversation": "Conversation"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Super administrator",
+    "ADMIN": "Administrator",
+    "GESTIONNAIRE": "Manager"
+  },
+  "statutsAbonnement": {
+    "EN_ATTENTE_PAIEMENT": "Awaiting payment",
+    "ACTIF": "Active",
+    "EXPIRE_BIENTOT": "Expiring soon",
+    "EXPIRE": "Expired",
+    "DESACTIVE": "Disabled"
+  },
+  "formules": {
+    "MENSUEL": "Monthly plan",
+    "ANNUEL": "Annual plan"
+  },
+  "fournisseurs": {
+    "STRIPE": "Card",
+    "MOOSYL": "Mobile"
+  },
+  "statutsDemande": {
+    "EN_ATTENTE": "Pending",
+    "TRAITEE": "Accepted",
+    "REFUSEE": "Refused"
+  },
+  "typesMessage": {
+    "STATISTIQUES": "Statistics sent",
+    "DEMANDE_ABONNEMENT": "Subscription upgrade request",
+    "REPONSE_DEMANDE": "Reply to a subscription request"
+  },
+  "statutsSondage": {
+    "NON_COMMENCE": "Not started",
+    "EN_COURS": "In progress",
+    "TERMINE": "Finished"
+  },
+  "etatsSondage": {
+    "BROUILLON": "Draft",
+    "PLANIFIE": "Scheduled",
+    "EN_COURS": "In progress",
+    "TERMINE": "Finished"
+  },
+  "relationsSondage": {
+    "CREATEUR": "Created by them",
+    "ASSIGNE": "Assigned"
+  },
+  "typesQuestion": {
+    "CHOIX_UNIQUE": "Single choice",
+    "CHOIX_MULTIPLE": "Multiple choice",
+    "OUI_NON": "Yes / No",
+    "TEXTE_COURT": "Short text",
+    "TEXTE_LONG": "Long text",
+    "ECHELLE": "Scale",
+    "CLASSEMENT": "Ranking",
+    "NUMERIQUE": "Number",
+    "DATE": "Date",
+    "MATRICE": "Grid (matrix)"
+  },
+  "operateurs": {
+    "EGAL": "equals",
+    "EGAL_DATE": "is on",
+    "DIFFERENT": "is not equal to",
+    "DIFFERENT_DATE": "is not on",
+    "PARMI": "is one of",
+    "PARMI_MULTIPLE": "contains at least one of",
+    "CONTIENT": "contains",
+    "SUPERIEUR": "is greater than",
+    "SUPERIEUR_DATE": "is after",
+    "INFERIEUR": "is less than",
+    "INFERIEUR_DATE": "is before",
+    "ENTRE": "is between",
+    "REPONDUE": "has been answered",
+    "NON_REPONDUE": "has not been answered"
+  },
+  "notifications": {
+    "liens": {
+      "voirInscriptions": "View sign-ups",
+      "voirAbonnements": "View subscriptions",
+      "voirMonAbonnement": "View my subscription",
+      "ouvrirSondage": "Open the survey",
+      "voirSondages": "View surveys",
+      "ouvrirConversation": "Open the conversation",
+      "ouvrirMessagerie": "Open messages",
+      "ouvrirStatistiques": "Open the statistics",
+      "voirStatistiquesRecues": "View received statistics",
+      "ouvrirDemande": "Open the request",
+      "voirDemandes": "View requests",
+      "voirReponse": "View the reply",
+      "voirMesDemandes": "View my requests"
+    },
+    "titre": "Notifications",
+    "toutMarquerLu": "Mark all as read",
+    "chargement": "Loading notifications",
+    "aucune": "No notifications.",
+    "nonLuePrefixe": "Unread: ",
+    "voirToutes": "View all notifications",
+    "cloche": {
+      "aucune": "Notifications, none unread",
+      "nonLues": {
+        "one": "Notifications, {{n}} unread",
+        "other": "Notifications, {{n}} unread"
+      }
+    },
+    "erreurChargement": "Notifications could not be loaded.",
+    "dernieres": "Latest notifications",
+    "page": {
+      "affichees": "Notifications shown",
+      "nonLues": "Unread",
+      "lues": "Read",
+      "aucuneNonLue": "No unread notifications.",
+      "aucuneLue": "No read notifications.",
+      "aucune": "No notifications yet.",
+      "nNonLues": {
+        "one": "{{n}} unread notification.",
+        "other": "{{n}} unread notifications."
+      },
+      "marquerLue": "Mark “{{titre}}” as read",
+      "pagination": "Notifications pagination",
+      "marquees": {
+        "one": "{{n}} notification marked as read.",
+        "other": "{{n}} notifications marked as read."
+      },
+      "marqueesSans": "Notifications marked as read."
+    }
+  },
+  "sondages": {
+    "liste": {
+      "titreAdmin": "Company surveys",
+      "creer": "Create a survey",
+      "versionsAffichees": "Versions shown",
+      "derniereVersion": "Latest version",
+      "filtrerStatut": "Filter by status",
+      "enPreparationDe": "New version being prepared: {{titre}}",
+      "enPreparation": "New version being prepared",
+      "dont": "including {{n}} for v{{version}}",
+      "aucunStatut": "No “{{statut}}” surveys.",
+      "aucun": "No surveys yet.",
+      "reponses": {
+        "one": "{{n}} response",
+        "other": "{{n}} responses"
+      },
+      "assignesDeuxPoints": "Assigned:",
+      "par": "By {{nom}}",
+      "modifieLe": "edited on {{date}}",
+      "colTitre": "Title",
+      "modele": "Template",
+      "colVersion": "Version",
+      "assignes": "Assigned",
+      "creePar": "Created by",
+      "colModifie": "Edited on",
+      "pagination": "Surveys pagination",
+      "desactive": "{{nom}} (disabled)"
+    },
+    "droits": {
+      "publie": "This survey is published: its content is frozen so as not to skew the responses. To change it, create a new version.",
+      "ferme": "This survey is closed: its content can no longer be edited. To reopen or change it, create a new version.",
+      "reserveCreateur": "You can view this survey, but only its creator and the admin can edit it.",
+      "sansPermission": "Your admin has not given you permission to create or edit surveys."
+    },
+    "onglets": {
+      "rubriques": "Survey sections",
+      "fiche": "Overview",
+      "statistiques": "Statistics"
+    },
+    "fiche": {
+      "chargement": "Loading the survey",
+      "erreur": "This survey could not be loaded.",
+      "actions": "Survey actions",
+      "voirContenu": "View the content",
+      "previsualiser": "Preview",
+      "publier": "Publish",
+      "diffuser": "Share",
+      "autresActions": "More actions",
+      "modifierDates": "Change the dates",
+      "ouvrirVersion": "Open version {{version}} in preparation",
+      "nouvelleVersion": "Create a new version",
+      "dupliquer": "Duplicate",
+      "retirerModele": "Remove from templates",
+      "marquerModele": "Mark as template",
+      "fermer": "Close the survey",
+      "informations": "Information",
+      "creeParLe": "{{nom}}, on {{date}}",
+      "ouverture": "Opening",
+      "fermeture": "Closing",
+      "nonPrevue": "Not scheduled",
+      "uneParAppareil": "Only one per device",
+      "plusieursParAppareil": "Several per device (field collection)",
+      "collecte": "Collection",
+      "reponsesTotal": {
+        "one": "response in total",
+        "other": "responses in total"
+      },
+      "dontVersion": ", including {{n}} for version {{version}}",
+      "collecteOuverte": "Collection open",
+      "collecteFermee": "Collection closed",
+      "derniereReponse": "Last response on {{date}}",
+      "suiviIndisponible": "Collection tracking is not available at the moment.",
+      "gestionnairesAssignes": "Assigned managers",
+      "assigner": "Assign managers",
+      "assignationLignee": "The assignment covers the survey and all its versions.",
+      "chargementAssignes": "Loading assigned managers",
+      "erreurAssignes": "Assigned managers could not be loaded.",
+      "aucunAssigne": "No managers assigned.",
+      "assigneLe": "assigned on {{date}}",
+      "retirerDe": "Remove the assignment of {{nom}}",
+      "versions": "Versions",
+      "affichee": "(shown)",
+      "ouvriraLe": "Opens on {{date}}",
+      "ouverteLe": "Opened on {{date}}",
+      "fermeeLe": "closed on {{date}}",
+      "fermetureLe": "closes on {{date}}",
+      "creeeLe": "Created on {{date}}",
+      "ouvrirBrouillon": "Open the draft",
+      "retirerMessage": "{{nom}} will no longer see “{{titre}}” (all its versions), unless they created one. They will be notified."
+    },
+    "creation": {
+      "sousTitre": "Start from an empty form, or reuse the questions of an existing survey or a template.",
+      "pointDepart": "Starting point",
+      "vide": "Empty survey",
+      "aPartir": "From a form",
+      "aReutiliser": "Form to reuse",
+      "aideSource": "Its sections, questions and options are copied (with the same values, to compare statistics). Dates, assignments and responses are not carried over.",
+      "choisissez": "Choose the form to reuse.",
+      "titre": "Survey title",
+      "titreObligatoire": "The title is required.",
+      "description": "Description (optional)",
+      "descriptionAide": "Empty: the chosen form’s description is used.",
+      "reponseUnique": "Only one response per device",
+      "reponseUniqueAide": "Untick for field collection (several responses from the same device). Can be changed until publication.",
+      "reponseUniqueReprise": "The “only one response per device” setting is taken from the chosen form.",
+      "erreur": "The survey could not be created.",
+      "enCours": "Creating",
+      "creer": "Create and edit"
+    },
+    "choix": {
+      "modelesSeulement": "Templates only",
+      "chargement": "Loading forms",
+      "erreur": "Forms could not be loaded.",
+      "aucunModele": "No templates yet.",
+      "aucun": "No forms to reuse yet.",
+      "questions": {
+        "one": "{{n}} question",
+        "other": "{{n}} questions"
+      },
+      "pagination": "Forms pagination"
+    },
+    "actions": {
+      "planifiee": "Publication scheduled for {{date}}.",
+      "publie": "Survey published: it now accepts responses.",
+      "datesEnregistrees": "Dates saved.",
+      "fermerTitre": "Close this survey?",
+      "fermerMessage": "“{{titre}}” will become Finished: no more responses will be accepted. This is final; to reopen it, you will have to create a new version. Responses received are kept.",
+      "ferme": "Survey closed.",
+      "versionCreee": "Version {{version}} created: edit it, then publish it.",
+      "copieCreee": "Copy created: it opens in the editor.",
+      "marqueModele": "Marked as template: it appears at the top of the forms to reuse.",
+      "retireModele": "Removed from templates.",
+      "elleSOuvre": "It is opening."
+    },
+    "publication": {
+      "aucuneSection": "The survey has no sections: nothing to publish.",
+      "sectionVide": "The section “{{titre}}” has no questions.",
+      "titresErreur": {
+        "reglage": "The “one response per device” setting was not saved: nothing was published",
+        "publication": "The survey was not published",
+        "dates": "The dates were not saved"
+      },
+      "publierTitre": "Publish “{{titre}}”",
+      "dates": "Survey dates",
+      "erreurPublier": "The survey could not be published.",
+      "erreurDates": "The dates could not be saved.",
+      "verifiez": "Check the form",
+      "invalides": "Some information is not valid: check the dates entered.",
+      "pasEncore": "The survey cannot be published yet",
+      "fige": "The content will no longer be editable",
+      "figeTexte": "Once published, sections, questions and options are frozen so as not to skew the responses. To change them, you will have to create a new version. Analysis criteria will remain editable.",
+      "ouvertDepuis": "Open since {{date}}: the opening can no longer be changed.",
+      "maintenant": "Now",
+      "ouvrirMaintenant": "Open now",
+      "planifiee": "On a scheduled date",
+      "dateOuverture": "Opening date and time",
+      "ouvertureManquante": "Enter the opening date and time.",
+      "ouverturePassee": "The scheduled opening must be in the future.",
+      "avecFermeture": "Set a closing date",
+      "dateFermeture": "Closing date and time",
+      "fermetureManquante": "Enter the closing date and time.",
+      "fermetureAvant": "Closing must come after opening and after now.",
+      "sansDate": "Without a date, the survey stays open until you close it.",
+      "reponseUniqueAide": "Untick for field collection (several responses from the same device). Frozen at publication.",
+      "planifier": "Schedule publication",
+      "publierMaintenant": "Publish now",
+      "enregistrerDates": "Save the dates"
+    },
+    "partage": {
+      "messageAvecTitre": "Hello, thank you for answering our survey “{{titre}}”: {{url}}",
+      "message": "Hello, thank you for answering our survey: {{url}}",
+      "aEnvoyer": "Message to send",
+      "aide": "Editable before sending; the recipient is chosen in the app.",
+      "whatsapp": "Share via WhatsApp (new tab)",
+      "sms": "Share via SMS",
+      "parDefaut": "Default message",
+      "ecrivez": "Write a message to be able to share it.",
+      "aideSms": "The SMS button opens your phone’s Messages app."
+    },
+    "diffuser": {
+      "fiche": "Survey overview",
+      "titre": "Share the survey",
+      "sousTitre": "Share the link or the QR code: it always leads to the open version of the survey.",
+      "chargementLien": "Loading the link",
+      "erreurLien": "The link could not be loaded.",
+      "pasDeLien": "No link yet",
+      "jamaisPublie": "This survey has never been published: its link and QR code will be created on publication.",
+      "retourFiche": "Back to the overview",
+      "lienPublic": "Public link",
+      "adresse": "Form address",
+      "copier": "Copy",
+      "ouvrir": "Open",
+      "memeLien": "The same link for all versions; responses are accepted only while the survey is open.",
+      "partager": "Share via WhatsApp or SMS",
+      "termine": "This survey is finished: the link shows that it is closed.",
+      "qr": "QR code",
+      "qrDu": "QR code of the link {{url}}",
+      "chargementQr": "Loading the QR code",
+      "taille": "File size",
+      "telecharger": "Download the PNG",
+      "imprimer": "To print on a poster or flyer: 1000 px for a large poster.",
+      "erreurQr": "The QR code could not be loaded.",
+      "copie": "Link copied.",
+      "copieEchouee": "Copying failed: select the link and copy it."
+    },
+    "apercu": {
+      "titre": "Preview",
+      "taille": "Preview size",
+      "ordinateur": "Computer",
+      "telephone": "Phone",
+      "chargement": "Loading the preview",
+      "erreur": "The preview could not be loaded."
+    },
+    "reponses": {
+      "surMax": "{{valeur}} out of {{max}}",
+      "repondues": {
+        "one": "{{n}} question answered",
+        "other": "{{n}} questions answered"
+      },
+      "reponduesSur": {
+        "one": "{{n}} question answered out of {{total}}",
+        "other": "{{n}} questions answered out of {{total}}"
+      },
+      "chargement": "Loading responses",
+      "erreur": "Responses could not be loaded.",
+      "affichees": "Responses shown",
+      "totalToutes": {
+        "one": "{{n}} response for all versions, most recent first.",
+        "other": "{{n}} responses for all versions, most recent first."
+      },
+      "totalVersion": {
+        "one": "{{n}} response for version {{version}}, most recent first.",
+        "other": "{{n}} responses for version {{version}}, most recent first."
+      },
+      "aucune": "No responses yet.",
+      "numero": "No. {{id}}",
+      "pagination": "Responses pagination"
+    },
+    "reponse": {
+      "titre": "Response no. {{id}}",
+      "envoyee": "Sent on {{date}} · version {{version}}",
+      "parLigne": "Answers by row",
+      "sansReponse": "No answer"
+    }
+  },
+  "statistiques": {
+    "envoi": {
+      "toutesVersions": "all versions",
+      "version": "version {{version}}",
+      "periode": "from {{du}} to {{au}}",
+      "debut": "start",
+      "dernierJour": "last day",
+      "criteres": {
+        "one": "{{n}} criterion",
+        "other": "{{n}} criteria"
+      },
+      "nonEnvoyees": "The statistics were not sent",
+      "aide": "The admin will receive these statistics, recalculated when opened with the following filters: {{filtres}}.",
+      "commentaire": "Comment (optional)"
+    },
+    "filtres": {
+      "toutesVersions": "All versions",
+      "version": "Version {{version}}",
+      "periode": "From {{du}} to {{au}}",
+      "ou": " or ",
+      "titre": "Statistics filters",
+      "du": "From",
+      "au": "To",
+      "datesPar": "Dates by",
+      "automatique": "Automatic",
+      "jour": "Day",
+      "mois": "Month",
+      "filtres": "Filters:",
+      "periodePastille": "Period {{du}} → {{au}}",
+      "retirer": "Remove the filter {{filtre}}",
+      "toutEffacer": "Clear all"
+    },
+    "calcul": "Computing statistics",
+    "preparation": "Preparing…",
+    "rapportPdf": "PDF report",
+    "resumeReponses": {
+      "one": "{{n}} response.",
+      "other": "{{n}} responses."
+    },
+    "resumeReponsesPeriode": {
+      "one": "{{n}} response, from {{du}} to {{au}}.",
+      "other": "{{n}} responses, from {{du}} to {{au}}."
+    },
+    "petitEffectif": "Fewer than 5 responses: interpret results with caution.",
+    "section": "Section {{titre}}",
+    "page": {
+      "exporter": "Export",
+      "envoyer": "Send the statistics to the admin",
+      "erreur": "Statistics could not be computed.",
+      "resume": "Summary",
+      "reponses": {
+        "one": "response",
+        "other": "responses"
+      },
+      "premiere": "first response",
+      "derniere": "last response",
+      "toutes": "All",
+      "versionsListe": "versions {{versions}}",
+      "portee": "scope",
+      "petitEffectif": "Fewer than 5 responses with these filters: interpret results with caution.",
+      "aucune": "No responses with these filters.",
+      "envoyees": "Statistics sent: your admin has been notified."
+    },
+    "carte": {
+      "rangMoyen": "average rank {{rang}} · 1st: {{premiers}}",
+      "intervalle": "from {{de}} to less than {{a}}",
+      "repondants": {
+        "one": "{{n}} respondent",
+        "other": "{{n}} respondents"
+      },
+      "sansReponse": {
+        "one": "{{n}} without an answer",
+        "other": "{{n}} without an answer"
+      },
+      "vueParSur": {
+        "one": "Conditional question: seen by {{n}} respondent out of {{total}}",
+        "other": "Conditional question: seen by {{n}} respondents out of {{total}}"
+      },
+      "vuePar": {
+        "one": "Conditional question: seen by {{n}} respondent",
+        "other": "Conditional question: seen by {{n}} respondents"
+      },
+      "pourcentagesRepondu": "(percentages computed on those who answered)",
+      "petitEffectif": "Fewer than 5 respondents: interpret results with caution.",
+      "aucune": "No answers to this question with these filters.",
+      "reponsesA": "Answers to “{{libelle}}”",
+      "plusieursChoix": "Several choices possible: shares exceed 100% in total.",
+      "classementNote": "From best to worst ranked (average rank: 1 = always first).",
+      "classementDe": "Ranking of “{{libelle}}”",
+      "option": "Option",
+      "enteteRang": "Average rank and number of first places",
+      "notesDonnees": "Scores given to “{{libelle}}”",
+      "note": "Score",
+      "distribution": "Distribution of “{{libelle}}”",
+      "datesParJour": "From {{du}} to {{au}}, by day.",
+      "datesParMois": "From {{du}} to {{au}}, by month.",
+      "datesDonnees": "Dates given to “{{libelle}}”",
+      "periode": "Period",
+      "matriceCaption": "Answers by row to “{{libelle}}” (count and share of the row)",
+      "repondantsCol": "Respondents",
+      "precedents": "Previous",
+      "suivants": "Next",
+      "pageTextes": {
+        "one": "Page {{page}} of {{total}} ({{n}} text)",
+        "other": "Page {{page}} of {{total}} ({{n}} texts)"
+      },
+      "moyenne": "Mean",
+      "mediane": "Median",
+      "minimum": "Minimum",
+      "maximum": "Maximum"
+    },
+    "graphique": {
+      "voirGraphique": "View the chart",
+      "voirTableau": "View the table",
+      "reponse": "Answer",
+      "nombreEtPart": "Count and share",
+      "valeur": "Value",
+      "nombre": "Count",
+      "aucuneDonnee": "{{titre}}: no data.",
+      "resumeColonnes": "{{titre}}: {{n}} values, from {{premier}} to {{dernier}}; the most frequent: {{pic}} ({{nombre}}). Details are in the table view."
+    },
+    "croise": {
+      "titre": "Cross-tab",
+      "exportEnCours": "Exporting…",
+      "exporter": "Export the table",
+      "condition": "The cross-tab requires a choice, yes / no, scale or number question, and at least one analysis criterion (set on a question in the survey editor).",
+      "question": "Question",
+      "par": "By (criterion)",
+      "valeursAffichees": "Values shown",
+      "nombres": "Counts",
+      "pctLigne": "Row %",
+      "pctColonne": "Column %",
+      "calcul": "Computing the cross-tab",
+      "erreur": "The cross-tab could not be computed.",
+      "caption": "“{{question}}” by “{{par}}”:",
+      "modeNombres": "numbers of respondents",
+      "modeLigne": "row percentages",
+      "modeColonne": "column percentages",
+      "rep": "{{n}} resp.",
+      "total": "Total",
+      "petitEffectifTitre": "Small sample: interpret with caution",
+      "petitEffectif": "(small sample)",
+      "captionNumerique": "Statistics of “{{question}}” by “{{par}}”",
+      "min": "Min",
+      "max": "Max",
+      "nonRenseigne": "Not specified"
+    },
+    "export": {
+      "echec": "The export failed",
+      "erreur": "The export could not be created.",
+      "filtres": "Filters applied: {{filtres}}.",
+      "fichier": "File",
+      "fichierAExporter": "File to export",
+      "pdf": "Statistics report (PDF)",
+      "xlsx": "Statistics (Excel: one sheet per question)",
+      "csv": "Raw responses (CSV)",
+      "reponsesXlsx": "Raw responses (Excel)",
+      "valeurs": "Choice values",
+      "libelles": "Labels (“Kayes”), for reading",
+      "codes": "Codes (“kayes”), for analysis",
+      "formatNombres": "Number format",
+      "virgule": "Excel in French (“;” and decimal comma)",
+      "point": "Python, R… (“,” and decimal point)",
+      "telecharger": "Download"
+    }
+  },
+  "statsRecues": {
+    "sousTitre": "Statistics of finished surveys sent to you by your managers, recalculated when opened.",
+    "chargement": "Loading received statistics",
+    "erreur": "Received statistics could not be loaded.",
+    "aucune": "No statistics received yet.",
+    "nouveau": "New",
+    "ligne": "From {{nom}}, on {{date}} · {{resume}}",
+    "pagination": "Received statistics pagination",
+    "erreurOuverture": "These statistics could not be opened.",
+    "envoyeesPar": "Sent by {{nom}} on {{date}}."
+  },
+  "statsEnvoyees": {
+    "sousTitre": "Statistics of finished surveys you have sent to your admin.",
+    "chargement": "Loading sent statistics",
+    "erreur": "Sent statistics could not be loaded.",
+    "aucun": "Nothing sent yet. From the Statistics tab of a finished survey, choose “Send to admin”.",
+    "consulte": "Viewed",
+    "pasConsulte": "Not viewed yet",
+    "ligne": "Sent on {{date}} · {{resume}}",
+    "consulteLe": "· viewed on {{date}}",
+    "pagination": "Sent statistics pagination",
+    "chargementEnvoi": "Loading the submission",
+    "erreurEnvoi": "This submission could not be loaded.",
+    "voir": "View these statistics",
+    "envoyeesLe": "Sent to your admin on {{date}}.",
+    "consulteesLe": "Viewed by your admin on {{date}}.",
+    "pasConsultees": "Not yet viewed by your admin.",
+    "votreCommentaire": "Your comment"
+  },
+  "stripe": {
+    "refus": {
+      "insufficient_funds": "Your card was declined: insufficient funds.",
+      "lost_card": "Your card was declined: it is reported lost.",
+      "stolen_card": "Your card was declined: it is reported stolen.",
+      "expired_card": "Your card has expired.",
+      "incorrect_cvc": "The card security code is incorrect.",
+      "incorrect_number": "The card number is incorrect.",
+      "processing_error": "An error occurred while processing the card. Please try again.",
+      "card_velocity_exceeded": "Your card was declined: the spending limit has been reached.",
+      "do_not_honor": "Your card was declined by your bank. Contact it or use another card.",
+      "fraudulent": "Your card was declined. Contact your bank or use another card.",
+      "generic_decline": "Your card was declined. Contact your bank or use another card."
+    },
+    "code": {
+      "expired_card": "Your card has expired.",
+      "incorrect_cvc": "The card security code is incorrect.",
+      "invalid_cvc": "The card security code is not valid.",
+      "incorrect_number": "The card number is incorrect.",
+      "invalid_number": "The card number is not valid.",
+      "invalid_expiry_month": "The expiry month is not valid.",
+      "invalid_expiry_year": "The expiry year is not valid.",
+      "incomplete_number": "The card number is incomplete.",
+      "incomplete_expiry": "The expiry date is incomplete.",
+      "incomplete_cvc": "The security code is incomplete.",
+      "processing_error": "An error occurred while processing the card. Please try again.",
+      "authentication_required": "Your bank requires a verification (3-D Secure). Try again and follow its instructions.",
+      "payment_intent_authentication_failure": "Your bank’s verification (3-D Secure) failed or was cancelled. No amount was charged.",
+      "payment_intent_payment_attempt_failed": "The payment failed. No amount was charged. Try again or use another card.",
+      "payment_intent_unexpected_state": "This payment has already been processed or is no longer valid. Reload the page to start again.",
+      "rate_limit": "Too many payment attempts. Wait a moment and try again."
+    },
+    "indisponible": "The payment service cannot be reached. Check your connection (or an ad blocker) and try again.",
+    "inattendu": "The payment could not be made. No amount was charged. Try again or use another card."
+  },
+  "titres": {
+    "vitrine": "Batulo · Surveys and field studies",
+    "connexion": "Sign in · Batulo",
+    "inscription": "Create an account · Batulo",
+    "motDePasseOublie": "Forgot password · Batulo",
+    "nouveauMotDePasse": "New password · Batulo",
+    "changerMotDePasse": "Change password · Batulo",
+    "accesRefuse": "Access denied · Batulo",
+    "accesSuspendu": "Access suspended · Batulo",
+    "apparence": "Appearance · Batulo",
+    "messagerie": "Messages · Batulo",
+    "conversation": "Conversation · Batulo",
+    "tableauDeBord": "Dashboard · Batulo",
+    "statistiquesEnvoyees": "Sent statistics · Batulo",
+    "sondages": "Surveys · Batulo",
+    "nouveauSondage": "New survey · Batulo",
+    "modifierSondage": "Edit survey · Batulo",
+    "apercu": "Survey preview · Batulo",
+    "diffuser": "Share the survey · Batulo",
+    "reponses": "Survey responses · Batulo",
+    "statistiques": "Survey statistics · Batulo",
+    "sondage": "Survey · Batulo",
+    "statistiquesRecues": "Received statistics · Batulo",
+    "gestionnaires": "Managers · Batulo",
+    "gestionnaire": "Manager · Batulo",
+    "monAbonnement": "My subscription · Batulo",
+    "demandesAugmentation": "Upgrade requests · Batulo",
+    "paiementMobile": "Mobile payment · Batulo",
+    "souscrire": "Subscribe · Batulo",
+    "abonnements": "Subscriptions · Batulo",
+    "demandesAbonnement": "Subscription requests · Batulo",
+    "admins": "Admins and companies · Batulo",
+    "entreprise": "Company · Batulo",
+    "notifications": "Notifications · Batulo"
+  },
+  "vitrine": {
+    "sections": {
+      "fonctionnalites": "Features",
+      "comment_ca_marche": "How it works",
+      "tarifs": "Pricing",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "fonctionnalites": {
+      "dynamic_form": {
+        "titre": "Dynamic forms",
+        "texte": "Ten question types: choice, yes/no, scale, number, date, text, ranking, grid. Sections, drag and drop and automatic saving."
+      },
+      "qr_code_2": {
+        "titre": "Share by link and QR code",
+        "texte": "Each published survey has its own link. Print its QR code; respondents don’t need an account."
+      },
+      "smartphone": {
+        "titre": "Field collection on phones",
+        "texte": "A form designed for phones, several responses from the same device, answers in progress kept on the device."
+      },
+      "insights": {
+        "titre": "Statistics and cross-tabs",
+        "texte": "Charts for each question computed from the latest responses, filters by period and criterion, cross-tabs."
+      },
+      "download": {
+        "titre": "Excel, CSV and PDF exports",
+        "texte": "Download raw responses for Excel, Python or R, and a PDF report ready to share."
+      },
+      "groups": {
+        "titre": "Company managers",
+        "texte": "Create accounts for your team, choose who creates surveys and assign them the ones to follow."
+      },
+      "titre": "Everything for your surveys, from question to analysis",
+      "chapeau": "Designed for teams collecting online and in the field."
+    },
+    "etapes": {
+      "e1": {
+        "titre": "Create your account and subscribe",
+        "texte": "Register your company, then choose the monthly or annual plan and pay by bank card or mobile app (Bankily, Masrvi, Sedad)."
+      },
+      "e2": {
+        "titre": "Build your survey",
+        "texte": "Add sections and questions, preview on computer and phone, then publish."
+      },
+      "e3": {
+        "titre": "Share the link",
+        "texte": "Send the link or display the QR code; also collect in the field from a phone."
+      },
+      "e4": {
+        "titre": "Analyze and export",
+        "texte": "Follow the results, cross the responses, export to Excel, CSV or PDF."
+      }
+    },
+    "faq": {
+      "q1": {
+        "question": "Do respondents need an account?",
+        "reponse": "No. Respondents simply open the link or scan the QR code, on a computer or a phone."
+      },
+      "q2": {
+        "question": "Are responses confidential?",
+        "reponse": "A response is not linked to any account: only the information requested by the survey is recorded. Results are visible only to your company’s admin and the managers concerned."
+      },
+      "q3": {
+        "question": "How does payment work?",
+        "reponse": "By bank card, with a payment secured by Stripe, in Canadian dollars, or by mobile app (Bankily, Masrvi, Sedad), in ouguiyas. For one month or one year."
+      },
+      "q4": {
+        "question": "Can I cancel?",
+        "reponse": "There is no automatic renewal: each period is paid separately. Without renewal, the subscription expires and your workspace stays available read-only."
+      },
+      "q5": {
+        "question": "Can I work as a team?",
+        "reponse": "Yes. The admin creates accounts for their managers, decides whether they can create surveys and assigns them the ones to follow."
+      },
+      "q6": {
+        "question": "Can people answer without an Internet connection?",
+        "reponse": "Answers in progress are kept on the device, but sending requires a connection."
+      },
+      "titre": "Frequently asked questions"
+    },
+    "tarifs": {
+      "chapeau": "One plan for your whole company, monthly or yearly.",
+      "chargement": "Loading prices",
+      "erreur": "Prices could not be loaded.",
+      "avantageux": "Best value",
+      "duree": {
+        "MENSUEL": "1 month",
+        "ANNUEL": "1 year"
+      },
+      "ou": "or",
+      "parMobile": "by mobile payment",
+      "inclus1": "All features",
+      "inclus2": "Your company’s managers",
+      "inclus3": "Bank card or mobile payment, no automatic renewal",
+      "moyens": "Pay by bank card or mobile app: {{applications}}.",
+      "libelle": {
+        "MENSUEL": "Monthly subscription",
+        "ANNUEL": "Annual subscription"
+      }
+    },
+    "contact": {
+      "titre": "A question? Write to us",
+      "chapeau": "We answer companies that want to discover Batulo."
+    },
+    "pied": {
+      "liens": "Footer links",
+      "copyright": "© {{annee}} Batulo. All rights reserved."
+    },
+    "heros": {
+      "surTitre": "Surveys and field studies for companies",
+      "titre": "Create your surveys, share a link, analyze the results.",
+      "sousTitre": "Batulo brings together form building, online or field collection and response analysis, for your whole team.",
+      "envoyer": "Send"
+    },
+    "commencer": "Get started",
+    "barre": {
+      "haut": "Batulo, top of page",
+      "menu": "Menu",
+      "sections": "Page sections"
+    }
+  }
+}

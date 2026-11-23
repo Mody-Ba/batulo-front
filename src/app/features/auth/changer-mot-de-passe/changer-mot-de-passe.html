@@ -1,8 +1,11 @@
 <mat-card class="carte-auth" appearance="outlined">
   <mat-card-header>
     <div class="en-tete-auth">
-      <p class="marque-auth"><mat-icon fontIcon="lock_reset" aria-hidden="true" />Sécurité du compte</p>
-      <h1>Changer le mot de passe</h1>
+      <div class="haut-auth">
+        <p class="marque-auth"><mat-icon fontIcon="lock_reset" aria-hidden="true" />{{ 'auth.changer.securite' | transloco }}</p>
+        <app-selecteur-langue />
+      </div>
+      <h1>{{ 'barre.changerMotDePasse' | transloco }}</h1>
       @if (auth.nomAffiche()) {
         <p class="sous-titre">{{ auth.nomAffiche() }} · {{ auth.utilisateur()?.courriel }}</p>
       }
@@ -12,20 +15,17 @@
   <mat-card-content>
     @if (auth.motDePasseTemporaire()) {
       <app-encadre type="avertissement" role="status" icone="key">
-        <p>
-          Vous utilisez un mot de passe temporaire. Choisissez votre propre mot de passe pour accéder
-          à Batulo.
-        </p>
+        <p>{{ 'auth.changer.temporaire' | transloco }}</p>
         @if (auth.utilisateur()?.motDePasseTemporaireExpireLe; as expireLe) {
-          <p>Le mot de passe temporaire est valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}.</p>
+          <p>{{ 'auth.changer.valableJusquau' | transloco: { date: (expireLe | dateL: 'longHeure') } }}</p>
         }
       </app-encadre>
     }
     <app-message-erreur [erreur]="erreur()" />
 
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="changer()" novalidate>
-      <mat-form-field>
-        <mat-label>{{ auth.motDePasseTemporaire() ? 'Mot de passe temporaire' : 'Mot de passe actuel' }}</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ (auth.motDePasseTemporaire() ? 'auth.changer.motDePasseTemporaire' : 'auth.changer.motDePasseActuel') | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock_open" aria-hidden="true" />
         <input
           matInput
@@ -39,20 +39,20 @@
           matSuffix
           type="button"
           (click)="motDePasseVisible.set(!motDePasseVisible())"
-          [attr.aria-label]="motDePasseVisible() ? 'Masquer les mots de passe' : 'Afficher les mots de passe'"
+          [attr.aria-label]="(motDePasseVisible() ? 'commun.masquerMotsDePasse' : 'commun.afficherMotsDePasse') | transloco"
           [attr.aria-pressed]="motDePasseVisible()"
         >
           <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
         </button>
         @if (formulaire.controls.motDePasseActuel.hasError('required')) {
-          <mat-error>Le mot de passe actuel est obligatoire.</mat-error>
+          <mat-error>{{ 'auth.changer.actuelObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.motDePasseActuel.hasError('maxlength')) {
-          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Nouveau mot de passe</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'commun.champs.nouveauMotDePasse' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
           matInput
@@ -61,18 +61,18 @@
           autocomplete="new-password"
           required
         />
-        <mat-hint>{{ aideMotDePasse }}</mat-hint>
+        <mat-hint>{{ aideMotDePasse | transloco }}</mat-hint>
         @if (formulaire.controls.nouveauMotDePasse.hasError('required')) {
-          <mat-error>Le nouveau mot de passe est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.nouveauMotDePasseObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.nouveauMotDePasse.hasError('motDePasseFaible')) {
-          <mat-error>{{ aideMotDePasse }}</mat-error>
+          <mat-error>{{ aideMotDePasse | transloco }}</mat-error>
         } @else if (formulaire.controls.nouveauMotDePasse.hasError('maxlength')) {
-          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Confirmation du nouveau mot de passe</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ 'auth.changer.confirmation' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
           matInput
@@ -82,24 +82,24 @@
           required
         />
         @if (formulaire.controls.confirmationMotDePasse.hasError('required')) {
-          <mat-error>La confirmation est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.confirmationObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.confirmationMotDePasse.hasError('confirmationDifferente')) {
-          <mat-error>La confirmation ne correspond pas au nouveau mot de passe.</mat-error>
+          <mat-error>{{ 'auth.changer.confirmationDifferente' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <div class="actions-auth">
         <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
           @if (enCours()) {
-            <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+            <mat-spinner diameter="20" [attr.aria-label]="'commun.enregistrementEnCours' | transloco" />
           } @else {
-            Changer le mot de passe
+            {{ 'barre.changerMotDePasse' | transloco }}
           }
         </button>
         @if (auth.motDePasseTemporaire()) {
-          <button mat-button type="button" (click)="seDeconnecter()">Se déconnecter</button>
+          <button mat-button type="button" (click)="seDeconnecter()">{{ 'barre.seDeconnecter' | transloco }}</button>
         } @else {
-          <a mat-button [routerLink]="auth.urlAccueil()">Annuler</a>
+          <a mat-button [routerLink]="auth.urlAccueil()">{{ 'commun.annuler' | transloco }}</a>
         }
       </div>
     </form>

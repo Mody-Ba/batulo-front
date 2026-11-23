@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EnvoiStatistiqueResponse, FiltresStatistiques } from '../../../core/models/statistiques.model';
 import { StatistiquesService } from '../../../core/services/statistiques.service';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Longueur maximale du commentaire (message de la messagerie). */
 export const COMMENTAIRE_MAX = 2000;
@@ -24,28 +25,27 @@ export interface DonneesEnvoi {
  */
 @Component({
   selector: 'app-dialogue-envoi-statistiques',
-  imports: [ReactiveFormsModule, MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule, MessageErreur],
+  imports: [TranslocoPipe, ReactiveFormsModule, MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule, MessageErreur],
   template: `
-    <h2 mat-dialog-title>Envoyer les statistiques à l’admin</h2>
+    <h2 mat-dialog-title>{{ 'statistiques.page.envoyer' | transloco }}</h2>
     <mat-dialog-content>
-      <app-message-erreur [erreur]="erreur()" titre="Les statistiques n’ont pas été envoyées" />
+      <app-message-erreur [erreur]="erreur()" [titre]="'statistiques.envoi.nonEnvoyees' | transloco" />
       <p class="texte-aide">
-        L’admin recevra ces statistiques, recalculées à l’ouverture avec les filtres suivants :
-        {{ donnees.resume.join(' · ') }}.
+        {{ 'statistiques.envoi.aide' | transloco: { filtres: donnees.resume.join(' · ') } }}
       </p>
-      <mat-form-field class="commentaire">
-        <mat-label>Commentaire (facultatif)</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="commentaire">
+        <mat-label>{{ 'statistiques.envoi.commentaire' | transloco }}</mat-label>
         <textarea matInput [formControl]="commentaire" rows="4" [maxlength]="max"></textarea>
         <mat-hint align="end">{{ commentaire.value.length }} / {{ max }}</mat-hint>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button matButton type="button" mat-dialog-close [disabled]="enCours()">Annuler</button>
+      <button matButton type="button" mat-dialog-close [disabled]="enCours()">{{ 'commun.annuler' | transloco }}</button>
       <button matButton="filled" type="button" class="bouton-principal" (click)="envoyer()" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Envoi en cours" />
+          <mat-spinner diameter="20" [attr.aria-label]="'commun.envoiEnCours' | transloco" />
         } @else {
-          Envoyer
+          {{ 'messagerie.envoyer' | transloco }}
         }
       </button>
     </mat-dialog-actions>
