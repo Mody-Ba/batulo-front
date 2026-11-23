@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +16,7 @@ import { EntetePage } from '../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { DialogueNouvelleConversation } from './dialogue-nouvelle-conversation';
 import { EtatMessagerie } from './etat-messagerie';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
 
 /** Relecture de la liste des conversations. */
 export const INTERVALLE_LISTE_MS = 30_000;
@@ -27,7 +27,7 @@ export const INTERVALLE_LISTE_MS = 30_000;
  */
 @Component({
   selector: 'app-page-messagerie',
-  imports: [DatePipe, RouterLink, RouterOutlet, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DateLPipe,  RouterLink, RouterOutlet, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
   providers: [EtatMessagerie],
   templateUrl: './page-messagerie.html',
   styleUrl: './page-messagerie.scss',

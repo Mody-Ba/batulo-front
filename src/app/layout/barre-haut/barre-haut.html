@@ -1,6 +1,6 @@
 <mat-toolbar class="barre">
   @if (boutonMenu()) {
-    <button mat-icon-button type="button" aria-label="Ouvrir le menu" (click)="basculerMenu.emit()">
+    <button mat-icon-button type="button" [attr.aria-label]="'barre.ouvrirMenu' | transloco" (click)="basculerMenu.emit()">
       <mat-icon fontIcon="menu" aria-hidden="true" />
     </button>
   }

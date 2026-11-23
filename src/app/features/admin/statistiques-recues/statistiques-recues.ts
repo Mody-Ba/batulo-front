@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +19,7 @@ import { CarteQuestionStat } from '../../sondages/statistiques/carte-question-st
 import { nombre } from '../../sondages/statistiques/graphiques/format';
 import { grouperParSection } from '../../sondages/statistiques/groupes-questions';
 import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resume-filtres';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Admin : statistiques reçues, recalculées avec les filtres de l'envoi (GET /api/statistiques-recues/{id}, qui les
@@ -28,7 +28,7 @@ import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resu
  */
 @Component({
   selector: 'app-statistiques-recues',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur, CarteQuestionStat],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur, CarteQuestionStat],
   template: `
     <section class="conteneur-page">
       <a matButton routerLink="/admin/statistiques-recues" class="retour">
@@ -50,7 +50,7 @@ import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resu
 
         @if (envoi(); as e) {
           <div class="envoi carte-section">
-            <p>Envoyées par <strong>{{ e.expediteurNom }}</strong> le {{ e.dateEnvoi | date: 'd MMMM y à HH:mm' }}.</p>
+            <p>Envoyées par <strong>{{ e.expediteurNom }}</strong> le {{ e.dateEnvoi | dateL: 'longHeure' }}.</p>
             @if (e.commentaire) {
               <blockquote>{{ e.commentaire }}</blockquote>
             }
@@ -60,7 +60,7 @@ import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resu
         <p class="texte-aide">
           {{ nombre(st.resume.nombreReponses) }} réponse{{ st.resume.nombreReponses > 1 ? 's' : '' }}
           @if (st.resume.premiereReponse) {
-            , du {{ st.resume.premiereReponse | date: 'd MMM y' }} au {{ st.resume.derniereReponse | date: 'd MMM y' }}
+            , du {{ st.resume.premiereReponse | dateL: 'court' }} au {{ st.resume.derniereReponse | dateL: 'court' }}
           }
           .
         </p>

@@ -42,7 +42,7 @@
                 <span class="ligne">
                   <span class="nom">{{ nom(c.interlocuteur) }}</span>
                   @if (c.dernierMessageLe) {
-                    <span class="date">{{ c.dernierMessageLe | date: 'd MMM, HH:mm' }}</span>
+                    <span class="date">{{ c.dernierMessageLe | dateL: 'jourHeure' }}</span>
                   }
                 </span>
                 @if (c.interlocuteur.entreprise && auth.role() === 'SUPER_ADMIN') {

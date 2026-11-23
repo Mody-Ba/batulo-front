@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, effect, inject, model, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormulaireResponse, LIBELLES_STATUT_SONDAGE } from '../../../../core/models/sondage.model';
 import { SondageService } from '../../../../core/services/sondage.service';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 export const TAILLE_FORMULAIRES = 10;
 
@@ -19,8 +19,7 @@ export const TAILLE_FORMULAIRES = 10;
  */
 @Component({
   selector: 'app-choix-formulaire',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
@@ -67,7 +66,7 @@ export const TAILLE_FORMULAIRES = 10;
             <span class="cellule-secondaire">
               Version {{ f.version }} · {{ libellesStatut[f.statut] }} ·
               {{ f.nombreQuestions === 1 ? '1 question' : f.nombreQuestions + ' questions' }} · modifié le
-              {{ f.dateModification | date: 'd MMM y' }}
+              {{ f.dateModification | dateL: 'court' }}
             </span>
           </mat-radio-button>
         }

@@ -96,16 +96,16 @@
           <dd>{{ s.version }}@if (s.estModele) { · Modèle }</dd>
 
           <dt>Créé par</dt>
-          <dd>{{ s.creePar ? nomComplet(s.creePar) : '—' }}, le {{ s.dateCreation | date: 'longDate' }}</dd>
+          <dd>{{ s.creePar ? nomComplet(s.creePar) : '—' }}, le {{ s.dateCreation | dateL: 'longDate' }}</dd>
 
           @if (s.datePublication) {
             <dt>Ouverture</dt>
-            <dd>{{ s.datePublication | date: 'd MMMM y à HH:mm' }}</dd>
+            <dd>{{ s.datePublication | dateL: 'longHeure' }}</dd>
           }
           <dt>Fermeture</dt>
           <dd>
             @if (s.dateFermeture) {
-              {{ s.dateFermeture | date: 'd MMMM y à HH:mm' }}
+              {{ s.dateFermeture | dateL: 'longHeure' }}
             } @else {
               Non prévue
             }
@@ -119,11 +119,11 @@
       <article class="carte-section">
         <h2>Collecte</h2>
         @if (collecte(); as c) {
-          <p class="nombre">{{ c.nombreReponsesTotal | number }}</p>
+          <p class="nombre">{{ c.nombreReponsesTotal | nombreL }}</p>
           <p class="cellule-secondaire">
             réponse{{ c.nombreReponsesTotal > 1 ? 's' : '' }} au total
             @if (versions().length > 1) {
-              , dont {{ c.nombreReponses | number }} pour la version {{ c.version }}
+              , dont {{ c.nombreReponses | nombreL }} pour la version {{ c.version }}
             }
           </p>
           <p class="collecte">
@@ -137,7 +137,7 @@
             <p class="texte-aide">{{ c.raisonFermeture }}</p>
           }
           @if (c.derniereReponse) {
-            <p class="cellule-secondaire">Dernière réponse le {{ c.derniereReponse | date: 'd MMMM y à HH:mm' }}</p>
+            <p class="cellule-secondaire">Dernière réponse le {{ c.derniereReponse | dateL: 'longHeure' }}</p>
           }
         } @else {
           <p class="texte-aide">Le suivi de la collecte n’est pas disponible pour le moment.</p>
@@ -180,7 +180,7 @@
                       <span class="pastille-statut compte-desactive">Désactivé</span>
                     }
                     <span class="cellule-secondaire">
-                      {{ a.courriel }} · assigné le {{ a.dateAssignation | date: 'd MMM y' }}
+                      {{ a.courriel }} · assigné le {{ a.dateAssignation | dateL: 'court' }}
                       @if (a.assignePar; as par) {
                         par {{ par.prenom }} {{ par.nom }}
                       }
@@ -217,17 +217,17 @@
                 <span class="pastille-statut" [class]="classeEtat(v)">{{ libelleEtat(v) }}</span>
                 @if (v.publie) {
                   <span class="nombre-reponses">
-                    {{ v.nombreReponses | number }} réponse{{ v.nombreReponses > 1 ? 's' : '' }}
+                    {{ v.nombreReponses | nombreL }} réponse{{ v.nombreReponses > 1 ? 's' : '' }}
                   </span>
                 }
                 <span class="cellule-secondaire">
                   @if (v.datePublication) {
-                    {{ v.statut === 'NON_COMMENCE' ? 'Ouvrira le' : 'Ouverte le' }} {{ v.datePublication | date: 'd MMM y' }}
+                    {{ v.statut === 'NON_COMMENCE' ? 'Ouvrira le' : 'Ouverte le' }} {{ v.datePublication | dateL: 'court' }}
                     @if (v.dateFermeture) {
-                      · {{ v.statut === 'TERMINE' ? 'fermée le' : 'fermeture le' }} {{ v.dateFermeture | date: 'd MMM y' }}
+                      · {{ v.statut === 'TERMINE' ? 'fermée le' : 'fermeture le' }} {{ v.dateFermeture | dateL: 'court' }}
                     }
                   } @else {
-                    Créée le {{ v.dateCreation | date: 'd MMM y' }}
+                    Créée le {{ v.dateCreation | dateL: 'court' }}
                   }
                 </span>
                 @if (!v.publie) {

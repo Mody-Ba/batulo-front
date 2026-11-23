@@ -57,7 +57,7 @@
               </p>
               <p class="message">{{ n.message }}</p>
               <p class="date">
-                <time [attr.datetime]="n.dateCreation">{{ n.dateCreation | date: 'd MMM y, HH:mm' }}</time>
+                <time [attr.datetime]="n.dateCreation">{{ n.dateCreation | dateL: 'courtHeure' }}</time>
               </p>
             </div>
             <div class="actions">

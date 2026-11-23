@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,6 +29,7 @@ import { nombre } from './graphiques/format';
 import { resumeFiltres, totalUneVersion } from './resume-filtres';
 import { grouperParSection } from './groupes-questions';
 import { TableauCroise } from './tableau-croise';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Onglet « Statistiques » : filtres dans l'URL (?lignee=&du=&au=&granularite=&critere=cle:valeur), résumé, une carte
@@ -38,8 +38,7 @@ import { TableauCroise } from './tableau-croise';
  */
 @Component({
   selector: 'app-page-statistiques',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

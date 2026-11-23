@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -16,6 +15,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { interrogationPeriodique } from '../../core/utils/interrogation';
 import { messageErreur } from '../../core/utils/erreur-http';
 import { lienNotification } from '../../features/notifications/liens-notifications';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
 
 /** Intervalle de mise à jour de la pastille. */
 const INTERVALLE_MS = 60_000;
@@ -24,8 +24,7 @@ const TAILLE_APERCU = 10;
 
 @Component({
   selector: 'app-cloche-notifications',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     RouterLink,
     MatBadgeModule,
     MatButtonModule,

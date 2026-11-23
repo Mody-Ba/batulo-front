@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +11,7 @@ import { StatistiquesService } from '../../../core/services/statistiques.service
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 
 /**
@@ -20,7 +20,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
  */
 @Component({
   selector: 'app-liste-statistiques-recues',
-  imports: [DatePipe, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DateLPipe,  MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <app-entete-page
@@ -52,7 +52,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
                     }
                   </span>
                   <span class="cellule-secondaire">
-                    De {{ e.expediteurNom }}, le {{ e.dateEnvoi | date: 'd MMM y à HH:mm' }} · {{ resume(e) }}
+                    De {{ e.expediteurNom }}, le {{ e.dateEnvoi | dateL: 'courtHeure' }} · {{ resume(e) }}
                   </span>
                   @if (e.commentaire) {
                     <span class="commentaire">« {{ e.commentaire }} »</span>

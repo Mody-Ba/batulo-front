@@ -37,7 +37,7 @@
           @if (s.expireLe) {
             <p class="expiration">
               <mat-icon fontIcon="schedule" aria-hidden="true" />
-              Valable jusqu’à {{ s.expireLe | date: 'HH:mm' }}
+              Valable jusqu’à {{ s.expireLe | dateL: 'heure' }}
             </p>
           }
           <!-- Même onglet : la session (sessionStorage) est encore là quand Moosyl renvoie sur Batulo. -->

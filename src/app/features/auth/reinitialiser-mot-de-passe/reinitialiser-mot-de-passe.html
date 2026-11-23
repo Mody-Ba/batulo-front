@@ -23,7 +23,7 @@
       </app-message-erreur>
 
       <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="reinitialiser()" novalidate>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nouveau mot de passe</mat-label>
           <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
           <input
@@ -53,7 +53,7 @@
           }
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Confirmation</mat-label>
           <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
           <input

@@ -33,7 +33,7 @@ export interface DonneesEnvoi {
         L’admin recevra ces statistiques, recalculées à l’ouverture avec les filtres suivants :
         {{ donnees.resume.join(' · ') }}.
       </p>
-      <mat-form-field class="commentaire">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="commentaire">
         <mat-label>Commentaire (facultatif)</mat-label>
         <textarea matInput [formControl]="commentaire" rows="4" [maxlength]="max"></textarea>
         <mat-hint align="end">{{ commentaire.value.length }} / {{ max }}</mat-hint>

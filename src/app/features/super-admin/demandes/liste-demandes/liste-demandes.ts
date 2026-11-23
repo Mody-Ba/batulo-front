@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +34,7 @@ import {
   DonneesDialogueDemande,
   ResultatDialogueDemande,
 } from '../dialogue-demande/dialogue-demande';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Pastilles de filtre (« Toutes » + les statuts), au pluriel. */
 const LIBELLES_FILTRE: Record<StatutDemande, string> = {
@@ -49,8 +50,7 @@ const LIBELLES_FILTRE: Record<StatutDemande, string> = {
  */
 @Component({
   selector: 'app-liste-demandes',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     NgTemplateOutlet,
     MatButtonModule,
     MatChipsModule,

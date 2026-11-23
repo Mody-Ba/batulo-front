@@ -1,4 +1,3 @@
-import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -56,6 +55,8 @@ import { EntetePage } from '../../../../shared/components/entete-page/entete-pag
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { PaiementMobile } from '../paiement-mobile/paiement-mobile';
 import { activerAbonnement, MESSAGE_RECONNEXION } from '../paiement-mobile/suivi-paiement-mobile';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
 
 type Etape = 'formule' | 'paiement' | 'mobile' | 'succes';
 type ChampCarte = 'numero' | 'expiration' | 'code';
@@ -80,10 +81,7 @@ export { MESSAGE_RECONNEXION };
  */
 @Component({
   selector: 'app-souscrire',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    UpperCasePipe,
+  imports: [MontantLPipe, DateLPipe, 
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,

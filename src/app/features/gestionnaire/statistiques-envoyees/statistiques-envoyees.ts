@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +11,7 @@ import { StatistiquesService } from '../../../core/services/statistiques.service
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Gestionnaire : statistiques qu'il a envoyées à son admin, les plus récentes d'abord (?page=&taille=), avec la portée,
@@ -19,7 +19,7 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
  */
 @Component({
   selector: 'app-statistiques-envoyees',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <app-entete-page
@@ -52,9 +52,9 @@ import { MessageErreur } from '../../../shared/components/message-erreur/message
                   </span>
                 </p>
                 <p class="cellule-secondaire">
-                  Envoyé le {{ e.dateEnvoi | date: 'd MMM y à HH:mm' }} · {{ resume(e) }}
+                  Envoyé le {{ e.dateEnvoi | dateL: 'courtHeure' }} · {{ resume(e) }}
                   @if (e.consulteLe) {
-                    · consulté le {{ e.consulteLe | date: 'd MMM y' }}
+                    · consulté le {{ e.consulteLe | dateL: 'court' }}
                   }
                 </p>
                 @if (e.commentaire) {

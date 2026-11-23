@@ -28,7 +28,7 @@ const CRANS_10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         </mat-button-toggle-group>
       </div>
       <div class="ligne-champs">
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Libellé du 1 (facultatif)</mat-label>
           <input
             matInput
@@ -37,7 +37,7 @@ const CRANS_10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             placeholder="Pas du tout d’accord"
           />
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Libellé du {{ configuration().controls.max.value }} (facultatif)</mat-label>
           <input
             matInput

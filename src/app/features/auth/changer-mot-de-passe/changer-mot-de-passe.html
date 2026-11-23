@@ -17,14 +17,14 @@
           à Batulo.
         </p>
         @if (auth.utilisateur()?.motDePasseTemporaireExpireLe; as expireLe) {
-          <p>Le mot de passe temporaire est valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}.</p>
+          <p>Le mot de passe temporaire est valable jusqu’au {{ expireLe | dateL: 'longHeure' }}.</p>
         }
       </app-encadre>
     }
     <app-message-erreur [erreur]="erreur()" />
 
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="changer()" novalidate>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>{{ auth.motDePasseTemporaire() ? 'Mot de passe temporaire' : 'Mot de passe actuel' }}</mat-label>
         <mat-icon matPrefix fontIcon="lock_open" aria-hidden="true" />
         <input
@@ -51,7 +51,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Nouveau mot de passe</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
@@ -71,7 +71,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Confirmation du nouveau mot de passe</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input

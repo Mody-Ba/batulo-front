@@ -19,7 +19,7 @@
     </p>
   } @else {
     <div class="choix">
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Question</mat-label>
         <mat-select [value]="cleQuestion()" (selectionChange)="cleQuestion.set($event.value)">
           @for (q of croisables(); track q.cle) {
@@ -27,7 +27,7 @@
           }
         </mat-select>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Par (critère)</mat-label>
         <mat-select [value]="clePar()" (selectionChange)="clePar.set($event.value)">
           @for (c of criteres(); track c.cle) {

@@ -25,7 +25,7 @@
           {{ n.titre }}
         </p>
         <p class="cellule-secondaire">{{ n.message }}</p>
-        <p class="cellule-secondaire">{{ n.dateCreation | date: 'd MMM, HH:mm' }}</p>
+        <p class="cellule-secondaire">{{ n.dateCreation | dateL: 'jourHeure' }}</p>
       </div>
     </li>
   }

@@ -38,7 +38,7 @@
                   <span class="visuellement-cache">Choisir la couleur principale</span>
                   <input #selecteur type="color" [value]="couleurSelecteur()" (input)="couleurChoisie($event)" />
                 </label>
-                <mat-form-field class="champ-couleur">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-couleur">
                   <mat-label>Couleur principale</mat-label>
                   <input
                     matInput
@@ -59,7 +59,7 @@
                 </button>
               </div>
 
-              <mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-label>Nom affiché sur les formulaires (facultatif)</mat-label>
                 <input matInput [formControl]="nomAffiche" [maxlength]="nomMax" autocomplete="organization" />
                 <mat-hint>Vide : « {{ p.nomEntreprise }} ». Montré à côté du logo et dans les rapports.</mat-hint>

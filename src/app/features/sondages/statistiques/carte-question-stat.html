@@ -56,7 +56,7 @@
       @case ('DATE') {
         @if (question().dates; as d) {
           <p class="note">
-            Du {{ d.min | date: 'd MMMM y' }} au {{ d.max | date: 'd MMMM y' }}, par {{ d.granularite === 'JOUR' ? 'jour' : 'mois' }}.
+            Du {{ d.min | dateL: 'long' }} au {{ d.max | dateL: 'long' }}, par {{ d.granularite === 'JOUR' ? 'jour' : 'mois' }}.
           </p>
         }
         <app-colonnes [colonnes]="colonnesDates()" [titre]="'Dates données à « ' + question().libelle + ' »'" enteteLibelle="Période" />
@@ -99,7 +99,7 @@
             @for (t of page.contenu; track $index) {
               <li>
                 <p>{{ t.texte }}</p>
-                <span class="date">{{ t.dateSoumission | date: 'd MMM y, HH:mm' }}</span>
+                <span class="date">{{ t.dateSoumission | dateL: 'courtHeure' }}</span>
               </li>
             }
           </ul>

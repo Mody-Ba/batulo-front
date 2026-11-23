@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,14 +30,14 @@ import {
   DialogueAssignerSondages,
   DonneesAssignerSondages,
 } from '../dialogue-assigner-sondages/dialogue-assigner-sondages';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 const TAILLE_SONDAGES = 10;
 
 /** Détail d'un gestionnaire : compte, actions, et ses sondages (créés ou assignés). */
 @Component({
   selector: 'app-detail-gestionnaire',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

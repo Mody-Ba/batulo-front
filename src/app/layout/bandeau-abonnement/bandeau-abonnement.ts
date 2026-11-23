@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +6,7 @@ import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { abonnementEnAlerte, LIBELLES_FORMULE } from '../../core/models/abonnement.model';
 import { AbonnementService } from '../../core/services/abonnement.service';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
 
 /**
  * Bandeau de l'admin, en haut de chaque page : formule, jours restants, date d'expiration et bouton
@@ -15,7 +15,7 @@ import { AbonnementService } from '../../core/services/abonnement.service';
  */
 @Component({
   selector: 'app-bandeau-abonnement',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule],
   templateUrl: './bandeau-abonnement.html',
   styleUrl: './bandeau-abonnement.scss',
 })

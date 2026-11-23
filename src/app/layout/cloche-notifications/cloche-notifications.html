@@ -50,7 +50,7 @@
           {{ notification.titre }}
         </span>
         <span class="message">{{ notification.message }}</span>
-        <span class="date">{{ notification.dateCreation | date: 'd MMM, HH:mm' }}</span>
+        <span class="date">{{ notification.dateCreation | dateL: 'jourHeure' }}</span>
       </span>
     </button>
   }

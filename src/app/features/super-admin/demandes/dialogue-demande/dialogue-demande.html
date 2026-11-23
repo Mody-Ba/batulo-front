@@ -26,7 +26,7 @@
       </dd>
 
       <dt>Envoyée le</dt>
-      <dd>{{ demande.dateDemande | date: 'd MMMM y à HH:mm' }}</dd>
+      <dd>{{ demande.dateDemande | dateL: 'longHeure' }}</dd>
     </dl>
 
     <h3>Message de l’admin</h3>
@@ -56,7 +56,7 @@
       }
 
       <div class="formulaire">
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Message à l’admin</mat-label>
           <textarea
             matInput

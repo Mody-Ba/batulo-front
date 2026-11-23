@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +9,7 @@ import { StatistiquesService } from '../../../core/services/statistiques.service
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { parametresUrl } from '../../sondages/statistiques/filtres-url';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Gestionnaire : un envoi de statistiques à son admin (GET /api/envois-statistiques/{id}) : sondage, portée et filtres,
@@ -18,7 +18,7 @@ import { parametresUrl } from '../../sondages/statistiques/filtres-url';
  */
 @Component({
   selector: 'app-envoi-statistiques',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <a matButton routerLink="/gestionnaire/statistiques-envoyees" class="retour">
@@ -40,10 +40,10 @@ import { parametresUrl } from '../../sondages/statistiques/filtres-url';
           </a>
         </app-entete-page>
         <div class="carte-section envoi">
-          <p>Envoyées à votre admin le <strong>{{ e.dateEnvoi | date: 'd MMMM y à HH:mm' }}</strong>.</p>
+          <p>Envoyées à votre admin le <strong>{{ e.dateEnvoi | dateL: 'longHeure' }}</strong>.</p>
           <p role="status">
             @if (e.consulteLe) {
-              Consultées par votre admin le {{ e.consulteLe | date: 'd MMMM y à HH:mm' }}.
+              Consultées par votre admin le {{ e.consulteLe | dateL: 'longHeure' }}.
             } @else {
               Pas encore consultées par votre admin.
             }

@@ -46,7 +46,7 @@
             <li>
               <button type="button" class="reponse" (click)="ouvrir(r)">
                 <span class="numero">N° {{ r.id }}</span>
-                <span class="date">{{ r.dateSoumission | date: 'd MMM y, HH:mm' }}</span>
+                <span class="date">{{ r.dateSoumission | dateL: 'courtHeure' }}</span>
                 <span class="version">Version {{ r.version }}</span>
                 <span class="cellule-secondaire resume">{{ resume(r, s) }}</span>
                 <mat-icon fontIcon="chevron_right" aria-hidden="true" />

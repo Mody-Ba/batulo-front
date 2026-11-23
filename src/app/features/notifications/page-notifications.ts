@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +16,7 @@ import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../.
 import { EntetePage } from '../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { lienNotification, LienNotification } from './liens-notifications';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
 
 /**
  * Notifications, les plus récentes d'abord, toutes ou filtrées (?lue=true|false&page=&taille= dans l'URL) : marquer
@@ -24,7 +24,7 @@ import { lienNotification, LienNotification } from './liens-notifications';
  */
 @Component({
   selector: 'app-page-notifications',
-  imports: [DatePipe, MatButtonModule, MatButtonToggleModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [DateLPipe,  MatButtonModule, MatButtonToggleModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   templateUrl: './page-notifications.html',
   styleUrl: './page-notifications.scss',
 })

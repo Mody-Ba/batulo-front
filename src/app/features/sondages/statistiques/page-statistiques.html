@@ -49,11 +49,11 @@
         <span class="libelle">réponse{{ st.resume.nombreReponses > 1 ? 's' : '' }}</span>
       </div>
       <div class="tuile-stat">
-        <span class="valeur petite">{{ st.resume.premiereReponse ? (st.resume.premiereReponse | date: 'd MMM y') : '—' }}</span>{{ ' ' }}
+        <span class="valeur petite">{{ st.resume.premiereReponse ? (st.resume.premiereReponse | dateL: 'court') : '—' }}</span>{{ ' ' }}
         <span class="libelle">première réponse</span>
       </div>
       <div class="tuile-stat">
-        <span class="valeur petite">{{ st.resume.derniereReponse ? (st.resume.derniereReponse | date: 'd MMM y') : '—' }}</span>{{ ' ' }}
+        <span class="valeur petite">{{ st.resume.derniereReponse ? (st.resume.derniereReponse | dateL: 'court') : '—' }}</span>{{ ' ' }}
         <span class="libelle">dernière réponse</span>
       </div>
       <div class="tuile-stat">

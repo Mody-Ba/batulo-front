@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import {
   afterNextRender,
   Component,
@@ -27,6 +26,7 @@ import { variablesApparence } from '../../../shared/formulaire/apparence/apparen
 import { FormulaireSondage, ReponsesParQuestion } from '../../../shared/formulaire/formulaire-sondage';
 import { ReponseQuestionRequest } from '../../../shared/formulaire/reponses';
 import { memoireRepondant } from './memoire-repondant';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /** Délai après la dernière saisie avant d'écrire le brouillon dans le navigateur. */
 export const DELAI_BROUILLON_MS = 500;
@@ -101,7 +101,7 @@ export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndi
  */
 @Component({
   selector: 'app-formulaire-public',
-  imports: [DatePipe, AccueilSondage, FormulaireSondage, BandeauApparence],
+  imports: [DateLPipe,  AccueilSondage, FormulaireSondage, BandeauApparence],
   templateUrl: './formulaire-public.html',
   styleUrl: './formulaire-public.scss',
 })

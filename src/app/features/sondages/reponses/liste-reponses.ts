@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +20,7 @@ import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { OngletsSondage } from '../onglets-sondage/onglets-sondage';
 import { DialogueReponse, DonneesDialogueReponse } from './dialogue-reponse';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Onglet « Réponses » : réponses de la version affichée, ou de toutes les versions (?lignee=true), les plus récentes
@@ -29,8 +29,7 @@ import { DialogueReponse, DonneesDialogueReponse } from './dialogue-reponse';
  */
 @Component({
   selector: 'app-liste-reponses',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatButtonToggleModule,

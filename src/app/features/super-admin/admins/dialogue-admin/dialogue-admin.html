@@ -11,7 +11,7 @@
     <app-message-erreur [erreur]="erreur()" />
 
     <div class="formulaire">
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Nom de l’entreprise</mat-label>
         <input matInput formControlName="nomEntreprise" autocomplete="organization" [required]="!!admin" cdkFocusInitial />
         @if (!admin) {
@@ -24,7 +24,7 @@
         }
       </mat-form-field>
       <div class="ligne-champs">
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Prénom de l’admin</mat-label>
           <input matInput formControlName="prenom" autocomplete="off" required />
           @if (formulaire.controls.prenom.hasError('required')) {
@@ -33,7 +33,7 @@
             <mat-error>100 caractères au plus.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nom de l’admin</mat-label>
           <input matInput formControlName="nom" autocomplete="off" required />
           @if (formulaire.controls.nom.hasError('required')) {
@@ -43,7 +43,7 @@
           }
         </mat-form-field>
       </div>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Courriel de l’admin</mat-label>
         <input matInput type="email" formControlName="courriel" autocomplete="off" inputmode="email" required />
         @if (formulaire.controls.courriel.hasError('required')) {

@@ -33,7 +33,7 @@
     @if (candidats().length === 0) {
       <p class="etat-vide">Aucun autre sondage à lui assigner.</p>
     } @else {
-      <mat-form-field class="recherche" subscriptSizing="dynamic">
+      <mat-form-field appearance="outline" class="recherche" subscriptSizing="dynamic">
         <mat-label>Rechercher un sondage</mat-label>
         <mat-icon matPrefix fontIcon="search" aria-hidden="true" />
         <input matInput [ngModel]="recherche()" (ngModelChange)="recherche.set($event)" autocomplete="off" />

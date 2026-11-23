@@ -1,4 +1,3 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,6 +33,8 @@ import {
   DialogueAssignerGestionnaires,
   DonneesAssignerGestionnaires,
 } from '../dialogue-assigner-gestionnaires/dialogue-assigner-gestionnaires';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { NombreLPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Fiche d'un sondage : informations, collecte, versions et, pour l'admin, les gestionnaires assignés (assigner,
@@ -41,9 +42,7 @@ import {
  */
 @Component({
   selector: 'app-detail-sondage',
-  imports: [
-    DatePipe,
-    DecimalPipe,
+  imports: [NombreLPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

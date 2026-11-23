@@ -25,7 +25,7 @@
       } @else {
         <mat-icon class="marqueur" [fontIcon]="icones[marqueur() === 'case' ? 'case' : 'rond']" aria-hidden="true" />
       }
-      <mat-form-field class="champ-libelle">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-libelle">
         <mat-label>Option {{ i + 1 }}</mat-label>
         <input
           #champLibelle
@@ -40,7 +40,7 @@
         }
       </mat-form-field>
       @if (afficherValeurs()) {
-        <mat-form-field class="champ-valeur">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
           <mat-label>Valeur</mat-label>
           <input matInput formControlName="valeur" [maxlength]="regles.valeurOptionMax" autocomplete="off" spellcheck="false" />
           @if (!option.controls.id.value && !option.controls.valeur.value) {

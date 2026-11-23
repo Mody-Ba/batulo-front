@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, DOCUMENT, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +18,7 @@ import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { CodeQr } from './code-qr';
 import { finDuSuivi, MESSAGE_ECHEC_MOBILE, MESSAGE_EXPIRE_MOBILE, suivrePaiementMobile } from './suivi-paiement-mobile';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur';
 
@@ -30,7 +30,7 @@ type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur
  */
 @Component({
   selector: 'app-paiement-mobile',
-  imports: [DatePipe, MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
+  imports: [DateLPipe,  MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
   templateUrl: './paiement-mobile.html',
   styleUrl: './paiement-mobile.scss',
 })

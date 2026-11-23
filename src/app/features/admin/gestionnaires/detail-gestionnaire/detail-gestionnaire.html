@@ -35,7 +35,7 @@
             @if (g.motDePasseTemporaire) {
               <span class="pastille-statut compte-temporaire">Temporaire</span>
               @if (g.motDePasseTemporaireExpireLe; as expireLe) {
-                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}</span>
+                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | dateL: 'longHeure' }}</span>
               }
             } @else {
               Défini par le gestionnaire
@@ -56,7 +56,7 @@
           </dd>
 
           <dt>Créé le</dt>
-          <dd>{{ g.dateCreation | date: 'longDate' }}</dd>
+          <dd>{{ g.dateCreation | dateL: 'longDate' }}</dd>
         </dl>
 
         <div class="actions" [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
@@ -110,7 +110,7 @@
                     <a [routerLink]="['/sondages', s.id]" class="titre">{{ s.titre }}</a>
                     <span class="cellule-secondaire">
                       Version {{ s.version }} · {{ libellesRelation[s.relation] }} · modifié le
-                      {{ s.dateModification | date: 'd MMM y' }}
+                      {{ s.dateModification | dateL: 'court' }}
                     </span>
                   </div>
                   <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>

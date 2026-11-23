@@ -12,17 +12,17 @@
       </mat-button-toggle-group>
     }
 
-    <mat-form-field class="champ-date">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-date">
       <mat-label>Du</mat-label>
       <input matInput type="date" [value]="filtres().du ?? ''" [max]="filtres().au ?? null" (change)="changerDate('du', $any($event.target).value)" />
     </mat-form-field>
-    <mat-form-field class="champ-date">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-date">
       <mat-label>Au</mat-label>
       <input matInput type="date" [value]="filtres().au ?? ''" [min]="filtres().du ?? null" (change)="changerDate('au', $any($event.target).value)" />
     </mat-form-field>
 
     @for (c of criteres(); track c.cle) {
-      <mat-form-field class="champ-critere">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-critere">
         <mat-label>{{ c.libelle }}</mat-label>
         <mat-select multiple [value]="valeursChoisies(c.cle)" (selectionChange)="changerCritere(c.cle, $event.value)">
           @for (v of c.valeurs; track v.valeur) {
@@ -32,7 +32,7 @@
       </mat-form-field>
     }
 
-    <mat-form-field class="champ-granularite">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-granularite">
       <mat-label>Dates par</mat-label>
       <mat-select [value]="filtres().granularite" (selectionChange)="changerGranularite($event.value)">
         <mat-option [value]="null">Automatique</mat-option>

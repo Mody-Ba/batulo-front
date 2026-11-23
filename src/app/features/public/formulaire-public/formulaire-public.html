@@ -15,7 +15,7 @@
             (commencer)="commencer(e.formulaire, $event)"
           >
             @if (e.formulaire.dateFermeture) {
-              <p class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | date: 'd MMMM y à HH:mm' }}.</p>
+              <p class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | dateL: 'longHeure' }}.</p>
             }
           </app-accueil-sondage>
         }
@@ -38,7 +38,7 @@
             (envoyer)="envoyer(e.formulaire, $event)"
           >
             @if (e.formulaire.dateFermeture) {
-              <p entete class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | date: 'd MMMM y à HH:mm' }}.</p>
+              <p entete class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | dateL: 'longHeure' }}.</p>
             }
             @if (brouillonRepris()) {
               <div class="encart-public info" role="status">
@@ -63,7 +63,7 @@
             <span class="icone" aria-hidden="true">✓</span>
             <h1 id="titre-etat" tabindex="-1">Merci !</h1>
             <p role="status">{{ e.confirmation.message }}</p>
-            <p class="secondaire">Envoyé le {{ e.confirmation.dateSoumission | date: 'd MMMM y à HH:mm' }}.</p>
+            <p class="secondaire">Envoyé le {{ e.confirmation.dateSoumission | dateL: 'longHeure' }}.</p>
             @if (!e.formulaire.reponseUnique) {
               <button type="button" class="bouton-public" (click)="nouvelleReponse(e.formulaire)">Nouvelle réponse</button>
               <p class="secondaire">Collecte terrain : le formulaire repart vide pour la personne suivante.</p>

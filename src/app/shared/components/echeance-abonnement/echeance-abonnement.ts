@@ -1,8 +1,8 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { AbonnementResponse } from '../../../core/models/abonnement.model';
 import { expireBientot } from '../../../core/models/super-admin.model';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /** « Expire dans 3 jours », « Expire demain », « Expire aujourd’hui ». */
 export function libelleJoursRestants(jours: number): string {
@@ -19,10 +19,10 @@ export function libelleJoursRestants(jours: number): string {
  */
 @Component({
   selector: 'app-echeance-abonnement',
-  imports: [DatePipe, MatIconModule],
+  imports: [DateLPipe,  MatIconModule],
   template: `
     @if (abonnement()?.dateExpiration; as date) {
-      <span>{{ date | date: 'longDate' }}</span>
+      <span>{{ date | dateL: 'longDate' }}</span>
       @if (alerte(); as texte) {
         <span class="alerte"><mat-icon fontIcon="schedule" aria-hidden="true" />{{ texte }}</span>
       }

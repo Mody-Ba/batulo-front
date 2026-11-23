@@ -63,9 +63,9 @@
   </ng-template>
 
   <ng-template #reponses let-s>
-    <span class="nombre">{{ nombreReponses(s) | number }}</span>
+    <span class="nombre">{{ nombreReponses(s) | nombreL }}</span>
     @if (aDetailReponses(s)) {
-      &ngsp;<span class="cellule-secondaire">dont {{ s.nombreReponses | number }} pour la v{{ s.version }}</span>
+      &ngsp;<span class="cellule-secondaire">dont {{ s.nombreReponses | nombreL }} pour la v{{ s.version }}</span>
     }
   </ng-template>
 
@@ -110,10 +110,10 @@
             <ng-container *ngTemplateOutlet="enPreparation; context: { $implicit: s }" />
             <span class="ligne">
               <span>
-                {{ nombreReponses(s) | number }} réponse{{ nombreReponses(s) > 1 ? 's' : '' }}
+                {{ nombreReponses(s) | nombreL }} réponse{{ nombreReponses(s) > 1 ? 's' : '' }}
                 @if (aDetailReponses(s)) {
                   <span class="cellule-secondaire en-ligne">
-                    (dont {{ s.nombreReponses | number }} pour la v{{ s.version }})
+                    (dont {{ s.nombreReponses | nombreL }} pour la v{{ s.version }})
                   </span>
                 }
               </span>
@@ -128,7 +128,7 @@
               @if (s.creePar; as auteur) {
                 Par {{ auteur.prenom }} {{ auteur.nom }} ·
               }
-              modifié le {{ s.dateModification | date: 'd MMM y' }}
+              modifié le {{ s.dateModification | dateL: 'court' }}
             </span>
           </li>
         }
@@ -188,7 +188,7 @@
 
           <ng-container matColumnDef="modification">
             <th mat-header-cell *matHeaderCellDef>Modifié le</th>
-            <td mat-cell *matCellDef="let s">{{ s.dateModification | date: 'd MMM y' }}</td>
+            <td mat-cell *matCellDef="let s">{{ s.dateModification | dateL: 'court' }}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="colonnes()"></tr>

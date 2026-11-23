@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +27,8 @@ import { FiltreSondages, SondageService } from '../../../core/services/sondage.s
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { NombreLPipe } from '../../../core/i18n/formats.pipes';
 
 /** Assignés affichés en clair dans une ligne ; les autres sont résumés par « +N ». */
 export const ASSIGNES_VISIBLES = 2;
@@ -43,9 +45,7 @@ export function libelleAssigne(gestionnaire: GestionnaireAssigneResponse): strin
  */
 @Component({
   selector: 'app-liste-sondages',
-  imports: [
-    DatePipe,
-    DecimalPipe,
+  imports: [NombreLPipe, DateLPipe, 
     NgTemplateOutlet,
     RouterLink,
     MatButtonModule,

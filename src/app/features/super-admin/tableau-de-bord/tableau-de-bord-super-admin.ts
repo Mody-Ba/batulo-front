@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +14,7 @@ import { SuperAdminService } from '../../../core/services/super-admin.service';
 import { DernieresNotifications } from '../../../shared/components/dernieres-notifications/dernieres-notifications';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { NombreLPipe } from '../../../core/i18n/formats.pipes';
 
 /** Tuile d'un statut : nombre d'entreprises et lien vers la liste filtrée. */
 interface TuileStatut {
@@ -32,8 +32,7 @@ interface TuileStatut {
  */
 @Component({
   selector: 'app-tableau-de-bord-super-admin',
-  imports: [
-    DecimalPipe,
+  imports: [NombreLPipe, 
     RouterLink,
     MatButtonModule,
     MatProgressBarModule,

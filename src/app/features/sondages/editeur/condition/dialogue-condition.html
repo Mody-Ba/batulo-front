@@ -28,7 +28,7 @@
             <span class="visuellement-cache">(règle {{ i + 1 }})</span>
           </legend>
           <div class="champs">
-            <mat-form-field class="champ-source">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-source">
               <mat-label>Question</mat-label>
               <mat-select [id]="'source-regle-' + i" formControlName="questionId">
                 @for (g of groupes; track g.titre) {
@@ -42,7 +42,7 @@
             </mat-form-field>
 
             @if (source(groupe); as src) {
-              <mat-form-field class="champ-operateur">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-operateur">
                 <mat-label>Condition</mat-label>
                 <mat-select formControlName="operateur">
                   @for (op of operateurs(groupe); track op) {
@@ -53,7 +53,7 @@
 
               @switch (genre(groupe)) {
                 @case ('option') {
-                  <mat-form-field class="champ-valeur">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
                     <mat-label>Option</mat-label>
                     <mat-select formControlName="valeur">
                       @for (o of src.options; track o.id) {
@@ -63,7 +63,7 @@
                   </mat-form-field>
                 }
                 @case ('options') {
-                  <mat-form-field class="champ-valeur">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
                     <mat-label>Options</mat-label>
                     <mat-select formControlName="valeurs" multiple>
                       @for (o of src.options; track o.id) {
@@ -73,7 +73,7 @@
                   </mat-form-field>
                 }
                 @case ('booleen') {
-                  <mat-form-field class="champ-valeur">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
                     <mat-label>Réponse</mat-label>
                     <mat-select formControlName="valeur">
                       <mat-option [value]="true">Oui</mat-option>
@@ -82,33 +82,33 @@
                   </mat-form-field>
                 }
                 @case ('nombre') {
-                  <mat-form-field class="champ-valeur">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
                     <mat-label>Valeur</mat-label>
                     <input matInput type="number" formControlName="valeur" />
                   </mat-form-field>
                 }
                 @case ('date') {
-                  <mat-form-field class="champ-valeur">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-valeur">
                     <mat-label>Date</mat-label>
                     <input matInput type="date" formControlName="valeur" />
                   </mat-form-field>
                 }
                 @case ('intervalle-nombre') {
-                  <mat-form-field class="champ-borne">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
                     <mat-label>De</mat-label>
                     <input matInput type="number" formControlName="min" />
                   </mat-form-field>
-                  <mat-form-field class="champ-borne">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
                     <mat-label>À (compris)</mat-label>
                     <input matInput type="number" formControlName="max" />
                   </mat-form-field>
                 }
                 @case ('intervalle-date') {
-                  <mat-form-field class="champ-borne">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
                     <mat-label>Du</mat-label>
                     <input matInput type="date" formControlName="min" />
                   </mat-form-field>
-                  <mat-form-field class="champ-borne">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-borne">
                     <mat-label>Au (compris)</mat-label>
                     <input matInput type="date" formControlName="max" />
                   </mat-form-field>

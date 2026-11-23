@@ -23,9 +23,9 @@
           <p>
             La nouvelle période s’ajoutera à votre abonnement actuel
             @if (abonnementActuel()?.statut === 'EXPIRE') {
-              à partir de la date du paiement (il a expiré le {{ dateExpiration | date: 'longDate' }}).
+              à partir de la date du paiement (il a expiré le {{ dateExpiration | dateL: 'longDate' }}).
             } @else {
-              à partir du {{ dateExpiration | date: 'longDate' }} : vous ne perdez aucun jour.
+              à partir du {{ dateExpiration | dateL: 'longDate' }} : vous ne perdez aucun jour.
             }
           </p>
         </app-encadre>
@@ -125,7 +125,7 @@
         <div class="resume">
           <div>
             <p class="resume-formule">{{ libellesFormule[intention.formule] }}</p>
-            <p class="resume-montant">{{ intention.montant | currency: (intention.devise | uppercase) }}</p>
+            <p class="resume-montant">{{ intention.montant | montantL: intention.devise }}</p>
           </div>
           @if (!paiementEnCours() && !paiementAVerifier()) {
             <button matButton type="button" (click)="changerFormule()">Changer de formule</button>
@@ -148,7 +148,7 @@
           novalidate
           aria-label="Informations de la carte"
         >
-          <mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label>Nom sur la carte</mat-label>
             <mat-icon matPrefix fontIcon="person" aria-hidden="true" />
             <input matInput [formControl]="nomTitulaire" autocomplete="cc-name" required />
@@ -223,7 +223,7 @@
               @if (paiementEnCours()) {
                 <mat-spinner diameter="20" aria-label="Paiement en cours" />
               } @else {
-                Payer {{ intention.montant | currency: (intention.devise | uppercase) }}
+                Payer {{ intention.montant | montantL: intention.devise }}
               }
             </button>
           }
@@ -258,7 +258,7 @@
               {{ libellesFormule[formule] }} active
             }
             @if (confirmation.abonnement.dateExpiration; as dateExpiration) {
-              jusqu’au {{ dateExpiration | date: 'longDate' }}.
+              jusqu’au {{ dateExpiration | dateL: 'longDate' }}.
             }
           </p>
           <p class="texte-aide">Redirection vers votre tableau de bord…</p>

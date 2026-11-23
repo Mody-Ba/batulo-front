@@ -28,14 +28,14 @@
       </button>
     </div>
 
-    <mat-form-field class="champ-titre">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-titre">
       <mat-label>Titre de la section</mat-label>
       <input matInput formControlName="titre" [maxlength]="regles.titreSectionMax" autocomplete="off" required />
       @if (formulaire.controls.titre.hasError('required')) {
         <mat-error>Le titre de la section est obligatoire.</mat-error>
       }
     </mat-form-field>
-    <mat-form-field class="champ-description">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-description">
       <mat-label>Description (facultative)</mat-label>
       <textarea
         matInput

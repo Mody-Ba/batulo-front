@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +7,7 @@ import { RouterLink } from '@angular/router';
 import { ICONES_NOTIFICATION, NotificationResponse } from '../../../core/models/notification.model';
 import { NotificationService } from '../../../core/services/notification.service';
 import { MessageErreur } from '../message-erreur/message-erreur';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 /** Nombre de notifications affichées. */
 export const NOMBRE_NOTIFICATIONS = 5;
@@ -18,7 +18,7 @@ export const NOMBRE_NOTIFICATIONS = 5;
  */
 @Component({
   selector: 'app-dernieres-notifications',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, MessageErreur],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, MessageErreur],
   templateUrl: './dernieres-notifications.html',
   styleUrl: './dernieres-notifications.scss',
 })

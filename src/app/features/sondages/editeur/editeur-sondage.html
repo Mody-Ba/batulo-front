@@ -75,14 +75,14 @@
       </div>
 
       <h1 class="visuellement-cache">Modifier « {{ s.titre }} »</h1>
-      <mat-form-field class="champ-titre-sondage">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-titre-sondage">
         <mat-label>Titre du sondage</mat-label>
         <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required />
         @if (formulaire.controls.titre.hasError('required')) {
           <mat-error>Le titre est obligatoire.</mat-error>
         }
       </mat-form-field>
-      <mat-form-field class="champ-description-sondage">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-description-sondage">
         <mat-label>Description (facultative)</mat-label>
         <textarea
           matInput
@@ -116,12 +116,12 @@
       <p class="texte-aide">
         Présentée au répondant avant les questions. Laissée vide et sans consentement, le questionnaire s’ouvre directement.
       </p>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Objet de l’enquête (facultatif)</mat-label>
         <textarea matInput formControlName="objetEnquete" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.objetEnqueteMax"></textarea>
         <mat-hint>Pourquoi cette enquête, à quoi serviront les réponses.</mat-hint>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Confidentialité des réponses (facultatif)</mat-label>
         <textarea matInput formControlName="texteConfidentialite" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConfidentialiteMax"></textarea>
         <mat-hint>Anonymat, conservation et usage des données.</mat-hint>
@@ -131,7 +131,7 @@
         <span class="cellule-secondaire">Le répondant coche une case avant de commencer ; la date est gardée avec sa réponse.</span>
       </mat-checkbox>
       @if (formulaire.controls.consentementRequis.value) {
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Texte de la case de consentement</mat-label>
           <textarea matInput formControlName="texteConsentement" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConsentementMax" required></textarea>
           <mat-hint>Par exemple : « J’ai lu ces informations et j’accepte de participer. »</mat-hint>

@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { afterNextRender, Component, DOCUMENT, DestroyRef, effect, ElementRef, inject, Injector, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,6 +21,7 @@ import {
   MESSAGE_RECONNEXION,
   suivrePaiementMobile,
 } from './suivi-paiement-mobile';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuvable' | 'erreur';
 
@@ -32,7 +32,7 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
  */
 @Component({
   selector: 'app-retour-paiement-mobile',
-  imports: [DatePipe, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
+  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page etroit">
       <app-entete-page titre="Paiement mobile" icone="smartphone" />
@@ -54,7 +54,7 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
               <p role="status">
                 Paiement de {{ montant(s.montant, s.devise) }} reçu : {{ libellesFormule[s.formule] }}
                 @if (s.abonnement.dateExpiration; as fin) {
-                  active jusqu’au {{ fin | date: 'longDate' }}.
+                  active jusqu’au {{ fin | dateL: 'longDate' }}.
                 } @else {
                   active.
                 }

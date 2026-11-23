@@ -1,10 +1,10 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ReponseResponse } from '../../../core/models/statistiques.model';
 import { QuestionResponse, SondageResponse } from '../../../core/models/sondage.model';
 import { formaterReponse, ReponseMiseEnForme } from './formater-reponse';
+import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
 export interface DonneesDialogueReponse {
   reponse: ReponseResponse;
@@ -22,12 +22,12 @@ interface LigneDetail {
 /** Détail d'une réponse, question par question, dans l'ordre du sondage ; « Sans réponse » si la question est vide. */
 @Component({
   selector: 'app-dialogue-reponse',
-  imports: [DatePipe, MatButtonModule, MatDialogModule],
+  imports: [DateLPipe,  MatButtonModule, MatDialogModule],
   template: `
     <h2 mat-dialog-title>Réponse n° {{ donnees.reponse.id }}</h2>
     <mat-dialog-content>
       <p class="texte-aide">
-        Envoyée le {{ donnees.reponse.dateSoumission | date: 'd MMMM y à HH:mm' }}
+        Envoyée le {{ donnees.reponse.dateSoumission | dateL: 'longHeure' }}
         · version {{ donnees.reponse.version }}
       </p>
       <dl class="detail">

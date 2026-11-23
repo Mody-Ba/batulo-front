@@ -44,14 +44,14 @@
 
       <section class="carte-section formulaire" aria-labelledby="titre-infos">
         <h2 id="titre-infos">Informations</h2>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Titre du sondage</mat-label>
           <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required />
           @if (formulaire.controls.titre.hasError('required')) {
             <mat-error>Le titre est obligatoire.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Description (facultative)</mat-label>
           <textarea
             matInput

@@ -32,7 +32,7 @@
     @if (expire()) {
       <app-encadre type="erreur" role="status" icone="event_busy">
         <p>
-          Votre abonnement a expiré le {{ abonnement.dateExpiration | date: 'longDate' }} : l’accès
+          Votre abonnement a expiré le {{ abonnement.dateExpiration | dateL: 'longDate' }} : l’accès
           est en lecture seule. Renouvelez-le pour modifier à nouveau vos sondages.
         </p>
       </app-encadre>
@@ -62,11 +62,11 @@
 
           @if (abonnement.dateDebut) {
             <dt>Début</dt>
-            <dd>{{ abonnement.dateDebut | date: 'longDate' }}</dd>
+            <dd>{{ abonnement.dateDebut | dateL: 'longDate' }}</dd>
           }
           @if (abonnement.dateExpiration) {
             <dt>Expiration</dt>
-            <dd>{{ abonnement.dateExpiration | date: 'longDate' }} à {{ abonnement.dateExpiration | date: 'HH:mm' }}</dd>
+            <dd>{{ abonnement.dateExpiration | dateL: 'longDate' }} à {{ abonnement.dateExpiration | dateL: 'heure' }}</dd>
           }
           @if (abonnement.joursRestants !== null) {
             <dt>Jours restants</dt>
@@ -101,7 +101,7 @@
             <tbody>
               @for (p of paiements(); track p.id) {
                 <tr>
-                  <td>{{ p.datePaiement | date: 'd MMM y' }}</td>
+                  <td>{{ p.datePaiement | dateL: 'court' }}</td>
                   <td>{{ libellesFormule[p.formule] }}</td>
                   <td>{{ p.fournisseur ? libellesFournisseur[p.fournisseur] : '—' }}</td>
                   <td class="colonne-montant">{{ montant(p.montant, p.devise, true) }}</td>

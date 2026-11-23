@@ -1,15 +1,15 @@
-import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { LIBELLES_TYPE_MESSAGE, MessageInterneResponse } from '../../core/models/messagerie.model';
 import { AuthService } from '../../core/services/auth.service';
 import { lienMessage } from './liens-messages';
+import { DateLPipe } from '../../core/i18n/formats.pipes';
 
 /** Un message du fil : bulle (envoyé ou reçu), ou carte distincte pour un message automatique, avec son lien. */
 @Component({
   selector: 'app-message-conversation',
-  imports: [DatePipe, RouterLink, MatIconModule],
+  imports: [DateLPipe,  RouterLink, MatIconModule],
   template: `
     @let m = message();
     <article
@@ -34,7 +34,7 @@ import { lienMessage } from './liens-messages';
         </a>
       }
       <p class="meta">
-        <time [attr.datetime]="m.dateEnvoi">{{ m.dateEnvoi | date: 'd MMM y, HH:mm' }}</time>
+        <time [attr.datetime]="m.dateEnvoi">{{ m.dateEnvoi | dateL: 'courtHeure' }}</time>
         @if (!m.recu) {
           · {{ m.luLe ? 'Lu' : 'Envoyé' }}
         }

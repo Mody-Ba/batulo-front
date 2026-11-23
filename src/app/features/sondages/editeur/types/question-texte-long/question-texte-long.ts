@@ -12,7 +12,7 @@ import { ControlesTexte } from '../formulaires-types';
   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule],
   template: `
     <div class="ligne-config" [formGroup]="configuration()">
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Longueur maximale</mat-label>
         <input matInput type="number" inputmode="numeric" formControlName="longueurMax" min="1" [max]="max" />
         <span matTextSuffix>caractères</span>

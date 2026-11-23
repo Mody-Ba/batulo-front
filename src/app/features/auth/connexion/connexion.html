@@ -16,7 +16,7 @@
     <app-message-erreur [erreur]="erreur()" />
 
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="seConnecter()" novalidate>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Courriel</mat-label>
         <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
         <input
@@ -36,7 +36,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Mot de passe</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input

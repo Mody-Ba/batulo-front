@@ -87,7 +87,7 @@
             </div>
             <div class="ligne-carte">
               <ng-container *ngTemplateOutlet="statutDemande; context: { $implicit: d }" />
-              <span class="cellule-secondaire">{{ d.dateDemande | date: 'd MMM y' }}</span>
+              <span class="cellule-secondaire">{{ d.dateDemande | dateL: 'court' }}</span>
               <span class="espace"></span>
               <ng-container *ngTemplateOutlet="action; context: { $implicit: d }" />
             </div>
@@ -115,7 +115,7 @@
 
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef>Envoyée le</th>
-            <td mat-cell *matCellDef="let d">{{ d.dateDemande | date: 'd MMM y' }}</td>
+            <td mat-cell *matCellDef="let d">{{ d.dateDemande | dateL: 'court' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="statut">

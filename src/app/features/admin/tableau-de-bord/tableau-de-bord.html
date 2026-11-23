@@ -22,13 +22,13 @@
             <ul class="tuiles">
               <li>
                 <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: true }">
-                  <span class="valeur">{{ c.gestionnaires.actifs | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.gestionnaires.actifs | nombreL }}</span>&ngsp;
                   <span class="libelle">Actif{{ c.gestionnaires.actifs > 1 ? 's' : '' }}</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/admin/gestionnaires" [queryParams]="{ actif: false }">
-                  <span class="valeur">{{ c.gestionnaires.desactives | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.gestionnaires.desactives | nombreL }}</span>&ngsp;
                   <span class="libelle">Désactivé{{ c.gestionnaires.desactives > 1 ? 's' : '' }}</span>
                 </a>
               </li>
@@ -39,20 +39,20 @@
             <ul class="tuiles">
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'NON_COMMENCE' }">
-                  <span class="valeur">{{ c.sondages.NON_COMMENCE | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.sondages.NON_COMMENCE | nombreL }}</span>&ngsp;
                   <span class="libelle">Non commencés</span>&ngsp;
                   <span class="precision">brouillons compris</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'EN_COURS' }">
-                  <span class="valeur">{{ c.sondages.EN_COURS | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.sondages.EN_COURS | nombreL }}</span>&ngsp;
                   <span class="libelle">En cours</span>
                 </a>
               </li>
               <li>
                 <a class="tuile" routerLink="/sondages" [queryParams]="{ statut: 'TERMINE' }">
-                  <span class="valeur">{{ c.sondages.TERMINE | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.sondages.TERMINE | nombreL }}</span>&ngsp;
                   <span class="libelle">Terminés</span>
                 </a>
               </li>
@@ -63,7 +63,7 @@
             <ul class="tuiles">
               <li>
                 <span class="tuile">
-                  <span class="valeur">{{ c.nombreTotalReponses | number }}</span>&ngsp;
+                  <span class="valeur">{{ c.nombreTotalReponses | nombreL }}</span>&ngsp;
                   <span class="libelle">Reçues au total</span>&ngsp;
                   <span class="precision">toutes versions</span>
                 </span>
@@ -94,14 +94,14 @@
         }
         @if (a.dateExpiration) {
           <p class="cellule-secondaire">
-            {{ expire() ? 'Expiré le' : 'Expire le' }} {{ a.dateExpiration | date: 'longDate' }}
+            {{ expire() ? 'Expiré le' : 'Expire le' }} {{ a.dateExpiration | dateL: 'longDate' }}
             @if (expire()) {
               : accès en lecture seule.
             }
           </p>
         }
         @if (a.montant !== null && a.devise) {
-          <p class="cellule-secondaire">Dernier paiement : {{ a.montant | currency: (a.devise | uppercase) }}</p>
+          <p class="cellule-secondaire">Dernier paiement : {{ a.montant | montantL: a.devise }}</p>
         }
         <div class="actions">
           <a

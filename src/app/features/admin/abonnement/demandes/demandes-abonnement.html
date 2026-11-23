@@ -18,7 +18,7 @@
       <h2 id="titre-nouvelle">Nouvelle demande</h2>
       @if (enAttente(); as d) {
         <p role="status">
-          Votre demande du {{ d.dateDemande | date: 'd MMMM y' }} ({{ libellesFormule[d.formuleSouhaitee] }}) est en
+          Votre demande du {{ d.dateDemande | dateL: 'long' }} ({{ libellesFormule[d.formuleSouhaitee] }}) est en
           attente de réponse. Vous pourrez en faire une autre une fois qu’elle aura été traitée.
         </p>
       } @else if (demandes() !== null) {
@@ -81,13 +81,13 @@
                   <span class="formule">{{ libellesFormule[d.formuleSouhaitee] }}</span>
                   <span class="pastille-statut demande-{{ d.statut }}">{{ libellesStatut[d.statut] }}</span>
                 </p>
-                <p class="date">Demandée le {{ d.dateDemande | date: 'd MMMM y à HH:mm' }}</p>
+                <p class="date">Demandée le {{ d.dateDemande | dateL: 'longHeure' }}</p>
                 <p class="message">« {{ d.message }} »</p>
                 @if (d.statut !== 'EN_ATTENTE') {
                   <p class="reponse">
                     <strong>Réponse{{ d.traiteeParNom ? ' de ' + d.traiteeParNom : '' }}</strong>
                     @if (d.dateTraitement) {
-                      , le {{ d.dateTraitement | date: 'd MMMM y' }}
+                      , le {{ d.dateTraitement | dateL: 'long' }}
                     }
                     :
                     {{ d.reponse || 'aucun message.' }}

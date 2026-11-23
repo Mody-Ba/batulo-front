@@ -17,10 +17,10 @@
           <strong>{{ libellesFormule[formule] }}</strong>
         }
         @if (expire()) {
-          <span>Expiré le {{ abonnement.dateExpiration | date: 'longDate' }} : accès en lecture seule.</span>
+          <span>Expiré le {{ abonnement.dateExpiration | dateL: 'longDate' }} : accès en lecture seule.</span>
         } @else {
           <span [class.important]="alerte()">{{ texteJours() }}</span>
-          <span>Expire le {{ abonnement.dateExpiration | date: 'longDate' }}</span>
+          <span>Expire le {{ abonnement.dateExpiration | dateL: 'longDate' }}</span>
         }
       </p>
       <a

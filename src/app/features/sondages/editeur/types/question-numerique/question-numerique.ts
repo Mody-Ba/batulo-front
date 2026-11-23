@@ -12,15 +12,15 @@ import { ControlesNumerique } from '../formulaires-types';
   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule],
   template: `
     <div class="grille-config" [formGroup]="configuration()">
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Minimum (facultatif)</mat-label>
         <input matInput type="number" inputmode="decimal" formControlName="min" />
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Maximum (facultatif)</mat-label>
         <input matInput type="number" inputmode="decimal" formControlName="max" />
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Décimales</mat-label>
         <input matInput type="number" inputmode="numeric" formControlName="decimales" min="0" [max]="regles.decimalesMax" />
         <mat-hint>De 0 (nombre entier) à {{ regles.decimalesMax }}</mat-hint>

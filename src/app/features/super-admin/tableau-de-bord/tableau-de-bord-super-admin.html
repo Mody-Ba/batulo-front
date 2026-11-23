@@ -20,7 +20,7 @@
         <ul class="tuiles">
           <li>
             <a class="tuile total" routerLink="/super-admin/admins">
-              <span class="valeur">{{ c.entreprises.total | number }}</span>&ngsp;
+              <span class="valeur">{{ c.entreprises.total | nombreL }}</span>&ngsp;
               <span class="libelle">Au total</span>
             </a>
           </li>
@@ -32,7 +32,7 @@
                 routerLink="/super-admin/admins"
                 [queryParams]="{ statut: t.statut }"
               >
-                <span class="valeur">{{ t.nombre | number }}</span>&ngsp;
+                <span class="valeur">{{ t.nombre | nombreL }}</span>&ngsp;
                 <span class="libelle">{{ t.libelle }}</span>
                 @if (t.aSurveiller) {
                   &ngsp;<span class="precision">7 jours ou moins</span>
@@ -59,7 +59,7 @@
               routerLink="/super-admin/demandes-abonnement"
               [queryParams]="{ statut: 'EN_ATTENTE' }"
             >
-              <span class="valeur">{{ c.demandesAugmentationEnAttente | number }}</span>&ngsp;
+              <span class="valeur">{{ c.demandesAugmentationEnAttente | nombreL }}</span>&ngsp;
               <span class="libelle">En attente de réponse</span>
             </a>
           </li>

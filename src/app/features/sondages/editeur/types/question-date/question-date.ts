@@ -11,11 +11,11 @@ import { ControlesDate } from '../formulaires-types';
   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule],
   template: `
     <div class="ligne-champs" [formGroup]="configuration()">
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Date au plus tôt (facultative)</mat-label>
         <input matInput type="date" formControlName="dateMin" [max]="configuration().controls.dateMax.value || null" />
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Date au plus tard (facultative)</mat-label>
         <input matInput type="date" formControlName="dateMax" [min]="configuration().controls.dateMin.value || null" />
       </mat-form-field>

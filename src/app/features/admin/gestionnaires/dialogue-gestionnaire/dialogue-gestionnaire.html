@@ -12,7 +12,7 @@
 
     <div class="formulaire">
       <div class="ligne-champs">
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Prénom</mat-label>
           <input matInput formControlName="prenom" autocomplete="off" required cdkFocusInitial />
           @if (formulaire.controls.prenom.hasError('required')) {
@@ -21,7 +21,7 @@
             <mat-error>100 caractères au plus.</mat-error>
           }
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nom</mat-label>
           <input matInput formControlName="nom" autocomplete="off" required />
           @if (formulaire.controls.nom.hasError('required')) {
@@ -31,7 +31,7 @@
           }
         </mat-form-field>
       </div>
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Courriel</mat-label>
         <input matInput type="email" formControlName="courriel" autocomplete="off" inputmode="email" required />
         @if (formulaire.controls.courriel.hasError('required')) {

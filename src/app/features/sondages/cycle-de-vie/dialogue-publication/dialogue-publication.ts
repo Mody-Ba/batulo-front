@@ -1,4 +1,3 @@
-import { DatePipe } from '@angular/common';
 import { afterNextRender, Component, computed, ElementRef, inject, Injector, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
@@ -15,6 +14,7 @@ import { SondageService } from '../../../../core/services/sondage.service';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { raisonIncomplet, versIso, versLocal } from '../dates-sondage';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 export interface DonneesPublication {
   sondage: SondageResponse;
@@ -78,8 +78,7 @@ function datesValides(groupe: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-dialogue-publication',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,

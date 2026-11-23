@@ -39,7 +39,7 @@
           <div class="bornes" formArrayName="bornes">
             @for (borne of formulaire.controls.bornes.controls; track borne; let i = $index) {
               <div class="borne">
-                <mat-form-field>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
                   <mat-label>Borne {{ i + 1 }}</mat-label>
                   <input matInput type="number" inputmode="decimal" [formControlName]="i" />
                   @if (borne.hasError('required')) {

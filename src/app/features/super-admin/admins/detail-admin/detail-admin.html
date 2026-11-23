@@ -39,7 +39,7 @@
           <dd>{{ libelleGestionnaires(d.nombreGestionnaires) }}</dd>
 
           <dt>Créée le</dt>
-          <dd>{{ d.admin.dateCreation | date: 'longDate' }}</dd>
+          <dd>{{ d.admin.dateCreation | dateL: 'longDate' }}</dd>
 
           @if (d.personnalisation; as p) {
             <dt>Nom affiché</dt>
@@ -81,7 +81,7 @@
             @if (d.admin.motDePasseTemporaire) {
               <span class="pastille-statut compte-temporaire">Temporaire</span>
               @if (d.admin.motDePasseTemporaireExpireLe; as expireLe) {
-                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | date: 'd MMMM y à HH:mm' }}</span>
+                <span class="cellule-secondaire">Valable jusqu’au {{ expireLe | dateL: 'longHeure' }}</span>
               }
             } @else {
               Défini par l’admin
@@ -105,11 +105,11 @@
             @if (a.dateExpiration; as expiration) {
               @if (a.dateDebut; as debut) {
                 <dt>Début</dt>
-                <dd>{{ debut | date: 'longDate' }}</dd>
+                <dd>{{ debut | dateL: 'longDate' }}</dd>
               }
               <dt>Expiration</dt>
               <dd>
-                {{ expiration | date: 'longDate' }}
+                {{ expiration | dateL: 'longDate' }}
                 @if (a.joursRestants !== null && a.statut !== 'EXPIRE' && a.statut !== 'DESACTIVE') {
                   <span class="cellule-secondaire" [class.texte-alerte]="enAlerte()">
                     {{ a.joursRestants === 1 ? '1 jour restant' : a.joursRestants + ' jours restants' }}
@@ -120,7 +120,7 @@
 
             @if (a.montant !== null && a.devise) {
               <dt>Dernier paiement</dt>
-              <dd>{{ a.montant | currency: (a.devise | uppercase) }}</dd>
+              <dd>{{ a.montant | montantL: a.devise }}</dd>
             }
           </dl>
         } @else {

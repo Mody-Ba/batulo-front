@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, inject, LOCALE_ID, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +19,7 @@ import { DemandeAbonnementService } from '../../../../core/services/demande-abon
 import { aLeCode } from '../../../../core/utils/erreur-http';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 export interface DonneesDialogueDemande {
   demande: DemandeAbonnementResponse;
@@ -37,8 +37,7 @@ export type ResultatDialogueDemande = DemandeAbonnementResponse | 'recharger';
  */
 @Component({
   selector: 'app-dialogue-demande',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -62,7 +61,7 @@ export class DialogueDemande {
   protected readonly libellesStatut = LIBELLES_STATUT_DEMANDE;
   protected readonly longueurMax = LONGUEUR_MAX_REPONSE_DEMANDE;
   /** « Refusée par X le 10 novembre 2026 à 14:05 » (demande déjà traitée). */
-  protected readonly mentionTraitement = this.decrireTraitement(new DatePipe(inject(LOCALE_ID)));
+  protected readonly mentionTraitement = this.decrireTraitement(new DateLPipe());
 
   private readonly fb = inject(NonNullableFormBuilder);
   protected readonly formulaire = this.fb.group({
@@ -122,12 +121,12 @@ export class DialogueDemande {
     });
   }
 
-  private decrireTraitement(dates: DatePipe): string {
+  private decrireTraitement(dates: DateLPipe): string {
     const { statut, traiteeParNom, dateTraitement } = this.demande;
     return [
       statut === 'TRAITEE' ? 'Acceptée' : 'Refusée',
       traiteeParNom ? `par ${traiteeParNom}` : null,
-      dateTraitement ? `le ${dates.transform(dateTraitement, 'd MMMM y à HH:mm')}` : null,
+      dateTraitement ? `le ${dates.transform(dateTraitement, 'longHeure')}` : null,
     ]
       .filter(Boolean)
       .join(' ');

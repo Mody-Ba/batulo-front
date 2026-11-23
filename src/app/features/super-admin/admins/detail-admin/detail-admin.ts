@@ -1,4 +1,3 @@
-import { CurrencyPipe, DatePipe, UpperCasePipe } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,14 +17,13 @@ import { MessageErreur } from '../../../../shared/components/message-erreur/mess
 import { ActionsAdmin, libelleGestionnaires } from '../actions-admin';
 import { couleurValide } from '../../../../core/utils/couleur';
 import { urlLogoSure } from '../../../../shared/formulaire/apparence/apparence';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Détail d'un admin : entreprise, compte de l'admin, abonnement (jours restants) et actions. */
 @Component({
   selector: 'app-detail-admin',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    UpperCasePipe,
+  imports: [MontantLPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

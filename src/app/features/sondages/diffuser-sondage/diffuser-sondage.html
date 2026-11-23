@@ -29,7 +29,7 @@
     <section class="carte-section" aria-labelledby="titre-lien">
       <h2 id="titre-lien">Lien public</h2>
       <div class="ligne-lien">
-        <mat-form-field class="champ-lien">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-lien">
           <mat-label>Adresse du formulaire</mat-label>
           <input matInput [value]="l.url" readonly (focus)="$any($event.target).select()" />
         </mat-form-field>

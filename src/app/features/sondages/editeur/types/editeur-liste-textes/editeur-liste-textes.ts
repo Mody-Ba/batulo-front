@@ -48,7 +48,7 @@ import { creerControleTexte } from '../formulaires-types';
           >
             <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
           </button>
-          <mat-form-field class="champ">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ">
             <mat-label>{{ libelleElement() }} {{ i + 1 }}</mat-label>
             <input
               #champ

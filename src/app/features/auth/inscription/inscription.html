@@ -14,7 +14,7 @@
 
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="inscrire()" novalidate>
       <div class="ligne-champs">
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Prénom</mat-label>
           <input matInput formControlName="prenom" autocomplete="given-name" required />
           @if (formulaire.controls.prenom.hasError('required')) {
@@ -24,7 +24,7 @@
           }
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
           <mat-label>Nom</mat-label>
           <input matInput formControlName="nom" autocomplete="family-name" required />
           @if (formulaire.controls.nom.hasError('required')) {
@@ -35,7 +35,7 @@
         </mat-form-field>
       </div>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Courriel</mat-label>
         <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
         <input
@@ -55,7 +55,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Nom de l’entreprise (facultatif)</mat-label>
         <mat-icon matPrefix fontIcon="business" aria-hidden="true" />
         <input matInput formControlName="nomEntreprise" autocomplete="organization" />
@@ -65,7 +65,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Mot de passe</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
@@ -95,7 +95,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Confirmation du mot de passe</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input

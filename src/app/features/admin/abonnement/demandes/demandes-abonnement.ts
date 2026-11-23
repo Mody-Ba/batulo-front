@@ -1,4 +1,4 @@
-import { DatePipe, LowerCasePipe } from '@angular/common';
+import { LowerCasePipe } from '@angular/common';
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, Injector, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -21,6 +21,7 @@ import { aLeCode } from '../../../../core/utils/erreur-http';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Demandes lues (les plus récentes d'abord) ; un admin en a peu. */
 const TAILLE = 20;
@@ -33,8 +34,7 @@ const TAILLE = 20;
  */
 @Component({
   selector: 'app-demandes-abonnement',
-  imports: [
-    DatePipe,
+  imports: [DateLPipe, 
     LowerCasePipe,
     ReactiveFormsModule,
     RouterLink,

@@ -16,7 +16,7 @@ export const MESSAGE_PARTAGE_MAX = 1000;
   selector: 'app-partage-message',
   imports: [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule],
   template: `
-    <mat-form-field class="champ-message">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-message">
       <mat-label>Message à envoyer</mat-label>
       <textarea
         matInput

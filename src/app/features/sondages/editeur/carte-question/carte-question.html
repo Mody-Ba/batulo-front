@@ -18,7 +18,7 @@
     }
     <span class="numero" aria-hidden="true">{{ numero() }}</span>
 
-    <mat-form-field class="champ-libelle">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-libelle">
       <mat-label>Question</mat-label>
       <textarea
         #champLibelle
@@ -34,7 +34,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="champ-type">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-type">
       <mat-label>Type</mat-label>
       <mat-select
         #selecteur
@@ -56,7 +56,7 @@
     </mat-form-field>
   </div>
 
-  <mat-form-field class="champ-aide">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-aide">
     <mat-label>Aide (facultative)</mat-label>
     <input matInput formControlName="aide" [maxlength]="regles.aideMax" autocomplete="off" />
     <mat-hint>Affichée sous la question, pour préciser ce qui est attendu.</mat-hint>

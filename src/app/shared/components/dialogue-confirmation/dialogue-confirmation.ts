@@ -39,7 +39,7 @@ export function saisieConforme(saisie: string, attendue: string): boolean {
         <p class="consigne" id="consigne-saisie">
           Pour confirmer, tapez <strong class="attendu">{{ attendue }}</strong> ci-dessous.
         </p>
-        <mat-form-field class="champ-saisie">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-saisie">
           <mat-label>Texte de confirmation</mat-label>
           <input
             matInput
