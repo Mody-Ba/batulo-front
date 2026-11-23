@@ -10,6 +10,7 @@ import { GestionnaireResponse, nomComplet } from '../../../core/models/gestionna
 import { AssignationService } from '../../../core/services/assignation.service';
 import { GestionnaireService } from '../../../core/services/gestionnaire.service';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Nombre de gestionnaires actifs lus pour le choix (les plus récents). */
 export const LIMITE_GESTIONNAIRES = 100;
@@ -29,8 +30,7 @@ export interface DonneesAssignerGestionnaires {
  */
 @Component({
   selector: 'app-dialogue-assigner-gestionnaires',
-  imports: [
-    FormsModule,
+  imports: [TranslocoPipe, FormsModule,
     MatButtonModule,
     MatDialogModule,
     MatListModule,
@@ -39,25 +39,24 @@ export interface DonneesAssignerGestionnaires {
     MessageErreur,
   ],
   template: `
-    <h2 mat-dialog-title>Assigner des gestionnaires</h2>
+    <h2 mat-dialog-title>{{ 'sondages.fiche.assigner' | transloco }}</h2>
     <mat-dialog-content>
       <p class="texte-aide">
-        Les gestionnaires choisis verront « {{ donnees.titre }} » (toutes ses versions), suivront sa collecte
-        et ses statistiques. Ils recevront une notification et un courriel.
+        {{ 'assignation.aideSondage' | transloco: { titre: donnees.titre } }}
       </p>
       @if (chargement()) {
-        <mat-progress-bar mode="indeterminate" aria-label="Chargement des gestionnaires" />
+        <mat-progress-bar mode="indeterminate" [attr.aria-label]="'gestionnaires.liste.chargement' | transloco" />
       }
       <app-message-erreur [erreur]="erreur()" />
 
       @if (!chargement() && candidats().length === 0 && !erreurChargement()) {
-        <p class="etat-vide">Aucun autre gestionnaire actif à assigner.</p>
+        <p class="etat-vide">{{ 'assignation.aucunAutreGestionnaire' | transloco }}</p>
       } @else if (candidats().length) {
         <mat-selection-list
           class="liste"
           [ngModel]="selection()"
           (ngModelChange)="selection.set($event)"
-          aria-label="Gestionnaires à assigner"
+          [attr.aria-label]="'assignation.gestionnairesAAssigner' | transloco"
           [disabled]="enCours()"
         >
           @for (g of candidats(); track g.id) {
@@ -68,10 +67,10 @@ export interface DonneesAssignerGestionnaires {
           }
         </mat-selection-list>
       }
-      <app-message-erreur [erreur]="erreurChargement()" parDefaut="Les gestionnaires n’ont pas pu être chargés." />
+      <app-message-erreur [erreur]="erreurChargement()" [parDefaut]="'gestionnaires.liste.erreur' | transloco" />
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button matButton type="button" mat-dialog-close [disabled]="enCours()">Annuler</button>
+      <button matButton type="button" mat-dialog-close [disabled]="enCours()">{{ 'commun.annuler' | transloco }}</button>
       <button
         matButton="filled"
         type="button"
@@ -80,9 +79,9 @@ export interface DonneesAssignerGestionnaires {
         [disabled]="enCours() || selection().length === 0"
       >
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Assignation en cours" />
+          <mat-spinner diameter="20" [attr.aria-label]="'assignation.enCours' | transloco" />
         } @else {
-          Assigner{{ selection().length ? ' (' + selection().length + ')' : '' }}
+          {{ 'assignation.assigner' | transloco }}{{ selection().length ? ' (' + selection().length + ')' : '' }}
         }
       </button>
     </mat-dialog-actions>

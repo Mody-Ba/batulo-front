@@ -2,16 +2,17 @@ import { Component, computed } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfigurationTexte } from '../../../core/models/sondage.model';
 import { ChampBase } from './champ-base';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** TEXTE_COURT : champ texte natif sur une ligne, jusqu'à longueurMax caractères. */
 @Component({
   selector: 'app-champ-texte-court',
-  imports: [ReactiveFormsModule],
+  imports: [TranslocoPipe, ReactiveFormsModule],
   template: `
     <input class="champ-saisie" type="text" [id]="idChamp" [formControl]="$any(controle())" autocomplete="off" [attr.maxlength]="longueurMax()" [attr.aria-describedby]="idsDescription()" [attr.aria-invalid]="invalide() || null" />
     <div class="indication">
       <span></span>
-      <span [id]="idBase() + '-compteur'">{{ longueur() }} / {{ longueurMax() }} caractères</span>
+      <span [id]="idBase() + '-compteur'">{{ 'public.champs.compteur' | transloco: { longueur: longueur(), max: longueurMax() } }}</span>
     </div>
   `,
 })

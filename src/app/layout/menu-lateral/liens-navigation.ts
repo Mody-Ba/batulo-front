@@ -1,6 +1,7 @@
 import { Role } from '../../core/models/role.model';
 
 export interface LienNavigation {
+  /** Clé de traduction du libellé. */
   libelle: string;
   lien: string;
   /** Icône Material, décorative. */
@@ -17,29 +18,29 @@ export interface LienNavigation {
  */
 export const LIENS_PAR_ROLE: Record<Role, readonly LienNavigation[]> = {
   SUPER_ADMIN: [
-    { libelle: 'Tableau de bord', lien: '/super-admin', icone: 'dashboard', exact: true },
-    { libelle: 'Admins et entreprises', lien: '/super-admin/admins', icone: 'business' },
-    { libelle: 'Abonnements', lien: '/super-admin/abonnements', icone: 'card_membership' },
-    { libelle: 'Demandes d’abonnement', lien: '/super-admin/demandes-abonnement', icone: 'upgrade' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
+    { libelle: 'menu.tableauDeBord', lien: '/super-admin', icone: 'dashboard', exact: true },
+    { libelle: 'menu.admins', lien: '/super-admin/admins', icone: 'business' },
+    { libelle: 'menu.abonnements', lien: '/super-admin/abonnements', icone: 'card_membership' },
+    { libelle: 'menu.demandesAbonnement', lien: '/super-admin/demandes-abonnement', icone: 'upgrade' },
+    { libelle: 'menu.messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'menu.notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
   ADMIN: [
-    { libelle: 'Tableau de bord', lien: '/admin', icone: 'dashboard', exact: true },
-    { libelle: 'Abonnement', lien: '/admin/abonnement', icone: 'card_membership' },
-    { libelle: 'Gestionnaires', lien: '/admin/gestionnaires', icone: 'group' },
-    { libelle: 'Sondages', lien: '/sondages', icone: 'ballot' },
-    { libelle: 'Statistiques reçues', lien: '/admin/statistiques-recues', icone: 'insights' },
-    { libelle: 'Apparence', lien: '/apparence', icone: 'palette' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
+    { libelle: 'menu.tableauDeBord', lien: '/admin', icone: 'dashboard', exact: true },
+    { libelle: 'menu.abonnement', lien: '/admin/abonnement', icone: 'card_membership' },
+    { libelle: 'menu.gestionnaires', lien: '/admin/gestionnaires', icone: 'group' },
+    { libelle: 'menu.sondages', lien: '/sondages', icone: 'ballot' },
+    { libelle: 'menu.statistiquesRecues', lien: '/admin/statistiques-recues', icone: 'insights' },
+    { libelle: 'menu.apparence', lien: '/apparence', icone: 'palette' },
+    { libelle: 'menu.messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'menu.notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
   GESTIONNAIRE: [
-    { libelle: 'Tableau de bord', lien: '/gestionnaire', icone: 'dashboard', exact: true },
-    { libelle: 'Mes sondages', lien: '/sondages', icone: 'ballot' },
-    { libelle: 'Statistiques envoyées', lien: '/gestionnaire/statistiques-envoyees', icone: 'outbox' },
-    { libelle: 'Apparence', lien: '/apparence', icone: 'palette' },
-    { libelle: 'Messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
-    { libelle: 'Notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
+    { libelle: 'menu.tableauDeBord', lien: '/gestionnaire', icone: 'dashboard', exact: true },
+    { libelle: 'menu.mesSondages', lien: '/sondages', icone: 'ballot' },
+    { libelle: 'menu.statistiquesEnvoyees', lien: '/gestionnaire/statistiques-envoyees', icone: 'outbox' },
+    { libelle: 'menu.apparence', lien: '/apparence', icone: 'palette' },
+    { libelle: 'menu.messagerie', lien: '/messagerie', icone: 'forum', compteur: 'messagerie' },
+    { libelle: 'menu.notifications', lien: '/notifications', icone: 'notifications', compteur: 'notifications' },
   ],
 };

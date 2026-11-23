@@ -1,8 +1,9 @@
 <main class="page-publique" id="contenu" [style]="variablesApparence()">
+  <div class="barre-langue"><app-selecteur-langue /></div>
   <app-bandeau-apparence [apparence]="apparence()" />
   @switch (etat().type) {
     @case ('chargement') {
-      <p class="chargement" role="status" aria-live="polite">Chargement du sondage…</p>
+      <p class="chargement" role="status" aria-live="polite">{{ 'public.etat.chargement' | transloco }}</p>
     }
 
     @case ('accueil') {
@@ -15,7 +16,7 @@
             (commencer)="commencer(e.formulaire, $event)"
           >
             @if (e.formulaire.dateFermeture) {
-              <p class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | dateL: 'longHeure' }}.</p>
+              <p class="fermeture">{{ 'public.fermeLe' | transloco: { date: (e.formulaire.dateFermeture | dateL: 'longHeure') } }}</p>
             }
           </app-accueil-sondage>
         }
@@ -38,12 +39,12 @@
             (envoyer)="envoyer(e.formulaire, $event)"
           >
             @if (e.formulaire.dateFermeture) {
-              <p entete class="fermeture">Ce sondage ferme le {{ e.formulaire.dateFermeture | dateL: 'longHeure' }}.</p>
+              <p entete class="fermeture">{{ 'public.fermeLe' | transloco: { date: (e.formulaire.dateFermeture | dateL: 'longHeure') } }}</p>
             }
             @if (brouillonRepris()) {
               <div class="encart-public info" role="status">
-                <p>Vos réponses en cours ont été reprises.</p>
-                <button type="button" class="bouton-lien" (click)="effacerBrouillon()">Tout effacer et recommencer</button>
+                <p>{{ 'public.brouillon.repris' | transloco }}</p>
+                <button type="button" class="bouton-lien" (click)="effacerBrouillon()">{{ 'public.brouillon.effacer' | transloco }}</button>
               </div>
             }
             @if (erreurEnvoi(); as message) {
@@ -61,14 +62,14 @@
         @if (e.type === 'confirmation') {
           <section class="carte-etat succes" aria-labelledby="titre-etat">
             <span class="icone" aria-hidden="true">✓</span>
-            <h1 id="titre-etat" tabindex="-1">Merci !</h1>
-            <p role="status">{{ e.confirmation.message }}</p>
-            <p class="secondaire">Envoyé le {{ e.confirmation.dateSoumission | dateL: 'longHeure' }}.</p>
+            <h1 id="titre-etat" tabindex="-1">{{ 'public.confirmation.merci' | transloco }}</h1>
+            <p role="status">{{ messageConfirmation(e.confirmation.message) }}</p>
+            <p class="secondaire">{{ 'public.confirmation.envoyeLe' | transloco: { date: (e.confirmation.dateSoumission | dateL: 'longHeure') } }}</p>
             @if (!e.formulaire.reponseUnique) {
-              <button type="button" class="bouton-public" (click)="nouvelleReponse(e.formulaire)">Nouvelle réponse</button>
-              <p class="secondaire">Collecte terrain : le formulaire repart vide pour la personne suivante.</p>
+              <button type="button" class="bouton-public" (click)="nouvelleReponse(e.formulaire)">{{ 'public.confirmation.nouvelle' | transloco }}</button>
+              <p class="secondaire">{{ 'public.confirmation.collecte' | transloco }}</p>
             } @else {
-              <p class="secondaire">Vous pouvez fermer cette page.</p>
+              <p class="secondaire">{{ 'public.confirmation.fermer' | transloco }}</p>
             }
           </section>
         }
@@ -80,31 +81,31 @@
         @if (e.type === 'indisponible') {
           <section class="carte-etat" [class]="'raison-' + e.raison" aria-labelledby="titre-etat">
             <span class="icone" aria-hidden="true">{{ e.raison === 'deja-repondu' ? '✓' : 'ⓘ' }}</span>
-            <h1 id="titre-etat" tabindex="-1">{{ titres[e.raison] }}</h1>
+            <h1 id="titre-etat" tabindex="-1">{{ titreIndisponible(e.raison) }}</h1>
             @switch (e.raison) {
               @case ('non-ouvert') {
-                <p>{{ e.message ?? 'Il n’accepte pas encore de réponses.' }} Revenez à ce moment-là avec le même lien.</p>
+                <p>{{ messageIndisponible(e) ?? ('public.etat.nonOuvert' | transloco) }} {{ 'public.etat.revenir' | transloco }}</p>
               }
               @case ('ferme') {
-                <p>Il n’accepte plus de réponses. Merci de votre intérêt.</p>
+                <p>{{ 'public.etat.ferme' | transloco }}</p>
               }
               @case ('deja-repondu') {
-                <p>Vos réponses ont déjà été envoyées depuis cet appareil. Ce sondage n’accepte qu’une réponse par appareil.</p>
+                <p>{{ 'public.etat.dejaRepondu' | transloco }}</p>
               }
               @case ('introuvable') {
-                <p>Ce lien ne correspond à aucun sondage. Vérifiez qu’il est complet, ou demandez-le à nouveau à la personne qui vous l’a envoyé.</p>
+                <p>{{ 'public.etat.introuvable' | transloco }}</p>
               }
               @case ('trop-de-requetes') {
-                <p>{{ e.message ?? 'Trop de demandes depuis votre connexion.' }}</p>
-                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+                <p>{{ messageIndisponible(e) ?? ('public.etat.tropDeRequetes' | transloco) }}</p>
+                <button type="button" class="bouton-public" (click)="charger()">{{ 'public.reessayer' | transloco }}</button>
               }
               @case ('injoignable') {
-                <p>Le sondage n’a pas pu être chargé. Vérifiez votre connexion à Internet.</p>
-                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+                <p>{{ 'public.etat.injoignable' | transloco }}</p>
+                <button type="button" class="bouton-public" (click)="charger()">{{ 'public.reessayer' | transloco }}</button>
               }
               @default {
-                <p>{{ e.message ?? 'Une erreur inattendue est survenue.' }}</p>
-                <button type="button" class="bouton-public" (click)="charger()">Réessayer</button>
+                <p>{{ messageIndisponible(e) ?? ('public.erreurs.inattendue' | transloco) }}</p>
+                <button type="button" class="bouton-public" (click)="charger()">{{ 'public.reessayer' | transloco }}</button>
               }
             }
           </section>
@@ -113,5 +114,5 @@
     }
   }
 
-  <footer class="pied">Sondage réalisé avec Batulo</footer>
+  <footer class="pied">{{ 'public.pied' | transloco }}</footer>
 </main>

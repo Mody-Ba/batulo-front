@@ -17,20 +17,20 @@
 
 <mat-menu #menuNotifications="matMenu" xPosition="before" class="menu-notifications">
   <div class="entete" (click)="$event.stopPropagation()" role="presentation">
-    <span class="titre">Notifications</span>
+    <span class="titre">{{ 'notifications.titre' | transloco }}</span>
     @if (nonLues() > 0) {
-      <button mat-button type="button" (click)="toutMarquerLu()">Tout marquer comme lu</button>
+      <button mat-button type="button" (click)="toutMarquerLu()">{{ 'notifications.toutMarquerLu' | transloco }}</button>
     }
   </div>
   <mat-divider />
 
   @if (chargement()) {
-    <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+    <mat-progress-bar mode="indeterminate" [attr.aria-label]="'notifications.chargement' | transloco" />
   }
   @if (erreur(); as message) {
     <p class="vide" role="alert">{{ message }}</p>
   } @else if (!chargement() && notifications().length === 0) {
-    <p class="vide">Aucune notification.</p>
+    <p class="vide">{{ 'notifications.aucune' | transloco }}</p>
   }
 
   @for (notification of notifications(); track notification.id) {
@@ -45,7 +45,7 @@
       <span class="texte">
         <span class="titre-notification">
           @if (!notification.lue) {
-            <span class="visuellement-cache">Non lue : </span>
+            <span class="visuellement-cache">{{ 'notifications.nonLuePrefixe' | transloco }}</span>
           }
           {{ notification.titre }}
         </span>
@@ -58,6 +58,6 @@
   <mat-divider />
   <a mat-menu-item routerLink="/notifications">
     <mat-icon fontIcon="list" aria-hidden="true" />
-    <span>Voir toutes les notifications</span>
+    <span>{{ 'notifications.voirToutes' | transloco }}</span>
   </a>
 </mat-menu>

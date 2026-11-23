@@ -6,7 +6,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'Tableau de bord · Batulo',
+    title: 'titres.tableauDeBord',
     loadComponent: () =>
       import('../../shared/components/accueil-provisoire/accueil-provisoire').then(
         (m) => m.AccueilProvisoire,
@@ -16,14 +16,14 @@ export const routes: Routes = [
     // ?page=&taille=
     path: 'statistiques-envoyees',
     pathMatch: 'full',
-    title: 'Statistiques envoyées · Batulo',
+    title: 'titres.statistiquesEnvoyees',
     providers: [fournirPaginateurFrancais()],
     loadComponent: () =>
       import('./statistiques-envoyees/statistiques-envoyees').then((m) => m.StatistiquesEnvoyees),
   },
   {
     path: 'statistiques-envoyees/:envoiId',
-    title: 'Statistiques envoyées · Batulo',
+    title: 'titres.statistiquesEnvoyees',
     loadComponent: () => import('./statistiques-envoyees/envoi-statistiques').then((m) => m.EnvoiStatistiques),
   },
 ];

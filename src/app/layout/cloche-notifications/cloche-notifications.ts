@@ -16,6 +16,8 @@ import { interrogationPeriodique } from '../../core/utils/interrogation';
 import { messageErreur } from '../../core/utils/erreur-http';
 import { lienNotification } from '../../features/notifications/liens-notifications';
 import { DateLPipe } from '../../core/i18n/formats.pipes';
+import { traduire, traduirePluriel } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Intervalle de mise à jour de la pastille. */
 const INTERVALLE_MS = 60_000;
@@ -24,7 +26,7 @@ const TAILLE_APERCU = 10;
 
 @Component({
   selector: 'app-cloche-notifications',
-  imports: [DateLPipe, 
+  imports: [TranslocoPipe, DateLPipe, 
     RouterLink,
     MatBadgeModule,
     MatButtonModule,
@@ -52,8 +54,8 @@ export class ClocheNotifications {
   protected readonly libelleBouton = computed(() => {
     const nombre = this.nonLues();
     return nombre === 0
-      ? 'Notifications, aucune non lue'
-      : `Notifications, ${nombre} non lue${nombre > 1 ? 's' : ''}`;
+      ? traduire('notifications.cloche.aucune')
+      : traduirePluriel('notifications.cloche.nonLues', nombre);
   });
 
   constructor() {
@@ -86,7 +88,7 @@ export class ClocheNotifications {
           this.chargement.set(false);
         },
         error: (erreur: unknown) => {
-          this.erreur.set(messageErreur(erreur, 'Les notifications n’ont pas pu être chargées.'));
+          this.erreur.set(messageErreur(erreur, traduire('notifications.erreurChargement')));
           this.chargement.set(false);
         },
       });

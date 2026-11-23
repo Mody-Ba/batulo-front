@@ -1,5 +1,6 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { nombre, pourcentage } from './format';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Une barre : libellé, valeur et texte affiché au bout (« 62 · 51,7 % »). */
 export interface Barre {
@@ -30,20 +31,21 @@ let compteur = 0;
  */
 @Component({
   selector: 'app-barres-horizontales',
+  imports: [TranslocoPipe],
   template: `
     @if (vueTableau()) {
       <table class="tableau-graphique">
         <caption class="visuellement-cache">{{ titre() }}</caption>
         <thead>
           <tr>
-            <th scope="col">{{ enteteLibelle() }}</th>
-            <th scope="col">{{ enteteValeur() }}</th>
+            <th scope="col">{{ enteteLibelle() ?? ('statistiques.graphique.reponse' | transloco) }}</th>
+            <th scope="col">{{ enteteValeur() ?? ('statistiques.graphique.nombreEtPart' | transloco) }}</th>
           </tr>
         </thead>
         <tbody>
           @for (b of barres(); track $index) {
             <tr>
-              <th scope="row">{{ b.libelle }}</th>
+              <th scope="row" dir="auto">{{ b.libelle }}</th>
               <td>{{ b.texte }}</td>
             </tr>
           }
@@ -53,7 +55,7 @@ let compteur = 0;
       <ul class="barres" role="list" [attr.aria-label]="titre()">
         @for (b of barres(); track $index) {
           <li class="barre" [attr.aria-label]="b.libelle + ' : ' + b.texte">
-            <span class="libelle" aria-hidden="true">{{ b.libelle }}</span>
+            <span class="libelle" aria-hidden="true" dir="auto">{{ b.libelle }}</span>
             <span class="piste" aria-hidden="true">
               <span class="remplissage" [style.width.%]="largeur(b)" [attr.title]="b.libelle + ' : ' + b.texte"></span>
               <span class="valeur">{{ b.texte }}</span>
@@ -63,7 +65,7 @@ let compteur = 0;
       </ul>
     }
     <button type="button" class="bascule" [attr.aria-controls]="id" (click)="vueTableau.set(!vueTableau())" [attr.aria-pressed]="vueTableau()">
-      {{ vueTableau() ? 'Voir le graphique' : 'Voir le tableau' }}
+      {{ (vueTableau() ? 'statistiques.graphique.voirGraphique' : 'statistiques.graphique.voirTableau') | transloco }}
     </button>
   `,
   styleUrl: './graphiques.scss',
@@ -74,8 +76,9 @@ export class BarresHorizontales {
   readonly barres = input.required<Barre[]>();
   /** Résumé du graphique pour les lecteurs d'écran (légende du tableau). */
   readonly titre = input.required<string>();
-  readonly enteteLibelle = input('Réponse');
-  readonly enteteValeur = input('Nombre et part');
+  /** En-têtes de la vue tableau ; absents : « Réponse » et « Nombre et part » dans la langue courante. */
+  readonly enteteLibelle = input<string | null>(null);
+  readonly enteteValeur = input<string | null>(null);
 
   protected readonly vueTableau = signal(false);
   private readonly max = computed(() => Math.max(0, ...this.barres().map((b) => b.valeur)));

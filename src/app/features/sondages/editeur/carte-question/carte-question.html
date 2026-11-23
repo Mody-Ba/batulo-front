@@ -1,7 +1,7 @@
 <article
   class="carte-question"
   [class.a-corriger]="auto.etat() === 'invalide' || auto.etat() === 'erreur'"
-  [attr.aria-label]="'Question ' + numero()"
+  [attr.aria-label]="'editeur.question.aria' | transloco: { numero: numero() }"
   [formGroup]="formulaire"
 >
   <div class="entete">
@@ -11,7 +11,7 @@
         type="button"
         class="poignee"
         cdkDragHandle
-        [attr.aria-label]="'Déplacer la question ' + numero() + ' (glisser, ou menu Monter / Descendre)'"
+        [attr.aria-label]="'editeur.question.deplacer' | transloco: { numero: numero() }"
       >
         <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
       </button>
@@ -19,23 +19,24 @@
     <span class="numero" aria-hidden="true">{{ numero() }}</span>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-libelle">
-      <mat-label>Question</mat-label>
+      <mat-label>{{ 'statistiques.croise.question' | transloco }}</mat-label>
       <textarea
         #champLibelle
         matInput
         formControlName="libelle"
+        dir="auto"
         cdkTextareaAutosize
         cdkAutosizeMinRows="1"
         [maxlength]="regles.libelleQuestionMax"
         required
       ></textarea>
       @if (formulaire.controls.libelle.hasError('required')) {
-        <mat-error>Le libellé de la question est obligatoire.</mat-error>
+        <mat-error>{{ 'editeur.question.libelleObligatoire' | transloco }}</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-type">
-      <mat-label>Type</mat-label>
+      <mat-label>{{ 'editeur.question.type' | transloco }}</mat-label>
       <mat-select
         #selecteur
         [value]="type"
@@ -57,9 +58,9 @@
   </div>
 
   <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-aide">
-    <mat-label>Aide (facultative)</mat-label>
+    <mat-label>{{ 'editeur.question.aide' | transloco }}</mat-label>
     <input matInput formControlName="aide" [maxlength]="regles.aideMax" autocomplete="off" />
-    <mat-hint>Affichée sous la question, pour préciser ce qui est attendu.</mat-hint>
+    <mat-hint>{{ 'editeur.question.aideAide' | transloco }}</mat-hint>
   </mat-form-field>
 
   @if (condition(); as c) {
@@ -112,19 +113,19 @@
     <app-critere-question [question]="q" />
   }
 
-  <app-message-erreur [erreur]="erreurAction()" titre="Action refusée" parDefaut="Cette action n’a pas pu être faite." />
+  <app-message-erreur [erreur]="erreurAction()" [titre]="'editeur.actionRefusee' | transloco" [parDefaut]="'editeur.actionImpossible' | transloco" />
 
   <app-message-erreur
     [erreur]="auto.erreur()"
-    [titre]="'La question ' + numero() + ' n’a pas été enregistrée'"
-    parDefaut="Cette question n’a pas pu être enregistrée."
+    [titre]="'editeur.question.nonEnregistree' | transloco: { numero: numero() }"
+    [parDefaut]="'editeur.question.erreur' | transloco"
   />
 
   <div class="pied">
-    <mat-slide-toggle formControlName="obligatoire">Obligatoire</mat-slide-toggle>
+    <mat-slide-toggle formControlName="obligatoire">{{ 'editeur.question.obligatoire' | transloco }}</mat-slide-toggle>
     @if (peutAjouterCondition()) {
       <button matButton="tonal" type="button" class="ajouter-condition" (click)="editerCondition()">
-        <mat-icon fontIcon="alt_route" aria-hidden="true" />Ajouter une condition
+        <mat-icon fontIcon="alt_route" aria-hidden="true" />{{ 'editeur.question.ajouterCondition' | transloco }}
       </button>
     }
     <span class="espace"></span>
@@ -134,7 +135,7 @@
       type="button"
       [matMenuTriggerFor]="menu"
       [disabled]="!store.modifiable()"
-      [attr.aria-label]="'Actions de la question ' + numero()"
+      [attr.aria-label]="'editeur.question.actions' | transloco: { numero: numero() }"
     >
       <mat-icon fontIcon="more_vert" aria-hidden="true" />
     </button>
@@ -143,15 +144,15 @@
   <mat-menu #menu="matMenu" xPosition="before">
     @if (idQuestion() !== null) {
       <button mat-menu-item type="button" (click)="monter()" [disabled]="position() === 0">
-        <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>Monter</span>
+        <mat-icon fontIcon="arrow_upward" aria-hidden="true" /><span>{{ 'editeur.question.monter' | transloco }}</span>
       </button>
       <button mat-menu-item type="button" (click)="descendre()" [disabled]="position() >= nombreEnregistrees() - 1">
-        <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>Descendre</span>
+        <mat-icon fontIcon="arrow_downward" aria-hidden="true" /><span>{{ 'editeur.question.descendre' | transloco }}</span>
       </button>
       @if (peutAjouterCondition() || condition()) {
         <button mat-menu-item type="button" (click)="editerCondition()">
           <mat-icon fontIcon="alt_route" aria-hidden="true" />
-          <span>{{ condition() ? 'Modifier la condition d’affichage' : 'Ajouter une condition d’affichage' }}</span>
+          <span>{{ (condition() ? 'editeur.condition.modifierMenu' : 'editeur.condition.ajouterMenu') | transloco }}</span>
         </button>
       }
       @if (autresSections().length) {
@@ -161,7 +162,7 @@
           [matMenuTriggerFor]="menuSections"
           [disabled]="!store.peutChangerDeSection(idQuestion())"
         >
-          <mat-icon fontIcon="drive_file_move" aria-hidden="true" /><span>Déplacer vers une autre section</span>
+          <mat-icon fontIcon="drive_file_move" aria-hidden="true" /><span>{{ 'editeur.question.versSection' | transloco }}</span>
         </button>
       }
     }
@@ -172,7 +173,7 @@
       (click)="supprimer()"
       [disabled]="auto.etat() === 'enregistrement'"
     >
-      <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer la question</span>
+      <mat-icon fontIcon="delete" aria-hidden="true" /><span>{{ 'editeur.question.supprimer' | transloco }}</span>
     </button>
   </mat-menu>
 
@@ -184,7 +185,7 @@
         (click)="changerDeSection(autre.section.id)"
         [disabled]="store.sectionPleine(autre.section.id)"
       >
-        <span>Section {{ autre.numero }} : {{ autre.section.titre }}</span>
+        <span>{{ 'editeur.question.sectionCible' | transloco: { numero: autre.numero, titre: autre.section.titre } }}</span>
       </button>
     }
   </mat-menu>

@@ -12,6 +12,7 @@ import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../.
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 /**
@@ -20,42 +21,42 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-liste-statistiques-recues',
-  imports: [DateLPipe,  MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <app-entete-page
-        titre="Statistiques reçues"
+        [titre]="'menu.statistiquesRecues' | transloco"
         icone="insights"
-        sousTitre="Les statistiques de sondages terminés que vos gestionnaires vous ont envoyées, recalculées à l’ouverture."
+        [sousTitre]="'statsRecues.sousTitre' | transloco"
       />
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des statistiques reçues" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statsRecues.chargement' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Les statistiques reçues n’ont pas pu être chargées.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'statsRecues.erreur' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
 
       @if (page(); as p) {
         @if (p.contenu.length === 0) {
-          <p class="etat-vide" role="status">Aucune statistique reçue pour le moment.</p>
+          <p class="etat-vide" role="status">{{ 'statsRecues.aucune' | transloco }}</p>
         } @else {
           <ul class="envois">
             @for (e of p.contenu; track e.id) {
               <li>
                 <button type="button" class="envoi" (click)="ouvrir(e)" [class.nouveau]="!e.consulteLe">
                   <span class="titre">
-                    {{ e.sondageTitre }}
+                    <span dir="auto">{{ e.sondageTitre }}</span>
                     @if (!e.consulteLe) {
-                      <span class="pastille-statut compte-temporaire">Nouveau</span>
+                      <span class="pastille-statut compte-temporaire">{{ 'statsRecues.nouveau' | transloco }}</span>
                     }
                   </span>
                   <span class="cellule-secondaire">
-                    De {{ e.expediteurNom }}, le {{ e.dateEnvoi | dateL: 'courtHeure' }} · {{ resume(e) }}
+                    {{ 'statsRecues.ligne' | transloco: { nom: e.expediteurNom, date: (e.dateEnvoi | dateL: 'courtHeure'), resume: resume(e) } }}
                   </span>
                   @if (e.commentaire) {
-                    <span class="commentaire">« {{ e.commentaire }} »</span>
+                    <span class="commentaire" dir="auto">« {{ e.commentaire }} »</span>
                   }
                   <mat-icon fontIcon="chevron_right" aria-hidden="true" />
                 </button>
@@ -68,7 +69,7 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
             [pageSize]="taillePage()"
             [pageSizeOptions]="tailles"
             (page)="changerPage($event)"
-            aria-label="Pagination des statistiques reçues"
+            [attr.aria-label]="'statsRecues.pagination' | transloco"
           />
         }
       }
@@ -98,7 +99,7 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
       border: 0;
       background: var(--mat-sys-surface);
       color: inherit;
-      text-align: left;
+      text-align: start;
       cursor: pointer;
 
       &:hover {
@@ -117,7 +118,7 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
       .mat-icon {
         position: absolute;
         top: 50%;
-        right: var(--bt-espace-3);
+        inset-inline-end: var(--bt-espace-3);
         transform: translateY(-50%);
       }
     }

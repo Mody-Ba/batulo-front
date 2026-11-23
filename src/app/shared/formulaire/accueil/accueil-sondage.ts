@@ -1,5 +1,6 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { PageAccueil } from '../../../core/models/sondage.model';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Ce qu'affiche la page d'accueil : en-tête du sondage et textes d'accueil. */
 export interface ContenuAccueil extends PageAccueil {
@@ -27,6 +28,7 @@ export interface DepartQuestionnaire {
  */
 @Component({
   selector: 'app-accueil-sondage',
+  imports: [TranslocoPipe],
   templateUrl: './accueil-sondage.html',
   styleUrl: './accueil-sondage.scss',
 })

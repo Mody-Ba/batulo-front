@@ -4,11 +4,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { FormulaireResponse } from '../../../core/models/sondage.model';
-import { MESSAGE_LECTURE_SEULE } from '../../../core/services/auth.service';
+import { messageLectureSeule } from '../../../core/services/auth.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SondageService } from '../../../core/services/sondage.service';
 import { sondageDeTest } from '../../../testing/donnees-test';
-import { MESSAGE_SANS_PERMISSION } from '../droits-sondage';
+import { messageSansPermission } from '../droits-sondage';
 import { CreationSondage } from './creation-sondage';
 
 const MODELE: FormulaireResponse = {
@@ -156,12 +156,12 @@ describe('CreationSondage', () => {
     role.set('GESTIONNAIRE');
     utilisateur.set({ id: 1, peutCreerSondages: false });
     let element = await creer();
-    expect(element.textContent).toContain(MESSAGE_SANS_PERMISSION);
+    expect(element.textContent).toContain(messageSansPermission());
     expect(element.querySelector('form')).toBeNull();
 
     role.set('ADMIN');
     lectureSeule.set(true);
     element = await creer();
-    expect(element.textContent).toContain(MESSAGE_LECTURE_SEULE);
+    expect(element.textContent).toContain(messageLectureSeule());
   });
 });

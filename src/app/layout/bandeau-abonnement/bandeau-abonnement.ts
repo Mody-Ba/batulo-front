@@ -7,6 +7,8 @@ import { filter, map } from 'rxjs';
 import { abonnementEnAlerte, LIBELLES_FORMULE } from '../../core/models/abonnement.model';
 import { AbonnementService } from '../../core/services/abonnement.service';
 import { DateLPipe } from '../../core/i18n/formats.pipes';
+import { traduirePluriel } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Bandeau de l'admin, en haut de chaque page : formule, jours restants, date d'expiration et bouton
@@ -15,7 +17,7 @@ import { DateLPipe } from '../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-bandeau-abonnement',
-  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule],
   templateUrl: './bandeau-abonnement.html',
   styleUrl: './bandeau-abonnement.scss',
 })
@@ -50,6 +52,6 @@ export class BandeauAbonnement {
 
   protected readonly texteJours = computed(() => {
     const jours = this.abonnement()?.joursRestants ?? 0;
-    return `${jours} jour${jours > 1 ? 's' : ''} restant${jours > 1 ? 's' : ''}`;
+    return traduirePluriel('bandeau.joursRestants', jours);
   });
 }

@@ -1,11 +1,11 @@
 <section class="conteneur-page etroit">
   <app-entete-page
-    [titre]="renouvellement() ? 'Renouveler mon abonnement' : 'S’abonner à Batulo'"
+    [titre]="(renouvellement() ? 'abonnement.souscrire.titreRenouveler' : 'abonnement.souscrire.titreAbonner') | transloco"
     icone="card_membership"
-    [sousTitre]="etape() === 'succes' ? null : etape() === 'formule' ? 'Étape 1 sur 2 : formule et moyen de paiement' : 'Étape 2 sur 2 : paiement'"
+    [sousTitre]="etape() === 'succes' ? null : ((etape() === 'formule' ? 'abonnement.souscrire.etape1' : 'abonnement.souscrire.etape2') | transloco)"
   >
     @if (renouvellement() && etape() !== 'succes') {
-      <a matButton routerLink="/admin/abonnement">Retour à mon abonnement</a>
+      <a matButton routerLink="/admin/abonnement">{{ 'abonnement.souscrire.retour' | transloco }}</a>
     }
   </app-entete-page>
 
@@ -16,16 +16,15 @@
   @switch (etape()) {
     <!-- ---------- Étape 1 : formule ---------- -->
     @case ('formule') {
-      <h2 class="titre-etape visuellement-cache" tabindex="-1">Choix de la formule</h2>
+      <h2 class="titre-etape visuellement-cache" tabindex="-1">{{ 'abonnement.souscrire.choixFormule' | transloco }}</h2>
 
       @if (renouvellement() && abonnementActuel()?.dateExpiration; as dateExpiration) {
         <app-encadre type="info" icone="autorenew">
           <p>
-            La nouvelle période s’ajoutera à votre abonnement actuel
             @if (abonnementActuel()?.statut === 'EXPIRE') {
-              à partir de la date du paiement (il a expiré le {{ dateExpiration | dateL: 'longDate' }}).
+              {{ 'abonnement.souscrire.ajoutExpire' | transloco: { date: (dateExpiration | dateL: 'longDate') } }}
             } @else {
-              à partir du {{ dateExpiration | dateL: 'longDate' }} : vous ne perdez aucun jour.
+              {{ 'abonnement.souscrire.ajout' | transloco: { date: (dateExpiration | dateL: 'longDate') } }}
             }
           </p>
         </app-encadre>
@@ -37,9 +36,9 @@
       }
 
       @if (chargementFormules()) {
-        <mat-progress-bar mode="indeterminate" aria-label="Chargement des formules" />
+        <mat-progress-bar mode="indeterminate" [attr.aria-label]="'abonnement.souscrire.chargementFormules' | transloco" />
       } @else if (formules().length) {
-        <h3 class="titre-groupe" id="titre-moyen">Moyen de paiement</h3>
+        <h3 class="titre-groupe" id="titre-moyen">{{ 'abonnement.souscrire.moyen' | transloco }}</h3>
         <div class="formules moyens" role="radiogroup" aria-labelledby="titre-moyen">
           @for (m of moyens; track m.moyen) {
             <label class="formule" [class.choisie]="m.moyen === moyenChoisi()">
@@ -52,19 +51,19 @@
                 (change)="choisirMoyen(m.moyen)"
               />
               <span class="formule-entete">
-                <span class="formule-libelle"><mat-icon [fontIcon]="m.icone" aria-hidden="true" />{{ m.libelle }}</span>
+                <span class="formule-libelle"><mat-icon [fontIcon]="m.icone" aria-hidden="true" />{{ m.libelle | transloco: { applications: applications } }}</span>
                 <mat-icon
                   class="coche"
                   [fontIcon]="m.moyen === moyenChoisi() ? 'radio_button_checked' : 'radio_button_unchecked'"
                   aria-hidden="true"
                 />
               </span>
-              <span class="duree">{{ m.detail }}</span>
+              <span class="duree">{{ m.detail | transloco }}</span>
             </label>
           }
         </div>
 
-        <h3 class="titre-groupe" id="titre-formule">Formule</h3>
+        <h3 class="titre-groupe" id="titre-formule">{{ 'abonnement.mon.formule' | transloco }}</h3>
         <div class="formules" role="radiogroup" aria-labelledby="titre-formule">
           @for (formule of formules(); track formule.formule) {
             <label class="formule" [class.choisie]="formule.formule === formuleChoisie()">
@@ -77,7 +76,7 @@
                 (change)="choisir(formule.formule)"
               />
               <span class="formule-entete">
-                <span class="formule-libelle">{{ formule.libelle }}</span>
+                <span class="formule-libelle">{{ libelleFormule(formule) }}</span>
                 <mat-icon
                   class="coche"
                   [fontIcon]="formule.formule === formuleChoisie() ? 'radio_button_checked' : 'radio_button_unchecked'"
@@ -85,10 +84,10 @@
                 />
               </span>
               <span class="prix">{{ prix(formule) }}</span>
-              <span class="duree">pour {{ formule.duree }}</span>
+              <span class="duree">{{ 'abonnement.souscrire.pour' | transloco: { duree: dureeFormule(formule) } }}</span>
               @if (formule.formule === 'ANNUEL' && economieAnnuelle() > 0) {
                 <span class="economie">
-                  Économisez {{ montant(economieAnnuelle(), devise(formule)) }} par rapport à 12 mois
+                  {{ 'abonnement.souscrire.economie' | transloco: { montant: montant(economieAnnuelle(), devise(formule)) } }}
                 </span>
               }
             </label>
@@ -104,15 +103,15 @@
             (click)="continuer()"
           >
             @if (preparation()) {
-              <mat-spinner diameter="20" aria-label="Préparation du paiement" />
+              <mat-spinner diameter="20" [attr.aria-label]="'abonnement.souscrire.preparation' | transloco" />
             } @else {
-              {{ moyenChoisi() === 'mobile' ? 'Continuer vers le paiement mobile' : 'Continuer vers le paiement' }}
+              {{ (moyenChoisi() === 'mobile' ? 'abonnement.souscrire.continuerMobile' : 'abonnement.souscrire.continuer') | transloco }}
             }
           </button>
         </div>
       } @else if (erreur()) {
         <div class="actions">
-          <button matButton="tonal" type="button" (click)="chargerFormules()">Réessayer</button>
+          <button matButton="tonal" type="button" (click)="chargerFormules()">{{ 'commun.reessayer' | transloco }}</button>
         </div>
       }
     }
@@ -120,7 +119,7 @@
     <!-- ---------- Étape 2 : paiement ---------- -->
     @case ('paiement') {
       @if (intention(); as intention) {
-        <h2 class="titre-etape visuellement-cache" tabindex="-1">Paiement par carte</h2>
+        <h2 class="titre-etape visuellement-cache" tabindex="-1">{{ 'abonnement.souscrire.paiementCarte' | transloco }}</h2>
 
         <div class="resume">
           <div>
@@ -128,15 +127,14 @@
             <p class="resume-montant">{{ intention.montant | montantL: intention.devise }}</p>
           </div>
           @if (!paiementEnCours() && !paiementAVerifier()) {
-            <button matButton type="button" (click)="changerFormule()">Changer de formule</button>
+            <button matButton type="button" (click)="changerFormule()">{{ 'abonnement.souscrire.changerFormule' | transloco }}</button>
           }
         </div>
 
         @if (modeTest()) {
           <app-encadre type="info" icone="science">
             <p>
-              Mode test Stripe : carte <strong>4242 4242 4242 4242</strong>, une date future et
-              n’importe quel code. Aucun montant réel n’est prélevé.
+              {{ 'abonnement.souscrire.test1' | transloco }} <strong dir="ltr">4242 4242 4242 4242</strong>{{ 'abonnement.souscrire.test2' | transloco }}
             </p>
           </app-encadre>
         }
@@ -146,21 +144,21 @@
           class="formulaire carte"
           (submit)="$event.preventDefault(); payer()"
           novalidate
-          aria-label="Informations de la carte"
+          [attr.aria-label]="'abonnement.souscrire.infosCarte' | transloco"
         >
           <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Nom sur la carte</mat-label>
+            <mat-label>{{ 'abonnement.souscrire.nomCarte' | transloco }}</mat-label>
             <mat-icon matPrefix fontIcon="person" aria-hidden="true" />
             <input matInput [formControl]="nomTitulaire" autocomplete="cc-name" required />
             @if (nomTitulaire.hasError('required')) {
-              <mat-error>Le nom sur la carte est obligatoire.</mat-error>
+              <mat-error>{{ 'abonnement.souscrire.nomCarteObligatoire' | transloco }}</mat-error>
             } @else if (nomTitulaire.hasError('maxlength')) {
-              <mat-error>100 caractères au plus.</mat-error>
+              <mat-error>{{ 'commun.erreurs.max100' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <div class="champ-stripe" [class.actif]="champActif() === 'numero'" [class.invalide]="!!erreursChamps().numero">
-            <span class="libelle-stripe" id="libelle-numero">Numéro de carte</span>
+            <span class="libelle-stripe" id="libelle-numero">{{ 'abonnement.souscrire.numero' | transloco }}</span>
             <div #conteneurNumero class="element-stripe" aria-labelledby="libelle-numero"></div>
           </div>
           @if (erreursChamps().numero; as message) {
@@ -170,7 +168,7 @@
           <div class="ligne-champs-carte">
             <div>
               <div class="champ-stripe" [class.actif]="champActif() === 'expiration'" [class.invalide]="!!erreursChamps().expiration">
-                <span class="libelle-stripe" id="libelle-expiration">Expiration (MM / AA)</span>
+                <span class="libelle-stripe" id="libelle-expiration">{{ 'abonnement.souscrire.expiration' | transloco }}</span>
                 <div #conteneurExpiration class="element-stripe" aria-labelledby="libelle-expiration"></div>
               </div>
               @if (erreursChamps().expiration; as message) {
@@ -179,7 +177,7 @@
             </div>
             <div>
               <div class="champ-stripe" [class.actif]="champActif() === 'code'" [class.invalide]="!!erreursChamps().code">
-                <span class="libelle-stripe" id="libelle-code">Code de sécurité</span>
+                <span class="libelle-stripe" id="libelle-code">{{ 'abonnement.souscrire.code' | transloco }}</span>
                 <div #conteneurCode class="element-stripe" aria-labelledby="libelle-code"></div>
               </div>
               @if (erreursChamps().code; as message) {
@@ -195,10 +193,7 @@
 
           @if (paiementAVerifier()) {
             <app-encadre type="avertissement" role="status" icone="hourglass_top">
-              <p>
-                Votre carte a été acceptée par Stripe : ne payez pas une seconde fois. Il reste à
-                faire valider le paiement par Batulo.
-              </p>
+              <p>{{ 'abonnement.souscrire.aVerifier' | transloco }}</p>
             </app-encadre>
             <button
               matButton="filled"
@@ -208,9 +203,9 @@
               (click)="verifier()"
             >
               @if (paiementEnCours()) {
-                <mat-spinner diameter="20" aria-label="Vérification en cours" />
+                <mat-spinner diameter="20" [attr.aria-label]="'abonnement.souscrire.verificationEnCours' | transloco" />
               } @else {
-                Vérifier à nouveau
+                {{ 'abonnement.verifierANouveau' | transloco }}
               }
             </button>
           } @else {
@@ -221,16 +216,16 @@
               [disabled]="paiementEnCours()"
             >
               @if (paiementEnCours()) {
-                <mat-spinner diameter="20" aria-label="Paiement en cours" />
+                <mat-spinner diameter="20" [attr.aria-label]="'abonnement.souscrire.paiementEnCours' | transloco" />
               } @else {
-                Payer {{ intention.montant | montantL: intention.devise }}
+                {{ 'abonnement.souscrire.payer' | transloco: { montant: (intention.montant | montantL: intention.devise) } }}
               }
             </button>
           }
 
           <p class="securite">
             <mat-icon fontIcon="verified_user" aria-hidden="true" />
-            Paiement sécurisé par Stripe. Vos données de carte ne transitent jamais par Batulo.
+            {{ 'abonnement.souscrire.securite' | transloco }}
           </p>
         </form>
       }
@@ -252,18 +247,19 @@
           <span class="icone-succes" aria-hidden="true">
             <mat-icon fontIcon="check_circle" aria-hidden="true" />
           </span>
-          <h2 class="titre-etape" tabindex="-1">Vous êtes bien abonné</h2>
+          <h2 class="titre-etape" tabindex="-1">{{ 'abonnement.succes.titre' | transloco }}</h2>
           <p role="status">
             @if (confirmation.abonnement.formule; as formule) {
-              {{ libellesFormule[formule] }} active
-            }
-            @if (confirmation.abonnement.dateExpiration; as dateExpiration) {
-              jusqu’au {{ dateExpiration | dateL: 'longDate' }}.
+              @if (confirmation.abonnement.dateExpiration; as dateExpiration) {
+                {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[formule], date: (dateExpiration | dateL: 'longDate') } }}
+              } @else {
+                {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[formule] } }}
+              }
             }
           </p>
-          <p class="texte-aide">Redirection vers votre tableau de bord…</p>
+          <p class="texte-aide">{{ 'abonnement.succes.redirection' | transloco }}</p>
           <button matButton="filled" type="button" class="bouton-principal" (click)="allerAuTableauDeBord()">
-            Aller au tableau de bord
+            {{ 'abonnement.succes.allerTdb' | transloco }}
           </button>
         </div>
       }

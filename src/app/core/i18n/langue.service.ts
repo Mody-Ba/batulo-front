@@ -1,8 +1,11 @@
 import { Directionality } from '@angular/cdk/bidi';
 import { DOCUMENT, registerLocaleData } from '@angular/common';
-import { inject, Injectable, signal } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
-import { firstValueFrom } from 'rxjs';
+import { filter, firstValueFrom } from 'rxjs';
+import { ChargeurTraductions, estPagePublique } from './chargeur-traductions';
 import { ecrireLocal, lireLocal } from '../utils/stockage-local';
 import { CLE_STOCKAGE_LANGUE, definitionLangue, estLangue, Langue, langueDuNavigateur } from './langues';
 import { brancherTraductions } from './traduire';
@@ -24,6 +27,9 @@ export class LangueService {
   private readonly transloco = inject(TranslocoService);
   private readonly direction = inject(Directionality);
   private readonly document = inject(DOCUMENT);
+  private readonly chargeur = inject(ChargeurTraductions);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly _langue = signal<Langue>(this.langueInitiale());
   /** Langue affichée (ses textes sont chargés). */
@@ -31,6 +37,13 @@ export class LangueService {
 
   /** Au démarrage (provideAppInitializer) : la page s'affiche directement dans la bonne langue. */
   initialiser(): Promise<void> {
+    // Arrivé par le formulaire public (/s/), seul son petit fichier est chargé : le reste en le quittant.
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => void this.completerTraductions());
     return this.appliquer(this._langue());
   }
 
@@ -62,6 +75,18 @@ export class LangueService {
       this.direction.change.emit(definition.dir);
     }
     this._langue.set(langue);
+  }
+
+  /** Ajoute le fichier principal aux langues chargées depuis le formulaire public, dès qu'on le quitte. */
+  private async completerTraductions(): Promise<void> {
+    if (estPagePublique() || this.chargeur.partielles.size === 0) {
+      return;
+    }
+    for (const langue of [...this.chargeur.partielles]) {
+      this.chargeur.partielles.delete(langue);
+      const principale = await firstValueFrom(this.chargeur.principale(langue));
+      this.transloco.setTranslation(principale, langue, { merge: true });
+    }
   }
 
   private async chargerDonneesLocales(locale: string): Promise<void> {

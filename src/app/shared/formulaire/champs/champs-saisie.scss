@@ -102,7 +102,7 @@ app-formulaire-sondage {
     align-items: center;
     gap: var(--bt-espace-1);
     min-height: 48px;
-    padding-left: var(--bt-espace-3);
+    padding-inline-start: var(--bt-espace-3);
     border: 1px solid var(--mat-sys-outline-variant);
     border-radius: 8px;
     background: var(--mat-sys-surface);

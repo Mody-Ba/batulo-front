@@ -60,5 +60,5 @@ tr.inactif .nom {
   align-items: center;
   justify-content: space-between;
   gap: var(--bt-espace-2);
-  margin-right: calc(-1 * var(--bt-espace-2));
+  margin-inline-end: calc(-1 * var(--bt-espace-2));
 }

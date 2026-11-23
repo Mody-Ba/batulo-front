@@ -1,11 +1,11 @@
 <article class="accueil-sondage" aria-labelledby="titre-accueil">
   @if (niveauTitre() === 1) {
-    <h1 id="titre-accueil" class="titre" tabindex="-1">{{ contenu().titre }}</h1>
+    <h1 id="titre-accueil" class="titre" tabindex="-1" dir="auto">{{ contenu().titre }}</h1>
   } @else {
-    <h2 id="titre-accueil" class="titre" tabindex="-1">{{ contenu().titre }}</h2>
+    <h2 id="titre-accueil" class="titre" tabindex="-1" dir="auto">{{ contenu().titre }}</h2>
   }
   @if (contenu().description) {
-    <p class="description">{{ contenu().description }}</p>
+    <p class="description" dir="auto">{{ contenu().description }}</p>
   }
   <ng-content />
 
@@ -17,23 +17,23 @@
 
   @if (objet(); as texte) {
     <section class="bloc" aria-labelledby="accueil-objet">
-      <h3 id="accueil-objet">Objet de l’enquête</h3>
-      <p class="texte">{{ texte }}</p>
+      <h3 id="accueil-objet">{{ 'public.accueil.objet' | transloco }}</h3>
+      <p class="texte" dir="auto">{{ texte }}</p>
     </section>
   }
   @if (confidentialite(); as texte) {
     <section class="bloc" aria-labelledby="accueil-confidentialite">
-      <h3 id="accueil-confidentialite">Confidentialité des réponses</h3>
-      <p class="texte">{{ texte }}</p>
+      <h3 id="accueil-confidentialite">{{ 'public.accueil.confidentialite' | transloco }}</h3>
+      <p class="texte" dir="auto">{{ texte }}</p>
     </section>
   }
 
   @if (contenu().consentementRequis) {
     <fieldset class="consentement">
-      <legend>Consentement</legend>
+      <legend>{{ 'public.accueil.consentement' | transloco }}</legend>
       <label class="case">
         <input type="checkbox" [checked]="coche()" (change)="cocher($event)" aria-describedby="aide-consentement" />
-        <span>{{ contenu().texteConsentement || 'J’accepte de participer à cette enquête.' }}</span>
+        <span dir="auto">{{ contenu().texteConsentement || ('public.accueil.accepte' | transloco) }}</span>
       </label>
     </fieldset>
   }
@@ -41,29 +41,29 @@
   <div class="actions">
     @if (reprise(); as r) {
       <button type="button" class="bouton principal" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(true)">
-        Reprendre le questionnaire
+        {{ 'public.accueil.reprendre' | transloco }}
         @if (r.nombreSections > 1) {
-          <span class="detail">(section {{ r.section + 1 }} sur {{ r.nombreSections }})</span>
+          <span class="detail">{{ 'public.accueil.sectionSur' | transloco: { numero: r.section + 1, total: r.nombreSections } }}</span>
         }
       </button>
       <button type="button" class="bouton secondaire" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(false)">
-        Recommencer à zéro
+        {{ 'public.accueil.recommencer' | transloco }}
       </button>
     } @else {
       <button type="button" class="bouton principal" [disabled]="bloque()" [attr.aria-describedby]="bloque() ? 'aide-consentement' : null" (click)="demarrer(false)">
-        Commencer le questionnaire
+        {{ 'public.accueil.commencer' | transloco }}
       </button>
     }
   </div>
   @if (contenu().consentementRequis) {
     <p id="aide-consentement" class="aide" [class.visuellement-cache]="!bloque()">
-      Cochez la case de consentement pour commencer.
+      {{ 'public.accueil.cochez' | transloco }}
     </p>
   }
   @if (reprise()) {
-    <p class="aide">Vos réponses en cours sont gardées sur cet appareil. « Recommencer à zéro » les efface.</p>
+    <p class="aide">{{ 'public.accueil.gardees' | transloco }}</p>
   }
   @if (mode() === 'apercu') {
-    <p class="aide">Aperçu de la page d’accueil : rien n’est enregistré.</p>
+    <p class="aide">{{ 'public.accueil.apercu' | transloco }}</p>
   }
 </article>

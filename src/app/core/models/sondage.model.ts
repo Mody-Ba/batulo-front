@@ -1,3 +1,4 @@
+import { libelles, traduire } from '../i18n/traduire';
 import { ApparenceResponse } from './personnalisation.model';
 
 /** Statut calculé à partir des dates (StatutSondage du backend). Un brouillon est NON_COMMENCE et publie=false. */
@@ -5,21 +6,12 @@ export type StatutSondage = 'NON_COMMENCE' | 'EN_COURS' | 'TERMINE';
 
 export const STATUTS_SONDAGE: readonly StatutSondage[] = ['NON_COMMENCE', 'EN_COURS', 'TERMINE'];
 
-export const LIBELLES_STATUT_SONDAGE: Record<StatutSondage, string> = {
-  NON_COMMENCE: 'Non commencé',
-  EN_COURS: 'En cours',
-  TERMINE: 'Terminé',
-};
+export const LIBELLES_STATUT_SONDAGE = libelles<StatutSondage>('statutsSondage', STATUTS_SONDAGE);
 
 /** État affiché d'un sondage : son statut, plus le brouillon (jamais publié) et le planifié (publié, pas ouvert). */
 export type EtatSondage = 'BROUILLON' | 'PLANIFIE' | 'EN_COURS' | 'TERMINE';
 
-export const LIBELLES_ETAT_SONDAGE: Record<EtatSondage, string> = {
-  BROUILLON: 'Brouillon',
-  PLANIFIE: 'Planifié',
-  EN_COURS: 'En cours',
-  TERMINE: 'Terminé',
-};
+export const LIBELLES_ETAT_SONDAGE = libelles<EtatSondage>('etatsSondage', ['BROUILLON', 'PLANIFIE', 'EN_COURS', 'TERMINE']);
 
 export function etatSondage(sondage: { statut: StatutSondage; publie: boolean }): EtatSondage {
   if (!sondage.publie) {
@@ -83,10 +75,7 @@ export interface SondageResumeResponse {
 /** Relation d'un gestionnaire avec un sondage (RelationSondage du backend). */
 export type RelationSondage = 'CREATEUR' | 'ASSIGNE';
 
-export const LIBELLES_RELATION: Record<RelationSondage, string> = {
-  CREATEUR: 'Créé par lui',
-  ASSIGNE: 'Assigné',
-};
+export const LIBELLES_RELATION = libelles<RelationSondage>('relationsSondage', ['CREATEUR', 'ASSIGNE']);
 
 /** GET /api/admin/gestionnaires/{id}/sondages (éléments de la page) */
 export interface SondageGestionnaireResponse {
@@ -182,18 +171,18 @@ export const TYPES_QUESTION: readonly TypeQuestion[] = [
   'MATRICE',
 ];
 
-export const LIBELLES_TYPE_QUESTION: Record<TypeQuestion, string> = {
-  CHOIX_UNIQUE: 'Choix unique',
-  CHOIX_MULTIPLE: 'Choix multiple',
-  OUI_NON: 'Oui / Non',
-  TEXTE_COURT: 'Texte court',
-  TEXTE_LONG: 'Texte long',
-  ECHELLE: 'Échelle',
-  CLASSEMENT: 'Classement',
-  NUMERIQUE: 'Nombre',
-  DATE: 'Date',
-  MATRICE: 'Grille (matrice)',
-};
+export const LIBELLES_TYPE_QUESTION = libelles<TypeQuestion>('typesQuestion', [
+  'CHOIX_UNIQUE',
+  'CHOIX_MULTIPLE',
+  'OUI_NON',
+  'TEXTE_COURT',
+  'TEXTE_LONG',
+  'ECHELLE',
+  'CLASSEMENT',
+  'NUMERIQUE',
+  'DATE',
+  'MATRICE',
+]);
 
 /** Icône Material de chaque type (décorative). */
 export const ICONES_TYPE_QUESTION: Record<TypeQuestion, string> = {
@@ -279,23 +268,14 @@ export function libelleOperateur(operateur: OperateurCondition, type: TypeQuesti
   const date = type === 'DATE';
   switch (operateur) {
     case 'EGAL':
-      return date ? 'est le' : 'est égal à';
     case 'DIFFERENT':
-      return date ? 'n’est pas le' : 'est différent de';
-    case 'PARMI':
-      return type === 'CHOIX_MULTIPLE' ? 'contient au moins une de' : 'est l’une de';
-    case 'CONTIENT':
-      return 'contient';
     case 'SUPERIEUR':
-      return date ? 'est après le' : 'est supérieur à';
     case 'INFERIEUR':
-      return date ? 'est avant le' : 'est inférieur à';
-    case 'ENTRE':
-      return 'est entre';
-    case 'REPONDUE':
-      return 'a reçu une réponse';
-    case 'NON_REPONDUE':
-      return 'n’a pas reçu de réponse';
+      return traduire(`operateurs.${operateur}${date ? '_DATE' : ''}`);
+    case 'PARMI':
+      return traduire(type === 'CHOIX_MULTIPLE' ? 'operateurs.PARMI_MULTIPLE' : 'operateurs.PARMI');
+    default:
+      return traduire(`operateurs.${operateur}`);
   }
 }
 

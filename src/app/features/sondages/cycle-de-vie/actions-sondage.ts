@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { inject, Injectable, LOCALE_ID } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -9,6 +8,8 @@ import { SondageService } from '../../../core/services/sondage.service';
 import { aLeCode, messageErreur } from '../../../core/utils/erreur-http';
 import { confirmer } from '../../../shared/components/dialogue-confirmation/dialogue-confirmation';
 import { DialoguePublication, DonneesPublication } from './dialogue-publication/dialogue-publication';
+import { traduire } from '../../../core/i18n/traduire';
+import { dateEnClair } from '../../../core/i18n/formats.pipes';
 
 /**
  * Cycle de vie d'un sondage, commun à la fiche et à l'éditeur : publier, ajuster les dates, fermer, nouvelle version,
@@ -21,7 +22,6 @@ export class ActionsSondage {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
-  private readonly dates = new DatePipe(inject(LOCALE_ID));
 
   /** `surReglageEnregistre` : appelée si « une réponse par appareil » est enregistré avant la publication. */
   publier(
@@ -32,28 +32,26 @@ export class ActionsSondage {
       tap((publie) =>
         this.informer(
           publie.statut === 'NON_COMMENCE'
-            ? `Publication planifiée le ${this.date(publie.datePublication)}.`
-            : 'Sondage publié : il accepte maintenant les réponses.',
+            ? traduire('sondages.actions.planifiee', { date: this.date(publie.datePublication) })
+            : traduire('sondages.actions.publie'),
         ),
       ),
     );
   }
 
   modifierDates(sondage: SondageResponse): Observable<SondageResponse> {
-    return this.ouvrirDates({ sondage, mode: 'dates' }).pipe(tap(() => this.informer('Dates enregistrées.')));
+    return this.ouvrirDates({ sondage, mode: 'dates' }).pipe(tap(() => this.informer(traduire('sondages.actions.datesEnregistrees'))));
   }
 
   fermer(sondage: SondageResponse): Observable<SondageResponse> {
     return confirmer(this.dialog, {
-      titre: 'Fermer ce sondage ?',
-      message:
-        `« ${sondage.titre} » passera à Terminé : plus aucune réponse ne sera acceptée. C’est définitif ; pour le ` +
-        'rouvrir, il faudra créer une nouvelle version. Les réponses reçues sont conservées.',
-      action: 'Fermer le sondage',
+      titre: traduire('sondages.actions.fermerTitre'),
+      message: traduire('sondages.actions.fermerMessage', { titre: sondage.titre }),
+      action: traduire('sondages.fiche.fermer'),
       destructive: true,
     }).pipe(
       filter(Boolean),
-      switchMap(() => this.executer(this.service.fermer(sondage.id), 'Sondage fermé.')),
+      switchMap(() => this.executer(this.service.fermer(sondage.id), traduire('sondages.actions.ferme'))),
     );
   }
 
@@ -64,7 +62,7 @@ export class ActionsSondage {
   nouvelleVersion(sondage: SondageResponse): Observable<SondageResponse> {
     return this.service.nouvelleVersion(sondage.id).pipe(
       tap((brouillon) => {
-        this.informer(`Version ${brouillon.version} créée : modifiez-la puis publiez-la.`);
+        this.informer(traduire('sondages.actions.versionCreee', { version: brouillon.version }));
         void this.router.navigate(['/sondages', brouillon.id, 'modifier']);
       }),
       catchError((erreur: unknown) => {
@@ -80,7 +78,7 @@ export class ActionsSondage {
 
   /** Copie indépendante (version 1, sans dates, assignations ni réponses), ouverte dans l'éditeur. */
   dupliquer(sondage: SondageResponse): Observable<SondageResponse> {
-    return this.executer(this.service.dupliquer(sondage.id), 'Copie créée : elle s’ouvre dans l’éditeur.').pipe(
+    return this.executer(this.service.dupliquer(sondage.id), traduire('sondages.actions.copieCreee')).pipe(
       tap((copie) => void this.router.navigate(['/sondages', copie.id, 'modifier'])),
     );
   }
@@ -90,8 +88,8 @@ export class ActionsSondage {
     return this.executer(
       this.service.marquerModele(sondage.id, estModele),
       estModele
-        ? 'Marqué comme modèle : il apparaît en tête des formulaires à réutiliser.'
-        : 'Retiré des modèles.',
+        ? traduire('sondages.actions.marqueModele')
+        : traduire('sondages.actions.retireModele'),
     );
   }
 
@@ -99,7 +97,7 @@ export class ActionsSondage {
     this.service.versions(id).subscribe({
       next: (versions) => {
         const brouillon = versions.find((v) => !v.publie);
-        this.informer(brouillon ? `${message} Elle s’ouvre.` : message);
+        this.informer(brouillon ? `${message} ${traduire('sondages.actions.elleSOuvre')}` : message);
         if (brouillon) {
           void this.router.navigate(['/sondages', brouillon.id, 'modifier']);
         }
@@ -130,11 +128,11 @@ export class ActionsSondage {
   }
 
   private date(iso: string | null): string {
-    return iso ? (this.dates.transform(iso, 'd MMMM y à HH:mm') ?? '') : '';
+    return iso ? dateEnClair(iso, 'longHeure') : '';
   }
 
   private informer(message: string): void {
-    this.snackBar.open(message, 'Fermer', { duration: 6000 });
+    this.snackBar.open(message, traduire('commun.fermer'), { duration: 6000 });
   }
 }
 

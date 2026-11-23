@@ -16,12 +16,13 @@ import { MessageErreur } from '../../../../shared/components/message-erreur/mess
 import {
   activerAbonnement,
   finDuSuivi,
-  MESSAGE_ATTENTE_LONGUE,
-  MESSAGE_ECHEC_MOBILE,
+  messageAttenteLongue,
+  messageEchecMobile,
   MESSAGE_RECONNEXION,
   suivrePaiementMobile,
 } from './suivi-paiement-mobile';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuvable' | 'erreur';
 
@@ -32,17 +33,17 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
  */
 @Component({
   selector: 'app-retour-paiement-mobile',
-  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page etroit">
-      <app-entete-page titre="Paiement mobile" icone="smartphone" />
+      <app-entete-page [titre]="'abonnement.retour.titre' | transloco" icone="smartphone" />
 
       @switch (etat()) {
         @case ('attente') {
           <div class="attente" role="status">
             <mat-spinner diameter="32" aria-hidden="true" />
-            <h2 class="titre-etat" tabindex="-1">Paiement en cours…</h2>
-            <p>Nous attendons la confirmation de votre paiement. Cette page se met à jour automatiquement.</p>
+            <h2 class="titre-etat" tabindex="-1">{{ 'abonnement.retour.enCours' | transloco }}</h2>
+            <p>{{ 'abonnement.retour.attente' | transloco }}</p>
           </div>
         }
 
@@ -50,60 +51,57 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
           @if (statut(); as s) {
             <div class="succes">
               <span class="icone-succes" aria-hidden="true"><mat-icon fontIcon="check_circle" aria-hidden="true" /></span>
-              <h2 class="titre-etat" tabindex="-1">Abonnement activé</h2>
+              <h2 class="titre-etat" tabindex="-1">{{ 'abonnement.retour.active' | transloco }}</h2>
               <p role="status">
-                Paiement de {{ montant(s.montant, s.devise) }} reçu : {{ libellesFormule[s.formule] }}
+                {{ 'abonnement.retour.recu' | transloco: { montant: montant(s.montant, s.devise) } }}
                 @if (s.abonnement.dateExpiration; as fin) {
-                  active jusqu’au {{ fin | dateL: 'longDate' }}.
+                  {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[s.formule], date: (fin | dateL: 'longDate') } }}
                 } @else {
-                  active.
+                  {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[s.formule] } }}
                 }
               </p>
-              <a matButton="filled" class="bouton-principal" routerLink="/admin">Aller au tableau de bord</a>
+              <a matButton="filled" class="bouton-principal" routerLink="/admin">{{ 'abonnement.succes.allerTdb' | transloco }}</a>
             </div>
           }
         }
 
         @case ('echoue') {
-          <h2 class="titre-etat visuellement-cache" tabindex="-1">Paiement non abouti</h2>
-          <app-encadre type="erreur" role="alert" icone="error"><p>{{ messageEchec }}</p></app-encadre>
+          <h2 class="titre-etat visuellement-cache" tabindex="-1">{{ 'abonnement.retour.nonAbouti' | transloco }}</h2>
+          <app-encadre type="erreur" role="alert" icone="error"><p>{{ messageEchec() }}</p></app-encadre>
           <div class="actions">
             <a matButton="filled" class="bouton-principal" routerLink="/admin/abonnement/souscrire" [queryParams]="parametresReessai()">
-              Réessayer
+              {{ 'commun.reessayer' | transloco }}
             </a>
           </div>
         }
 
         @case ('attente-longue') {
-          <h2 class="titre-etat visuellement-cache" tabindex="-1">Paiement pas encore confirmé</h2>
-          <app-encadre type="avertissement" role="alert" icone="hourglass_top"><p>{{ messageAttente }}</p></app-encadre>
+          <h2 class="titre-etat visuellement-cache" tabindex="-1">{{ 'abonnement.retour.pasConfirme' | transloco }}</h2>
+          <app-encadre type="avertissement" role="alert" icone="hourglass_top"><p>{{ messageAttente() }}</p></app-encadre>
           <div class="actions">
-            <button matButton="filled" type="button" class="bouton-principal" (click)="charger()">Vérifier à nouveau</button>
-            <a matButton routerLink="/admin/abonnement/souscrire" [queryParams]="parametresReessai()">Réessayer</a>
+            <button matButton="filled" type="button" class="bouton-principal" (click)="charger()">{{ 'abonnement.verifierANouveau' | transloco }}</button>
+            <a matButton routerLink="/admin/abonnement/souscrire" [queryParams]="parametresReessai()">{{ 'commun.reessayer' | transloco }}</a>
           </div>
         }
 
         @case ('introuvable') {
-          <h2 class="titre-etat visuellement-cache" tabindex="-1">Paiement introuvable</h2>
+          <h2 class="titre-etat visuellement-cache" tabindex="-1">{{ 'abonnement.retour.introuvable' | transloco }}</h2>
           <app-encadre type="erreur" role="alert" icone="search_off">
-            <p>
-              Ce paiement est introuvable pour votre entreprise. Si vous avez payé, vérifiez votre abonnement ; sinon,
-              relancez un paiement.
-            </p>
+            <p>{{ 'abonnement.retour.introuvableTexte' | transloco }}</p>
           </app-encadre>
           <div class="actions">
             <a matButton="filled" class="bouton-principal" routerLink="/admin/abonnement/souscrire" [queryParams]="{ moyen: 'mobile' }">
-              Payer mon abonnement
+              {{ 'abonnement.retour.payer' | transloco }}
             </a>
-            <a matButton routerLink="/admin/abonnement">Mon abonnement</a>
+            <a matButton routerLink="/admin/abonnement">{{ 'abonnement.mon.titre' | transloco }}</a>
           </div>
         }
 
         @case ('erreur') {
-          <h2 class="titre-etat visuellement-cache" tabindex="-1">Statut du paiement indisponible</h2>
-          <app-message-erreur [erreur]="erreur()" parDefaut="Le statut du paiement n’a pas pu être lu." />
+          <h2 class="titre-etat visuellement-cache" tabindex="-1">{{ 'abonnement.retour.statutIndisponible' | transloco }}</h2>
+          <app-message-erreur [erreur]="erreur()" [parDefaut]="'abonnement.retour.erreurStatut' | transloco" />
           <div class="actions">
-            <button matButton="filled" type="button" class="bouton-principal" (click)="charger()">Vérifier à nouveau</button>
+            <button matButton="filled" type="button" class="bouton-principal" (click)="charger()">{{ 'abonnement.verifierANouveau' | transloco }}</button>
           </div>
         }
       }
@@ -146,8 +144,8 @@ export class RetourPaiementMobile {
   private readonly hote = inject<ElementRef<HTMLElement>>(ElementRef);
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly montant = montantEnClair;
-  protected readonly messageEchec = MESSAGE_ECHEC_MOBILE;
-  protected readonly messageAttente = MESSAGE_ATTENTE_LONGUE;
+  protected readonly messageEchec = messageEchecMobile;
+  protected readonly messageAttente = messageAttenteLongue;
 
   /** ?reference= ajouté par Moosyl. */
   readonly reference = input<string | undefined>(undefined);

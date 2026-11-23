@@ -1,12 +1,12 @@
 <section class="conteneur-page etroit">
   <a matButton routerLink="/sondages" class="retour">
-    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.sondages' | transloco }}
   </a>
 
   <app-entete-page
-    titre="Créer un sondage"
+    [titre]="'sondages.liste.creer' | transloco"
     icone="add"
-    sousTitre="Partez d’un formulaire vide, ou réutilisez les questions d’un sondage existant ou d’un modèle."
+    [sousTitre]="'sondages.creation.sousTitre' | transloco"
   />
 
   @if (interdit(); as raison) {
@@ -15,44 +15,43 @@
     <form [formGroup]="formulaire" (ngSubmit)="creer()" novalidate>
       <mat-button-toggle-group
         class="choix-mode"
-        aria-label="Point de départ"
+        [attr.aria-label]="'sondages.creation.pointDepart' | transloco"
         [value]="mode()"
         (change)="changerMode($event.value)"
         [hideSingleSelectionIndicator]="true"
       >
         <mat-button-toggle value="vide">
-          <mat-icon fontIcon="note_add" aria-hidden="true" />Sondage vide
+          <mat-icon fontIcon="note_add" aria-hidden="true" />{{ 'sondages.creation.vide' | transloco }}
         </mat-button-toggle>
         <mat-button-toggle value="source">
-          <mat-icon fontIcon="content_copy" aria-hidden="true" />À partir d’un formulaire
+          <mat-icon fontIcon="content_copy" aria-hidden="true" />{{ 'sondages.creation.aPartir' | transloco }}
         </mat-button-toggle>
       </mat-button-toggle-group>
 
       @if (mode() === 'source') {
         <section class="carte-section" aria-labelledby="titre-source">
-          <h2 id="titre-source">Formulaire à réutiliser</h2>
+          <h2 id="titre-source">{{ 'sondages.creation.aReutiliser' | transloco }}</h2>
           <p class="texte-aide">
-            Ses sections, questions et options sont copiées (avec les mêmes valeurs, pour comparer les statistiques).
-            Ni les dates, ni les assignations, ni les réponses ne sont reprises.
+            {{ 'sondages.creation.aideSource' | transloco }}
           </p>
           <app-choix-formulaire [(choisi)]="source" />
           @if (sourceManquante()) {
-            <p class="erreur-config" role="alert">Choisissez le formulaire à réutiliser.</p>
+            <p class="erreur-config" role="alert">{{ 'sondages.creation.choisissez' | transloco }}</p>
           }
         </section>
       }
 
       <section class="carte-section formulaire" aria-labelledby="titre-infos">
-        <h2 id="titre-infos">Informations</h2>
+        <h2 id="titre-infos">{{ 'sondages.fiche.informations' | transloco }}</h2>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Titre du sondage</mat-label>
+          <mat-label>{{ 'sondages.creation.titre' | transloco }}</mat-label>
           <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required />
           @if (formulaire.controls.titre.hasError('required')) {
-            <mat-error>Le titre est obligatoire.</mat-error>
+            <mat-error>{{ 'sondages.creation.titreObligatoire' | transloco }}</mat-error>
           }
         </mat-form-field>
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Description (facultative)</mat-label>
+          <mat-label>{{ 'sondages.creation.description' | transloco }}</mat-label>
           <textarea
             matInput
             formControlName="description"
@@ -61,33 +60,30 @@
             [maxlength]="regles.descriptionMax"
           ></textarea>
           @if (mode() === 'source') {
-            <mat-hint>Vide : celle du formulaire choisi est reprise.</mat-hint>
+            <mat-hint>{{ 'sondages.creation.descriptionAide' | transloco }}</mat-hint>
           }
         </mat-form-field>
         @if (mode() === 'vide') {
           <mat-checkbox formControlName="reponseUnique">
-            Une seule réponse par appareil
-            <span class="cellule-secondaire">
-              Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Modifiable jusqu’à la
-              publication.
-            </span>
+            {{ 'sondages.creation.reponseUnique' | transloco }}
+            <span class="cellule-secondaire">{{ 'sondages.creation.reponseUniqueAide' | transloco }}</span>
           </mat-checkbox>
         } @else {
-          <p class="texte-aide">Le réglage « une seule réponse par appareil » est repris du formulaire choisi.</p>
+          <p class="texte-aide">{{ 'sondages.creation.reponseUniqueReprise' | transloco }}</p>
         }
       </section>
 
-      <app-message-erreur [erreur]="erreur()" parDefaut="Le sondage n’a pas pu être créé." />
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.creation.erreur' | transloco" />
 
       <div class="actions">
         <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours()">
           @if (enCours()) {
-            <mat-spinner diameter="20" aria-label="Création en cours" />
+            <mat-spinner diameter="20" [attr.aria-label]="'sondages.creation.enCours' | transloco" />
           } @else {
-            Créer et modifier
+            {{ 'sondages.creation.creer' | transloco }}
           }
         </button>
-        <a matButton routerLink="/sondages">Annuler</a>
+        <a matButton routerLink="/sondages">{{ 'commun.annuler' | transloco }}</a>
       </div>
     </form>
   }

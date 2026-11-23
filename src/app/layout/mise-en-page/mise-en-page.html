@@ -1,4 +1,4 @@
-<a class="lien-evitement" href="#contenu">Aller au contenu</a>
+<a class="lien-evitement" href="#contenu">{{ 'public.commun.allerAuContenu' | transloco }}</a>
 
 <app-barre-haut [boutonMenu]="petitEcran()" (basculerMenu)="tiroirOuvert.set(!tiroirOuvert())" />
 
@@ -20,10 +20,7 @@
         <app-bandeau-abonnement />
       } @else if (auth.role() === 'GESTIONNAIRE' && auth.statutAbonnement() === 'EXPIRE') {
         <app-encadre type="avertissement" class="bandeau" role="status" icone="event_busy">
-          <p>
-            L’abonnement de votre entreprise est expiré : l’accès est en lecture seule. Votre
-            administrateur doit le renouveler.
-          </p>
+          <p>{{ 'layout.abonnementExpireGestionnaire' | transloco }}</p>
         </app-encadre>
       }
       <router-outlet />

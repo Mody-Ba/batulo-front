@@ -1,11 +1,12 @@
 <mat-card class="carte-auth" appearance="outlined">
   <mat-card-header>
     <div class="en-tete-auth">
-      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
-      <h1>Créer le compte de votre entreprise</h1>
-      <p class="sous-titre">
-        Vous serez l’administrateur de l’espace. Il sera activé après le paiement de l’abonnement.
-      </p>
+      <div class="haut-auth">
+        <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+        <app-selecteur-langue />
+      </div>
+      <h1>{{ 'auth.inscription.titre' | transloco }}</h1>
+      <p class="sous-titre">{{ 'auth.inscription.sousTitre' | transloco }}</p>
     </div>
   </mat-card-header>
 
@@ -15,28 +16,28 @@
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="inscrire()" novalidate>
       <div class="ligne-champs">
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Prénom</mat-label>
+          <mat-label>{{ 'commun.champs.prenom' | transloco }}</mat-label>
           <input matInput formControlName="prenom" autocomplete="given-name" required />
           @if (formulaire.controls.prenom.hasError('required')) {
-            <mat-error>Le prénom est obligatoire.</mat-error>
+            <mat-error>{{ 'commun.erreurs.prenomObligatoire' | transloco }}</mat-error>
           } @else if (formulaire.controls.prenom.hasError('maxlength')) {
-            <mat-error>100 caractères au plus.</mat-error>
+            <mat-error>{{ 'commun.erreurs.max100' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Nom</mat-label>
+          <mat-label>{{ 'commun.champs.nom' | transloco }}</mat-label>
           <input matInput formControlName="nom" autocomplete="family-name" required />
           @if (formulaire.controls.nom.hasError('required')) {
-            <mat-error>Le nom est obligatoire.</mat-error>
+            <mat-error>{{ 'commun.erreurs.nomObligatoire' | transloco }}</mat-error>
           } @else if (formulaire.controls.nom.hasError('maxlength')) {
-            <mat-error>100 caractères au plus.</mat-error>
+            <mat-error>{{ 'commun.erreurs.max100' | transloco }}</mat-error>
           }
         </mat-form-field>
       </div>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Courriel</mat-label>
+        <mat-label>{{ 'commun.champs.courriel' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
         <input
           matInput
@@ -47,26 +48,26 @@
           required
         />
         @if (formulaire.controls.courriel.hasError('required')) {
-          <mat-error>Le courriel est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.courriel.hasError('email')) {
-          <mat-error>Le courriel n’est pas valide.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielInvalide' | transloco }}</mat-error>
         } @else if (formulaire.controls.courriel.hasError('maxlength')) {
-          <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Nom de l’entreprise (facultatif)</mat-label>
+        <mat-label>{{ 'auth.inscription.nomEntreprise' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="business" aria-hidden="true" />
         <input matInput formControlName="nomEntreprise" autocomplete="organization" />
-        <mat-hint>Par défaut : « Entreprise de Prénom Nom ».</mat-hint>
+        <mat-hint>{{ 'auth.inscription.nomEntrepriseAide' | transloco }}</mat-hint>
         @if (formulaire.controls.nomEntreprise.hasError('maxlength')) {
-          <mat-error>150 caractères au plus.</mat-error>
+          <mat-error>{{ 'commun.erreurs.max150' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Mot de passe</mat-label>
+        <mat-label>{{ 'commun.champs.motDePasse' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
           matInput
@@ -80,23 +81,23 @@
           matSuffix
           type="button"
           (click)="motDePasseVisible.set(!motDePasseVisible())"
-          [attr.aria-label]="motDePasseVisible() ? 'Masquer les mots de passe' : 'Afficher les mots de passe'"
+          [attr.aria-label]="(motDePasseVisible() ? 'commun.masquerMotsDePasse' : 'commun.afficherMotsDePasse') | transloco"
           [attr.aria-pressed]="motDePasseVisible()"
         >
           <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
         </button>
-        <mat-hint>{{ aideMotDePasse }}</mat-hint>
+        <mat-hint>{{ aideMotDePasse | transloco }}</mat-hint>
         @if (formulaire.controls.motDePasse.hasError('required')) {
-          <mat-error>Le mot de passe est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.motDePasse.hasError('motDePasseFaible')) {
-          <mat-error>{{ aideMotDePasse }}</mat-error>
+          <mat-error>{{ aideMotDePasse | transloco }}</mat-error>
         } @else if (formulaire.controls.motDePasse.hasError('maxlength')) {
-          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Confirmation du mot de passe</mat-label>
+        <mat-label>{{ 'commun.champs.confirmationMotDePasse' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
           matInput
@@ -106,21 +107,21 @@
           required
         />
         @if (formulaire.controls.confirmationMotDePasse.hasError('required')) {
-          <mat-error>La confirmation est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.confirmationObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.confirmationMotDePasse.hasError('confirmationDifferente')) {
-          <mat-error>La confirmation ne correspond pas au mot de passe.</mat-error>
+          <mat-error>{{ 'commun.erreurs.confirmationDifferente' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Création du compte en cours" />
+          <mat-spinner diameter="20" [attr.aria-label]="'auth.inscription.enCours' | transloco" />
         } @else {
-          Créer le compte
+          {{ 'auth.inscription.creer' | transloco }}
         }
       </button>
     </form>
 
-    <p class="lien-bas">Déjà un compte ? <a routerLink="/connexion">Se connecter</a></p>
+    <p class="lien-bas">{{ 'auth.inscription.dejaCompte' | transloco }} <a routerLink="/connexion">{{ 'auth.connexion.seConnecter' | transloco }}</a></p>
   </mat-card-content>
 </mat-card>

@@ -1,29 +1,29 @@
 <article class="formulaire-sondage">
   <header class="entete">
-    <h2 class="titre">{{ contenu().titre }}</h2>
+    <h2 class="titre" dir="auto">{{ contenu().titre }}</h2>
     @if (contenu().description) {
-      <p class="description">{{ contenu().description }}</p>
+      <p class="description" dir="auto">{{ contenu().description }}</p>
     }
     <ng-content select="[entete]" />
-    <p class="legende"><span class="obligatoire" aria-hidden="true">*</span> Réponse obligatoire</p>
+    <p class="legende"><span class="obligatoire" aria-hidden="true">*</span> {{ 'public.formulaire.obligatoire' | transloco }}</p>
   </header>
 
   <ng-content />
 
   @if (sections().length === 0) {
-    <p class="encart info" role="status">Ce formulaire n’a encore aucune question.</p>
+    <p class="encart info" role="status">{{ 'public.formulaire.aucuneQuestion' | transloco }}</p>
   } @else if (section(); as s) {
     @if (sections().length > 1) {
       <div class="progression">
-        <label [for]="'progression-' + s.id">Section {{ indexSection() + 1 }} sur {{ sections().length }}</label>
+        <label [for]="'progression-' + s.id">{{ 'public.formulaire.sectionSur' | transloco: { numero: indexSection() + 1, total: sections().length } }}</label>
         <progress [id]="'progression-' + s.id" [max]="sections().length" [value]="indexSection() + 1"></progress>
       </div>
     }
 
     <section class="section" [attr.aria-labelledby]="'titre-section-' + s.id">
-      <h3 class="titre-section" tabindex="-1" [id]="'titre-section-' + s.id">{{ s.titre }}</h3>
+      <h3 class="titre-section" tabindex="-1" [id]="'titre-section-' + s.id" dir="auto">{{ s.titre }}</h3>
       @if (s.description) {
-        <p class="description">{{ s.description }}</p>
+        <p class="description" dir="auto">{{ s.description }}</p>
       }
       <div class="questions">
         @for (q of s.questions; track q.id; let i = $index) {
@@ -47,35 +47,35 @@
       </div>
     }
     @if (aCorriger()) {
-      <p class="a-corriger" role="alert">Certaines réponses sont à corriger avant de continuer.</p>
+      <p class="a-corriger" role="alert">{{ 'public.formulaire.aCorriger' | transloco }}</p>
     }
     @if (verifie()) {
-      <p class="encart succes" role="status">Vos réponses sont valides. Rien n’a été envoyé : c’est un aperçu.</p>
+      <p class="encart succes" role="status">{{ 'public.formulaire.apercuValide' | transloco }}</p>
     }
 
     <div class="navigation">
       @if (indexSection() > 0) {
         <button type="button" class="bouton secondaire" (click)="precedent()" [disabled]="envoiEnCours()">
-          <span aria-hidden="true">←</span> Précédent
+          <span class="fleche" aria-hidden="true">←</span> {{ 'public.formulaire.precedent' | transloco }}
         </button>
       }
       <span class="espace"></span>
       @if (derniere()) {
         <button type="button" class="bouton principal" (click)="terminer()" [disabled]="envoiEnCours()" [attr.aria-busy]="envoiEnCours() || null">
           @if (envoiEnCours()) {
-            Envoi en cours…
+            {{ 'public.formulaire.envoiEnCours' | transloco }}
           } @else {
-            {{ mode() === 'apercu' ? 'Vérifier (aperçu, rien n’est envoyé)' : 'Envoyer mes réponses' }}
+            {{ (mode() === 'apercu' ? 'public.formulaire.verifier' : 'public.formulaire.envoyer') | transloco }}
           }
         </button>
       } @else {
-        <button type="button" class="bouton principal" (click)="suivant()">Suivant <span aria-hidden="true">→</span></button>
+        <button type="button" class="bouton principal" (click)="suivant()">{{ 'public.formulaire.suivant' | transloco }} <span class="fleche" aria-hidden="true">→</span></button>
       }
     </div>
     @if (mode() === 'apercu') {
       <p class="note-apercu">
-        Aperçu : vous pouvez répondre pour essayer le formulaire ; rien n’est enregistré.
-        <button type="button" class="bouton lien" (click)="recommencer(); recommence.emit()">Recommencer</button>
+        {{ 'public.formulaire.noteApercu' | transloco }}
+        <button type="button" class="bouton lien" (click)="recommencer(); recommence.emit()">{{ 'public.formulaire.recommencer' | transloco }}</button>
       </p>
     }
   }

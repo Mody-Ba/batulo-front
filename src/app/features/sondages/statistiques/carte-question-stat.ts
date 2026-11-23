@@ -8,6 +8,9 @@ import { Barre, BarresHorizontales, barresEffectifs } from './graphiques/barres-
 import { ColonneGraphique, Colonnes } from './graphiques/colonnes';
 import { decimal, nombre, periode, pourcentage } from './graphiques/format';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 const TAILLE_TEXTES = 10;
 
@@ -18,7 +21,7 @@ const TAILLE_TEXTES = 10;
  */
 @Component({
   selector: 'app-carte-question-stat',
-  imports: [DateLPipe,  NgTemplateOutlet, BarresHorizontales, Colonnes],
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe,  NgTemplateOutlet, BarresHorizontales, Colonnes],
   templateUrl: './carte-question-stat.html',
   styleUrl: './carte-question-stat.scss',
 })
@@ -51,7 +54,7 @@ export class CarteQuestionStat {
       .map((r) => ({
         libelle: r.libelle,
         valeur: r.rangMoyen == null || n < 2 ? 0 : (n - r.rangMoyen + 1) / n,
-        texte: `rang moyen ${decimal(r.rangMoyen)} · 1er : ${nombre(r.nombrePremier)}`,
+        texte: traduire('statistiques.carte.rangMoyen', { rang: decimal(r.rangMoyen), premiers: nombre(r.nombrePremier) }),
       }));
   });
 
@@ -62,7 +65,7 @@ export class CarteQuestionStat {
       const etiquette = exacte ? decimal(c.valeur) : `${decimal(c.de)}–${decimal(c.a)}`;
       return {
         etiquette,
-        libelle: exacte ? etiquette : `de ${decimal(c.de)} à moins de ${decimal(c.a)}`,
+        libelle: exacte ? etiquette : traduire('statistiques.carte.intervalle', { de: decimal(c.de), a: decimal(c.a) }),
         nombre: c.nombre,
         texte: `${nombre(c.nombre)} · ${pourcentage(c.pourcentage)}`,
       };

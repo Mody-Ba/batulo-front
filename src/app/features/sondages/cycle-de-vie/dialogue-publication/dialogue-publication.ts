@@ -15,6 +15,8 @@ import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { raisonIncomplet, versIso, versLocal } from '../dates-sondage';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { libelles } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesPublication {
   sondage: SondageResponse;
@@ -30,11 +32,7 @@ export interface DonneesPublication {
 /** Étape qui a échoué, pour un message précis. */
 type Etape = 'reglage' | 'publication' | 'dates';
 
-const TITRES_ERREUR: Record<Etape, string> = {
-  reglage: 'Le réglage « une réponse par appareil » n’a pas été enregistré : rien n’a été publié',
-  publication: 'Le sondage n’a pas été publié',
-  dates: 'Les dates n’ont pas été enregistrées',
-};
+const TITRES_ERREUR = libelles<Etape>('sondages.publication.titresErreur', ['reglage', 'publication', 'dates']);
 
 type Ouverture = 'maintenant' | 'planifiee';
 
@@ -78,7 +76,7 @@ function datesValides(groupe: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-dialogue-publication',
-  imports: [DateLPipe, 
+  imports: [TranslocoPipe, DateLPipe, 
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,

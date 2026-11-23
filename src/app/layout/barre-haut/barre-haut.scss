@@ -38,14 +38,14 @@
 }
 
 .nom {
-  margin-left: var(--bt-espace-2);
+  margin-inline-start: var(--bt-espace-2);
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-// Téléphone : seulement l'avatar.
+// Téléphone : seulement l'avatar ; le choix de la langue reste accessible.
 @media (max-width: 599.98px) {
   .nom {
     display: none;

@@ -5,6 +5,7 @@ import { AbonnementService } from '../../core/services/abonnement.service';
 import { COURRIEL_CONTACT, FAQ, FONCTIONNALITES, SECTIONS_VITRINE } from './contenu-vitrine';
 import { prixEnClair } from './tarifs-vitrine/tarifs-vitrine';
 import { Vitrine } from './vitrine';
+import { traduire } from '../../core/i18n/traduire';
 
 const FORMULES = [
   { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois', prixMobile: 40, deviseMobile: 'MRU' },
@@ -37,7 +38,7 @@ describe('Vitrine publique', () => {
     expect(el.querySelector('h1')!.textContent).toContain('Créez vos sondages');
     for (const s of SECTIONS_VITRINE) {
       expect(el.querySelector(`#${s.id}`)).not.toBeNull();
-      expect(el.querySelector(`nav a[href="#${s.id}"]`)!.textContent).toContain(s.libelle);
+      expect(el.querySelector(`nav a[href="#${s.id}"]`)!.textContent).toContain(traduire(s.libelle));
     }
     expect(el.querySelectorAll('.grille-fonctionnalites li').length).toBe(FONCTIONNALITES.length);
     expect(el.querySelectorAll('.etapes li').length).toBe(4);

@@ -22,6 +22,8 @@ import { ouvrirDialogueCondition, ResumeCondition } from '../condition/resume-co
 import { EditeurSondageStore, ElementQuestion } from '../editeur-sondage.store';
 import { EnregistrementAuto } from '../enregistrement-auto';
 import { EtatEnregistrementIndicateur } from '../etat-enregistrement/etat-enregistrement';
+import { traduire, traduirePluriel } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Identifiant de la liste des questions d'une section (glisser-déposer entre sections). */
 export function idListeQuestions(sectionId: number): string {
@@ -34,8 +36,7 @@ export function idListeQuestions(sectionId: number): string {
  */
 @Component({
   selector: 'app-carte-section',
-  imports: [
-    CdkDrag,
+  imports: [TranslocoPipe, CdkDrag,
     CdkDragHandle,
     CdkDropList,
     TextFieldModule,
@@ -91,7 +92,7 @@ export class CarteSection implements OnInit {
     drag.dropContainer === liste ||
     (this.store.peutChangerDeSection(drag.data) && !this.store.sectionPleine(this.section().id));
   protected readonly parCle = (_index: number, element: ElementQuestion) => element.cle;
-  protected readonly nomCible = computed(() => `la section ${this.position() + 1}`);
+  protected readonly nomCible = computed(() => traduire('editeur.section.nomCible', { numero: this.position() + 1 }));
   /** Bouton « Ajouter une condition » : brouillon, sans condition, et au moins une question dans les sections précédentes. */
   protected readonly peutAjouterCondition = computed(() => {
     const sondage = this.store.sondage();
@@ -185,7 +186,7 @@ export class CarteSection implements OnInit {
       enregistrer: (condition) => this.store.definirConditionSection(section.id, condition),
     }).subscribe((resultat) => {
       if (resultat) {
-        this.snackBar.open('Condition d’affichage enregistrée.', 'Fermer', { duration: 4000 });
+        this.snackBar.open(traduire('editeur.condition.enregistree'), traduire('commun.fermer'), { duration: 4000 });
       }
     });
   }
@@ -193,7 +194,7 @@ export class CarteSection implements OnInit {
   protected retirerCondition(): void {
     this.erreurAction.set(null);
     this.store.definirConditionSection(this.section().id, null).subscribe({
-      next: () => this.snackBar.open('Condition d’affichage retirée : la section est toujours affichée.', 'Fermer', { duration: 4000 }),
+      next: () => this.snackBar.open(traduire('editeur.condition.retireeSection'), traduire('commun.fermer'), { duration: 4000 }),
       error: (erreur: unknown) => this.erreurAction.set(erreur),
     });
   }
@@ -202,18 +203,18 @@ export class CarteSection implements OnInit {
     const section = this.section();
     const nombre = this.elements().length;
     confirmer(this.dialog, {
-      titre: 'Supprimer cette section ?',
+      titre: traduire('editeur.section.supprimerTitre'),
       message:
         nombre === 0
-          ? `La section « ${section.titre} » sera supprimée.`
-          : `La section « ${section.titre} » sera supprimée avec ${nombre === 1 ? 'sa question' : `ses ${nombre} questions`}.`,
-      action: 'Supprimer la section',
+          ? traduire('editeur.section.supprimerVide', { titre: section.titre })
+          : traduirePluriel('editeur.section.supprimerAvec', nombre, { titre: section.titre }),
+      action: traduire('editeur.section.supprimer'),
       destructive: true,
     })
       .pipe(filter(Boolean))
       .subscribe(() =>
         this.store.supprimerSection(section.id).subscribe({
-          next: () => this.snackBar.open('Section supprimée.', 'Fermer', { duration: 4000 }),
+          next: () => this.snackBar.open(traduire('editeur.section.supprimee'), traduire('commun.fermer'), { duration: 4000 }),
           error: (erreur: unknown) => this.signalerRefus(erreur),
         }),
       );
@@ -236,7 +237,7 @@ export class CarteSection implements OnInit {
     if (aLeCode(erreur, 'CONDITION_DEPENDANTE')) {
       this.erreurAction.set(erreur);
     } else {
-      this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+      this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
     }
   }
 

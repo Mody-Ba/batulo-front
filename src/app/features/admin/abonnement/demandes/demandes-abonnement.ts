@@ -22,6 +22,9 @@ import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Demandes lues (les plus récentes d'abord) ; un admin en a peu. */
 const TAILLE = 20;
@@ -34,7 +37,7 @@ const TAILLE = 20;
  */
 @Component({
   selector: 'app-demandes-abonnement',
-  imports: [DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe, 
     LowerCasePipe,
     ReactiveFormsModule,
     RouterLink,
@@ -132,7 +135,7 @@ export class DemandesAbonnement {
         this.formulaire.reset();
         this.demandes.update((liste) => [demande, ...(liste ?? [])]);
         this.total.update((n) => n + 1);
-        this.snackBar.open('Demande envoyée à Batulo. Vous serez notifié de sa réponse.', 'Fermer', { duration: 5000 });
+        this.snackBar.open(traduire('demandes.envoyee'), traduire('commun.fermer'), { duration: 5000 });
       },
       error: (erreur: unknown) => {
         this.envoiEnCours.set(false);

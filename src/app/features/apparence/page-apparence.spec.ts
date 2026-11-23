@@ -9,8 +9,8 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/services/auth.service';
 import { PersonnalisationService } from '../../core/services/personnalisation.service';
 import { fichierDeTest, OCTETS_PNG, personnalisationDeTest } from '../../testing/donnees-test';
-import { MESSAGE_GESTIONNAIRE, PageApparence } from './page-apparence';
-import { MESSAGE_LOGO_FORMAT } from './validation-logo';
+import { messageGestionnaire, PageApparence } from './page-apparence';
+import { messageLogoFormat } from './validation-logo';
 import { ZoneLogo } from './zone-logo';
 
 /** Comme le renvoie le backend avec APP_BASE_URL=http://localhost:4200 (le front, pas l'API). */
@@ -197,7 +197,7 @@ describe('PageApparence (/apparence)', () => {
   it('gestionnaire : lecture seule, valeurs et aperçu sans aucun bouton ni champ de modification', async () => {
     role.set('GESTIONNAIRE');
     await creer();
-    expect(texte()).toContain(MESSAGE_GESTIONNAIRE);
+    expect(texte()).toContain(messageGestionnaire());
     expect(element.querySelectorAll('button').length).toBe(0);
     expect(element.querySelector('input[type="color"], .champ-couleur, .zone-depot')).toBeNull();
     expect(texte()).toContain('#1E6B52');
@@ -219,7 +219,7 @@ describe('PageApparence (/apparence)', () => {
       const zone = fixture.debugElement.query((d) => d.componentInstance instanceof ZoneLogo).componentInstance as ZoneLogo;
       await zone.prendre(fichierDeTest([0x47, 0x49, 0x46, 0x38], 'anim.png'));
       fixture.detectChanges();
-      expect(element.querySelector('.erreur-logo')!.textContent).toContain(MESSAGE_LOGO_FORMAT);
+      expect(element.querySelector('.erreur-logo')!.textContent).toContain(messageLogoFormat());
       expect(element.querySelector('.erreur-logo')!.getAttribute('role')).toBe('alert');
       expect(service.remplacerLogo).not.toHaveBeenCalled();
     });

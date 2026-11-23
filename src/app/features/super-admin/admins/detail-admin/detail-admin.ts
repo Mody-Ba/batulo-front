@@ -19,11 +19,13 @@ import { couleurValide } from '../../../../core/utils/couleur';
 import { urlLogoSure } from '../../../../shared/formulaire/apparence/apparence';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Détail d'un admin : entreprise, compte de l'admin, abonnement (jours restants) et actions. */
 @Component({
   selector: 'app-detail-admin',
-  imports: [MontantLPipe, DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, MontantLPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

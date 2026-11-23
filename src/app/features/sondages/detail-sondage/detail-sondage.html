@@ -1,52 +1,52 @@
 <section class="conteneur-page">
   <a matButton routerLink="/sondages" class="retour">
-    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.sondages' | transloco }}
   </a>
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement du sondage" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.fiche.chargement' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="Ce sondage n’a pas pu être chargé." />
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.fiche.erreur' | transloco" />
 
   @if (sondage(); as s) {
-    <app-entete-page [titre]="s.titre" [sousTitre]="s.description" icone="ballot">
+    <app-entete-page [titre]="s.titre" [sousTitre]="s.description" icone="ballot" dir="auto">
       <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
       @if (s.estModele) {
-        <span class="pastille-statut etiquette-modele">Modèle</span>
+        <span class="pastille-statut etiquette-modele">{{ 'sondages.liste.modele' | transloco }}</span>
       }
     </app-entete-page>
     <app-onglets-sondage [id]="s.id" />
 
     @if (droits(); as d) {
-      <div class="barre-actions" role="toolbar" aria-label="Actions du sondage">
+      <div class="barre-actions" role="toolbar" [attr.aria-label]="'sondages.fiche.actions' | transloco">
         @if (contenuModifiable()) {
           <a matButton="tonal" [routerLink]="['/sondages', s.id, 'modifier']">
-            <mat-icon fontIcon="edit" aria-hidden="true" />Modifier
+            <mat-icon fontIcon="edit" aria-hidden="true" />{{ 'commun.modifier' | transloco }}
           </a>
         } @else {
           <a matButton="outlined" [routerLink]="['/sondages', s.id, 'modifier']">
-            <mat-icon fontIcon="visibility" aria-hidden="true" />Voir le contenu
+            <mat-icon fontIcon="visibility" aria-hidden="true" />{{ 'sondages.fiche.voirContenu' | transloco }}
           </a>
         }
         <a matButton="outlined" [routerLink]="['/sondages', s.id, 'apercu']">
-          <mat-icon fontIcon="preview" aria-hidden="true" />Prévisualiser
+          <mat-icon fontIcon="preview" aria-hidden="true" />{{ 'sondages.fiche.previsualiser' | transloco }}
         </a>
         @if (!s.publie && d.gerer) {
-          <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+          <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule() : ''">
             <button matButton="filled" type="button" (click)="publier(s)" [disabled]="auth.lectureSeule()">
-              <mat-icon fontIcon="publish" aria-hidden="true" />Publier
+              <mat-icon fontIcon="publish" aria-hidden="true" />{{ 'sondages.fiche.publier' | transloco }}
             </button>
           </span>
         }
         @if (d.diffuser) {
           <a matButton="filled" [routerLink]="['/sondages', s.id, 'diffuser']">
-            <mat-icon fontIcon="share" aria-hidden="true" />Diffuser
+            <mat-icon fontIcon="share" aria-hidden="true" />{{ 'sondages.fiche.diffuser' | transloco }}
           </a>
         }
         @if (d.gerer || d.dupliquer) {
-          <button matIconButton type="button" [matMenuTriggerFor]="menuActions" aria-label="Autres actions">
+          <button matIconButton type="button" [matMenuTriggerFor]="menuActions" [attr.aria-label]="'sondages.fiche.autresActions' | transloco">
             <mat-icon fontIcon="more_vert" aria-hidden="true" />
           </button>
         }
@@ -55,34 +55,34 @@
       <mat-menu #menuActions="matMenu" xPosition="before">
         @if (d.gerer && ouvertOuPlanifie()) {
           <button mat-menu-item type="button" (click)="modifierDates(s)" [disabled]="auth.lectureSeule()">
-            <mat-icon fontIcon="event" aria-hidden="true" /><span>Modifier les dates</span>
+            <mat-icon fontIcon="event" aria-hidden="true" /><span>{{ 'sondages.fiche.modifierDates' | transloco }}</span>
           </button>
         }
         @if (d.gerer && s.publie && situation().derniereVersionPubliee) {
           @if (situation().brouillon; as b) {
             <a mat-menu-item [routerLink]="['/sondages', b.id, 'modifier']">
-              <mat-icon fontIcon="edit_note" aria-hidden="true" /><span>Ouvrir la version {{ b.version }} en préparation</span>
+              <mat-icon fontIcon="edit_note" aria-hidden="true" /><span>{{ 'sondages.fiche.ouvrirVersion' | transloco: { version: b.version } }}</span>
             </a>
           } @else {
             <button mat-menu-item type="button" (click)="nouvelleVersion(s)" [disabled]="auth.lectureSeule()">
-              <mat-icon fontIcon="difference" aria-hidden="true" /><span>Créer une nouvelle version</span>
+              <mat-icon fontIcon="difference" aria-hidden="true" /><span>{{ 'sondages.fiche.nouvelleVersion' | transloco }}</span>
             </button>
           }
         }
         @if (d.dupliquer) {
           <button mat-menu-item type="button" (click)="dupliquer(s)" [disabled]="auth.lectureSeule()">
-            <mat-icon fontIcon="content_copy" aria-hidden="true" /><span>Dupliquer</span>
+            <mat-icon fontIcon="content_copy" aria-hidden="true" /><span>{{ 'sondages.fiche.dupliquer' | transloco }}</span>
           </button>
         }
         @if (d.gerer) {
           <button mat-menu-item type="button" (click)="basculerModele(s)" [disabled]="auth.lectureSeule()">
             <mat-icon [fontIcon]="s.estModele ? 'bookmark_remove' : 'bookmark_add'" aria-hidden="true" />
-            <span>{{ s.estModele ? 'Retirer des modèles' : 'Marquer comme modèle' }}</span>
+            <span>{{ (s.estModele ? 'sondages.fiche.retirerModele' : 'sondages.fiche.marquerModele') | transloco }}</span>
           </button>
         }
         @if (d.gerer && ouvertOuPlanifie()) {
           <button mat-menu-item type="button" class="action-danger" (click)="fermer(s)" [disabled]="auth.lectureSeule()">
-            <mat-icon fontIcon="lock" aria-hidden="true" /><span>Fermer le sondage</span>
+            <mat-icon fontIcon="lock" aria-hidden="true" /><span>{{ 'sondages.fiche.fermer' | transloco }}</span>
           </button>
         }
       </mat-menu>
@@ -90,86 +90,86 @@
 
     <div class="grille">
       <article class="carte-section">
-        <h2>Informations</h2>
+        <h2>{{ 'sondages.fiche.informations' | transloco }}</h2>
         <dl class="liste-details">
-          <dt>Version</dt>
-          <dd>{{ s.version }}@if (s.estModele) { · Modèle }</dd>
+          <dt>{{ 'sondages.liste.colVersion' | transloco }}</dt>
+          <dd>{{ s.version }}@if (s.estModele) { · {{ 'sondages.liste.modele' | transloco }} }</dd>
 
-          <dt>Créé par</dt>
-          <dd>{{ s.creePar ? nomComplet(s.creePar) : '—' }}, le {{ s.dateCreation | dateL: 'longDate' }}</dd>
+          <dt>{{ 'sondages.liste.creePar' | transloco }}</dt>
+          <dd>{{ 'sondages.fiche.creeParLe' | transloco: { nom: s.creePar ? nomComplet(s.creePar) : '—', date: (s.dateCreation | dateL: 'longDate') } }}</dd>
 
           @if (s.datePublication) {
-            <dt>Ouverture</dt>
+            <dt>{{ 'sondages.fiche.ouverture' | transloco }}</dt>
             <dd>{{ s.datePublication | dateL: 'longHeure' }}</dd>
           }
-          <dt>Fermeture</dt>
+          <dt>{{ 'sondages.fiche.fermeture' | transloco }}</dt>
           <dd>
             @if (s.dateFermeture) {
               {{ s.dateFermeture | dateL: 'longHeure' }}
             } @else {
-              Non prévue
+              {{ 'sondages.fiche.nonPrevue' | transloco }}
             }
           </dd>
 
-          <dt>Réponses</dt>
-          <dd>{{ s.reponseUnique ? 'Une seule par appareil' : 'Plusieurs par appareil (collecte terrain)' }}</dd>
+          <dt>{{ 'admin.tdb.reponses' | transloco }}</dt>
+          <dd>{{ (s.reponseUnique ? 'sondages.fiche.uneParAppareil' : 'sondages.fiche.plusieursParAppareil') | transloco }}</dd>
         </dl>
       </article>
 
       <article class="carte-section">
-        <h2>Collecte</h2>
+        <h2>{{ 'sondages.fiche.collecte' | transloco }}</h2>
         @if (collecte(); as c) {
           <p class="nombre">{{ c.nombreReponsesTotal | nombreL }}</p>
           <p class="cellule-secondaire">
-            réponse{{ c.nombreReponsesTotal > 1 ? 's' : '' }} au total
+            {{ 'sondages.fiche.reponsesTotal' | pluriel: c.nombreReponsesTotal }}
             @if (versions().length > 1) {
-              , dont {{ c.nombreReponses | nombreL }} pour la version {{ c.version }}
+              {{ 'sondages.fiche.dontVersion' | transloco: { n: (c.nombreReponses | nombreL), version: c.version } }}
             }
           </p>
           <p class="collecte">
             @if (c.collecteOuverte) {
-              <span class="pastille-statut sondage-EN_COURS">Collecte ouverte</span>
+              <span class="pastille-statut sondage-EN_COURS">{{ 'sondages.fiche.collecteOuverte' | transloco }}</span>
             } @else {
-              <span class="pastille-statut sondage-TERMINE">Collecte fermée</span>
+              <span class="pastille-statut sondage-TERMINE">{{ 'sondages.fiche.collecteFermee' | transloco }}</span>
             }
           </p>
           @if (c.raisonFermeture) {
             <p class="texte-aide">{{ c.raisonFermeture }}</p>
           }
           @if (c.derniereReponse) {
-            <p class="cellule-secondaire">Dernière réponse le {{ c.derniereReponse | dateL: 'longHeure' }}</p>
+            <p class="cellule-secondaire">{{ 'sondages.fiche.derniereReponse' | transloco: { date: (c.derniereReponse | dateL: 'longHeure') } }}</p>
           }
         } @else {
-          <p class="texte-aide">Le suivi de la collecte n’est pas disponible pour le moment.</p>
+          <p class="texte-aide">{{ 'sondages.fiche.suiviIndisponible' | transloco }}</p>
         }
       </article>
 
       @if (estAdmin()) {
         <article class="carte-section large">
           <div class="entete-section">
-            <h2>Gestionnaires assignés</h2>
-            <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule : ''">
+            <h2>{{ 'sondages.fiche.gestionnairesAssignes' | transloco }}</h2>
+            <span [matTooltip]="auth.lectureSeule() ? messageLectureSeule() : ''">
               <button matButton="tonal" type="button" (click)="assigner(s)" [disabled]="auth.lectureSeule()">
-                <mat-icon fontIcon="assignment_ind" aria-hidden="true" />Assigner des gestionnaires
+                <mat-icon fontIcon="assignment_ind" aria-hidden="true" />{{ 'sondages.fiche.assigner' | transloco }}
               </button>
             </span>
           </div>
-          <p class="texte-aide">L’assignation porte sur le sondage et toutes ses versions.</p>
+          <p class="texte-aide">{{ 'sondages.fiche.assignationLignee' | transloco }}</p>
 
           <div class="zone-progression">
             @if (chargementAssignations()) {
-              <mat-progress-bar mode="indeterminate" aria-label="Chargement des gestionnaires assignés" />
+              <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.fiche.chargementAssignes' | transloco" />
             }
           </div>
           <app-message-erreur
             [erreur]="erreurAssignations()"
-            parDefaut="Les gestionnaires assignés n’ont pas pu être chargés."
+            [parDefaut]="'sondages.fiche.erreurAssignes' | transloco"
           >
-            <p><button matButton type="button" (click)="chargerAssignations()">Réessayer</button></p>
+            <p><button matButton type="button" (click)="chargerAssignations()">{{ 'commun.reessayer' | transloco }}</button></p>
           </app-message-erreur>
 
           @if (!chargementAssignations() && !erreurAssignations() && assignations().length === 0) {
-            <p class="etat-vide">Aucun gestionnaire assigné.</p>
+            <p class="etat-vide">{{ 'sondages.fiche.aucunAssigne' | transloco }}</p>
           } @else if (assignations().length) {
             <ul class="assignations">
               @for (a of assignations(); track a.gestionnaireId) {
@@ -177,12 +177,12 @@
                   <div class="assignation-texte">
                     <a [routerLink]="['/admin/gestionnaires', a.gestionnaireId]">{{ nomComplet(a) }}</a>
                     @if (!a.actif) {
-                      <span class="pastille-statut compte-desactive">Désactivé</span>
+                      <span class="pastille-statut compte-desactive">{{ 'statutsAbonnement.DESACTIVE' | transloco }}</span>
                     }
                     <span class="cellule-secondaire">
-                      {{ a.courriel }} · assigné le {{ a.dateAssignation | dateL: 'court' }}
+                      {{ a.courriel }} · {{ 'sondages.fiche.assigneLe' | transloco: { date: (a.dateAssignation | dateL: 'court') } }}
                       @if (a.assignePar; as par) {
-                        par {{ par.prenom }} {{ par.nom }}
+                        {{ 'superAdmin.demande.par' | transloco: { nom: par.prenom + ' ' + par.nom } }}
                       }
                     </span>
                   </div>
@@ -191,8 +191,8 @@
                     type="button"
                     (click)="retirer(s, a)"
                     [disabled]="auth.lectureSeule()"
-                    [matTooltip]="auth.lectureSeule() ? messageLectureSeule : 'Retirer l’assignation'"
-                    [attr.aria-label]="'Retirer l’assignation de ' + nomComplet(a)"
+                    [matTooltip]="auth.lectureSeule() ? messageLectureSeule() : ('gestionnaires.detail.retirer' | transloco)"
+                    [attr.aria-label]="'sondages.fiche.retirerDe' | transloco: { nom: nomComplet(a) }"
                   >
                     <mat-icon fontIcon="link_off" aria-hidden="true" />
                   </button>
@@ -205,33 +205,33 @@
 
       @if (versions().length > 1) {
         <article class="carte-section large">
-          <h2>Versions</h2>
+          <h2>{{ 'sondages.fiche.versions' | transloco }}</h2>
           <ol class="versions">
             @for (v of versions(); track v.id) {
               <li [class.courante]="v.id === s.id">
                 @if (v.id === s.id) {
-                  <strong>Version {{ v.version }}</strong> (affichée)
+                  <strong>{{ 'statistiques.filtres.version' | transloco: { version: v.version } }}</strong> {{ 'sondages.fiche.affichee' | transloco }}
                 } @else {
-                  <a [routerLink]="['/sondages', v.id]">Version {{ v.version }}</a>
+                  <a [routerLink]="['/sondages', v.id]">{{ 'statistiques.filtres.version' | transloco: { version: v.version } }}</a>
                 }
                 <span class="pastille-statut" [class]="classeEtat(v)">{{ libelleEtat(v) }}</span>
                 @if (v.publie) {
                   <span class="nombre-reponses">
-                    {{ v.nombreReponses | nombreL }} réponse{{ v.nombreReponses > 1 ? 's' : '' }}
+                    {{ 'sondages.liste.reponses' | pluriel: v.nombreReponses }}
                   </span>
                 }
                 <span class="cellule-secondaire">
                   @if (v.datePublication) {
-                    {{ v.statut === 'NON_COMMENCE' ? 'Ouvrira le' : 'Ouverte le' }} {{ v.datePublication | dateL: 'court' }}
+                    {{ (v.statut === 'NON_COMMENCE' ? 'sondages.fiche.ouvriraLe' : 'sondages.fiche.ouverteLe') | transloco: { date: (v.datePublication | dateL: 'court') } }}
                     @if (v.dateFermeture) {
-                      · {{ v.statut === 'TERMINE' ? 'fermée le' : 'fermeture le' }} {{ v.dateFermeture | dateL: 'court' }}
+                      · {{ (v.statut === 'TERMINE' ? 'sondages.fiche.fermeeLe' : 'sondages.fiche.fermetureLe') | transloco: { date: (v.dateFermeture | dateL: 'court') } }}
                     }
                   } @else {
-                    Créée le {{ v.dateCreation | dateL: 'court' }}
+                    {{ 'sondages.fiche.creeeLe' | transloco: { date: (v.dateCreation | dateL: 'court') } }}
                   }
                 </span>
                 @if (!v.publie) {
-                  <a matButton [routerLink]="['/sondages', v.id, 'modifier']">Ouvrir le brouillon</a>
+                  <a matButton [routerLink]="['/sondages', v.id, 'modifier']">{{ 'sondages.fiche.ouvrirBrouillon' | transloco }}</a>
                 }
               </li>
             }

@@ -1,14 +1,15 @@
 import { LOGO_TAILLE_MAX } from '../../core/models/personnalisation.model';
+import { formaterNombre, traduire } from '../../core/i18n/traduire';
 
-export const MESSAGE_LOGO_FORMAT = 'Le logo doit être une image PNG ou JPEG.';
-export const MESSAGE_LOGO_VIDE = 'Ce fichier est vide.';
+export const messageLogoFormat = (): string => traduire('apparence.logo.format');
+export const messageLogoVide = (): string => traduire('apparence.logo.vide');
 
-/** « 1 Mo », « 350 Ko ». */
+/** « 1 Mo », « 350 Ko » (« 1 MB », « 350 KB » en anglais). */
 export function tailleEnClair(octets: number): string {
   if (octets >= 1024 * 1024) {
-    return `${(octets / (1024 * 1024)).toLocaleString('fr-CA', { maximumFractionDigits: 1 })} Mo`;
+    return traduire('apparence.logo.mo', { n: formaterNombre(octets / (1024 * 1024), { maximumFractionDigits: 1 }) });
   }
-  return `${Math.max(1, Math.round(octets / 1024)).toLocaleString('fr-CA')} Ko`;
+  return traduire('apparence.logo.ko', { n: formaterNombre(Math.max(1, Math.round(octets / 1024))) });
 }
 
 /** PNG ou JPEG reconnu à ses premiers octets, comme le backend (l'extension et le type annoncé ne suffisent pas). */
@@ -29,11 +30,11 @@ export function typeLogo(octets: Uint8Array): 'image/png' | 'image/jpeg' | null 
  */
 export async function verifierLogo(fichier: File): Promise<string | null> {
   if (fichier.size === 0) {
-    return MESSAGE_LOGO_VIDE;
+    return messageLogoVide();
   }
   if (fichier.size > LOGO_TAILLE_MAX) {
-    return `Le logo ne doit pas dépasser 1 Mo (ce fichier fait ${tailleEnClair(fichier.size)}).`;
+    return traduire('apparence.logo.tropGros', { max: tailleEnClair(LOGO_TAILLE_MAX), taille: tailleEnClair(fichier.size) });
   }
   const entete = new Uint8Array(await fichier.slice(0, 8).arrayBuffer());
-  return typeLogo(entete) ? null : MESSAGE_LOGO_FORMAT;
+  return typeLogo(entete) ? null : messageLogoFormat();
 }

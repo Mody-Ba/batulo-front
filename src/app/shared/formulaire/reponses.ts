@@ -8,6 +8,7 @@ import {
   QuestionAffichee,
   SectionAffichee,
 } from '../../core/models/sondage.model';
+import { formaterNombre, localeIntl, traduire, traduirePluriel } from '../../core/i18n/traduire';
 
 /**
  * Réponses d'un répondant (aperçu F5b, formulaire public F6), mêmes règles que ValidateurReponse du backend.
@@ -163,43 +164,45 @@ export function messageReponse(controle: AbstractControl): string | null {
     return null;
   }
   if (e['requise']) {
-    return 'Cette question est obligatoire.';
+    return traduire('public.reponses.obligatoire');
   }
   if (e['longueurMax']) {
-    return `${e['longueurMax'].max} caractères au plus.`;
+    return traduirePluriel('public.reponses.longueurMax', e['longueurMax'].max);
   }
   if (e['nombre']) {
-    return 'La réponse doit être un nombre.';
+    return traduire('public.reponses.nombre');
   }
   if (e['decimales']) {
     const max = e['decimales'].max;
-    return max === 0 ? 'La réponse doit être un nombre entier.' : `${max} décimale${max > 1 ? 's' : ''} au plus.`;
+    return max === 0 ? traduire('public.reponses.entier') : traduirePluriel('public.reponses.decimales', max);
   }
   if (e['bornes']) {
     const { min, max } = e['bornes'];
     if (min !== null && max !== null) {
-      return `La valeur doit être comprise entre ${min} et ${max}.`;
+      return traduire('public.reponses.entre', { min: formaterNombre(min), max: formaterNombre(max) });
     }
-    return min !== null ? `La valeur doit être au moins ${min}.` : `La valeur doit être au plus ${max}.`;
+    return min !== null
+      ? traduire('public.reponses.auMoins', { min: formaterNombre(min) })
+      : traduire('public.reponses.auPlus', { max: formaterNombre(max) });
   }
   if (e['dateMin']) {
-    return `La date doit être le ${formaterDate(e['dateMin'].date)} ou après.`;
+    return traduire('public.reponses.dateMin', { date: formaterDate(e['dateMin'].date) });
   }
   if (e['dateMax']) {
-    return `La date doit être le ${formaterDate(e['dateMax'].date)} ou avant.`;
+    return traduire('public.reponses.dateMax', { date: formaterDate(e['dateMax'].date) });
   }
   if (e['matriceIncomplete']) {
-    return 'Choisissez une réponse pour chaque ligne.';
+    return traduire('public.reponses.matrice');
   }
   if (e['serveur']) {
-    // Refus du serveur (REPONSES_INVALIDES) : son message, en français.
+    // Refus du serveur (REPONSES_INVALIDES) : son message, en français (le serveur n'envoie pas de code par question).
     return String(e['serveur']);
   }
   return null;
 }
 
-/** « 2026-03-05 » -> « 5 mars 2026 ». */
+/** « 2026-03-05 » -> « 5 mars 2026 » (« March 5, 2026 » en anglais), dans la langue courante. */
 export function formaterDate(iso: string): string {
   const [annee, mois, jour] = iso.split('-').map(Number);
-  return new Date(annee, mois - 1, jour).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(annee, mois - 1, jour).toLocaleDateString(localeIntl(), { day: 'numeric', month: 'long', year: 'numeric' });
 }

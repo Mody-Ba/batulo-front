@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { messageErreurListe, REGLES_SONDAGE } from '../../../../../core/utils/regles-question';
 import { creerControleTexte } from '../formulaires-types';
+import { traduire } from '../../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Liste de textes (lignes ou colonnes d'une matrice) : ajout (bouton ou Entrée), suppression, réordonnancement.
@@ -14,8 +16,7 @@ import { creerControleTexte } from '../formulaires-types';
  */
 @Component({
   selector: 'app-editeur-liste-textes',
-  imports: [
-    CdkDrag,
+  imports: [TranslocoPipe, CdkDrag,
     CdkDragHandle,
     CdkDropList,
     ReactiveFormsModule,
@@ -25,7 +26,7 @@ import { creerControleTexte } from '../formulaires-types';
     MatInputModule,
   ],
   template: `
-    <h4 [id]="idTitre">{{ titre() }}</h4>
+    <h4 [id]="idTitre">{{ titre() | transloco }}</h4>
     <div
       class="liste"
       cdkDropList
@@ -42,24 +43,25 @@ import { creerControleTexte } from '../formulaires-types';
             cdkDragHandle
             class="poignee"
             [disabled]="liste().disabled"
-            [attr.aria-label]="'Déplacer ' + element() + ' ' + (i + 1) + ' (ou Alt + flèches)'"
+            [attr.aria-label]="'editeur.liste.deplacer' | transloco: { element: (element() | transloco), n: i + 1 }"
             (keydown.alt.arrowup)="$event.preventDefault(); deplacer(i, i - 1)"
             (keydown.alt.arrowdown)="$event.preventDefault(); deplacer(i, i + 1)"
           >
             <mat-icon fontIcon="drag_indicator" aria-hidden="true" />
           </button>
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ">
-            <mat-label>{{ libelleElement() }} {{ i + 1 }}</mat-label>
+            <mat-label>{{ libelleElement() | transloco }} {{ i + 1 }}</mat-label>
             <input
               #champ
               matInput
+              dir="auto"
               [formControl]="controle"
               [maxlength]="regles.libelleConfigMax"
               autocomplete="off"
               (keydown.enter)="$event.preventDefault(); ajouter(i)"
             />
             @if (controle.hasError('required')) {
-              <mat-error>Le texte est obligatoire.</mat-error>
+              <mat-error>{{ 'editeur.liste.texteObligatoire' | transloco }}</mat-error>
             }
           </mat-form-field>
           <button
@@ -67,7 +69,7 @@ import { creerControleTexte } from '../formulaires-types';
             type="button"
             (click)="supprimer(i)"
             [disabled]="liste().disabled"
-            [attr.aria-label]="'Supprimer ' + element() + ' ' + (i + 1)"
+            [attr.aria-label]="'editeur.liste.supprimer' | transloco: { element: (element() | transloco), n: i + 1 }"
           >
             <mat-icon fontIcon="close" aria-hidden="true" />
           </button>
@@ -78,7 +80,7 @@ import { creerControleTexte } from '../formulaires-types';
       <p class="erreur-liste" role="alert">{{ message }}</p>
     }
     <button matButton type="button" (click)="ajouter()" [disabled]="liste().disabled || liste().length >= max()">
-      <mat-icon fontIcon="add" aria-hidden="true" />Ajouter {{ element() }}
+      <mat-icon fontIcon="add" aria-hidden="true" />{{ 'editeur.liste.ajouter' | transloco: { element: (element() | transloco) } }}
     </button>
   `,
   styles: `
@@ -145,7 +147,7 @@ export class EditeurListeTextes {
   private readonly champs = viewChildren<ElementRef<HTMLInputElement>>('champ');
 
   protected erreur(): string | null {
-    return messageErreurListe(this.liste(), this.elements());
+    return messageErreurListe(this.liste(), traduire(this.elements()));
   }
 
   protected ajouter(apres?: number): void {

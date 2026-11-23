@@ -30,6 +30,9 @@ import { resumeFiltres, totalUneVersion } from './resume-filtres';
 import { grouperParSection } from './groupes-questions';
 import { TableauCroise } from './tableau-croise';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Onglet « Statistiques » : filtres dans l'URL (?lignee=&du=&au=&granularite=&critere=cle:valeur), résumé, une carte
@@ -38,7 +41,7 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-page-statistiques',
-  imports: [DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -161,7 +164,7 @@ export class PageStatistiques {
       .afterClosed()
       .pipe(filter((envoi): envoi is EnvoiStatistiqueResponse => !!envoi))
       .subscribe(() =>
-        this.snackBar.open('Statistiques envoyées : votre admin est prévenu.', 'Fermer', { duration: 6000 }),
+        this.snackBar.open(traduire('statistiques.page.envoyees'), traduire('commun.fermer'), { duration: 6000 }),
       );
   }
 

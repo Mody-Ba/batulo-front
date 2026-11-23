@@ -1,17 +1,17 @@
 <section class="conteneur-page">
   <app-entete-page
-    titre="Apparence"
+    [titre]="'menu.apparence' | transloco"
     icone="palette"
-    sousTitre="Logo, couleur et nom montrés aux répondants sur les formulaires et dans les rapports PDF"
+    [sousTitre]="'apparence.sousTitre' | transloco"
   />
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement de l’apparence" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'apparence.chargement' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="L’apparence n’a pas pu être chargée.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'apparence.erreurChargement' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (personnalisation(); as p) {
@@ -30,72 +30,72 @@
         />
 
         <section class="carte-section" aria-labelledby="titre-couleur-nom">
-          <h2 id="titre-couleur-nom" class="titre-carte">Couleur et nom</h2>
+          <h2 id="titre-couleur-nom" class="titre-carte">{{ 'apparence.couleurEtNom' | transloco }}</h2>
           @if (modifiable()) {
             <form class="formulaire-apparence" (submit)="$event.preventDefault(); enregistrer()" novalidate>
               <div class="ligne-couleur">
                 <label class="selecteur-couleur">
-                  <span class="visuellement-cache">Choisir la couleur principale</span>
+                  <span class="visuellement-cache">{{ 'apparence.choisirCouleur' | transloco }}</span>
                   <input #selecteur type="color" [value]="couleurSelecteur()" (input)="couleurChoisie($event)" />
                 </label>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-couleur">
-                  <mat-label>Couleur principale</mat-label>
+                  <mat-label>{{ 'apparence.couleurPrincipale' | transloco }}</mat-label>
                   <input
                     matInput
                     [formControl]="couleur"
                     (blur)="normaliserSaisie()"
-                    placeholder="Couleur Batulo (#005CBB)"
+                    [placeholder]="'apparence.placeholderCouleur' | transloco"
                     autocomplete="off"
                     spellcheck="false"
                     maxlength="7"
                   />
-                  <mat-hint>Code hexadécimal #RRGGBB ; vide : couleur Batulo ({{ couleurDefaut }}).</mat-hint>
+                  <mat-hint>{{ 'apparence.aideCouleur' | transloco: { defaut: couleurDefaut } }}</mat-hint>
                   @if (couleur.hasError('pattern')) {
-                    <mat-error>Format attendu : # suivi de 6 chiffres ou lettres de A à F (ex. #1E6B52).</mat-error>
+                    <mat-error>{{ 'apparence.formatCouleur' | transloco }}</mat-error>
                   }
                 </mat-form-field>
                 <button matButton type="button" (click)="couleurParDefaut()" [disabled]="couleur.value === ''">
-                  Couleur par défaut
+                  {{ 'apparence.couleurDefaut' | transloco }}
                 </button>
               </div>
 
               <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Nom affiché sur les formulaires (facultatif)</mat-label>
+                <mat-label>{{ 'apparence.nomAffiche' | transloco }}</mat-label>
                 <input matInput [formControl]="nomAffiche" [maxlength]="nomMax" autocomplete="organization" />
-                <mat-hint>Vide : « {{ p.nomEntreprise }} ». Montré à côté du logo et dans les rapports.</mat-hint>
+                <mat-hint>{{ 'apparence.aideNom' | transloco: { nom: p.nomEntreprise } }}</mat-hint>
                 @if (nomAffiche.hasError('maxlength')) {
-                  <mat-error>{{ nomMax }} caractères au plus.</mat-error>
+                  <mat-error>{{ 'public.reponses.longueurMax' | pluriel: nomMax }}</mat-error>
                 }
               </mat-form-field>
 
-              <app-message-erreur [erreur]="erreurEnregistrement()" titre="L’apparence n’a pas été enregistrée" parDefaut="L’apparence n’a pas pu être enregistrée." />
+              <app-message-erreur [erreur]="erreurEnregistrement()" [titre]="'apparence.nonEnregistree' | transloco" [parDefaut]="'apparence.erreurEnregistrement' | transloco" />
 
               <div class="actions">
                 <button matButton="filled" type="submit" [disabled]="enregistrement()">
                   @if (enregistrement()) {
-                    <mat-spinner diameter="20" aria-label="Enregistrement" />
+                    <mat-spinner diameter="20" [attr.aria-label]="'commun.enregistrementEnCours' | transloco" />
                   } @else {
-                    Enregistrer
+                    {{ 'commun.enregistrer' | transloco }}
                   }
                 </button>
               </div>
             </form>
           } @else {
             <dl class="valeurs">
-              <dt>Couleur principale</dt>
+              <dt>{{ 'apparence.couleurPrincipale' | transloco }}</dt>
               <dd>
                 <span class="pastille" [style.background]="couleurApercu()" aria-hidden="true"></span>
-                {{ p.couleurEffective }}{{ p.couleurPrincipale ? '' : ' (couleur Batulo)' }}
+                <span dir="ltr">{{ p.couleurEffective }}</span>{{ p.couleurPrincipale ? '' : ' ' + ('superAdmin.detail.couleurBatulo' | transloco) }}
               </dd>
-              <dt>Nom affiché</dt>
-              <dd>{{ p.nomEffectif }}{{ p.nomAffiche ? '' : ' (nom de l’entreprise)' }}</dd>
+              <dt>{{ 'superAdmin.detail.nomAffiche' | transloco }}</dt>
+              <dd><span dir="auto">{{ p.nomEffectif }}</span>{{ p.nomAffiche ? '' : ' ' + ('superAdmin.detail.nomEntreprise' | transloco) }}</dd>
             </dl>
           }
         </section>
       </div>
 
       <section class="carte-section apercu" aria-labelledby="titre-apercu">
-        <h2 id="titre-apercu" class="titre-carte">Aperçu du formulaire</h2>
+        <h2 id="titre-apercu" class="titre-carte">{{ 'apparence.apercu' | transloco }}</h2>
         <app-apercu-apparence
           [nom]="nomApercu()"
           [logoUrl]="logoApercu()"

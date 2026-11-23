@@ -4,10 +4,12 @@ import { RouterLink } from '@angular/router';
 import { APPLICATIONS_MOBILES, FormuleResponse } from '../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../core/services/abonnement.service';
 import { montantEnClair } from '../../../core/utils/montant';
+import { localeIntl, texteServeur } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
-/** « 1,00 $ » (fr-CA) : Intl plutôt que CurrencyPipe (pas de données de locale à charger). */
+/** « 1,00 $ » en français, « $1.00 » en anglais : Intl plutôt que CurrencyPipe (pas de données de locale à charger). */
 export function prixEnClair(formule: Pick<FormuleResponse, 'prix' | 'devise'>): string {
-  return new Intl.NumberFormat('fr-CA', { style: 'currency', currency: formule.devise }).format(formule.prix);
+  return new Intl.NumberFormat(localeIntl(), { style: 'currency', currency: formule.devise }).format(formule.prix);
 }
 
 /**
@@ -17,7 +19,7 @@ export function prixEnClair(formule: Pick<FormuleResponse, 'prix' | 'devise'>): 
  */
 @Component({
   selector: 'app-tarifs-vitrine',
-  imports: [RouterLink],
+  imports: [TranslocoPipe, RouterLink],
   templateUrl: './tarifs-vitrine.html',
   styleUrl: './tarifs-vitrine.scss',
 })
@@ -42,6 +44,15 @@ export class TarifsVitrine {
 
   constructor() {
     this.charger();
+  }
+
+  /** Libellé et durée du serveur en français, traduits dans les autres langues. */
+  protected libelle(f: FormuleResponse): string {
+    return texteServeur(`vitrine.tarifs.libelle.${f.formule}`, f.libelle);
+  }
+
+  protected duree(f: FormuleResponse): string {
+    return texteServeur(`vitrine.tarifs.duree.${f.formule}`, f.duree);
   }
 
   protected charger(): void {

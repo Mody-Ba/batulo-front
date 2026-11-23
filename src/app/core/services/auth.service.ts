@@ -24,6 +24,7 @@ import {
 import { ACCUEIL_PAR_ROLE, Role } from '../models/role.model';
 import { UtilisateurResponse } from '../models/utilisateur.model';
 import { AbonnementService } from './abonnement.service';
+import { traduire } from '../i18n/traduire';
 
 /** Ce qui est gardé dans sessionStorage : propre à l'onglet, effacé à sa fermeture. */
 interface Session {
@@ -39,8 +40,10 @@ interface Session {
 }
 
 const CLE_SESSION = 'batulo.session';
-export const MESSAGE_LECTURE_SEULE = 'Abonnement expiré : lecture seule.';
-export const MESSAGE_SESSION_EXPIREE = 'Votre session a expiré. Veuillez vous reconnecter.';
+/** Infobulle des boutons d'écriture désactivés (abonnement expiré), dans la langue courante. */
+export const messageLectureSeule = (): string => traduire('commun.lectureSeule');
+/** Clé du message de /connexion après une session expirée (les messages de connexion sont des clés ou des textes). */
+export const MESSAGE_SESSION_EXPIREE = 'auth.sessionExpiree';
 
 /**
  * État de connexion de l'application (signals).
@@ -66,7 +69,7 @@ export class AuthService {
   readonly motDePasseTemporaire = computed(() => this.session()?.motDePasseTemporaire ?? false);
   /**
    * Abonnement expiré : le backend n'accepte plus que la lecture (GET). Les boutons d'écriture sont
-   * désactivés avec l'infobulle MESSAGE_LECTURE_SEULE.
+   * désactivés avec l'infobulle messageLectureSeule().
    */
   readonly lectureSeule = computed(
     () => this.role() !== 'SUPER_ADMIN' && this.statutAbonnement() === 'EXPIRE',
@@ -217,7 +220,7 @@ export class AuthService {
     this.mettreAJourSession({ motDePasseTemporaire: true });
   }
 
-  /** Message à afficher à la prochaine ouverture de /connexion. */
+  /** Message à afficher à la prochaine ouverture de /connexion : clé de traduction (ou texte affiché tel quel). */
   preparerMessageConnexion(message: string): void {
     this._messageConnexion.set(message);
   }

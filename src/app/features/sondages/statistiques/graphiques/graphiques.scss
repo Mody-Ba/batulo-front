@@ -67,7 +67,7 @@
   padding-bottom: 22px;
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-label-small);
-  text-align: right;
+  text-align: end;
 }
 
 .trace {
@@ -129,7 +129,7 @@
   td {
     padding: var(--bt-espace-2);
     border-bottom: 1px solid var(--mat-sys-outline-variant);
-    text-align: left;
+    text-align: start;
   }
 
   td {

@@ -33,6 +33,9 @@ import { EntetePage } from '../../../../shared/components/entete-page/entete-pag
 import { FiltreStatutAbonnement } from '../../../../shared/components/filtre-statut-abonnement/filtre-statut-abonnement';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { ActionsAdmin, libelleGestionnaires } from '../actions-admin';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { NombreLPipe } from '../../../../core/i18n/formats.pipes';
 
 /**
  * Admins et entreprises (une ligne par admin, jamais le super admin) : recherche (entreprise, prénom, nom ou
@@ -41,8 +44,7 @@ import { ActionsAdmin, libelleGestionnaires } from '../actions-admin';
  */
 @Component({
   selector: 'app-liste-admins',
-  imports: [
-    NgTemplateOutlet,
+  imports: [NombreLPipe, TranslocoPipe, NgTemplateOutlet,
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -85,11 +87,14 @@ export class ListeAdmins {
   protected readonly filtre = computed(() => !!this.termeRecherche() || !!this.filtreStatut());
   protected readonly messageAucunResultat = computed(() => {
     const statut = this.filtreStatut();
-    const precision = statut ? ` au statut « ${LIBELLES_STATUT_ABONNEMENT[statut]} »` : '';
     const terme = this.termeRecherche();
-    return terme
-      ? `Aucune entreprise${precision} ne correspond à « ${terme} ».`
-      : `Aucune entreprise${precision}.`;
+    if (statut) {
+      const libelle = LIBELLES_STATUT_ABONNEMENT[statut];
+      return terme
+        ? traduire('superAdmin.admins.aucuneStatutRecherche', { statut: libelle, terme })
+        : traduire('superAdmin.admins.aucuneStatut', { statut: libelle });
+    }
+    return terme ? traduire('superAdmin.admins.aucuneRecherche', { terme }) : traduire('superAdmin.admins.aucuneFiltre');
   });
   /** Champ de recherche ; l'URL reste la source de vérité (retour arrière, rechargement). */
   protected readonly champRecherche = new FormControl('', { nonNullable: true });
@@ -141,7 +146,7 @@ export class ListeAdmins {
   }
 
   protected libelleStatut(ligne: AdminLigneResponse): string {
-    return ligne.abonnement ? LIBELLES_STATUT_ABONNEMENT[ligne.abonnement.statut] : 'Sans abonnement';
+    return ligne.abonnement ? LIBELLES_STATUT_ABONNEMENT[ligne.abonnement.statut] : traduire('superAdmin.admins.sansAbonnement');
   }
 
   protected enAlerte(ligne: AdminLigneResponse): boolean {

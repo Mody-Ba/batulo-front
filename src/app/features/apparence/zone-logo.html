@@ -1,52 +1,51 @@
 <section class="carte-section zone-logo" aria-labelledby="titre-logo">
-  <h2 id="titre-logo" class="titre-carte">Logo</h2>
+  <h2 id="titre-logo" class="titre-carte">{{ 'superAdmin.detail.logo' | transloco }}</h2>
 
   @if (fichier(); as f) {
     <div class="logo-actuel">
-      <img [src]="apercuLocal()" [alt]="'Aperçu du logo choisi : ' + f.name" class="image-logo" />
+      <img [src]="apercuLocal()" [alt]="'apparence.logo.apercuChoisi' | transloco: { nom: f.name }" class="image-logo" />
       <div>
-        <p><strong>{{ f.name }}</strong></p>
-        <p class="texte-aide">{{ taille(f.size) }} · pas encore enregistré</p>
+        <p><strong dir="auto">{{ f.name }}</strong></p>
+        <p class="texte-aide">{{ taille(f.size) }} · {{ 'apparence.logo.pasEnregistre' | transloco }}</p>
       </div>
     </div>
     <div class="actions-logo">
       <button matButton="filled" type="button" (click)="envoyer()" [disabled]="envoi()">
         @if (envoi()) {
-          <mat-spinner diameter="20" aria-label="Envoi du logo" />
+          <mat-spinner diameter="20" [attr.aria-label]="'apparence.logo.envoi' | transloco" />
         } @else {
-          Enregistrer ce logo
+          {{ 'apparence.logo.enregistrer' | transloco }}
         }
       </button>
-      <button matButton type="button" (click)="annuler()" [disabled]="envoi()">Annuler</button>
+      <button matButton type="button" (click)="annuler()" [disabled]="envoi()">{{ 'commun.annuler' | transloco }}</button>
     </div>
   } @else if (logo(); as l) {
     <div class="logo-actuel">
       @if (urlSure(l.url); as url) {
         @if (logoIllisible() === url) {
           <p class="erreur-logo" role="alert">
-            Le logo est enregistré mais son image n’a pas pu être chargée depuis {{ url }}. Vérifiez que l’API Batulo
-            répond, puis rechargez la page.
+            {{ 'apparence.logo.illisible' | transloco: { url: url } }}
           </p>
         } @else {
-          <img [src]="url" [alt]="nom() || 'Logo de l’entreprise'" class="image-logo" (error)="logoIllisible.set(url)" />
+          <img [src]="url" [alt]="nom() || ('apparence.logo.entreprise' | transloco)" class="image-logo" (error)="logoIllisible.set(url)" />
         }
       }
       <div>
-        <p>{{ l.typeMime === 'image/png' ? 'PNG' : 'JPEG' }} · {{ taille(l.taille) }} · {{ l.largeur }} × {{ l.hauteur }} px</p>
+        <p>{{ l.typeMime === 'image/png' ? 'PNG' : 'JPEG' }} · {{ taille(l.taille) }} · <span dir="ltr">{{ l.largeur }} × {{ l.hauteur }} px</span></p>
       </div>
     </div>
     @if (modifiable()) {
       <div class="actions-logo">
         <button matButton="tonal" type="button" (click)="ouvrirChoix()">
-          <mat-icon fontIcon="upload" aria-hidden="true" />Remplacer
+          <mat-icon fontIcon="upload" aria-hidden="true" />{{ 'apparence.logo.remplacer' | transloco }}
         </button>
         <button matButton type="button" class="action-danger" (click)="supprimer()">
-          <mat-icon fontIcon="delete" aria-hidden="true" />Supprimer
+          <mat-icon fontIcon="delete" aria-hidden="true" />{{ 'commun.supprimer' | transloco }}
         </button>
       </div>
     }
   } @else if (!modifiable()) {
-    <p class="texte-aide">Aucun logo : les formulaires s’affichent sans bandeau.</p>
+    <p class="texte-aide">{{ 'apparence.logo.aucun' | transloco }}</p>
   }
 
   @if (modifiable() && !fichier()) {
@@ -58,9 +57,9 @@
       (drop)="deposer($event)"
     >
       <mat-icon fontIcon="add_photo_alternate" aria-hidden="true" />
-      <p>{{ logo() ? 'Glissez un autre logo ici, ou' : 'Glissez votre logo ici, ou' }}</p>
-      <button matButton="outlined" type="button" (click)="ouvrirChoix()" aria-describedby="regles-logo">Choisir un fichier</button>
-      <p id="regles-logo" class="texte-aide">PNG ou JPEG, 1 Mo et 2000 × 2000 px au plus.</p>
+      <p>{{ (logo() ? 'apparence.logo.glissezAutre' : 'apparence.logo.glissez') | transloco }}</p>
+      <button matButton="outlined" type="button" (click)="ouvrirChoix()" aria-describedby="regles-logo">{{ 'apparence.logo.choisir' | transloco }}</button>
+      <p id="regles-logo" class="texte-aide">{{ 'apparence.logo.regles' | transloco }}</p>
     </div>
   }
 
@@ -69,5 +68,5 @@
   @if (erreurLocale(); as message) {
     <p class="erreur-logo" role="alert">{{ message }}</p>
   }
-  <app-message-erreur [erreur]="erreurServeur()" titre="Le logo n’a pas été enregistré" parDefaut="Le logo n’a pas pu être enregistré." />
+  <app-message-erreur [erreur]="erreurServeur()" [titre]="'apparence.logo.nonEnregistre' | transloco" [parDefaut]="'apparence.logo.erreurEnregistrement' | transloco" />
 </section>

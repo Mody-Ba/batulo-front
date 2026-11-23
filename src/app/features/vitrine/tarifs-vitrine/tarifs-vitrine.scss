@@ -41,7 +41,7 @@
 .pastille {
   position: absolute;
   top: -14px;
-  left: var(--bt-espace-6);
+  inset-inline-start: var(--bt-espace-6);
   padding: 4px 12px;
   border-radius: 14px;
   background: var(--mat-sys-primary);

@@ -38,6 +38,10 @@ tr.en-alerte {
 
   td:first-child {
     box-shadow: inset 4px 0 0 var(--bt-attente-texte);
+
+    :host-context([dir='rtl']) & {
+      box-shadow: inset -4px 0 0 var(--bt-attente-texte);
+    }
   }
 }
 
@@ -70,7 +74,7 @@ tr.en-alerte {
 
   &.en-alerte {
     border-color: var(--bt-attente-texte);
-    border-left-width: 4px;
+    border-inline-start-width: 4px;
     background: var(--bt-attente-fond);
   }
 }
@@ -80,7 +84,7 @@ tr.en-alerte {
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--bt-espace-2);
-  margin-right: calc(-1 * var(--bt-espace-2));
+  margin-inline-end: calc(-1 * var(--bt-espace-2));
 }
 
 .carte-titre {

@@ -16,28 +16,28 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'Mon abonnement · Batulo',
+    title: 'titres.monAbonnement',
     canActivate: [enAttenteVersSouscrire],
     loadComponent: () => import('./mon-abonnement/mon-abonnement').then((m) => m.MonAbonnement),
   },
   {
     // Demandes d'augmentation (permises abonnement expiré). En attente de paiement, la mise en page n'y mène pas.
     path: 'demandes',
-    title: 'Demandes d’augmentation · Batulo',
+    title: 'titres.demandesAugmentation',
     canActivate: [enAttenteVersSouscrire],
     loadComponent: () => import('./demandes/demandes-abonnement').then((m) => m.DemandesAbonnement),
   },
   {
     // URL de retour de Moosyl (?reference=) ; permise abonnement en attente de paiement (sous /admin/abonnement).
     path: 'paiement-mobile',
-    title: 'Paiement mobile · Batulo',
+    title: 'titres.paiementMobile',
     loadComponent: () =>
       import('./paiement-mobile/retour-paiement-mobile').then((m) => m.RetourPaiementMobile),
   },
   {
     // ?formule=MENSUEL|ANNUEL pour présélectionner (bouton « Renouveler ») ; ?moyen=carte|mobile.
     path: 'souscrire',
-    title: 'S’abonner · Batulo',
+    title: 'titres.souscrire',
     loadComponent: () => import('./souscrire/souscrire').then((m) => m.Souscrire),
   },
 ];

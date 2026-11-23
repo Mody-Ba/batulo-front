@@ -1,19 +1,19 @@
 <section class="conteneur-page etroit editeur">
   <div class="barre-editeur">
     <a matButton [routerLink]="['/sondages', id()]" class="retour">
-      <mat-icon fontIcon="arrow_back" aria-hidden="true" />Fiche du sondage
+      <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'sondages.diffuser.fiche' | transloco }}
     </a>
     <span class="espace"></span>
     @if (store.sondage() && store.modifiable()) {
-      <app-etat-enregistrement [etat]="etatGlobal()" libelleEnregistre="Tout est enregistré" />
+      <app-etat-enregistrement [etat]="etatGlobal()" [libelleEnregistre]="'editeur.toutEnregistre' | transloco" />
     }
     @if (store.sondage(); as s) {
       <a matButton="outlined" [routerLink]="['/sondages', s.id, 'apercu']">
-        <mat-icon fontIcon="preview" aria-hidden="true" />Prévisualiser
+        <mat-icon fontIcon="preview" aria-hidden="true" />{{ 'sondages.fiche.previsualiser' | transloco }}
       </a>
       @if (!s.publie && store.droits()?.gerer) {
         <button matButton="filled" type="button" (click)="publier(s)">
-          <mat-icon fontIcon="publish" aria-hidden="true" />Publier
+          <mat-icon fontIcon="publish" aria-hidden="true" />{{ 'sondages.fiche.publier' | transloco }}
         </button>
       }
     }
@@ -21,32 +21,32 @@
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement du sondage" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.fiche.chargement' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="Ce sondage n’a pas pu être chargé.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.fiche.erreur' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (store.sondage(); as s) {
     @if (store.raisonLectureSeule(); as raison) {
-      <app-encadre type="info" icone="lock" titre="Lecture seule" role="status" class="bandeau-lecture-seule">
+      <app-encadre type="info" icone="lock" [titre]="'editeur.lectureSeule' | transloco" role="status" class="bandeau-lecture-seule">
         <p>{{ raison }}</p>
         @if (s.publie && store.droits()?.gerer && store.situation().derniereVersionPubliee) {
           <p>
             @if (store.situation().brouillon; as b) {
               <a matButton="filled" [routerLink]="['/sondages', b.id, 'modifier']">
-                <mat-icon fontIcon="edit_note" aria-hidden="true" />Ouvrir la version {{ b.version }} en préparation
+                <mat-icon fontIcon="edit_note" aria-hidden="true" />{{ 'sondages.fiche.ouvrirVersion' | transloco: { version: b.version } }}
               </a>
             } @else {
               <button matButton="filled" type="button" (click)="nouvelleVersion(s)">
-                <mat-icon fontIcon="difference" aria-hidden="true" />Créer une nouvelle version
+                <mat-icon fontIcon="difference" aria-hidden="true" />{{ 'sondages.fiche.nouvelleVersion' | transloco }}
               </button>
             }
           </p>
         }
         @if (s.publie && store.criteresModifiables()) {
-          <p class="cellule-secondaire">Les critères d’analyse des questions restent modifiables.</p>
+          <p class="cellule-secondaire">{{ 'editeur.criteresModifiables' | transloco }}</p>
         }
       </app-encadre>
     }
@@ -55,7 +55,7 @@
     <header class="carte-entete" [formGroup]="formulaire" (focusout)="sortieEnTete()">
       <div class="ligne-entete">
         <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
-        <span class="texte-aide">Version {{ s.version }}</span>
+        <span class="texte-aide">{{ 'statistiques.filtres.version' | transloco: { version: s.version } }}</span>
         <span class="espace"></span>
         @if (enTete(); as e) {
           @if (store.modifiable()) {
@@ -63,27 +63,27 @@
           }
         }
         @if (store.modifiable()) {
-          <button matIconButton type="button" [matMenuTriggerFor]="menuSondage" aria-label="Actions du sondage">
+          <button matIconButton type="button" [matMenuTriggerFor]="menuSondage" [attr.aria-label]="'sondages.fiche.actions' | transloco">
             <mat-icon fontIcon="more_vert" aria-hidden="true" />
           </button>
           <mat-menu #menuSondage="matMenu" xPosition="before">
             <button mat-menu-item type="button" class="action-danger" (click)="supprimerBrouillon(s)">
-              <mat-icon fontIcon="delete" aria-hidden="true" /><span>Supprimer le brouillon</span>
+              <mat-icon fontIcon="delete" aria-hidden="true" /><span>{{ 'editeur.supprimerBrouillon' | transloco }}</span>
             </button>
           </mat-menu>
         }
       </div>
 
-      <h1 class="visuellement-cache">Modifier « {{ s.titre }} »</h1>
+      <h1 class="visuellement-cache">{{ 'editeur.modifierTitre' | transloco: { titre: s.titre } }}</h1>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-titre-sondage">
-        <mat-label>Titre du sondage</mat-label>
-        <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required />
+        <mat-label>{{ 'sondages.creation.titre' | transloco }}</mat-label>
+        <input matInput formControlName="titre" [maxlength]="regles.titreMax" autocomplete="off" required dir="auto" />
         @if (formulaire.controls.titre.hasError('required')) {
-          <mat-error>Le titre est obligatoire.</mat-error>
+          <mat-error>{{ 'sondages.creation.titreObligatoire' | transloco }}</mat-error>
         }
       </mat-form-field>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-description-sondage">
-        <mat-label>Description (facultative)</mat-label>
+        <mat-label>{{ 'sondages.creation.description' | transloco }}</mat-label>
         <textarea
           matInput
           formControlName="description"
@@ -91,21 +91,19 @@
           cdkAutosizeMinRows="2"
           [maxlength]="regles.descriptionMax"
         ></textarea>
-        <mat-hint>Présentée aux répondants au début du sondage.</mat-hint>
+        <mat-hint>{{ 'editeur.descriptionAide' | transloco }}</mat-hint>
       </mat-form-field>
       <mat-checkbox formControlName="reponseUnique">
-        Une seule réponse par appareil
-        <span class="cellule-secondaire">
-          Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.
-        </span>
+        {{ 'sondages.creation.reponseUnique' | transloco }}
+        <span class="cellule-secondaire">{{ 'sondages.publication.reponseUniqueAide' | transloco }}</span>
       </mat-checkbox>
-      <app-message-erreur [erreur]="erreurEnTete()" parDefaut="L’en-tête n’a pas pu être enregistré." />
+      <app-message-erreur [erreur]="erreurEnTete()" [parDefaut]="'editeur.erreurEnTete' | transloco" />
     </header>
 
     <!-- Page d'accueil du formulaire du répondant (même enregistrement automatique que l'en-tête) -->
     <section class="carte-entete carte-accueil" [formGroup]="formulaire" (focusout)="sortieEnTete()" aria-labelledby="titre-accueil-editeur">
       <div class="ligne-entete">
-        <h2 id="titre-accueil-editeur" class="titre-carte">Page d’accueil</h2>
+        <h2 id="titre-accueil-editeur" class="titre-carte">{{ 'editeur.accueil.titre' | transloco }}</h2>
         <span class="espace"></span>
         @if (enTete(); as e) {
           @if (store.modifiable()) {
@@ -114,39 +112,39 @@
         }
       </div>
       <p class="texte-aide">
-        Présentée au répondant avant les questions. Laissée vide et sans consentement, le questionnaire s’ouvre directement.
+        {{ 'editeur.accueil.aide' | transloco }}
       </p>
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Objet de l’enquête (facultatif)</mat-label>
+        <mat-label>{{ 'editeur.accueil.objet' | transloco }}</mat-label>
         <textarea matInput formControlName="objetEnquete" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.objetEnqueteMax"></textarea>
-        <mat-hint>Pourquoi cette enquête, à quoi serviront les réponses.</mat-hint>
+        <mat-hint>{{ 'editeur.accueil.objetAide' | transloco }}</mat-hint>
       </mat-form-field>
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Confidentialité des réponses (facultatif)</mat-label>
+        <mat-label>{{ 'editeur.accueil.confidentialite' | transloco }}</mat-label>
         <textarea matInput formControlName="texteConfidentialite" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConfidentialiteMax"></textarea>
-        <mat-hint>Anonymat, conservation et usage des données.</mat-hint>
+        <mat-hint>{{ 'editeur.accueil.confidentialiteAide' | transloco }}</mat-hint>
       </mat-form-field>
       <mat-checkbox formControlName="consentementRequis">
-        Exiger le consentement du répondant
-        <span class="cellule-secondaire">Le répondant coche une case avant de commencer ; la date est gardée avec sa réponse.</span>
+        {{ 'editeur.accueil.consentement' | transloco }}
+        <span class="cellule-secondaire">{{ 'editeur.accueil.consentementAide' | transloco }}</span>
       </mat-checkbox>
       @if (formulaire.controls.consentementRequis.value) {
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Texte de la case de consentement</mat-label>
+          <mat-label>{{ 'editeur.accueil.texteConsentement' | transloco }}</mat-label>
           <textarea matInput formControlName="texteConsentement" cdkTextareaAutosize cdkAutosizeMinRows="2" [maxlength]="regles.texteConsentementMax" required></textarea>
-          <mat-hint>Par exemple : « J’ai lu ces informations et j’accepte de participer. »</mat-hint>
+          <mat-hint>{{ 'editeur.accueil.texteConsentementAide' | transloco }}</mat-hint>
           @if (formulaire.controls.texteConsentement.hasError('texteConsentementRequis')) {
-            <mat-error>Écrivez le texte de la case de consentement.</mat-error>
+            <mat-error>{{ 'editeur.accueil.texteConsentementRequis' | transloco }}</mat-error>
           }
         </mat-form-field>
       }
-      <app-message-erreur [erreur]="erreurAccueil()" parDefaut="La page d’accueil n’a pas pu être enregistrée." />
+      <app-message-erreur [erreur]="erreurAccueil()" [parDefaut]="'editeur.accueil.erreur' | transloco" />
     </section>
 
     <!-- Sections -->
     @if (sections().length === 0) {
       <div class="vide" role="status">
-        <p>Ce sondage n’a pas encore de section. Les questions se rangent dans des sections.</p>
+        <p>{{ 'editeur.aucuneSection' | transloco }}</p>
       </div>
     }
 
@@ -171,10 +169,10 @@
           [disabled]="ajoutSectionEnCours() || limiteSections()"
         >
           <mat-icon fontIcon="playlist_add" aria-hidden="true" />
-          {{ sections().length === 0 ? 'Ajouter une première section' : 'Ajouter une section' }}
+          {{ (sections().length === 0 ? 'editeur.ajouterPremiereSection' : 'editeur.ajouterSection') | transloco }}
         </button>
         @if (limiteSections()) {
-          <span class="texte-aide">{{ regles.sectionsMax }} sections au plus.</span>
+          <span class="texte-aide">{{ 'editeur.sectionsMax' | transloco: { max: regles.sectionsMax } }}</span>
         }
       </div>
     }

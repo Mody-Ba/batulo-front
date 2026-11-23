@@ -1,3 +1,4 @@
+import { traduire, traduirePluriel } from '../i18n/traduire';
 import { TypeQuestion } from './sondage.model';
 
 /** Granularité de la répartition des dates (absente : choisie par le backend selon l'écart). */
@@ -241,12 +242,19 @@ export type SeparateurDecimal = 'VIRGULE' | 'POINT';
 
 /** Période d'un envoi en clair. */
 export function resumeEnvoi(envoi: EnvoiStatistiqueResponse): string {
-  const parties = [envoi.lignee ? 'toutes les versions' : `version ${envoi.version}`];
+  const parties = [
+    envoi.lignee ? traduire('statistiques.envoi.toutesVersions') : traduire('statistiques.envoi.version', { version: envoi.version }),
+  ];
   if (envoi.du || envoi.au) {
-    parties.push(`du ${envoi.du ?? 'début'} au ${envoi.au ?? 'dernier jour'}`);
+    parties.push(
+      traduire('statistiques.envoi.periode', {
+        du: envoi.du ?? traduire('statistiques.envoi.debut'),
+        au: envoi.au ?? traduire('statistiques.envoi.dernierJour'),
+      }),
+    );
   }
   if (envoi.criteres.length) {
-    parties.push(`${envoi.criteres.length} critère${envoi.criteres.length > 1 ? 's' : ''}`);
+    parties.push(traduirePluriel('statistiques.envoi.criteres', envoi.criteres.length));
   }
   return parties.join(' · ');
 }

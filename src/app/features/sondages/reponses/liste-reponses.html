@@ -1,10 +1,10 @@
 <section class="conteneur-page">
   <a matButton routerLink="/sondages" class="retour">
-    <mat-icon fontIcon="arrow_back" aria-hidden="true" />Sondages
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.sondages' | transloco }}
   </a>
 
   @if (sondage(); as s) {
-    <app-entete-page [titre]="s.titre" icone="ballot">
+    <app-entete-page [titre]="s.titre" icone="ballot" dir="auto">
       <span class="pastille-statut" [class]="classeEtat(s)">{{ libelleEtat(s) }}</span>
     </app-entete-page>
   }
@@ -12,11 +12,11 @@
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement des réponses" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.reponses.chargement' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="Les réponses n’ont pas pu être chargées.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.reponses.erreur' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (sondage(); as s) {
@@ -24,30 +24,29 @@
       <div class="barre-outils">
         @if (versions().length > 1) {
           <mat-button-toggle-group
-            aria-label="Réponses affichées"
+            [attr.aria-label]="'sondages.reponses.affichees' | transloco"
             [value]="toutesVersions()"
             (change)="changerPortee($event.value)"
             [hideSingleSelectionIndicator]="true"
           >
-            <mat-button-toggle [value]="false">Version {{ s.version }}</mat-button-toggle>
-            <mat-button-toggle [value]="true">Toutes les versions</mat-button-toggle>
+            <mat-button-toggle [value]="false">{{ 'statistiques.filtres.version' | transloco: { version: s.version } }}</mat-button-toggle>
+            <mat-button-toggle [value]="true">{{ 'statistiques.filtres.toutesVersions' | transloco }}</mat-button-toggle>
           </mat-button-toggle-group>
         }
         <p class="texte-aide" role="status">
-          {{ page.totalElements }} réponse{{ page.totalElements > 1 ? 's' : '' }}
-          {{ toutesVersions() ? 'pour toutes les versions' : 'pour la version ' + s.version }}, les plus récentes d’abord.
+          {{ (toutesVersions() ? 'sondages.reponses.totalToutes' : 'sondages.reponses.totalVersion') | pluriel: page.totalElements : { version: s.version } }}
         </p>
       </div>
       @if (page.contenu.length === 0) {
-        <p class="etat-vide" role="status">Aucune réponse pour le moment.</p>
+        <p class="etat-vide" role="status">{{ 'sondages.reponses.aucune' | transloco }}</p>
       } @else {
         <ul class="reponses">
           @for (r of page.contenu; track r.id) {
             <li>
               <button type="button" class="reponse" (click)="ouvrir(r)">
-                <span class="numero">N° {{ r.id }}</span>
+                <span class="numero">{{ 'sondages.reponses.numero' | transloco: { id: r.id } }}</span>
                 <span class="date">{{ r.dateSoumission | dateL: 'courtHeure' }}</span>
-                <span class="version">Version {{ r.version }}</span>
+                <span class="version">{{ 'statistiques.filtres.version' | transloco: { version: r.version } }}</span>
                 <span class="cellule-secondaire resume">{{ resume(r, s) }}</span>
                 <mat-icon fontIcon="chevron_right" aria-hidden="true" />
               </button>
@@ -60,7 +59,7 @@
           [pageSize]="taillePage()"
           [pageSizeOptions]="tailles"
           (page)="changerPage($event)"
-          aria-label="Pagination des réponses"
+          [attr.aria-label]="'sondages.reponses.pagination' | transloco"
         />
       }
     }

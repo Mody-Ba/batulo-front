@@ -3,14 +3,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EtatEnregistrement } from '../enregistrement-auto';
+import { libelles } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
-const LIBELLES: Record<EtatEnregistrement, string> = {
-  enregistre: 'Enregistré',
-  modifie: 'Modifications non enregistrées',
-  invalide: 'À corriger avant l’enregistrement',
-  enregistrement: 'Enregistrement…',
-  erreur: 'Échec de l’enregistrement',
-};
+const LIBELLES = libelles<EtatEnregistrement>('editeur.etat', ['enregistre', 'modifie', 'invalide', 'enregistrement', 'erreur']);
 
 const ICONES: Partial<Record<EtatEnregistrement, string>> = {
   enregistre: 'cloud_done',
@@ -22,7 +18,7 @@ const ICONES: Partial<Record<EtatEnregistrement, string>> = {
 /** Indicateur « Enregistré » d'un élément de l'éditeur (en-tête, section ou question), annoncé poliment. */
 @Component({
   selector: 'app-etat-enregistrement',
-  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [TranslocoPipe, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
   template: `
     <span class="etat" [class]="'etat-' + etat()" role="status" aria-live="polite">
       @if (etat() === 'enregistrement') {
@@ -33,7 +29,7 @@ const ICONES: Partial<Record<EtatEnregistrement, string>> = {
       {{ libelle() }}
     </span>
     @if (etat() === 'erreur') {
-      <button matButton type="button" (click)="reessayer.emit()">Réessayer</button>
+      <button matButton type="button" (click)="reessayer.emit()">{{ 'commun.reessayer' | transloco }}</button>
     }
   `,
   styles: `

@@ -3,6 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ConfigurationDate } from '../../../core/models/sondage.model';
 import { formaterDate } from '../reponses';
 import { ChampBase } from './champ-base';
+import { traduire } from '../../../core/i18n/traduire';
 
 /** DATE : sélecteur de date natif (adapté au téléphone), AAAA-MM-JJ, entre dateMin et dateMax si définies. */
 @Component({
@@ -29,9 +30,13 @@ export class ChampDate extends ChampBase {
   protected readonly indication = computed(() => {
     const { dateMin, dateMax } = this.config();
     if (dateMin && dateMax) {
-      return `Du ${formaterDate(dateMin)} au ${formaterDate(dateMax)}`;
+      return traduire('public.champs.duAu', { du: formaterDate(dateMin), au: formaterDate(dateMax) });
     }
-    return dateMin ? `À partir du ${formaterDate(dateMin)}` : dateMax ? `Jusqu’au ${formaterDate(dateMax)}` : null;
+    return dateMin
+      ? traduire('public.champs.aPartirDu', { date: formaterDate(dateMin) })
+      : dateMax
+        ? traduire('public.champs.jusquau', { date: formaterDate(dateMax) })
+        : null;
   });
 
   protected idsDescription(): string | null {

@@ -2,7 +2,7 @@ import { formatDate, formatNumber, formatPercent } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
 import { montantEnClair } from '../utils/montant';
 import { Langue } from './langues';
-import { langueCourante, localeAngular } from './traduire';
+import { langueCourante, localeAngular, Parametres, traduirePluriel } from './traduire';
 
 /** Formats nommés (dates du produit), un motif par langue ; les formats d'Angular (longDate…) restent acceptés. */
 export const FORMATS_DATE: Record<string, Record<Langue, string>> = {
@@ -17,6 +17,11 @@ export const FORMATS_DATE: Record<string, Record<Langue, string>> = {
 /** Motif d'un format nommé dans la langue courante (sinon le format tel quel). */
 export function motifDate(format: string): string {
   return FORMATS_DATE[format]?.[langueCourante()] ?? format;
+}
+
+/** Date dans la langue courante, hors gabarit (snackbars, messages) : mêmes formats que le pipe dateL. */
+export function dateEnClair(valeur: string | number | Date, format = 'long'): string {
+  return formatDate(valeur, motifDate(format), localeAngular());
 }
 
 /**
@@ -49,5 +54,13 @@ export class MontantLPipe implements PipeTransform {
 export class PourcentLPipe implements PipeTransform {
   transform(valeur: number | null | undefined, chiffres?: string): string | null {
     return valeur === null || valeur === undefined ? null : formatPercent(valeur, localeAngular(), chiffres);
+  }
+}
+
+/** Texte au pluriel selon la langue : {{ 'sondages.reponses' | pluriel: total }} (le nombre est passé sous `n`). */
+@Pipe({ name: 'pluriel', pure: false })
+export class PlurielPipe implements PipeTransform {
+  transform(cle: string, nombre: number | null | undefined, params?: Parametres): string {
+    return traduirePluriel(cle, nombre ?? 0, params);
   }
 }

@@ -1,4 +1,6 @@
 import { Component, effect, input, signal } from '@angular/core';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 interface CodeQrDessine {
   taille: number;
@@ -25,6 +27,7 @@ export function cheminQr(modules: readonly (readonly boolean[])[]): string {
  */
 @Component({
   selector: 'app-code-qr',
+  imports: [TranslocoPipe],
   template: `
     @if (dessin(); as qr) {
       <svg
@@ -37,9 +40,9 @@ export function cheminQr(modules: readonly (readonly boolean[])[]): string {
         <path [attr.d]="qr.chemin" fill="#000" />
       </svg>
     } @else if (echec()) {
-      <p class="echec" role="alert">Le code QR n’a pas pu être affiché : utilisez le bouton ci-dessous.</p>
+      <p class="echec" role="alert">{{ 'abonnement.mobile.qrEchec' | transloco }}</p>
     } @else {
-      <div class="attente" role="status" aria-label="Préparation du code QR"></div>
+      <div class="attente" role="status" [attr.aria-label]="'abonnement.mobile.qrPreparation' | transloco"></div>
     }
   `,
   styles: `
@@ -69,7 +72,7 @@ export function cheminQr(modules: readonly (readonly boolean[])[]): string {
 })
 export class CodeQr {
   readonly texte = input.required<string>();
-  readonly libelle = input('Code QR');
+  readonly libelle = input(traduire('abonnement.mobile.codeQr'));
 
   protected readonly dessin = signal<CodeQrDessine | null>(null);
   protected readonly echec = signal(false);

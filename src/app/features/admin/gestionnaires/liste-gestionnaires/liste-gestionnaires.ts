@@ -17,13 +17,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { GestionnaireResponse, nomComplet } from '../../../../core/models/gestionnaire.model';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../../../core/services/auth.service';
 import { GestionnaireService } from '../../../../core/services/gestionnaire.service';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { ActionsGestionnaire } from '../actions-gestionnaire';
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../../core/utils/pagination-url';
 import { DELAI_RECHERCHE_MS } from '../../../../core/utils/recherche';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 
 /** Filtre d'état : ?actif=true|false dans l'URL, absent pour tous. */
@@ -35,8 +37,7 @@ export type FiltreActif = 'tous' | 'actifs' | 'desactives';
  */
 @Component({
   selector: 'app-liste-gestionnaires',
-  imports: [
-    NgTemplateOutlet,
+  imports: [TranslocoPipe, NgTemplateOutlet,
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -62,7 +63,7 @@ export class ListeGestionnaires {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
-  protected readonly messageLectureSeule = MESSAGE_LECTURE_SEULE;
+  protected readonly messageLectureSeule = messageLectureSeule;
   protected readonly nomComplet = nomComplet;
   protected readonly tailles = [...TAILLES_PAGE];
   /** Garde les lignes (et le focus) quand un élément est mis à jour. */
@@ -82,11 +83,11 @@ export class ListeGestionnaires {
   });
   protected readonly filtre = computed(() => !!this.termeRecherche() || this.filtreActif() !== 'tous');
   protected readonly messageAucunResultat = computed(() => {
-    const etat = { tous: '', actifs: ' actif', desactives: ' désactivé' }[this.filtreActif()];
+    const etat = this.filtreActif();
     const terme = this.termeRecherche();
     return terme
-      ? `Aucun gestionnaire${etat} ne correspond à « ${terme} ».`
-      : `Aucun gestionnaire${etat}.`;
+      ? traduire(`gestionnaires.liste.aucunRecherche.${etat}`, { terme })
+      : traduire(`gestionnaires.liste.aucunFiltre.${etat}`);
   });
   /** Champ de recherche ; l'URL reste la source de vérité (retour arrière, rechargement). */
   protected readonly champRecherche = new FormControl('', { nonNullable: true });

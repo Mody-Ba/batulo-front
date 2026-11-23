@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfigurationNumerique } from '../../../core/models/sondage.model';
 import { ChampBase } from './champ-base';
+import { formaterNombre, traduire, traduirePluriel } from '../../../core/i18n/traduire';
 
 /** NUMERIQUE : champ nombre natif (clavier numérique sur téléphone), bornes et décimales de la question. */
 @Component({
@@ -30,13 +31,15 @@ export class ChampNumerique extends ChampBase {
     const { min, max, decimales } = this.config();
     const bornes =
       min !== undefined && max !== undefined
-        ? `De ${min} à ${max}`
+        ? traduire('public.champs.deA', { min: formaterNombre(min), max: formaterNombre(max) })
         : min !== undefined
-          ? `Au moins ${min}`
+          ? traduire('public.champs.auMoins', { min: formaterNombre(min) })
           : max !== undefined
-            ? `Au plus ${max}`
+            ? traduire('public.champs.auPlus', { max: formaterNombre(max) })
             : null;
-    const precision = decimales ? `${decimales} décimale${decimales > 1 ? 's' : ''} au plus` : 'Nombre entier';
+    const precision = decimales
+      ? traduirePluriel('public.champs.decimales', decimales)
+      : traduire('public.champs.entier');
     return bornes ? `${bornes} · ${precision}` : precision;
   });
 

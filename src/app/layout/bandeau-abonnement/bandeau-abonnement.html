@@ -4,7 +4,7 @@
       class="bandeau"
       [class.alerte]="alerte()"
       [class.expire]="expire()"
-      aria-label="Votre abonnement"
+      [attr.aria-label]="'bandeau.votreAbonnement' | transloco"
       [attr.role]="alerte() || expire() ? 'status' : null"
     >
       <mat-icon
@@ -17,10 +17,10 @@
           <strong>{{ libellesFormule[formule] }}</strong>
         }
         @if (expire()) {
-          <span>Expiré le {{ abonnement.dateExpiration | dateL: 'longDate' }} : accès en lecture seule.</span>
+          <span>{{ 'bandeau.expireLe' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
         } @else {
           <span [class.important]="alerte()">{{ texteJours() }}</span>
-          <span>Expire le {{ abonnement.dateExpiration | dateL: 'longDate' }}</span>
+          <span>{{ 'bandeau.expirera' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
         }
       </p>
       <a
@@ -29,7 +29,7 @@
         routerLink="/admin/abonnement/souscrire"
         [queryParams]="{ formule: abonnement.formule }"
       >
-        Renouveler
+        {{ 'bandeau.renouveler' | transloco }}
       </a>
     </aside>
   }

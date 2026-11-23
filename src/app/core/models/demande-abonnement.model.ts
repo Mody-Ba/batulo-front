@@ -1,3 +1,4 @@
+import { libelles } from '../i18n/traduire';
 import { Formule, StatutAbonnement } from './abonnement.model';
 
 /** Statut d'une demande d'augmentation d'abonnement (enum StatutDemande du backend). */
@@ -5,11 +6,7 @@ export type StatutDemande = 'EN_ATTENTE' | 'TRAITEE' | 'REFUSEE';
 
 export const STATUTS_DEMANDE: readonly StatutDemande[] = ['EN_ATTENTE', 'TRAITEE', 'REFUSEE'];
 
-export const LIBELLES_STATUT_DEMANDE: Record<StatutDemande, string> = {
-  EN_ATTENTE: 'En attente',
-  TRAITEE: 'Acceptée',
-  REFUSEE: 'Refusée',
-};
+export const LIBELLES_STATUT_DEMANDE = libelles<StatutDemande>('statutsDemande', STATUTS_DEMANDE);
 
 /** Statut lu dans l'URL (?statut=) ; null s'il est absent ou inconnu. */
 export function statutDemandeValide(valeur: string | null | undefined): StatutDemande | null {

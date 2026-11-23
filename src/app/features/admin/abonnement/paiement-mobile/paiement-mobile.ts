@@ -17,8 +17,9 @@ import { montantEnClair } from '../../../../core/utils/montant';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { CodeQr } from './code-qr';
-import { finDuSuivi, MESSAGE_ECHEC_MOBILE, MESSAGE_EXPIRE_MOBILE, suivrePaiementMobile } from './suivi-paiement-mobile';
+import { finDuSuivi, messageEchecMobile, messageExpireMobile, suivrePaiementMobile } from './suivi-paiement-mobile';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur';
 
@@ -30,7 +31,7 @@ type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur
  */
 @Component({
   selector: 'app-paiement-mobile',
-  imports: [DateLPipe,  MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
+  imports: [TranslocoPipe, DateLPipe,  MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
   templateUrl: './paiement-mobile.html',
   styleUrl: './paiement-mobile.scss',
 })
@@ -50,8 +51,8 @@ export class PaiementMobile {
   protected readonly etat = signal<EtatPaiementMobile>('creation');
   protected readonly session = signal<PaiementMobileResponse | null>(null);
   protected readonly erreur = signal<unknown>(null);
-  protected readonly messageEchec = MESSAGE_ECHEC_MOBILE;
-  protected readonly messageExpire = MESSAGE_EXPIRE_MOBILE;
+  protected readonly messageEchec = messageEchecMobile;
+  protected readonly messageExpire = messageExpireMobile;
 
   private suivi: Subscription | null = null;
 

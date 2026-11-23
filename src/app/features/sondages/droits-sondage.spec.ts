@@ -1,11 +1,11 @@
 import { UtilisateurResponse } from '../../core/models/utilisateur.model';
-import { MESSAGE_LECTURE_SEULE } from '../../core/services/auth.service';
+import { messageLectureSeule } from '../../core/services/auth.service';
 import { gestionnaireDeTest } from '../../testing/donnees-test';
 import {
-  MESSAGE_RESERVE_CREATEUR,
-  MESSAGE_SANS_PERMISSION,
-  MESSAGE_SONDAGE_FERME,
-  MESSAGE_SONDAGE_PUBLIE,
+  messageReserveCreateur,
+  messageSansPermission,
+  messageSondageFerme,
+  messageSondagePublie,
   raisonLectureSeule,
 } from './droits-sondage';
 
@@ -20,13 +20,13 @@ describe('raisonLectureSeule', () => {
 
   it('publié ou fermé : jamais modifiable, avec le renvoi à une nouvelle version', () => {
     const contexte = { role: 'ADMIN' as const, utilisateur: null, lectureSeule: false };
-    expect(raisonLectureSeule({ ...brouillon, publie: true, statut: 'EN_COURS' }, contexte)).toBe(MESSAGE_SONDAGE_PUBLIE);
-    expect(raisonLectureSeule({ ...brouillon, publie: true, statut: 'TERMINE' }, contexte)).toBe(MESSAGE_SONDAGE_FERME);
+    expect(raisonLectureSeule({ ...brouillon, publie: true, statut: 'EN_COURS' }, contexte)).toBe(messageSondagePublie());
+    expect(raisonLectureSeule({ ...brouillon, publie: true, statut: 'TERMINE' }, contexte)).toBe(messageSondageFerme());
   });
 
   it('abonnement expiré : lecture seule', () => {
     expect(raisonLectureSeule(brouillon, { role: 'ADMIN', utilisateur: null, lectureSeule: true })).toBe(
-      MESSAGE_LECTURE_SEULE,
+      messageLectureSeule(),
     );
   });
 
@@ -40,9 +40,9 @@ describe('raisonLectureSeule', () => {
         utilisateur: gestionnaire({ peutCreerSondages: false }),
         lectureSeule: false,
       }),
-    ).toBe(MESSAGE_SANS_PERMISSION);
+    ).toBe(messageSansPermission());
     expect(
       raisonLectureSeule(brouillon, { role: 'GESTIONNAIRE', utilisateur: gestionnaire({ id: 8 }), lectureSeule: false }),
-    ).toBe(MESSAGE_RESERVE_CREATEUR);
+    ).toBe(messageReserveCreateur());
   });
 });

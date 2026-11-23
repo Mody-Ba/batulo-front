@@ -35,13 +35,11 @@ import {
   ResultatDialogueDemande,
 } from '../dialogue-demande/dialogue-demande';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { libelles, traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Pastilles de filtre (« Toutes » + les statuts), au pluriel. */
-const LIBELLES_FILTRE: Record<StatutDemande, string> = {
-  EN_ATTENTE: 'En attente',
-  TRAITEE: 'Acceptées',
-  REFUSEE: 'Refusées',
-};
+const LIBELLES_FILTRE = libelles<StatutDemande>('superAdmin.demandes.filtre', ['EN_ATTENTE', 'TRAITEE', 'REFUSEE']);
 
 /**
  * Demandes d'augmentation d'abonnement reçues (SA-07), les plus récentes d'abord. Filtre de statut et page dans
@@ -50,7 +48,7 @@ const LIBELLES_FILTRE: Record<StatutDemande, string> = {
  */
 @Component({
   selector: 'app-liste-demandes',
-  imports: [DateLPipe, 
+  imports: [TranslocoPipe, DateLPipe, 
     NgTemplateOutlet,
     MatButtonModule,
     MatChipsModule,
@@ -157,7 +155,7 @@ export class ListeDemandes {
 
   /** Formule actuelle null : jamais payé. */
   protected libelleFormule(formule: Formule | null): string {
-    return formule ? LIBELLES_FORMULE[formule] : 'aucune';
+    return formule ? LIBELLES_FORMULE[formule] : traduire('superAdmin.demandes.aucuneFormule');
   }
 
   protected ouvrir(demande: DemandeAbonnementResponse, depuisUrl = false): void {
@@ -182,9 +180,9 @@ export class ListeDemandes {
         }
         this.snackBar.open(
           resultat.statut === 'TRAITEE'
-            ? `Demande de ${resultat.entreprise} acceptée ; l’admin en est notifié.`
-            : `Demande de ${resultat.entreprise} refusée ; l’admin en est notifié.`,
-          'Fermer',
+            ? traduire('superAdmin.demandes.acceptee', { entreprise: resultat.entreprise })
+            : traduire('superAdmin.demandes.refusee', { entreprise: resultat.entreprise }),
+          traduire('commun.fermer'),
           { duration: 6000 },
         );
         // Filtrée sur « En attente », la demande sort de la liste : on relit la page.

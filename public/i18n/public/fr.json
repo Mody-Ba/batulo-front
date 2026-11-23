@@ -1,1 +1,157 @@
-{"public":{}}
+{
+  "public": {
+    "erreurs": {
+      "injoignable": "Le serveur Batulo est injoignable. Vérifiez votre connexion puis réessayez.",
+      "inattendue": "Une erreur inattendue est survenue. Réessayez.",
+      "serveur": "Le serveur a rencontré un problème. Réessayez dans un instant.",
+      "validation": "Certaines informations sont invalides :",
+      "detailChamp": "{{champ}} : {{message}}"
+    },
+    "erreursApi": {
+      "SONDAGE_INTROUVABLE": "Ce sondage est introuvable.",
+      "SONDAGE_FERME": "Ce sondage n’accepte plus de réponses.",
+      "SONDAGE_NON_OUVERT": "Ce sondage n’est pas encore ouvert.",
+      "DEJA_REPONDU": "Vous avez déjà répondu à ce sondage depuis cet appareil.",
+      "REPONSES_INVALIDES": "Certaines réponses sont à corriger.",
+      "CONSENTEMENT_REQUIS": "Cochez la case de consentement pour envoyer vos réponses.",
+      "JETON_REPONDANT_INVALIDE": "Ce sondage n’accepte qu’une réponse par appareil : rechargez la page puis réessayez.",
+      "TROP_DE_REQUETES": "Trop de requêtes en peu de temps. Patientez un instant puis réessayez.",
+      "INTROUVABLE": "Cette adresse n’existe pas.",
+      "ERREUR_INTERNE": "Une erreur inattendue est survenue.",
+      "REQUETE_INVALIDE": "La requête est absente ou mal formée."
+    },
+    "commun": {
+      "allerAuContenu": "Aller au contenu"
+    },
+    "langue": {
+      "libelle": "Langue"
+    },
+    "etat": {
+      "chargement": "Chargement du sondage…",
+      "nonOuvert": "Il n’accepte pas encore de réponses.",
+      "revenir": "Revenez à ce moment-là avec le même lien.",
+      "ferme": "Il n’accepte plus de réponses. Merci de votre intérêt.",
+      "dejaRepondu": "Vos réponses ont déjà été envoyées depuis cet appareil. Ce sondage n’accepte qu’une réponse par appareil.",
+      "introuvable": "Ce lien ne correspond à aucun sondage. Vérifiez qu’il est complet, ou demandez-le à nouveau à la personne qui vous l’a envoyé.",
+      "tropDeRequetes": "Trop de demandes depuis votre connexion.",
+      "injoignable": "Le sondage n’a pas pu être chargé. Vérifiez votre connexion à Internet."
+    },
+    "fermeLe": "Ce sondage ferme le {{date}}.",
+    "brouillon": {
+      "repris": "Vos réponses en cours ont été reprises.",
+      "effacer": "Tout effacer et recommencer"
+    },
+    "confirmation": {
+      "merci": "Merci !",
+      "message": "Merci, votre réponse a été enregistrée.",
+      "envoyeLe": "Envoyé le {{date}}.",
+      "nouvelle": "Nouvelle réponse",
+      "collecte": "Collecte terrain : le formulaire repart vide pour la personne suivante.",
+      "fermer": "Vous pouvez fermer cette page."
+    },
+    "reessayer": "Réessayer",
+    "pied": "Sondage réalisé avec Batulo",
+    "titresIndisponible": {
+      "non-ouvert": "Ce sondage n’est pas encore ouvert",
+      "ferme": "Ce sondage est fermé",
+      "deja-repondu": "Vous avez déjà répondu",
+      "introuvable": "Lien introuvable",
+      "trop-de-requetes": "Trop de demandes",
+      "injoignable": "Connexion impossible",
+      "inattendu": "Le sondage ne peut pas être affiché"
+    },
+    "titres": {
+      "sondage": "{{titre}} · Batulo",
+      "repondre": "Répondre au sondage · Batulo"
+    },
+    "envoi": {
+      "injoignable": "Vos réponses n’ont pas pu être envoyées : vérifiez votre connexion, puis réessayez. Elles sont gardées sur cet appareil.",
+      "gardees": "Vos réponses sont gardées sur cet appareil."
+    },
+    "formulaire": {
+      "obligatoire": "Réponse obligatoire",
+      "aucuneQuestion": "Ce formulaire n’a encore aucune question.",
+      "sectionSur": "Section {{numero}} sur {{total}}",
+      "aCorriger": "Certaines réponses sont à corriger avant de continuer.",
+      "apercuValide": "Vos réponses sont valides. Rien n’a été envoyé : c’est un aperçu.",
+      "precedent": "Précédent",
+      "envoiEnCours": "Envoi en cours…",
+      "verifier": "Vérifier (aperçu, rien n’est envoyé)",
+      "envoyer": "Envoyer mes réponses",
+      "suivant": "Suivant",
+      "noteApercu": "Aperçu : vous pouvez répondre pour essayer le formulaire ; rien n’est enregistré.",
+      "recommencer": "Recommencer"
+    },
+    "accueil": {
+      "objet": "Objet de l’enquête",
+      "confidentialite": "Confidentialité des réponses",
+      "consentement": "Consentement",
+      "accepte": "J’accepte de participer à cette enquête.",
+      "reprendre": "Reprendre le questionnaire",
+      "sectionSur": "(section {{numero}} sur {{total}})",
+      "recommencer": "Recommencer à zéro",
+      "commencer": "Commencer le questionnaire",
+      "cochez": "Cochez la case de consentement pour commencer.",
+      "gardees": "Vos réponses en cours sont gardées sur cet appareil. « Recommencer à zéro » les efface.",
+      "apercu": "Aperçu de la page d’accueil : rien n’est enregistré."
+    },
+    "reponses": {
+      "obligatoire": "Cette question est obligatoire.",
+      "longueurMax": {
+        "one": "{{n}} caractère au plus.",
+        "other": "{{n}} caractères au plus."
+      },
+      "nombre": "La réponse doit être un nombre.",
+      "entier": "La réponse doit être un nombre entier.",
+      "decimales": {
+        "one": "{{n}} décimale au plus.",
+        "other": "{{n}} décimales au plus."
+      },
+      "entre": "La valeur doit être comprise entre {{min}} et {{max}}.",
+      "auMoins": "La valeur doit être au moins {{min}}.",
+      "auPlus": "La valeur doit être au plus {{max}}.",
+      "dateMin": "La date doit être le {{date}} ou après.",
+      "dateMax": "La date doit être le {{date}} ou avant.",
+      "matrice": "Choisissez une réponse pour chaque ligne."
+    },
+    "annonce": {
+      "uneApparue": "Nouvelle question affichée : « {{libelle}} ».",
+      "apparues": {
+        "one": "{{n}} nouvelle question affichée.",
+        "other": "{{n}} nouvelles questions affichées."
+      },
+      "uneMasquee": "Une question n’est plus affichée.",
+      "masquees": {
+        "one": "{{n}} question n’est plus affichée.",
+        "other": "{{n}} questions ne sont plus affichées."
+      }
+    },
+    "question": {
+      "obligatoire": "(obligatoire)"
+    },
+    "champs": {
+      "oui": "Oui",
+      "non": "Non",
+      "monter": "Monter « {{libelle}} » (position {{position}})",
+      "descendre": "Descendre « {{libelle}} » (position {{position}})",
+      "garderOrdre": "Garder cet ordre",
+      "deplace": "« {{libelle}} » est maintenant en position {{position}} sur {{total}}.",
+      "classementGarde": "Classement enregistré dans vos réponses.",
+      "deA": "De {{min}} à {{max}}",
+      "auMoins": "Au moins {{min}}",
+      "auPlus": "Au plus {{max}}",
+      "decimales": {
+        "one": "{{n}} décimale au plus",
+        "other": "{{n}} décimales au plus"
+      },
+      "entier": "Nombre entier",
+      "duAu": "Du {{du}} au {{au}}",
+      "aPartirDu": "À partir du {{date}}",
+      "jusquau": "Jusqu’au {{date}}",
+      "compteur": "{{longueur}} / {{max}} caractères"
+    },
+    "apparence": {
+      "logo": "Logo de l’organisation"
+    }
+  }
+}

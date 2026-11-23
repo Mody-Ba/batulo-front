@@ -15,47 +15,47 @@ export const routes: Routes = [
         // ?statut=&page=&taille=
         path: '',
         pathMatch: 'full',
-        title: 'Sondages · Batulo',
+        title: 'titres.sondages',
         loadComponent: () => import('./liste-sondages/liste-sondages').then((m) => m.ListeSondages),
       },
       {
         path: 'nouveau',
-        title: 'Nouveau sondage · Batulo',
+        title: 'titres.nouveauSondage',
         loadComponent: () => import('./creation-sondage/creation-sondage').then((m) => m.CreationSondage),
       },
       {
         // Lecture seule si le sondage est publié ou fermé, l'abonnement expiré, ou sans droit de modification.
         path: ':id/modifier',
-        title: 'Modifier le sondage · Batulo',
+        title: 'titres.modifierSondage',
         canDeactivate: [quitterEditeurGuard],
         loadComponent: () => import('./editeur/editeur-sondage').then((m) => m.EditeurSondage),
       },
       {
         path: ':id/apercu',
-        title: 'Aperçu du sondage · Batulo',
+        title: 'titres.apercu',
         loadComponent: () => import('./apercu-sondage/apercu-sondage').then((m) => m.ApercuSondage),
       },
       {
         // Lien public et QR code (sondage publié).
         path: ':id/diffuser',
-        title: 'Diffuser le sondage · Batulo',
+        title: 'titres.diffuser',
         loadComponent: () => import('./diffuser-sondage/diffuser-sondage').then((m) => m.DiffuserSondage),
       },
       {
         // ?page=&taille=
         path: ':id/reponses',
-        title: 'Réponses du sondage · Batulo',
+        title: 'titres.reponses',
         loadComponent: () => import('./reponses/liste-reponses').then((m) => m.ListeReponses),
       },
       {
         // ?lignee=&du=&au=&granularite=&critere=cle:valeur (répété)
         path: ':id/statistiques',
-        title: 'Statistiques du sondage · Batulo',
+        title: 'titres.statistiques',
         loadComponent: () => import('./statistiques/page-statistiques').then((m) => m.PageStatistiques),
       },
       {
         path: ':id',
-        title: 'Sondage · Batulo',
+        title: 'titres.sondage',
         loadComponent: () => import('./detail-sondage/detail-sondage').then((m) => m.DetailSondage),
       },
     ],

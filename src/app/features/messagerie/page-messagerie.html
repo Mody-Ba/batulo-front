@@ -1,5 +1,5 @@
 <section class="conteneur-page messagerie" [class.fil-ouvert]="etat.conversationActive() !== null">
-  <app-entete-page titre="Messagerie" icone="forum" class="entete">
+  <app-entete-page [titre]="'menu.messagerie' | transloco" icone="forum" class="entete">
     <button matButton="filled" type="button" (click)="nouvelleConversation()" [disabled]="ouvertureEnCours()">
       <mat-icon fontIcon="edit_square" aria-hidden="true" />{{ titreNouvelle() }}
     </button>
@@ -7,18 +7,18 @@
 
   <div class="disposition">
     <aside class="liste" aria-labelledby="titre-conversations">
-      <h2 id="titre-conversations" class="visuellement-cache">Conversations</h2>
+      <h2 id="titre-conversations" class="visuellement-cache">{{ 'messagerie.conversations' | transloco }}</h2>
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des conversations" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'messagerie.chargement' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Les conversations n’ont pas pu être chargées.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'messagerie.erreur' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
 
       @if (!chargement() && !erreur() && etat.conversations().length === 0) {
-        <p class="etat-vide" role="status">Aucune conversation pour le moment.</p>
+        <p class="etat-vide" role="status">{{ 'messagerie.aucune' | transloco }}</p>
       }
       <ul class="conversations">
         @for (c of etat.conversations(); track c.id) {
@@ -40,23 +40,23 @@
               </span>
               <span class="texte" aria-hidden="true">
                 <span class="ligne">
-                  <span class="nom">{{ nom(c.interlocuteur) }}</span>
+                  <span class="nom" dir="auto">{{ nom(c.interlocuteur) }}</span>
                   @if (c.dernierMessageLe) {
                     <span class="date">{{ c.dernierMessageLe | dateL: 'jourHeure' }}</span>
                   }
                 </span>
                 @if (c.interlocuteur.entreprise && auth.role() === 'SUPER_ADMIN') {
-                  <span class="entreprise">{{ c.interlocuteur.entreprise }}</span>
+                  <span class="entreprise" dir="auto">{{ c.interlocuteur.entreprise }}</span>
                 }
                 <span class="ligne">
                   <span class="extrait">
                     @if (c.dernierMessage; as d) {
                       @if (!d.recu) {
-                        Vous :
+                        {{ 'messagerie.vous' | transloco }}
                       }
-                      {{ d.extrait }}
+                      <bdi>{{ d.extrait }}</bdi>
                     } @else {
-                      Aucun message
+                      {{ 'messagerie.aucunMessage' | transloco }}
                     }
                   </span>
                   @if (c.nonLus > 0) {

@@ -1,4 +1,5 @@
 import { AbstractControl, FormArray, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { traduire } from '../../core/i18n/traduire';
 
 /**
  * Règles du backend pour le contenu d'un sondage (ValidateurQuestion, SondageServiceImpl, records *Request),
@@ -104,17 +105,17 @@ export function messageErreurListe(controle: AbstractControl, element: string): 
     return null;
   }
   if (erreurs['optionsMin']) {
-    return `Ajoutez au moins ${erreurs['optionsMin'].min} options.`;
+    return traduire('editeur.regles.optionsMin', { min: erreurs['optionsMin'].min });
   }
   if (erreurs['valeurEnDouble']) {
-    return `La valeur « ${erreurs['valeurEnDouble'].valeur} » est utilisée par deux options.`;
+    return traduire('editeur.regles.valeurEnDouble', { valeur: erreurs['valeurEnDouble'].valeur });
   }
   if (erreurs['nombreElements']) {
     const { min, max } = erreurs['nombreElements'];
-    return `De ${min} à ${max} ${element}.`;
+    return traduire('editeur.regles.nombreElements', { min, max, element });
   }
   if (erreurs['doublon']) {
-    return `« ${erreurs['doublon'].texte} » apparaît deux fois.`;
+    return traduire('editeur.regles.doublon', { texte: erreurs['doublon'].texte });
   }
   return null;
 }

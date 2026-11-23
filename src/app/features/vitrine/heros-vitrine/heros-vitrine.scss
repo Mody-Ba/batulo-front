@@ -85,13 +85,13 @@ h1 {
 
 .formulaire {
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   width: 62%;
   border-top: 6px solid var(--mat-sys-primary);
 }
 
 .resultats {
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   width: 58%;
 }

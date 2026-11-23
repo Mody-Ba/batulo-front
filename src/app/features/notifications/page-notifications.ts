@@ -17,6 +17,9 @@ import { EntetePage } from '../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../shared/components/message-erreur/message-erreur';
 import { lienNotification, LienNotification } from './liens-notifications';
 import { DateLPipe } from '../../core/i18n/formats.pipes';
+import { traduire, traduirePluriel } from '../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../core/i18n/formats.pipes';
 
 /**
  * Notifications, les plus récentes d'abord, toutes ou filtrées (?lue=true|false&page=&taille= dans l'URL) : marquer
@@ -24,7 +27,7 @@ import { DateLPipe } from '../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-page-notifications',
-  imports: [DateLPipe,  MatButtonModule, MatButtonToggleModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe,  MatButtonModule, MatButtonToggleModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   templateUrl: './page-notifications.html',
   styleUrl: './page-notifications.scss',
 })
@@ -46,11 +49,11 @@ export class PageNotifications {
   protected readonly etatVide = computed(() => {
     switch (this.filtreLue()) {
       case true:
-        return 'Aucune notification lue.';
+        return traduire('notifications.page.aucuneLue');
       case false:
-        return 'Aucune notification non lue.';
+        return traduire('notifications.page.aucuneNonLue');
       default:
-        return 'Aucune notification pour le moment.';
+        return traduire('notifications.page.aucune');
     }
   });
   protected readonly numeroPage = computed(() => numeroPageUrl(this.pageUrl()));
@@ -109,7 +112,7 @@ export class PageNotifications {
     }
     this.service.marquerLue(notification.id).subscribe({
       next: (miseAJour) => this.remplacer(miseAJour),
-      error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+      error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 }),
     });
   }
 
@@ -131,14 +134,16 @@ export class PageNotifications {
           this.charger(0, this.taillePage());
         }
         this.snackBar.open(
-          r.nombreMarquees > 1 ? `${r.nombreMarquees} notifications marquées comme lues.` : 'Notifications marquées comme lues.',
-          'Fermer',
+          r.nombreMarquees > 1
+            ? traduirePluriel('notifications.page.marquees', r.nombreMarquees)
+            : traduire('notifications.page.marqueesSans'),
+          traduire('commun.fermer'),
           { duration: 4000 },
         );
       },
       error: (erreur: unknown) => {
         this.marquageEnCours.set(false);
-        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
       },
     });
   }

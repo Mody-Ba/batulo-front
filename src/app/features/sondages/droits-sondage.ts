@@ -1,17 +1,13 @@
 import { Role } from '../../core/models/role.model';
 import { SondageResponse } from '../../core/models/sondage.model';
 import { UtilisateurResponse } from '../../core/models/utilisateur.model';
-import { MESSAGE_LECTURE_SEULE } from '../../core/services/auth.service';
+import { messageLectureSeule } from '../../core/services/auth.service';
+import { traduire } from '../../core/i18n/traduire';
 
-export const MESSAGE_SONDAGE_PUBLIE =
-  'Ce sondage est publié : son contenu est figé pour ne pas fausser les réponses. Pour le modifier, créez-en une ' +
-  'nouvelle version.';
-export const MESSAGE_SONDAGE_FERME =
-  'Ce sondage est fermé : son contenu ne se modifie plus. Pour le rouvrir ou le modifier, créez-en une nouvelle version.';
-export const MESSAGE_RESERVE_CREATEUR =
-  'Vous pouvez consulter ce sondage, mais seuls son créateur et l’admin peuvent le modifier.';
-export const MESSAGE_SANS_PERMISSION =
-  'Votre admin ne vous a pas donné la permission de créer ou modifier des sondages.';
+export const messageSondagePublie = (): string => traduire('sondages.droits.publie');
+export const messageSondageFerme = (): string => traduire('sondages.droits.ferme');
+export const messageReserveCreateur = (): string => traduire('sondages.droits.reserveCreateur');
+export const messageSansPermission = (): string => traduire('sondages.droits.sansPermission');
 
 export interface ContexteDroits {
   role: Role | null;
@@ -30,21 +26,21 @@ export function raisonLectureSeule(
   { role, utilisateur, lectureSeule }: ContexteDroits,
 ): string | null {
   if (sondage.publie) {
-    return sondage.statut === 'TERMINE' ? MESSAGE_SONDAGE_FERME : MESSAGE_SONDAGE_PUBLIE;
+    return sondage.statut === 'TERMINE' ? messageSondageFerme() : messageSondagePublie();
   }
   if (lectureSeule) {
-    return MESSAGE_LECTURE_SEULE;
+    return messageLectureSeule();
   }
   if (role === 'ADMIN') {
     return null;
   }
   if (role !== 'GESTIONNAIRE' || !utilisateur) {
-    return MESSAGE_RESERVE_CREATEUR;
+    return messageReserveCreateur();
   }
   if (!utilisateur.peutCreerSondages) {
-    return MESSAGE_SANS_PERMISSION;
+    return messageSansPermission();
   }
-  return sondage.creePar?.id === utilisateur.id ? null : MESSAGE_RESERVE_CREATEUR;
+  return sondage.creePar?.id === utilisateur.id ? null : messageReserveCreateur();
 }
 
 /** Ce que l'utilisateur peut faire d'un sondage (affichage seulement : le serveur décide). */

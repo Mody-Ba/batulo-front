@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Routes } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Panneau du fil quand aucune conversation n'est ouverte (masqué sur téléphone). */
 @Component({
   selector: 'app-fil-vide',
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   template: `
     <p class="fil-vide">
       <mat-icon fontIcon="forum" aria-hidden="true" />
-      Choisissez une conversation pour lire ses messages.
+      {{ 'messagerie.choisissez' | transloco }}
     </p>
   `,
   styles: `
@@ -35,10 +36,10 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./page-messagerie').then((m) => m.PageMessagerie),
     children: [
-      { path: '', pathMatch: 'full', title: 'Messagerie · Batulo', component: FilVide },
+      { path: '', pathMatch: 'full', title: 'titres.messagerie', component: FilVide },
       {
         path: ':id',
-        title: 'Conversation · Batulo',
+        title: 'titres.conversation',
         loadComponent: () => import('./fil-conversation').then((m) => m.FilConversation),
       },
     ],

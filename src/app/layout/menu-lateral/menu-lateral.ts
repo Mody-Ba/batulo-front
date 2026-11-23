@@ -5,13 +5,15 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MessagerieService } from '../../core/services/messagerie.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { LienNavigation } from './liens-navigation';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../core/i18n/formats.pipes';
 
 /** Liste des rubriques du rôle connecté (calculée par la mise en page). */
 @Component({
   selector: 'app-menu-lateral',
-  imports: [MatListModule, MatIconModule, RouterLink, RouterLinkActive],
+  imports: [PlurielPipe, TranslocoPipe, MatListModule, MatIconModule, RouterLink, RouterLinkActive],
   template: `
-    <nav aria-label="Menu principal">
+    <nav [attr.aria-label]="'menu.principal' | transloco">
       <mat-nav-list>
         @for (lien of liens(); track lien.lien) {
           <a
@@ -25,10 +27,10 @@ import { LienNavigation } from './liens-navigation';
           >
             <mat-icon matListItemIcon [fontIcon]="lien.icone" aria-hidden="true" />
             <span matListItemTitle>
-              {{ lien.libelle }}
+              {{ lien.libelle | transloco }}
               @if (compteur(lien); as n) {
                 <span class="compteur" aria-hidden="true">{{ n > 99 ? '99+' : n }}</span>
-                <span class="visuellement-cache">({{ n }} non {{ lien.compteur === 'messagerie' ? 'lu' : 'lue' }}{{ n > 1 ? 's' : '' }})</span>
+                <span class="visuellement-cache">{{ (lien.compteur === 'messagerie' ? 'menu.nonLus' : 'menu.nonLues') | pluriel: n }}</span>
               }
             </span>
           </a>
@@ -51,7 +53,7 @@ import { LienNavigation } from './liens-navigation';
       justify-content: center;
       min-width: 20px;
       height: 20px;
-      margin-left: var(--bt-espace-2);
+      margin-inline-start: var(--bt-espace-2);
       padding: 0 6px;
       border-radius: 10px;
       background: var(--mat-sys-error);

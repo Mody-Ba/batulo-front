@@ -1,42 +1,42 @@
 <section class="conteneur-page">
-  <app-entete-page titre="Notifications" icone="notifications">
+  <app-entete-page [titre]="'notifications.titre' | transloco" icone="notifications">
     <button
       matButton="tonal"
       type="button"
       (click)="toutMarquerLu()"
       [disabled]="nonLues() === 0 || marquageEnCours()"
     >
-      <mat-icon fontIcon="done_all" aria-hidden="true" />Tout marquer comme lu
+      <mat-icon fontIcon="done_all" aria-hidden="true" />{{ 'notifications.toutMarquerLu' | transloco }}
     </button>
   </app-entete-page>
 
   <mat-button-toggle-group
     class="filtre"
-    aria-label="Notifications affichées"
+    [attr.aria-label]="'notifications.page.affichees' | transloco"
     [value]="filtreLue() === null ? 'toutes' : filtreLue() ? 'lues' : 'non-lues'"
     (change)="filtrer($event.value)"
     [hideSingleSelectionIndicator]="true"
   >
-    <mat-button-toggle value="toutes">Toutes</mat-button-toggle>
-    <mat-button-toggle value="non-lues">Non lues</mat-button-toggle>
-    <mat-button-toggle value="lues">Lues</mat-button-toggle>
+    <mat-button-toggle value="toutes">{{ 'superAdmin.demandes.toutes' | transloco }}</mat-button-toggle>
+    <mat-button-toggle value="non-lues">{{ 'notifications.page.nonLues' | transloco }}</mat-button-toggle>
+    <mat-button-toggle value="lues">{{ 'notifications.page.lues' | transloco }}</mat-button-toggle>
   </mat-button-toggle-group>
 
   <p class="texte-aide" role="status">
     @if (nonLues() === 0) {
-      Aucune notification non lue.
+      {{ 'notifications.page.aucuneNonLue' | transloco }}
     } @else {
-      {{ nonLues() }} notification{{ nonLues() > 1 ? 's' : '' }} non lue{{ nonLues() > 1 ? 's' : '' }}.
+      {{ 'notifications.page.nNonLues' | pluriel: nonLues() }}
     }
   </p>
 
   <div class="zone-progression">
     @if (chargement()) {
-      <mat-progress-bar mode="indeterminate" aria-label="Chargement des notifications" />
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'notifications.chargement' | transloco" />
     }
   </div>
-  <app-message-erreur [erreur]="erreur()" parDefaut="Les notifications n’ont pas pu être chargées.">
-    <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'notifications.erreurChargement' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
   </app-message-erreur>
 
   @if (page(); as p) {
@@ -51,7 +51,7 @@
               <p class="titre">
                 @if (!n.lue) {
                   <span class="point" aria-hidden="true"></span>
-                  <span class="visuellement-cache">Non lue : </span>
+                  <span class="visuellement-cache">{{ 'notifications.nonLuePrefixe' | transloco }}</span>
                 }
                 {{ n.titre }}
               </p>
@@ -71,7 +71,7 @@
                   matIconButton
                   type="button"
                   (click)="marquerLue(n)"
-                  [attr.aria-label]="'Marquer « ' + n.titre + ' » comme lue'"
+                  [attr.aria-label]="'notifications.page.marquerLue' | transloco: { titre: n.titre }"
                 >
                   <mat-icon fontIcon="mark_email_read" aria-hidden="true" />
                 </button>
@@ -86,7 +86,7 @@
         [pageSize]="taillePage()"
         [pageSizeOptions]="tailles"
         (page)="changerPage($event)"
-        aria-label="Pagination des notifications"
+        [attr.aria-label]="'notifications.page.pagination' | transloco"
       />
     }
   }

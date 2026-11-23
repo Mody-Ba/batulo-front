@@ -146,3 +146,10 @@
     padding-top: var(--bt-espace-8);
   }
 }
+
+// Choix de la langue, en haut du côté de fin de ligne (à droite en français, à gauche en arabe).
+.barre-langue {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: calc(-1 * var(--bt-espace-2));
+}

@@ -13,12 +13,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Title } from '@angular/platform-browser';
 import { debounceTime, Subject } from 'rxjs';
 import { ErreurQuestion } from '../../../core/models/erreur.model';
 import { ConfirmationReponseResponse, FormulairePublicResponse } from '../../../core/models/formulaire-public.model';
 import { FormulairePublicService } from '../../../core/services/formulaire-public.service';
-import { codeErreur, corpsErreur, messageErreur } from '../../../core/utils/erreur-http';
+import { codeErreur, corpsErreur, messageApi, messageErreur } from '../../../core/utils/erreur-http';
 import { accueilNecessaire } from '../../../core/models/sondage.model';
 import { AccueilSondage, DepartQuestionnaire, RepriseBrouillon } from '../../../shared/formulaire/accueil/accueil-sondage';
 import { BandeauApparence } from '../../../shared/formulaire/apparence/bandeau-apparence';
@@ -27,6 +26,10 @@ import { FormulaireSondage, ReponsesParQuestion } from '../../../shared/formulai
 import { ReponseQuestionRequest } from '../../../shared/formulaire/reponses';
 import { memoireRepondant } from './memoire-repondant';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { texteServeur, traduire } from '../../../core/i18n/traduire';
+import { TitreTraduit } from '../../../core/i18n/titre-traduit';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Délai après la dernière saisie avant d'écrire le brouillon dans le navigateur. */
 export const DELAI_BROUILLON_MS = 500;
@@ -46,17 +49,12 @@ type Etat =
   | { type: 'accueil'; formulaire: FormulairePublicResponse }
   | { type: 'formulaire'; formulaire: FormulairePublicResponse }
   | { type: 'confirmation'; formulaire: FormulairePublicResponse; confirmation: ConfirmationReponseResponse }
-  | { type: 'indisponible'; raison: RaisonIndisponible; message: string | null };
+  | { type: 'indisponible'; raison: RaisonIndisponible; code: string | null; message: string | null };
 
-export const TITRES_INDISPONIBLE: Record<RaisonIndisponible, string> = {
-  'non-ouvert': 'Ce sondage n’est pas encore ouvert',
-  ferme: 'Ce sondage est fermé',
-  'deja-repondu': 'Vous avez déjà répondu',
-  introuvable: 'Lien introuvable',
-  'trop-de-requetes': 'Trop de demandes',
-  injoignable: 'Connexion impossible',
-  inattendu: 'Le sondage ne peut pas être affiché',
-};
+/** Titre de l'écran d'état (clés public.titresIndisponible.*), dans la langue courante. */
+export function titreIndisponible(raison: RaisonIndisponible): string {
+  return traduire(`public.titresIndisponible.${raison}`);
+}
 
 /**
  * Refus de l'envoi faute de consentement. Code exact à confirmer dans l'OpenAPI (backend en cours) : tout code qui
@@ -101,17 +99,16 @@ export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndi
  */
 @Component({
   selector: 'app-formulaire-public',
-  imports: [DateLPipe,  AccueilSondage, FormulaireSondage, BandeauApparence],
+  imports: [TranslocoPipe, SelecteurLangue, DateLPipe,  AccueilSondage, FormulaireSondage, BandeauApparence],
   templateUrl: './formulaire-public.html',
   styleUrl: './formulaire-public.scss',
 })
 export class FormulairePublic {
   private readonly service = inject(FormulairePublicService);
-  private readonly titre = inject(Title);
+  private readonly titre = inject(TitreTraduit);
   private readonly hote = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
-  protected readonly titres = TITRES_INDISPONIBLE;
 
   /** Paramètre de route :jeton (le lien public, le même pour toutes les versions). */
   readonly jeton = input.required<string>();
@@ -165,12 +162,12 @@ export class FormulairePublic {
           if (formulaire.reponseUnique && formulaire.dejaRepondu) {
             memoireRepondant.marquerRepondu(jeton);
             memoireRepondant.effacerBrouillon(jeton);
-            this.afficherIndisponible('deja-repondu', null);
+            this.afficherIndisponible('deja-repondu');
             return;
           }
           // Le serveur fait foi : pas encore répondu (ou collecte terrain) -> le drapeau local est oublié.
           memoireRepondant.oublierRepondu(jeton);
-          this.titre.setTitle(`${formulaire.titre} · Batulo`);
+          this.titre.personnaliser(() => traduire('public.titres.sondage', { titre: formulaire.titre }));
           const brouillon = memoireRepondant.lireBrouillon(jeton);
           this.reponsesInitiales.set(brouillon?.reponses ?? null);
           this.sectionInitiale.set(brouillon?.section ?? 0);
@@ -193,10 +190,10 @@ export class FormulairePublic {
           const raison = raisonSelonErreur(erreur, true) ?? 'inattendu';
           // Serveur injoignable mais envoi déjà fait depuis cet appareil : on le dit plutôt que « connexion impossible ».
           if (raison === 'injoignable' && memoireRepondant.dejaRepondu(jeton)) {
-            this.afficherIndisponible('deja-repondu', null);
+            this.afficherIndisponible('deja-repondu');
             return;
           }
-          this.afficherIndisponible(raison, corpsErreur(erreur)?.message ?? null);
+          this.afficherIndisponible(raison, erreur);
         },
       });
   }
@@ -284,13 +281,13 @@ export class FormulairePublic {
             if (raison !== 'non-ouvert') {
               memoireRepondant.effacerBrouillon(jeton);
             }
-            this.afficherIndisponible(raison, corpsErreur(erreur)?.message ?? null);
+            this.afficherIndisponible(raison, erreur);
             return;
           }
           this.erreurEnvoi.set(
             (erreur as { status?: number }).status === 0
-              ? 'Vos réponses n’ont pas pu être envoyées : vérifiez votre connexion, puis réessayez. Elles sont gardées sur cet appareil.'
-              : `${messageErreur(erreur)} Vos réponses sont gardées sur cet appareil.`,
+              ? traduire('public.envoi.injoignable')
+              : `${messageErreur(erreur)} ${traduire('public.envoi.gardees')}`,
           );
           this.focaliser('.erreur-envoi');
         },
@@ -311,13 +308,32 @@ export class FormulairePublic {
     this.focaliserTitre();
   }
 
+  protected readonly titreIndisponible = titreIndisponible;
+
+  /** Message du serveur dans la langue courante (traduction de son code hors du français), ou null. */
+  protected messageIndisponible(etat: { code: string | null; message: string | null }): string | null {
+    return etat.message ? messageApi(etat.code, etat.message) : null;
+  }
+
+  /** « Merci, votre réponse a été enregistrée. » (message fixe du serveur, traduit hors du français). */
+  protected messageConfirmation(recu: string): string {
+    return texteServeur('public.confirmation.message', recu);
+  }
+
   private nombreSections(formulaire: FormulairePublicResponse): number {
     return formulaire.sections.filter((s) => s.questions.length > 0).length;
   }
 
-  private afficherIndisponible(raison: RaisonIndisponible, message: string | null): void {
-    this.titre.setTitle(`${TITRES_INDISPONIBLE[raison]} · Batulo`);
-    this.etat.set({ type: 'indisponible', raison, message });
+  /** Écran d'état ; le message du serveur (s'il y en a un) est relu dans la langue courante par messageIndisponible. */
+  private afficherIndisponible(raison: RaisonIndisponible, erreur?: unknown): void {
+    this.titre.personnaliser(() => traduire('public.titres.sondage', { titre: titreIndisponible(raison) }));
+    const message = corpsErreur(erreur)?.message;
+    this.etat.set({
+      type: 'indisponible',
+      raison,
+      code: codeErreur(erreur),
+      message: typeof message === 'string' && message.trim() ? message : null,
+    });
     this.focaliserTitre();
   }
 

@@ -8,6 +8,7 @@ import { ICONES_NOTIFICATION, NotificationResponse } from '../../../core/models/
 import { NotificationService } from '../../../core/services/notification.service';
 import { MessageErreur } from '../message-erreur/message-erreur';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Nombre de notifications affichées. */
 export const NOMBRE_NOTIFICATIONS = 5;
@@ -18,7 +19,7 @@ export const NOMBRE_NOTIFICATIONS = 5;
  */
 @Component({
   selector: 'app-dernieres-notifications',
-  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, MessageErreur],
   templateUrl: './dernieres-notifications.html',
   styleUrl: './dernieres-notifications.scss',
 })

@@ -6,7 +6,7 @@ import { AbonnementService } from '../../../../core/services/abonnement.service'
 import { sessionMobileDeTest, statutMobileDeTest } from '../../../../testing/donnees-test';
 import { cheminQr } from './code-qr';
 import { PaiementMobile } from './paiement-mobile';
-import { MESSAGE_ECHEC_MOBILE } from './suivi-paiement-mobile';
+import { messageEchecMobile } from './suivi-paiement-mobile';
 
 describe('PaiementMobile (Moosyl)', () => {
   let fixture: ComponentFixture<PaiementMobile>;
@@ -86,7 +86,7 @@ describe('PaiementMobile (Moosyl)', () => {
   it('échec : message clair et « Réessayer » crée un nouveau paiement', async () => {
     statutMobile.mockReturnValue(of(statutMobileDeTest({ statut: 'ECHOUE' })));
     await creer();
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain(MESSAGE_ECHEC_MOBILE);
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain(messageEchecMobile());
     expect(element.querySelector('app-code-qr')).toBeNull();
     statutMobile.mockReturnValue(of(statutMobileDeTest()));
     bouton('Réessayer')!.click();

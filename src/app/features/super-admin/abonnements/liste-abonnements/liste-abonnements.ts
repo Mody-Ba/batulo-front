@@ -29,6 +29,7 @@ import { EcheanceAbonnement } from '../../../../shared/components/echeance-abonn
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { FiltreStatutAbonnement } from '../../../../shared/components/filtre-statut-abonnement/filtre-statut-abonnement';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Abonnements de toutes les entreprises (SA-04, SA-06) : expiration la plus proche d'abord, les jamais payés à
@@ -37,8 +38,7 @@ import { MessageErreur } from '../../../../shared/components/message-erreur/mess
  */
 @Component({
   selector: 'app-liste-abonnements',
-  imports: [
-    NgTemplateOutlet,
+  imports: [TranslocoPipe, NgTemplateOutlet,
     RouterLink,
     MatButtonModule,
     MatPaginatorModule,

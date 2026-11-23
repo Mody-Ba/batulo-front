@@ -15,6 +15,8 @@ import { DernieresNotifications } from '../../../shared/components/dernieres-not
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { NombreLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Tuile d'un statut : nombre d'entreprises et lien vers la liste filtrée. */
 interface TuileStatut {
@@ -32,7 +34,7 @@ interface TuileStatut {
  */
 @Component({
   selector: 'app-tableau-de-bord-super-admin',
-  imports: [NombreLPipe, 
+  imports: [TranslocoPipe, NombreLPipe, 
     RouterLink,
     MatButtonModule,
     MatProgressBarModule,
@@ -50,7 +52,7 @@ export class TableauDeBordSuperAdmin {
 
   protected readonly titre = computed(() => {
     const prenom = this.auth.utilisateur()?.prenom;
-    return prenom ? `Bonjour ${prenom}` : 'Tableau de bord';
+    return prenom ? traduire('accueil.bonjourPrenom', { prenom }) : traduire('menu.tableauDeBord');
   });
 
   protected readonly chiffres = signal<TableauDeBordSuperAdminResponse | null>(null);

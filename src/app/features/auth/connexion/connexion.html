@@ -1,9 +1,12 @@
 <mat-card class="carte-auth" appearance="outlined">
   <mat-card-header>
     <div class="en-tete-auth">
-      <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
-      <h1>Connexion</h1>
-      <p class="sous-titre">Accédez à votre espace de sondages.</p>
+      <div class="haut-auth">
+        <p class="marque-auth"><mat-icon fontIcon="ballot" aria-hidden="true" />BATULO</p>
+        <app-selecteur-langue />
+      </div>
+      <h1>{{ 'auth.connexion.titre' | transloco }}</h1>
+      <p class="sous-titre">{{ 'auth.connexion.sousTitre' | transloco }}</p>
     </div>
   </mat-card-header>
 
@@ -17,7 +20,7 @@
 
     <form class="formulaire" [formGroup]="formulaire" (ngSubmit)="seConnecter()" novalidate>
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Courriel</mat-label>
+        <mat-label>{{ 'commun.champs.courriel' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="mail" aria-hidden="true" />
         <input
           matInput
@@ -28,16 +31,16 @@
           required
         />
         @if (formulaire.controls.courriel.hasError('required')) {
-          <mat-error>Le courriel est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.courriel.hasError('email')) {
-          <mat-error>Le courriel n’est pas valide.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielInvalide' | transloco }}</mat-error>
         } @else if (formulaire.controls.courriel.hasError('maxlength')) {
-          <mat-error>Le courriel ne doit pas dépasser 255 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.courrielTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Mot de passe</mat-label>
+        <mat-label>{{ 'commun.champs.motDePasse' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />
         <input
           matInput
@@ -51,34 +54,34 @@
           matSuffix
           type="button"
           (click)="motDePasseVisible.set(!motDePasseVisible())"
-          [attr.aria-label]="motDePasseVisible() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          [attr.aria-label]="(motDePasseVisible() ? 'commun.masquerMotDePasse' : 'commun.afficherMotDePasse') | transloco"
           [attr.aria-pressed]="motDePasseVisible()"
         >
           <mat-icon [fontIcon]="motDePasseVisible() ? 'visibility_off' : 'visibility'" aria-hidden="true" />
         </button>
         @if (formulaire.controls.motDePasse.hasError('required')) {
-          <mat-error>Le mot de passe est obligatoire.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseObligatoire' | transloco }}</mat-error>
         } @else if (formulaire.controls.motDePasse.hasError('maxlength')) {
-          <mat-error>Le mot de passe ne doit pas dépasser 72 caractères.</mat-error>
+          <mat-error>{{ 'commun.erreurs.motDePasseTropLong' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <p class="liens-secondaires">
-        <a routerLink="/mot-de-passe-oublie">Mot de passe oublié ?</a>
+        <a routerLink="/mot-de-passe-oublie">{{ 'auth.connexion.oublie' | transloco }}</a>
       </p>
 
       <button mat-flat-button type="submit" class="bouton-principal" [disabled]="enCours()">
         @if (enCours()) {
-          <mat-spinner diameter="20" aria-label="Connexion en cours" />
+          <mat-spinner diameter="20" [attr.aria-label]="'auth.connexion.enCours' | transloco" />
         } @else {
-          Se connecter
+          {{ 'auth.connexion.seConnecter' | transloco }}
         }
       </button>
     </form>
 
     <p class="lien-bas">
-      Votre entreprise n’a pas encore de compte ?
-      <a routerLink="/inscription">Créer un compte</a>
+      {{ 'auth.connexion.pasDeCompte' | transloco }}
+      <a routerLink="/inscription">{{ 'auth.connexion.creerCompte' | transloco }}</a>
     </p>
   </mat-card-content>
 </mat-card>

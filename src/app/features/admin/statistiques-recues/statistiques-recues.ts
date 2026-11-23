@@ -20,6 +20,9 @@ import { nombre } from '../../sondages/statistiques/graphiques/format';
 import { grouperParSection } from '../../sondages/statistiques/groupes-questions';
 import { resumeFiltres, totalUneVersion } from '../../sondages/statistiques/resume-filtres';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
  * Admin : statistiques reçues, recalculées avec les filtres de l'envoi (GET /api/statistiques-recues/{id}, qui les
@@ -28,48 +31,48 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-statistiques-recues',
-  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur, CarteQuestionStat],
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressBarModule, EntetePage, MessageErreur, CarteQuestionStat],
   template: `
     <section class="conteneur-page">
       <a matButton routerLink="/admin/statistiques-recues" class="retour">
-        <mat-icon fontIcon="arrow_back" aria-hidden="true" />Statistiques reçues
+        <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'menu.statistiquesRecues' | transloco }}
       </a>
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Calcul des statistiques" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statistiques.calcul' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Ces statistiques n’ont pas pu être ouvertes." />
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'statsRecues.erreurOuverture' | transloco" />
 
       @if (statistiques(); as st) {
         <app-entete-page [titre]="st.titre" icone="insights" [sousTitre]="filtresEnClair().join(' · ')">
           <button matButton="filled" type="button" (click)="telechargerPdf()" [disabled]="pdfEnCours()">
-            <mat-icon fontIcon="picture_as_pdf" aria-hidden="true" />{{ pdfEnCours() ? 'Préparation…' : 'Rapport PDF' }}
+            <mat-icon fontIcon="picture_as_pdf" aria-hidden="true" />{{ (pdfEnCours() ? 'statistiques.preparation' : 'statistiques.rapportPdf') | transloco }}
           </button>
         </app-entete-page>
 
         @if (envoi(); as e) {
           <div class="envoi carte-section">
-            <p>Envoyées par <strong>{{ e.expediteurNom }}</strong> le {{ e.dateEnvoi | dateL: 'longHeure' }}.</p>
+            <p>{{ 'statsRecues.envoyeesPar' | transloco: { nom: e.expediteurNom, date: (e.dateEnvoi | dateL: 'longHeure') } }}</p>
             @if (e.commentaire) {
-              <blockquote>{{ e.commentaire }}</blockquote>
+              <blockquote dir="auto">{{ e.commentaire }}</blockquote>
             }
           </div>
         }
 
         <p class="texte-aide">
-          {{ nombre(st.resume.nombreReponses) }} réponse{{ st.resume.nombreReponses > 1 ? 's' : '' }}
           @if (st.resume.premiereReponse) {
-            , du {{ st.resume.premiereReponse | dateL: 'court' }} au {{ st.resume.derniereReponse | dateL: 'court' }}
+            {{ 'statistiques.resumeReponsesPeriode' | pluriel: st.resume.nombreReponses : { du: (st.resume.premiereReponse | dateL: 'court'), au: (st.resume.derniereReponse | dateL: 'court') } }}
+          } @else {
+            {{ 'statistiques.resumeReponses' | pluriel: st.resume.nombreReponses }}
           }
-          .
         </p>
         @if (st.resume.petitEffectif && st.resume.nombreReponses > 0) {
-          <p class="avertissement" role="note"><span aria-hidden="true">⚠</span> Moins de 5 réponses : résultats à interpréter avec prudence.</p>
+          <p class="avertissement" role="note"><span aria-hidden="true">⚠</span> {{ 'statistiques.petitEffectif' | transloco }}</p>
         }
         @for (g of groupes(); track $index) {
-          <section class="groupe" [attr.aria-label]="'Section ' + g.section">
-            <h2 class="titre-section">{{ g.section }}</h2>
+          <section class="groupe" [attr.aria-label]="'statistiques.section' | transloco: { titre: g.section }">
+            <h2 class="titre-section" dir="auto">{{ g.section }}</h2>
             @for (q of g.questions; track q.question.questionId) {
               <app-carte-question-stat [question]="q.question" [numero]="q.numero" [sondageId]="st.sondageId" [filtres]="filtres()" [totalReponses]="totalUneVersion(st)" />
             }
@@ -92,8 +95,8 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
 
       blockquote {
         margin: var(--bt-espace-2) 0 0;
-        padding-left: var(--bt-espace-3);
-        border-left: 3px solid var(--mat-sys-outline-variant);
+        padding-inline-start: var(--bt-espace-3);
+        border-inline-start: 3px solid var(--mat-sys-outline-variant);
         white-space: pre-line;
         overflow-wrap: anywhere;
       }
@@ -212,7 +215,7 @@ export class StatistiquesRecues {
         },
         error: (erreur: unknown) => {
           this.pdfEnCours.set(false);
-          this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+          this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
         },
       });
   }

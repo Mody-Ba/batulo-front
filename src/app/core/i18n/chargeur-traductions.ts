@@ -19,13 +19,20 @@ export class ChargeurTraductions implements TranslocoLoader {
   private readonly http = inject(HttpClient);
   private readonly contexte = new HttpContext().set(SANS_AUTHENTIFICATION, true);
 
+  /** Langues chargées sans le fichier principal (formulaire public) : complétées en quittant /s/ (LangueService). */
+  readonly partielles = new Set<string>();
+
   getTranslation(langue: string): Observable<Translation> {
     const publique = this.http.get<Translation>(`i18n/public/${langue}.json`, { context: this.contexte });
     if (estPagePublique()) {
+      this.partielles.add(langue);
       return publique;
     }
-    return forkJoin([this.http.get<Translation>(`i18n/${langue}.json`, { context: this.contexte }), publique]).pipe(
-      map(([principale, pub]) => ({ ...principale, ...pub })),
-    );
+    this.partielles.delete(langue);
+    return forkJoin([this.principale(langue), publique]).pipe(map(([principale, pub]) => ({ ...principale, ...pub })));
+  }
+
+  principale(langue: string): Observable<Translation> {
+    return this.http.get<Translation>(`i18n/${langue}.json`, { context: this.contexte });
   }
 }

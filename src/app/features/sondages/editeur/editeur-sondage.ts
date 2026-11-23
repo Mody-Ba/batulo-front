@@ -33,6 +33,8 @@ import { CarteSection } from './carte-section/carte-section';
 import { EditeurSondageStore } from './editeur-sondage.store';
 import { EnregistrementAuto, EtatEnregistrement } from './enregistrement-auto';
 import { EtatEnregistrementIndicateur } from './etat-enregistrement/etat-enregistrement';
+import { traduire, traduirePluriel } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Page qui peut demander confirmation avant d'être quittée (garde `quitterEditeurGuard`). */
 export interface PeutQuitter {
@@ -46,8 +48,7 @@ export interface PeutQuitter {
  */
 @Component({
   selector: 'app-editeur-sondage',
-  imports: [
-    CdkDrag,
+  imports: [TranslocoPipe, CdkDrag,
     CdkDropList,
     TextFieldModule,
     ReactiveFormsModule,
@@ -189,8 +190,8 @@ export class EditeurSondage implements PeutQuitter {
   protected publier(sondage: SondageResponse): void {
     if (this.store.modificationsEnAttente()) {
       this.snackBar.open(
-        'Des modifications ne sont pas encore enregistrées : corrigez-les ou attendez « Tout est enregistré ».',
-        'Fermer',
+        traduire('editeur.modificationsEnAttente'),
+        traduire('commun.fermer'),
         { duration: 6000 },
       );
       return;
@@ -214,11 +215,11 @@ export class EditeurSondage implements PeutQuitter {
 
   protected ajouterSection(): void {
     this.ajoutSectionEnCours.set(true);
-    this.store.ajouterSection({ titre: `Section ${this.sections().length + 1}`, description: null }).subscribe({
+    this.store.ajouterSection({ titre: traduire('editeur.titreSection', { numero: this.sections().length + 1 }), description: null }).subscribe({
       next: () => this.ajoutSectionEnCours.set(false),
       error: (erreur: unknown) => {
         this.ajoutSectionEnCours.set(false);
-        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
       },
     });
   }
@@ -226,7 +227,7 @@ export class EditeurSondage implements PeutQuitter {
   protected deposerSection(evenement: CdkDragDrop<unknown>): void {
     this.store.deplacerSection(evenement.previousIndex, evenement.currentIndex).subscribe({
       error: (erreur: unknown) => {
-        this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+        this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
         this.store.recharger();
       },
     });
@@ -234,9 +235,9 @@ export class EditeurSondage implements PeutQuitter {
 
   protected supprimerBrouillon(sondage: SondageResponse): void {
     confirmer(this.dialog, {
-      titre: 'Supprimer ce brouillon ?',
-      message: `« ${sondage.titre} » sera supprimé définitivement, avec ses sections et ses questions. Cette action est irréversible.`,
-      action: 'Supprimer le brouillon',
+      titre: traduire('editeur.supprimerBrouillonTitre'),
+      message: traduire('editeur.supprimerBrouillonMessage', { titre: sondage.titre }),
+      action: traduire('editeur.supprimerBrouillon'),
       destructive: true,
     })
       .pipe(
@@ -245,11 +246,11 @@ export class EditeurSondage implements PeutQuitter {
       )
       .subscribe({
         next: () => {
-          this.snackBar.open('Brouillon supprimé.', 'Fermer', { duration: 5000 });
+          this.snackBar.open(traduire('editeur.brouillonSupprime'), traduire('commun.fermer'), { duration: 5000 });
           this.quitterSansConfirmer = true;
           void this.router.navigateByUrl('/sondages');
         },
-        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 }),
+        error: (erreur: unknown) => this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 }),
       });
   }
 
@@ -260,12 +261,9 @@ export class EditeurSondage implements PeutQuitter {
     }
     const nombre = this.store.nombreNonEnregistres();
     return confirmer(this.dialog, {
-      titre: 'Quitter l’éditeur ?',
-      message:
-        nombre > 0
-          ? `${nombre === 1 ? 'Un élément n’est' : `${nombre} éléments ne sont`} pas enregistrés (à corriger ou en cours). Ces modifications seront perdues.`
-          : 'Un enregistrement est en cours : attendez qu’il se termine pour ne rien perdre.',
-      action: 'Quitter quand même',
+      titre: traduire('editeur.quitterTitre'),
+      message: nombre > 0 ? traduirePluriel('editeur.quitterNonEnregistres', nombre) : traduire('editeur.quitterEnCours'),
+      action: traduire('editeur.quitterQuandMeme'),
       destructive: true,
     }).pipe(map(Boolean));
   }

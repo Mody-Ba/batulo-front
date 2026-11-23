@@ -4,6 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { lienSms, lienWhatsApp, messageParDefaut } from './partage';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Longueur maximale du message (un SMS long reste envoyable ; au-delà, l'adresse deviendrait démesurée). */
 export const MESSAGE_PARTAGE_MAX = 1000;
@@ -14,10 +15,10 @@ export const MESSAGE_PARTAGE_MAX = 1000;
  */
 @Component({
   selector: 'app-partage-message',
-  imports: [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule],
+  imports: [TranslocoPipe, MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule],
   template: `
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-message">
-      <mat-label>Message à envoyer</mat-label>
+      <mat-label>{{ 'sondages.partage.aEnvoyer' | transloco }}</mat-label>
       <textarea
         matInput
         rows="3"
@@ -25,7 +26,7 @@ export const MESSAGE_PARTAGE_MAX = 1000;
         (input)="message.set($any($event.target).value)"
         [attr.maxlength]="max"
       ></textarea>
-      <mat-hint>Modifiable avant l’envoi ; le destinataire se choisit dans l’application.</mat-hint>
+      <mat-hint>{{ 'sondages.partage.aide' | transloco }}</mat-hint>
     </mat-form-field>
 
     <div class="boutons-partage">
@@ -37,7 +38,7 @@ export const MESSAGE_PARTAGE_MAX = 1000;
         rel="noopener noreferrer"
         [attr.aria-disabled]="vide() || null"
         [class.desactive]="vide()"
-        aria-label="Partager par WhatsApp (nouvel onglet)"
+        [attr.aria-label]="'sondages.partage.whatsapp' | transloco"
       >
         <mat-icon fontIcon="chat" aria-hidden="true" />WhatsApp
       </a>
@@ -47,19 +48,19 @@ export const MESSAGE_PARTAGE_MAX = 1000;
         [attr.href]="vide() ? null : urlSms()"
         [attr.aria-disabled]="vide() || null"
         [class.desactive]="vide()"
-        aria-label="Partager par SMS"
+        [attr.aria-label]="'sondages.partage.sms' | transloco"
       >
         <mat-icon fontIcon="sms" aria-hidden="true" />SMS
       </a>
       <button matButton type="button" (click)="reinitialiser()" [disabled]="message() === parDefaut()">
-        Message par défaut
+        {{ 'sondages.partage.parDefaut' | transloco }}
       </button>
     </div>
     <p id="aide-partage" class="texte-aide">
       @if (vide()) {
-        Écrivez un message pour pouvoir le partager.
+        {{ 'sondages.partage.ecrivez' | transloco }}
       } @else {
-        Le bouton SMS ouvre l’application Messages de votre téléphone.
+        {{ 'sondages.partage.aideSms' | transloco }}
       }
     </p>
   `,

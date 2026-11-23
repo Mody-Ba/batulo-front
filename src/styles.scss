@@ -123,7 +123,7 @@ a {
 // Lien d'évitement : visible seulement au clavier.
 .lien-evitement {
   position: absolute;
-  left: var(--bt-espace-4);
+  inset-inline-start: var(--bt-espace-4);
   top: -100px;
   z-index: 1000;
   padding: var(--bt-espace-2) var(--bt-espace-4);
@@ -213,6 +213,24 @@ a {
     color: var(--mat-sys-primary);
     font: var(--mat-sys-title-medium);
     letter-spacing: 0.08em;
+  }
+
+  // Marque et choix de la langue sur une ligne (l'un sous l'autre si la place manque).
+  .haut-auth {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--bt-espace-2);
+    margin: 0 0 var(--bt-espace-1);
+
+    .marque-auth {
+      margin: 0;
+    }
+  }
+
+  .en-tete-auth {
+    flex: 1;
   }
 
   h1 {
@@ -517,3 +535,23 @@ a.tuile {
   opacity: 0.4;
 }
 
+
+/* ---------- Sens de lecture : arabe de droite à gauche (dir="rtl" posé sur <html> par LangueService) ---------- */
+// Icônes et flèches qui indiquent une direction : en miroir en RTL. Les autres icônes (cloche, crayon…) ne changent pas.
+[dir='rtl'] {
+  .mat-icon:is(
+      [data-mat-icon-name='arrow_back'],
+      [data-mat-icon-name='arrow_forward'],
+      [data-mat-icon-name='chevron_left'],
+      [data-mat-icon-name='chevron_right'],
+      [data-mat-icon-name='send'],
+      [data-mat-icon-name='logout'],
+      [data-mat-icon-name='open_in_new'],
+      [data-mat-icon-name='drive_file_move'],
+      [data-mat-icon-name='alt_route']
+    ),
+  .fleche {
+    display: inline-block;
+    transform: scaleX(-1);
+  }
+}

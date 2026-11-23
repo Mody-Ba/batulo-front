@@ -24,6 +24,22 @@ export const TRADUCTIONS: Record<string, Translation> = {
   ar: { ...ar, ...publicAr },
 };
 
+/** Traducteur sans injection (tests de fonctions hors TestBed) : clé pointée et paramètres {{ nom }}. */
+export function traducteurStatique(dictionnaire: Translation) {
+  return {
+    translate(cle: string, params?: Record<string, unknown>): string {
+      const valeur = cle.split('.').reduce<unknown>((noeud, partie) => (noeud as Record<string, unknown> | undefined)?.[partie], dictionnaire);
+      if (typeof valeur !== 'string') {
+        return cle;
+      }
+      return valeur.replace(/{{\s*(\w+)\s*}}/g, (_, nom: string) => String(params?.[nom] ?? ''));
+    },
+  };
+}
+
+// Fonctions appelées hors de TestBed (libellés, messages d'erreur) : textes français dès le chargement.
+brancherTraductions(traducteurStatique(TRADUCTIONS['fr']), 'fr');
+
 class ChargeurDeTest implements TranslocoLoader {
   getTranslation(langue: string): Observable<Translation> {
     return of(TRADUCTIONS[langue] ?? {});

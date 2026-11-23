@@ -16,6 +16,8 @@ import { GestionnaireService } from '../../../../core/services/gestionnaire.serv
 import { SondageService } from '../../../../core/services/sondage.service';
 import { messageErreur } from '../../../../core/utils/erreur-http';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Nombre de sondages proposés (les plus récemment modifiés). */
 export const LIMITE_SONDAGES = 100;
@@ -41,8 +43,7 @@ function normaliser(texte: string): string {
  */
 @Component({
   selector: 'app-dialogue-assigner-sondages',
-  imports: [
-    FormsModule,
+  imports: [PlurielPipe, TranslocoPipe, FormsModule,
     MatButtonModule,
     MatDialogModule,
     MatFormFieldModule,

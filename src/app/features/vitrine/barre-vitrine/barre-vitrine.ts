@@ -1,6 +1,8 @@
 import { Component, ElementRef, HostListener, inject, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SECTIONS_VITRINE } from '../contenu-vitrine';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Barre du haut de la vitrine, collée en haut de l'écran : marque, liens vers les sections, « Connexion » et « Créer un
@@ -8,7 +10,7 @@ import { SECTIONS_VITRINE } from '../contenu-vitrine';
  */
 @Component({
   selector: 'app-barre-vitrine',
-  imports: [RouterLink],
+  imports: [TranslocoPipe, SelecteurLangue, RouterLink],
   templateUrl: './barre-vitrine.html',
   styleUrl: './barre-vitrine.scss',
 })

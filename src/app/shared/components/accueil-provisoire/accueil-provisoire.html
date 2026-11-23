@@ -9,20 +9,20 @@
 
   @if (auth.statutAbonnement(); as statut) {
     <p class="statut">
-      Abonnement de l’entreprise :
+      {{ 'accueil.abonnementEntreprise' | transloco }}
       <span class="pastille-statut" [class]="'statut-' + statut">
         {{ libellesStatut[statut] }}
       </span>
     </p>
   }
 
-  <h2 class="titre-section">Accès rapides</h2>
+  <h2 class="titre-section">{{ 'accueil.accesRapides' | transloco }}</h2>
   <ul class="raccourcis">
     @for (lien of raccourcis(); track lien.lien) {
       <li>
         <a class="raccourci" [routerLink]="lien.lien">
           <mat-icon [fontIcon]="lien.icone" aria-hidden="true" />
-          <span>{{ lien.libelle }}</span>
+          <span>{{ lien.libelle | transloco }}</span>
         </a>
       </li>
     }

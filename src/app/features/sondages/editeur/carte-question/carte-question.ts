@@ -62,6 +62,8 @@ import { QuestionNumerique } from '../types/question-numerique/question-numeriqu
 import { QuestionOuiNon } from '../types/question-oui-non/question-oui-non';
 import { QuestionTexteCourt } from '../types/question-texte-court/question-texte-court';
 import { QuestionTexteLong } from '../types/question-texte-long/question-texte-long';
+import { traduire, traduirePluriel } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Une question de l'éditeur : libellé, aide, type, obligatoire et configuration propre au type. Enregistrée seule
@@ -71,8 +73,7 @@ import { QuestionTexteLong } from '../types/question-texte-long/question-texte-l
  */
 @Component({
   selector: 'app-carte-question',
-  imports: [
-    CdkDragHandle,
+  imports: [TranslocoPipe, CdkDragHandle,
     TextFieldModule,
     ReactiveFormsModule,
     MatButtonModule,
@@ -146,7 +147,9 @@ export class CarteQuestion implements OnInit {
   /** « la question 2 de la section 1 » (boîte de condition, libellés des boutons). */
   protected readonly nomCible = computed(() => {
     const rang = (this.store.sondage()?.sections.findIndex((s) => s.id === this.sectionId()) ?? -1) + 1;
-    return `la question ${this.numero()}${rang > 0 ? ` de la section ${rang}` : ''}`;
+    return rang > 0
+      ? traduire('editeur.question.nomCibleSection', { numero: this.numero(), section: rang })
+      : traduire('editeur.question.nomCible', { numero: this.numero() });
   });
   /**
    * Refus qui concerne cette question et doit rester lisible (409 CONDITION_DEPENDANTE : suppression, déplacement ou
@@ -218,19 +221,19 @@ export class CarteQuestion implements OnInit {
     }
     const pertes: string[] = [];
     if (optionsPerdues(this.formulaire, nouveau)) {
-      pertes.push(`ses ${this.formulaire.controls.options.length} options`);
+      pertes.push(traduirePluriel('editeur.question.perteOptions', this.formulaire.controls.options.length));
     }
     if (ancien === 'MATRICE') {
-      pertes.push('les lignes et les colonnes de la grille');
+      pertes.push(traduire('editeur.question.perteGrille'));
     }
     if (pertes.length === 0) {
       changerType(this.formulaire, nouveau);
       return;
     }
     confirmer(this.dialog, {
-      titre: `Passer en « ${LIBELLES_TYPE_QUESTION[nouveau]} » ?`,
-      message: `Cette question perdra ${pertes.join(' et ')}.`,
-      action: 'Changer de type',
+      titre: traduire('editeur.question.changerTypeTitre', { type: LIBELLES_TYPE_QUESTION[nouveau] }),
+      message: traduire('editeur.question.changerTypeMessage', { pertes: pertes.join(traduire('editeur.question.et')) }),
+      action: traduire('editeur.question.changerType'),
       destructive: true,
     }).subscribe((ok) => {
       if (ok) {
@@ -255,7 +258,7 @@ export class CarteQuestion implements OnInit {
       return;
     }
     this.store.changerDeSection(id, sectionId).subscribe({
-      next: () => this.snackBar.open('Question déplacée.', 'Fermer', { duration: 4000 }),
+      next: () => this.snackBar.open(traduire('editeur.question.deplacee'), traduire('commun.fermer'), { duration: 4000 }),
       error: (erreur: unknown) => {
         this.signalerRefus(erreur);
         this.store.recharger();
@@ -279,7 +282,7 @@ export class CarteQuestion implements OnInit {
       enregistrer: (condition) => this.store.definirConditionQuestion(id, condition),
     }).subscribe((sondage) => {
       if (sondage) {
-        this.snackBar.open('Condition d’affichage enregistrée.', 'Fermer', { duration: 4000 });
+        this.snackBar.open(traduire('editeur.condition.enregistree'), traduire('commun.fermer'), { duration: 4000 });
       }
     });
   }
@@ -291,7 +294,7 @@ export class CarteQuestion implements OnInit {
     }
     this.erreurAction.set(null);
     this.store.definirConditionQuestion(id, null).subscribe({
-      next: () => this.snackBar.open('Condition d’affichage retirée : la question est toujours affichée.', 'Fermer', { duration: 4000 }),
+      next: () => this.snackBar.open(traduire('editeur.condition.retireeQuestion'), traduire('commun.fermer'), { duration: 4000 }),
       error: (erreur: unknown) => this.erreurAction.set(erreur),
     });
   }
@@ -301,7 +304,7 @@ export class CarteQuestion implements OnInit {
     if (aLeCode(erreur, 'CONDITION_DEPENDANTE')) {
       this.erreurAction.set(erreur);
     } else {
-      this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+      this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
     }
   }
 
@@ -320,7 +323,7 @@ export class CarteQuestion implements OnInit {
       id === null
         ? this.store.retirerQuestionLocale(this.sectionId(), this.cle())
         : this.store.supprimerQuestion(id).subscribe({
-            next: () => this.snackBar.open('Question supprimée.', 'Fermer', { duration: 4000 }),
+            next: () => this.snackBar.open(traduire('editeur.question.supprimee'), traduire('commun.fermer'), { duration: 4000 }),
             error: (erreur: unknown) => this.signalerRefus(erreur),
           });
     if (id === null && !libelle) {
@@ -328,9 +331,9 @@ export class CarteQuestion implements OnInit {
       return;
     }
     confirmer(this.dialog, {
-      titre: 'Supprimer cette question ?',
-      message: libelle ? `« ${libelle} » sera supprimée.` : 'Cette question sera supprimée.',
-      action: 'Supprimer',
+      titre: traduire('editeur.question.supprimerTitre'),
+      message: libelle ? traduire('editeur.question.supprimerMessage', { libelle }) : traduire('editeur.question.supprimerSans'),
+      action: traduire('commun.supprimer'),
       destructive: true,
     })
       .pipe(filter(Boolean))

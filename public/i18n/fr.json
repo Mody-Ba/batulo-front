@@ -1,1 +1,1804 @@
-{}
+{
+  "abonnement": {
+    "echeance": {
+      "aujourdhui": "Expire aujourd’hui",
+      "demain": "Expire demain",
+      "dans": {
+        "one": "Expire dans {{n}} jour",
+        "other": "Expire dans {{n}} jours"
+      },
+      "jamaisPaye": "Jamais payé",
+      "aucun": "Aucun abonnement"
+    },
+    "filtrerParStatut": "Filtrer par statut d’abonnement",
+    "mon": {
+      "titre": "Mon abonnement",
+      "demanderAutre": "Demander une autre formule",
+      "erreur": "L’abonnement n’a pas pu être chargé.",
+      "expire": "Votre abonnement a expiré le {{date}} : l’accès est en lecture seule. Renouvelez-le pour modifier à nouveau vos sondages.",
+      "alerte": {
+        "one": "Votre abonnement expire dans {{n}} jour. Renouvelez-le pour éviter toute interruption.",
+        "other": "Votre abonnement expire dans {{n}} jours. Renouvelez-le pour éviter toute interruption."
+      },
+      "detail": "Détail",
+      "formule": "Formule",
+      "aucune": "Aucune",
+      "statut": "Statut",
+      "debut": "Début",
+      "expiration": "Expiration",
+      "joursRestants": "Jours restants",
+      "paiements": "Paiements",
+      "chargementPaiements": "Chargement des paiements",
+      "erreurPaiements": "L’historique des paiements n’a pas pu être chargé.",
+      "aucunPaiement": "Aucun paiement pour le moment.",
+      "historique": "Historique des paiements, du plus récent au plus ancien",
+      "date": "Date",
+      "moyen": "Moyen",
+      "montant": "Montant",
+      "pagination": "Pagination des paiements",
+      "info": "Renouveler prolonge votre abonnement à partir de sa date d’expiration actuelle : vous ne perdez aucun jour. Sans renouvellement, l’abonnement s’arrête de lui-même à cette date."
+    },
+    "souscrire": {
+      "titreRenouveler": "Renouveler mon abonnement",
+      "titreAbonner": "S’abonner à Batulo",
+      "etape1": "Étape 1 sur 2 : formule et moyen de paiement",
+      "etape2": "Étape 2 sur 2 : paiement",
+      "retour": "Retour à mon abonnement",
+      "choixFormule": "Choix de la formule",
+      "ajoutExpire": "La nouvelle période s’ajoutera à votre abonnement actuel à partir de la date du paiement (il a expiré le {{date}}).",
+      "ajout": "La nouvelle période s’ajoutera à votre abonnement actuel à partir du {{date}} : vous ne perdez aucun jour.",
+      "chargementFormules": "Chargement des formules",
+      "moyen": "Moyen de paiement",
+      "carte": "Carte bancaire",
+      "carteDetail": "Visa, Mastercard…, paiement sécurisé par Stripe",
+      "mobile": "Application mobile ({{applications}}…)",
+      "mobileDetail": "Depuis votre téléphone, en ouguiyas",
+      "pour": "pour {{duree}}",
+      "economie": "Économisez {{montant}} par rapport à 12 mois",
+      "preparation": "Préparation du paiement",
+      "continuerMobile": "Continuer vers le paiement mobile",
+      "continuer": "Continuer vers le paiement",
+      "paiementCarte": "Paiement par carte",
+      "changerFormule": "Changer de formule",
+      "test1": "Mode test Stripe : carte",
+      "test2": ", une date future et n’importe quel code. Aucun montant réel n’est prélevé.",
+      "infosCarte": "Informations de la carte",
+      "nomCarte": "Nom sur la carte",
+      "nomCarteObligatoire": "Le nom sur la carte est obligatoire.",
+      "numero": "Numéro de carte",
+      "expiration": "Expiration (MM / AA)",
+      "code": "Code de sécurité",
+      "aVerifier": "Votre carte a été acceptée par Stripe : ne payez pas une seconde fois. Il reste à faire valider le paiement par Batulo.",
+      "verificationEnCours": "Vérification en cours",
+      "paiementEnCours": "Paiement en cours",
+      "payer": "Payer {{montant}}",
+      "securite": "Paiement sécurisé par Stripe. Vos données de carte ne transitent jamais par Batulo."
+    },
+    "verifierANouveau": "Vérifier à nouveau",
+    "succes": {
+      "titre": "Vous êtes bien abonné",
+      "activeJusquau": "{{formule}} active jusqu’au {{date}}.",
+      "active": "{{formule}} active",
+      "redirection": "Redirection vers votre tableau de bord…",
+      "allerTdb": "Aller au tableau de bord"
+    },
+    "mobile": {
+      "titre": "Paiement par application mobile",
+      "application": "application mobile",
+      "preparation": "Préparation du paiement mobile",
+      "preparationPage": "Préparation de la page de paiement…",
+      "erreurPreparation": "Le paiement mobile n’a pas pu être préparé. Réessayez.",
+      "qr": "Code QR de la page de paiement mobile",
+      "codeQr": "Code QR",
+      "scannez": "Scannez ce code avec l’appareil photo de votre téléphone, puis payez avec {{applications}}…",
+      "revenez": "Une fois payé, revenez sur cette page.",
+      "valable": "Valable jusqu’à {{heure}}",
+      "payerTelephone": "Payer sur ce téléphone",
+      "enCours": "Paiement en cours… Cette page se met à jour dès que le paiement est confirmé.",
+      "qrEchec": "Le code QR n’a pas pu être affiché : utilisez le bouton ci-dessous.",
+      "qrPreparation": "Préparation du code QR",
+      "echec": "Le paiement n’a pas abouti : il a été refusé, annulé, ou la session de paiement a expiré. Votre abonnement n’a pas changé.",
+      "expire": "La session de paiement a expiré sans paiement confirmé. Votre abonnement n’a pas changé : relancez un paiement.",
+      "attenteLongue": "Le paiement n’est pas encore confirmé. Si vous avez payé, vérifiez à nouveau dans quelques instants ; sinon, relancez un paiement."
+    },
+    "retour": {
+      "titre": "Paiement mobile",
+      "enCours": "Paiement en cours…",
+      "attente": "Nous attendons la confirmation de votre paiement. Cette page se met à jour automatiquement.",
+      "active": "Abonnement activé",
+      "recu": "Paiement de {{montant}} reçu :",
+      "nonAbouti": "Paiement non abouti",
+      "pasConfirme": "Paiement pas encore confirmé",
+      "introuvable": "Paiement introuvable",
+      "introuvableTexte": "Ce paiement est introuvable pour votre entreprise. Si vous avez payé, vérifiez votre abonnement ; sinon, relancez un paiement.",
+      "payer": "Payer mon abonnement",
+      "statutIndisponible": "Statut du paiement indisponible",
+      "erreurStatut": "Le statut du paiement n’a pas pu être lu."
+    },
+    "reconnexion": "Votre paiement est enregistré. Reconnectez-vous pour accéder à Batulo.",
+    "carte": {
+      "incomplete": "Complétez les informations de la carte.",
+      "enTraitement": "Votre banque traite encore le paiement. Vérifiez à nouveau dans quelques instants."
+    }
+  },
+  "admin": {
+    "tdb": {
+      "enChiffres": "En chiffres",
+      "chargementChiffres": "Chargement des chiffres",
+      "erreurChiffres": "Les chiffres n’ont pas pu être chargés.",
+      "actifs": {
+        "one": "Actif",
+        "other": "Actifs"
+      },
+      "desactives": {
+        "one": "Désactivé",
+        "other": "Désactivés"
+      },
+      "nonCommences": "Non commencés",
+      "brouillonsCompris": "brouillons compris",
+      "enCours": "En cours",
+      "termines": "Terminés",
+      "reponses": "Réponses",
+      "recuesTotal": "Reçues au total",
+      "toutesVersions": "toutes versions",
+      "joursRestants": {
+        "one": "jour restant",
+        "other": "jours restants"
+      },
+      "dernierPaiement": "Dernier paiement : {{montant}}",
+      "voirDetail": "Voir le détail",
+      "chargementAbonnement": "Chargement de l’abonnement"
+    }
+  },
+  "apparence": {
+    "sousTitre": "Logo, couleur et nom montrés aux répondants sur les formulaires et dans les rapports PDF",
+    "chargement": "Chargement de l’apparence",
+    "erreurChargement": "L’apparence n’a pas pu être chargée.",
+    "couleurEtNom": "Couleur et nom",
+    "choisirCouleur": "Choisir la couleur principale",
+    "couleurPrincipale": "Couleur principale",
+    "placeholderCouleur": "Couleur Batulo (#005CBB)",
+    "aideCouleur": "Code hexadécimal #RRGGBB ; vide : couleur Batulo ({{defaut}}).",
+    "formatCouleur": "Format attendu : # suivi de 6 chiffres ou lettres de A à F (ex. #1E6B52).",
+    "couleurDefaut": "Couleur par défaut",
+    "nomAffiche": "Nom affiché sur les formulaires (facultatif)",
+    "aideNom": "Vide : « {{nom}} ». Montré à côté du logo et dans les rapports.",
+    "nonEnregistree": "L’apparence n’a pas été enregistrée",
+    "erreurEnregistrement": "L’apparence n’a pas pu être enregistrée.",
+    "apercu": "Aperçu du formulaire",
+    "gestionnaire": "Seul l’admin de votre entreprise peut modifier l’apparence des formulaires.",
+    "aucuneModification": "Aucune modification à enregistrer.",
+    "enregistree": "Apparence enregistrée.",
+    "logo": {
+      "format": "Le logo doit être une image PNG ou JPEG.",
+      "vide": "Ce fichier est vide.",
+      "enregistre": "Logo enregistré.",
+      "supprime": "Logo supprimé.",
+      "mo": "{{n}} Mo",
+      "ko": "{{n}} Ko",
+      "tropGros": "Le logo ne doit pas dépasser {{max}} (ce fichier fait {{taille}}).",
+      "apercuChoisi": "Aperçu du logo choisi : {{nom}}",
+      "pasEnregistre": "pas encore enregistré",
+      "envoi": "Envoi du logo",
+      "enregistrer": "Enregistrer ce logo",
+      "illisible": "Le logo est enregistré mais son image n’a pas pu être chargée depuis {{url}}. Vérifiez que l’API Batulo répond, puis rechargez la page.",
+      "entreprise": "Logo de l’entreprise",
+      "remplacer": "Remplacer",
+      "aucun": "Aucun logo : les formulaires s’affichent sans bandeau.",
+      "glissezAutre": "Glissez un autre logo ici, ou",
+      "glissez": "Glissez votre logo ici, ou",
+      "choisir": "Choisir un fichier",
+      "regles": "PNG ou JPEG, 1 Mo et 2000 × 2000 px au plus.",
+      "nonEnregistre": "Le logo n’a pas été enregistré",
+      "erreurEnregistrement": "Le logo n’a pas pu être enregistré.",
+      "supprimerTitre": "Supprimer le logo ?",
+      "supprimerMessage": "Il disparaîtra des formulaires et des rapports. Vous pourrez en ajouter un autre ensuite.",
+      "supprimerAction": "Supprimer le logo"
+    },
+    "apercuExemple": {
+      "titre": "Titre de votre sondage",
+      "texte": "Trois minutes pour nous aider à mieux vous servir.",
+      "choisie": "Option choisie",
+      "autre": "Autre option"
+    },
+    "apercuLegende": {
+      "avecLogo": "Aperçu : logo et « {{nom}} » en en-tête ;",
+      "sansLogo": "Aperçu : sans logo, pas de bandeau ;",
+      "couleur": "boutons, progression et choix en {{couleur}}, texte {{texte}}.",
+      "noir": "noir",
+      "blanc": "blanc",
+      "batulo": "boutons, progression et choix aux couleurs Batulo."
+    }
+  },
+  "auth": {
+    "connexion": {
+      "titre": "Connexion",
+      "sousTitre": "Accédez à votre espace de sondages.",
+      "oublie": "Mot de passe oublié ?",
+      "enCours": "Connexion en cours",
+      "seConnecter": "Se connecter",
+      "pasDeCompte": "Votre entreprise n’a pas encore de compte ?",
+      "creerCompte": "Créer un compte"
+    },
+    "inscription": {
+      "titre": "Créer le compte de votre entreprise",
+      "sousTitre": "Vous serez l’administrateur de l’espace. Il sera activé après le paiement de l’abonnement.",
+      "nomEntreprise": "Nom de l’entreprise (facultatif)",
+      "nomEntrepriseAide": "Par défaut : « Entreprise de Prénom Nom ».",
+      "enCours": "Création du compte en cours",
+      "creer": "Créer le compte",
+      "dejaCompte": "Déjà un compte ?",
+      "compteCree": "Votre compte a été créé. Connectez-vous pour choisir votre abonnement."
+    },
+    "oublie": {
+      "titre": "Mot de passe oublié",
+      "sousTitre": "Indiquez votre courriel : vous recevrez un lien pour choisir un nouveau mot de passe.",
+      "indesirables": "Pensez à vérifier vos courriels indésirables.",
+      "renvoyer": "Renvoyer un lien",
+      "recevoir": "Recevoir le lien",
+      "confirmation": "Si un compte existe pour ce courriel, un lien de réinitialisation vient d’y être envoyé."
+    },
+    "retourConnexion": "Retour à la connexion",
+    "reinitialiser": {
+      "titre": "Nouveau mot de passe",
+      "sousTitre": "Choisissez le mot de passe de votre compte.",
+      "lienIncomplet": "Ce lien est incomplet. Ouvrez le lien reçu par courriel, ou demandez-en un nouveau.",
+      "nouveauLien": "Demander un nouveau lien",
+      "enregistrer": "Enregistrer le mot de passe",
+      "reussi": "Votre mot de passe a été modifié. Connectez-vous avec le nouveau."
+    },
+    "changer": {
+      "securite": "Sécurité du compte",
+      "temporaire": "Vous utilisez un mot de passe temporaire. Choisissez votre propre mot de passe pour accéder à Batulo.",
+      "valableJusquau": "Le mot de passe temporaire est valable jusqu’au {{date}}.",
+      "motDePasseTemporaire": "Mot de passe temporaire",
+      "motDePasseActuel": "Mot de passe actuel",
+      "actuelObligatoire": "Le mot de passe actuel est obligatoire.",
+      "confirmation": "Confirmation du nouveau mot de passe",
+      "confirmationDifferente": "La confirmation ne correspond pas au nouveau mot de passe.",
+      "modifie": "Votre mot de passe a été modifié."
+    },
+    "sessionExpiree": "Votre session a expiré. Veuillez vous reconnecter."
+  },
+  "commun": {
+    "champs": {
+      "courriel": "Courriel",
+      "motDePasse": "Mot de passe",
+      "nouveauMotDePasse": "Nouveau mot de passe",
+      "confirmation": "Confirmation",
+      "prenom": "Prénom",
+      "nom": "Nom",
+      "confirmationMotDePasse": "Confirmation du mot de passe"
+    },
+    "erreurs": {
+      "courrielObligatoire": "Le courriel est obligatoire.",
+      "courrielInvalide": "Le courriel n’est pas valide.",
+      "courrielTropLong": "Le courriel ne doit pas dépasser 255 caractères.",
+      "motDePasseObligatoire": "Le mot de passe est obligatoire.",
+      "motDePasseTropLong": "Le mot de passe ne doit pas dépasser 72 caractères.",
+      "nouveauMotDePasseObligatoire": "Le nouveau mot de passe est obligatoire.",
+      "max100": "100 caractères au plus.",
+      "max150": "150 caractères au plus.",
+      "prenomObligatoire": "Le prénom est obligatoire.",
+      "nomObligatoire": "Le nom est obligatoire.",
+      "confirmationObligatoire": "La confirmation est obligatoire.",
+      "confirmationDifferente": "La confirmation ne correspond pas au mot de passe.",
+      "max255": "255 caractères au plus."
+    },
+    "masquerMotDePasse": "Masquer le mot de passe",
+    "afficherMotDePasse": "Afficher le mot de passe",
+    "envoiEnCours": "Envoi en cours",
+    "enregistrementEnCours": "Enregistrement en cours",
+    "fermer": "Fermer",
+    "confirmation": {
+      "tapezAvant": "Pour confirmer, tapez ",
+      "tapezApres": " ci-dessous.",
+      "texte": "Texte de confirmation"
+    },
+    "annuler": "Annuler",
+    "reessayer": "Réessayer",
+    "toutVoir": "Tout voir",
+    "tous": "Tous",
+    "paginateur": {
+      "parPage": "Éléments par page",
+      "suivante": "Page suivante",
+      "precedente": "Page précédente",
+      "premiere": "Première page",
+      "derniere": "Dernière page",
+      "intervalle": "{{debut}} – {{fin}} sur {{total}}",
+      "vide": "0 sur {{total}}"
+    },
+    "aVenir": {
+      "texte": "Cette rubrique sera disponible prochainement.",
+      "titre": "Bientôt disponible"
+    },
+    "lectureSeule": "Abonnement expiré : lecture seule.",
+    "aideMotDePasse": "Au moins 8 caractères, dont une lettre et un chiffre.",
+    "masquerMotsDePasse": "Masquer les mots de passe",
+    "afficherMotsDePasse": "Afficher les mots de passe",
+    "retourAccueil": "Retour à l’accueil",
+    "retirer": "Retirer",
+    "enregistrer": "Enregistrer",
+    "envoi": "Envoi…",
+    "modificationsEnregistrees": "Modifications enregistrées.",
+    "desactiver": "Désactiver",
+    "activer": "Activer",
+    "renvoyer": "Renvoyer",
+    "supprimer": "Supprimer",
+    "rechercher": "Rechercher",
+    "effacerRecherche": "Effacer la recherche",
+    "modifier": "Modifier",
+    "etat": "État",
+    "actions": "Actions",
+    "actionsPour": "Actions pour {{nom}}",
+    "chargement": "Chargement…",
+    "separateurListe": ", ",
+    "facultatif": "Facultatif"
+  },
+  "accueil": {
+    "abonnementEntreprise": "Abonnement de l’entreprise :",
+    "accesRapides": "Accès rapides",
+    "bonjourPrenom": "Bonjour {{prenom}}",
+    "bonjour": "Bonjour"
+  },
+  "erreurs": {
+    "accesRefuse": {
+      "titre": "Accès refusé",
+      "texte": "Votre rôle ne permet pas d’accéder à cette page."
+    },
+    "suspendu": {
+      "titreDesactive": "Accès suspendu",
+      "titreNonActif": "Abonnement non actif",
+      "desactive": "Votre entreprise a été désactivée par Batulo : aucun accès n’est possible pour le moment. Contactez Batulo pour en savoir plus.",
+      "enAttente": "L’abonnement de votre entreprise n’est pas encore payé. Votre administrateur doit choisir une formule pour que vous puissiez accéder à Batulo.",
+      "ouvert": "Votre accès est de nouveau ouvert."
+    },
+    "champs": {
+      "prenom": "Prénom",
+      "nom": "Nom",
+      "courriel": "Courriel",
+      "motDePasse": "Mot de passe",
+      "motDePasseActuel": "Mot de passe actuel",
+      "nouveauMotDePasse": "Nouveau mot de passe",
+      "confirmationMotDePasse": "Confirmation",
+      "nomEntreprise": "Entreprise",
+      "jeton": "Lien",
+      "jetonRafraichissement": "Session"
+    }
+  },
+  "demandes": {
+    "titre": "Demandes d’augmentation",
+    "sousTitre": "Demandez à Batulo de passer à une autre formule. Votre demande arrive aussi dans votre conversation avec Batulo.",
+    "info": "Une demande ne change pas votre abonnement : une fois acceptée, vous payez vous-même la formule par carte, depuis « S’abonner ».",
+    "nouvelle": "Nouvelle demande",
+    "enAttente": "Votre demande du {{date}} ({{formule}}) est en attente de réponse. Vous pourrez en faire une autre une fois qu’elle aura été traitée.",
+    "formuleSouhaitee": "Formule souhaitée",
+    "choisissezFormule": "Choisissez une formule.",
+    "votreMessage": "Votre message",
+    "expliquez": "Expliquez votre besoin en quelques mots.",
+    "erreurEnvoi": "La demande n’a pas pu être envoyée.",
+    "envoyer": "Envoyer la demande",
+    "mesDemandes": "Mes demandes",
+    "chargement": "Chargement des demandes",
+    "erreurChargement": "Vos demandes n’ont pas pu être chargées.",
+    "aucune": "Aucune demande pour le moment.",
+    "demandeeLe": "Demandée le {{date}}",
+    "reponseDe": "Réponse de {{nom}}",
+    "reponse": "Réponse",
+    "le": ", le {{date}}",
+    "deuxPoints": ":",
+    "aucunMessage": "aucun message.",
+    "payer": "Payer la {{formule}}",
+    "plusRecentes": {
+      "one": "La {{n}} demande la plus récente est affichée.",
+      "other": "Les {{n}} demandes les plus récentes sont affichées."
+    },
+    "envoyee": "Demande envoyée à Batulo. Vous serez notifié de sa réponse."
+  },
+  "editeur": {
+    "store": {
+      "aucunSondage": "Aucun sondage chargé.",
+      "questionCreeeIntrouvable": "La question créée est introuvable dans la réponse du serveur.",
+      "questionModifieeIntrouvable": "La question modifiée est introuvable dans la réponse du serveur."
+    },
+    "toutEnregistre": "Tout est enregistré",
+    "lectureSeule": "Lecture seule",
+    "criteresModifiables": "Les critères d’analyse des questions restent modifiables.",
+    "supprimerBrouillon": "Supprimer le brouillon",
+    "modifierTitre": "Modifier « {{titre}} »",
+    "descriptionAide": "Présentée aux répondants au début du sondage.",
+    "erreurEnTete": "L’en-tête n’a pas pu être enregistré.",
+    "accueil": {
+      "titre": "Page d’accueil",
+      "aide": "Présentée au répondant avant les questions. Laissée vide et sans consentement, le questionnaire s’ouvre directement.",
+      "objet": "Objet de l’enquête (facultatif)",
+      "objetAide": "Pourquoi cette enquête, à quoi serviront les réponses.",
+      "confidentialite": "Confidentialité des réponses (facultatif)",
+      "confidentialiteAide": "Anonymat, conservation et usage des données.",
+      "consentement": "Exiger le consentement du répondant",
+      "consentementAide": "Le répondant coche une case avant de commencer ; la date est gardée avec sa réponse.",
+      "texteConsentement": "Texte de la case de consentement",
+      "texteConsentementAide": "Par exemple : « J’ai lu ces informations et j’accepte de participer. »",
+      "texteConsentementRequis": "Écrivez le texte de la case de consentement.",
+      "erreur": "La page d’accueil n’a pas pu être enregistrée."
+    },
+    "aucuneSection": "Ce sondage n’a pas encore de section. Les questions se rangent dans des sections.",
+    "ajouterPremiereSection": "Ajouter une première section",
+    "ajouterSection": "Ajouter une section",
+    "sectionsMax": "{{max}} sections au plus.",
+    "modificationsEnAttente": "Des modifications ne sont pas encore enregistrées : corrigez-les ou attendez « Tout est enregistré ».",
+    "titreSection": "Section {{numero}}",
+    "supprimerBrouillonTitre": "Supprimer ce brouillon ?",
+    "supprimerBrouillonMessage": "« {{titre}} » sera supprimé définitivement, avec ses sections et ses questions. Cette action est irréversible.",
+    "brouillonSupprime": "Brouillon supprimé.",
+    "quitterTitre": "Quitter l’éditeur ?",
+    "quitterNonEnregistres": {
+      "one": "Un élément n’est pas enregistré (à corriger ou en cours). Ces modifications seront perdues.",
+      "other": "{{n}} éléments ne sont pas enregistrés (à corriger ou en cours). Ces modifications seront perdues."
+    },
+    "quitterEnCours": "Un enregistrement est en cours : attendez qu’il se termine pour ne rien perdre.",
+    "quitterQuandMeme": "Quitter quand même",
+    "section": {
+      "deplacer": "Déplacer la section {{numero}} (glisser, ou menu Monter / Descendre)",
+      "actions": "Actions de la section {{numero}}",
+      "titre": "Titre de la section",
+      "titreObligatoire": "Le titre de la section est obligatoire.",
+      "ajouterCondition": "Ajouter une condition à la section",
+      "erreur": "La section n’a pas pu être enregistrée.",
+      "aucuneQuestion": "Aucune question dans cette section.",
+      "ajouterQuestion": "Ajouter une question",
+      "questionsMax": "{{max}} questions au plus par section.",
+      "monter": "Monter la section",
+      "descendre": "Descendre la section",
+      "supprimer": "Supprimer la section",
+      "nomCible": "la section {{numero}}",
+      "supprimerTitre": "Supprimer cette section ?",
+      "supprimerVide": "La section « {{titre}} » sera supprimée.",
+      "supprimerAvec": {
+        "one": "La section « {{titre}} » sera supprimée avec sa question.",
+        "other": "La section « {{titre}} » sera supprimée avec ses {{n}} questions."
+      },
+      "supprimee": "Section supprimée."
+    },
+    "actionRefusee": "Action refusée",
+    "actionImpossible": "Cette action n’a pas pu être faite.",
+    "condition": {
+      "modifierMenu": "Modifier la condition d’affichage",
+      "ajouterMenu": "Ajouter une condition d’affichage",
+      "enregistree": "Condition d’affichage enregistrée.",
+      "retireeSection": "Condition d’affichage retirée : la section est toujours affichée.",
+      "retireeQuestion": "Condition d’affichage retirée : la question est toujours affichée.",
+      "questionIntrouvable": "Question introuvable",
+      "regleEntre": "{{libelle}} entre {{min}} et {{max}}",
+      "lienOu": " ou ",
+      "lienEt": " et ",
+      "visibleSi": "Visible si :",
+      "modifierDe": "Modifier la condition de {{cible}}",
+      "retirerDe": "Retirer la condition de {{cible}}",
+      "cetteQuestion": "cette question",
+      "titre": "Condition d’affichage de {{cible}}",
+      "aucuneSource": "Aucune question enregistrée n’est placée avant {{cible}} : une condition ne peut dépendre que d’une question qui la précède.",
+      "aideSection": "Cette section ne sera affichée qu’aux répondants dont les réponses vérifient ces règles. Seules les questions placées avant sont proposées.",
+      "aideQuestion": "Cette question ne sera affichée qu’aux répondants dont les réponses vérifient ces règles. Seules les questions placées avant sont proposées.",
+      "combinaison": "Combinaison des règles",
+      "et": "Toutes les règles (ET)",
+      "ou": "Au moins une règle (OU)",
+      "afficherSi": "Afficher si",
+      "ouSi": "ou si",
+      "etSi": "et si",
+      "regleN": "(règle {{n}})",
+      "sansLibelle": "(sans libellé)",
+      "condition": "Condition",
+      "options": "Options",
+      "de": "De",
+      "aCompris": "À (compris)",
+      "auCompris": "Au (compris)",
+      "retirerRegle": "Retirer la règle {{n}}",
+      "ajouterRegle": "Ajouter une règle",
+      "reglesMax": "{{max}} règles au plus.",
+      "nonEnregistree": "La condition n’a pas été enregistrée",
+      "pasEncore": "Pas encore enregistrée",
+      "enregistrement": "Enregistrement de la condition",
+      "enregistrer": "Enregistrer la condition",
+      "sansReponse": "Le serveur n’a pas répondu : la condition n’a pas été enregistrée. Réessayez.",
+      "reponseSansCondition": "Le serveur a répondu sans la condition : elle n’a pas été enregistrée. Réessayez ; si cela se reproduit, signalez le détail ci-dessous.",
+      "reglesIncompletes": "Une règle est incomplète : complétez les champs signalés en rouge, puis enregistrez.",
+      "erreur": "La condition n’a pas pu être enregistrée.",
+      "fermerTitre": "Fermer sans enregistrer ?",
+      "fermerMessage": "Les règles de cette condition d’affichage ne sont pas enregistrées : elles seront perdues.",
+      "fermerAction": "Fermer sans enregistrer",
+      "choisirQuestion": "Choisissez la question dont dépend l’affichage.",
+      "choisirCondition": "Choisissez une condition.",
+      "choisirOption": "Choisissez au moins une option.",
+      "indiquerValeur": "Indiquez la valeur attendue.",
+      "bornes": "La première borne doit être inférieure ou égale à la seconde."
+    },
+    "question": {
+      "aria": "Question {{numero}}",
+      "deplacer": "Déplacer la question {{numero}} (glisser, ou menu Monter / Descendre)",
+      "libelleObligatoire": "Le libellé de la question est obligatoire.",
+      "type": "Type",
+      "aide": "Aide (facultative)",
+      "aideAide": "Affichée sous la question, pour préciser ce qui est attendu.",
+      "nonEnregistree": "La question {{numero}} n’a pas été enregistrée",
+      "erreur": "Cette question n’a pas pu être enregistrée.",
+      "obligatoire": "Obligatoire",
+      "ajouterCondition": "Ajouter une condition",
+      "actions": "Actions de la question {{numero}}",
+      "monter": "Monter",
+      "descendre": "Descendre",
+      "versSection": "Déplacer vers une autre section",
+      "supprimer": "Supprimer la question",
+      "sectionCible": "Section {{numero}} : {{titre}}",
+      "nomCibleSection": "la question {{numero}} de la section {{section}}",
+      "nomCible": "la question {{numero}}",
+      "perteOptions": {
+        "one": "son option",
+        "other": "ses {{n}} options"
+      },
+      "perteGrille": "les lignes et les colonnes de la grille",
+      "et": " et ",
+      "changerTypeTitre": "Passer en « {{type}} » ?",
+      "changerTypeMessage": "Cette question perdra {{pertes}}.",
+      "changerType": "Changer de type",
+      "supprimerTitre": "Supprimer cette question ?",
+      "supprimerMessage": "« {{libelle}} » sera supprimée.",
+      "supprimerSans": "Cette question sera supprimée.",
+      "deplacee": "Question déplacée.",
+      "supprimee": "Question supprimée."
+    },
+    "critere": {
+      "aria": "Critère d’analyse de la question",
+      "titre": "Critère d’analyse",
+      "aide": "Permet de comparer les statistiques selon les réponses à cette question (ex. par région). Jamais montré au répondant ; modifiable même après publication. Un critère sensible (sexe, âge…) devrait être une question facultative.",
+      "tranches": "Tranches",
+      "egales": "5 tranches égales",
+      "personnalisees": "Bornes personnalisées",
+      "sansBornes": "Les tranches égales se calculent entre le minimum et le maximum de la question, qui n’en a pas : définissez-les, ou choisissez des bornes personnalisées.",
+      "borne": "Borne {{n}}",
+      "borneObligatoire": "La borne est obligatoire.",
+      "supprimerBorne": "Supprimer la borne {{n}}",
+      "ajouterBorne": "Ajouter une borne",
+      "apercu": "Tranches : {{tranches}}.",
+      "regrouper": "Regrouper par",
+      "annee": "Année",
+      "erreur": "Le critère n’a pas pu être enregistré.",
+      "nombreBornes": "De 1 à {{max}} bornes.",
+      "croissantes": "Les bornes doivent être strictement croissantes.",
+      "moinsDe": "moins de {{borne}}",
+      "entre": "{{de}} à {{a}}",
+      "etPlus": "{{borne}} et plus"
+    },
+    "liste": {
+      "deplacer": "Déplacer {{element}} {{n}} (ou Alt + flèches)",
+      "texteObligatoire": "Le texte est obligatoire.",
+      "supprimer": "Supprimer {{element}} {{n}}",
+      "ajouter": "Ajouter {{element}}"
+    },
+    "matrice": {
+      "lignes": "Lignes",
+      "ligne": "Ligne",
+      "uneLigne": "une ligne",
+      "lignesMin": "lignes",
+      "colonnes": "Colonnes",
+      "colonne": "Colonne",
+      "uneColonne": "une colonne",
+      "colonnesMin": "colonnes",
+      "aide": "De 1 à {{lignesMax}} lignes et de {{colonnesMin}} à {{colonnesMax}} colonnes. Chaque ligne reçoit une réponse parmi les colonnes."
+    },
+    "options": {
+      "deplacer": "Déplacer l’option {{n}} (ou Alt + flèches)",
+      "option": "Option {{n}}",
+      "libelleObligatoire": "Le libellé est obligatoire.",
+      "generee": "Générée depuis le libellé",
+      "supprimer": "Supprimer l’option {{n}}",
+      "ajouter": "Ajouter une option",
+      "valeurs": "Valeurs pour les statistiques",
+      "elements": "options"
+    },
+    "regles": {
+      "optionsMin": "Ajoutez au moins {{min}} options.",
+      "valeurEnDouble": "La valeur « {{valeur}} » est utilisée par deux options.",
+      "nombreElements": "De {{min}} à {{max}} {{element}}.",
+      "doublon": "« {{texte}} » apparaît deux fois."
+    },
+    "types": {
+      "dateMin": "Date au plus tôt (facultative)",
+      "dateMax": "Date au plus tard (facultative)",
+      "datesInversees": "La date au plus tôt doit précéder ou égaler la date au plus tard.",
+      "etendue": "Étendue",
+      "unA": "1 à {{max}}",
+      "libelleDu": "Libellé du {{n}} (facultatif)",
+      "pasDuTout": "Pas du tout d’accord",
+      "toutAFait": "Tout à fait d’accord",
+      "minimum": "Minimum (facultatif)",
+      "maximum": "Maximum (facultatif)",
+      "decimales": "Décimales",
+      "decimalesAide": "De 0 (nombre entier) à {{max}}",
+      "decimalesObligatoire": "Le nombre de décimales est obligatoire.",
+      "decimalesInvalide": "Un nombre entier de 0 à {{max}}.",
+      "bornesInversees": "Le minimum doit être inférieur ou égal au maximum.",
+      "apercuReponses": "Aperçu des réponses",
+      "ouiNonAide": "Rien à configurer : le répondant choisit Oui ou Non.",
+      "longueurMax": "Longueur maximale",
+      "caracteres": "caractères",
+      "de1A": "De 1 à {{max}}",
+      "longueurObligatoire": "La longueur maximale est obligatoire.",
+      "nombreEntier": "Un nombre entier.",
+      "entre1Et": "Entre 1 et {{max}} caractères.",
+      "reponseCourt": "Réponse courte",
+      "reponseLong": "Réponse longue"
+    },
+    "etat": {
+      "enregistre": "Enregistré",
+      "modifie": "Modifications non enregistrées",
+      "invalide": "À corriger avant l’enregistrement",
+      "enregistrement": "Enregistrement…",
+      "erreur": "Échec de l’enregistrement"
+    }
+  },
+  "superAdmin": {
+    "entrepriseDe": "Entreprise de {{nom}}",
+    "tdb": {
+      "sousTitre": "Vue d’ensemble des entreprises clientes de Batulo",
+      "entreprises": "Entreprises",
+      "auTotal": "Au total",
+      "septJours": "7 jours ou moins",
+      "toutesDemandes": "Toutes les demandes",
+      "enAttenteReponse": "En attente de réponse"
+    },
+    "admins": {
+      "sousTitre": "Chaque entreprise cliente, son admin, son abonnement et son équipe.",
+      "nouvel": "Nouvel admin",
+      "aideRecherche": "Entreprise, prénom, nom ou courriel de l’admin",
+      "chargement": "Chargement des entreprises",
+      "erreur": "La liste des entreprises n’a pas pu être chargée.",
+      "desactiverEntreprise": "Désactiver l’entreprise",
+      "activerEntreprise": "Activer l’entreprise",
+      "aucune": "Aucune entreprise pour le moment. Créez un admin pour ouvrir le compte d’une entreprise.",
+      "pagination": "Pagination des entreprises",
+      "aucuneStatutRecherche": "Aucune entreprise au statut « {{statut}} » ne correspond à « {{terme}} ».",
+      "aucuneStatut": "Aucune entreprise au statut « {{statut}} ».",
+      "aucuneRecherche": "Aucune entreprise ne correspond à « {{terme}} ».",
+      "aucuneFiltre": "Aucune entreprise.",
+      "sansAbonnement": "Sans abonnement"
+    },
+    "actions": {
+      "aucunGestionnaire": "aucun gestionnaire",
+      "gestionnaires": {
+        "one": "{{n}} gestionnaire",
+        "other": "{{n}} gestionnaires"
+      },
+      "creee": "{{entreprise}} a été créée. Un mot de passe temporaire a été envoyé à {{courriel}} ; l’abonnement attend le paiement de l’admin.",
+      "reactivee": "{{entreprise}} est de nouveau active, avec ses gestionnaires.",
+      "gestionnairesBloques": "Ses gestionnaires seront bloqués aussi.",
+      "nGestionnairesBloques": {
+        "one": "Son gestionnaire sera bloqué aussi.",
+        "other": "Ses {{n}} gestionnaires seront bloqués aussi."
+      },
+      "desactiverTitre": "Désactiver cette entreprise ?",
+      "desactiverMessage": "{{nom}} ({{entreprise}}) ne pourra plus se connecter.{{gestionnaires}} Les sondages de l’entreprise n’accepteront plus de réponses. Rien n’est supprimé ; vous pourrez la réactiver.",
+      "desactivee": "{{entreprise}} est désactivée, avec ses gestionnaires.",
+      "motDePasseEnvoye": "Mot de passe temporaire envoyé à {{courriel}}, valable jusqu’au {{date}}.",
+      "contenu": {
+        "sesGestionnaires": "ses gestionnaires",
+        "nGestionnaires": {
+          "one": "son gestionnaire",
+          "other": "ses {{n}} gestionnaires"
+        },
+        "admin": "son admin",
+        "sondages": "ses sondages et leurs réponses",
+        "abonnement": "son abonnement et ses paiements"
+      },
+      "supprimerTitre": "Supprimer cette entreprise ?",
+      "supprimerMessage": "L’entreprise « {{nom}} » sera supprimée définitivement, avec {{contenu}}. Cette action est irréversible. Pour lui couper l’accès sans rien perdre, désactivez-la plutôt.",
+      "supprimerDefinitivement": "Supprimer définitivement",
+      "supprimee": "{{nom}} a été supprimée."
+    },
+    "detail": {
+      "chargement": "Chargement de l’admin",
+      "erreur": "Cet admin n’a pas pu être chargé.",
+      "adminNom": "Admin : {{nom}}",
+      "active": "Active",
+      "desactivee": "Désactivée",
+      "creeeLe": "Créée le",
+      "nomAffiche": "Nom affiché",
+      "nomEntreprise": "(nom de l’entreprise)",
+      "couleur": "Couleur",
+      "couleurBatulo": "(couleur Batulo)",
+      "logo": "Logo",
+      "logoDe": "Logo de {{nom}}",
+      "aucun": "Aucun",
+      "admin": "Admin",
+      "defini": "Défini par l’admin",
+      "aucuneFormule": "Aucune (jamais payé)",
+      "dernierPaiement": "Dernier paiement"
+    },
+    "dialogue": {
+      "modifier": "Modifier l’admin",
+      "aide": "L’entreprise et son compte admin seront créés. Un mot de passe temporaire, valable 24 heures, sera envoyé par courriel ; l’abonnement restera en attente de paiement jusqu’à ce que l’admin paie en ligne.",
+      "nomEntreprise": "Nom de l’entreprise",
+      "nomEntrepriseAide": "Facultatif. Par défaut : « Entreprise de Prénom Nom ».",
+      "nomEntrepriseObligatoire": "Le nom de l’entreprise est obligatoire.",
+      "prenom": "Prénom de l’admin",
+      "nom": "Nom de l’admin",
+      "courriel": "Courriel de l’admin",
+      "creer": "Créer l’admin"
+    },
+    "abonnements": {
+      "sousTitre": "L’abonnement de chaque entreprise, de l’expiration la plus proche à la plus lointaine ; les jamais payés à la fin.",
+      "chargement": "Chargement des abonnements",
+      "erreur": "La liste des abonnements n’a pas pu être chargée.",
+      "aucunStatut": "Aucun abonnement au statut « {{statut}} ».",
+      "aucune": "Aucune entreprise pour le moment.",
+      "aucuneFormule": "Aucune formule",
+      "caption": "Abonnements des entreprises",
+      "pagination": "Pagination des abonnements"
+    },
+    "demandes": {
+      "sousTitre": "Les demandes d’augmentation envoyées par les admins. Votre réponse n’a aucun effet sur l’abonnement : l’admin paie lui-même la formule.",
+      "filtrer": "Filtrer par statut de la demande",
+      "toutes": "Toutes",
+      "erreurOuverture": "Cette demande n’a pas pu être ouverte.",
+      "erreur": "La liste des demandes n’a pas pu être chargée.",
+      "actuelle": "Actuelle : {{formule}}",
+      "repondreA": "Répondre à la demande de {{entreprise}}",
+      "voirDe": "Voir la demande de {{entreprise}}",
+      "repondre": "Répondre",
+      "voir": "Voir",
+      "aucuneEnAttente": "Aucune demande en attente.",
+      "aucuneAcceptee": "Aucune demande acceptée.",
+      "aucuneRefusee": "Aucune demande refusée.",
+      "caption": "Demandes d’augmentation d’abonnement",
+      "envoyeeLe": "Envoyée le",
+      "pagination": "Pagination des demandes",
+      "filtre": {
+        "EN_ATTENTE": "En attente",
+        "TRAITEE": "Acceptées",
+        "REFUSEE": "Refusées"
+      },
+      "acceptee": "Demande de {{entreprise}} acceptée ; l’admin en est notifié.",
+      "refusee": "Demande de {{entreprise}} refusée ; l’admin en est notifié.",
+      "aucuneFormule": "aucune"
+    },
+    "demande": {
+      "par": "par {{nom}}",
+      "le": "le {{date}}",
+      "titre": "Demande de {{entreprise}}",
+      "formuleActuelle": "Formule actuelle",
+      "messageAdmin": "Message de l’admin",
+      "sansMessage": "Sans message.",
+      "votreReponse": "Votre réponse",
+      "aide": "Accepter n’a aucun effet sur l’abonnement : l’admin choisit et paie lui-même la formule depuis sa page Abonnement. Votre réponse est postée dans sa conversation avec Batulo et l’admin en est notifié.",
+      "accepter": "Accepter",
+      "refuser": "Refuser",
+      "choisissez": "Choisissez d’accepter ou de refuser la demande.",
+      "messageA": "Message à l’admin",
+      "obligatoireRefus": "Obligatoire pour un refus",
+      "expliquez": "Expliquez à l’admin pourquoi sa demande est refusée.",
+      "envoi": "Envoi de la réponse",
+      "envoyer": "Envoyer la réponse"
+    }
+  },
+  "erreursApi": {
+    "ABONNEMENT_EXPIRE": "L’abonnement de l’entreprise n’est pas actif : cette action est en lecture seule.",
+    "ABONNEMENT_EN_ATTENTE_PAIEMENT": "L’abonnement attend son paiement.",
+    "ABONNEMENT_DESACTIVE": "L’accès de l’entreprise est désactivé.",
+    "ABONNEMENT_INTROUVABLE": "Aucun abonnement pour cette entreprise.",
+    "ACCES_REFUSE": "Votre rôle ne permet pas d’accéder à cette ressource.",
+    "ACTION_RESERVEE_ADMIN": "Seul l’admin de l’entreprise peut faire cette modification.",
+    "ACTION_RESERVEE_CREATEUR": "Vous pouvez consulter ce sondage, mais seuls son créateur et l’admin peuvent le modifier, le publier ou le fermer.",
+    "ADMIN_INTROUVABLE": "Compte admin introuvable.",
+    "ASSIGNATION_INTROUVABLE": "Ce sondage n’est pas assigné à ce gestionnaire.",
+    "BROUILLON_EXISTANT": "Une nouvelle version est déjà en préparation : modifiez son brouillon.",
+    "COMPTE_DESACTIVE": "Votre compte ou votre entreprise a été désactivé. Contactez votre administrateur.",
+    "CONFLIT": "L’opération viole une contrainte de données.",
+    "CONVERSATION_INTROUVABLE": "Cette conversation est introuvable.",
+    "COULEUR_INVALIDE": "La couleur doit être au format hexadécimal #RRGGBB (ex. #1E6B52).",
+    "COURRIEL_DEJA_UTILISE": "Ce courriel est déjà utilisé par un compte.",
+    "CRITERE_INVALIDE": "Ce filtre ne correspond à aucun critère d’analyse de ce sondage.",
+    "CROISEMENT_INVALIDE": "Ce croisement n’est pas possible : seules les questions à choix, oui/non, échelle et numériques se croisent avec un autre critère.",
+    "DATES_INVALIDES": "Ces dates ne sont pas valides : la fermeture doit suivre l’ouverture et maintenant, et l’ouverture d’un sondage déjà ouvert ne change plus.",
+    "DEMANDE_DEJA_TRAITEE": "Cette demande a déjà reçu une réponse.",
+    "DEMANDE_EN_COURS": "Une demande attend déjà la réponse de Batulo : vous pouvez lui écrire dans la messagerie.",
+    "DEMANDE_INTROUVABLE": "Cette demande est introuvable.",
+    "ENTREPRISE_DESACTIVEE": "Votre entreprise a été désactivée : le paiement est impossible. Contactez Batulo.",
+    "ENVOI_INTROUVABLE": "Cet envoi de statistiques est introuvable.",
+    "FICHIER_MANQUANT": "Aucun fichier n’a été reçu.",
+    "FICHIER_TROP_GROS": "Le fichier est trop gros.",
+    "FORMAT_INVALIDE": "Ce format d’export n’est pas disponible.",
+    "GESTIONNAIRE_CREATEUR": "Ce gestionnaire a créé ce sondage : il le voit déjà.",
+    "GESTIONNAIRE_DESACTIVE": "Ce gestionnaire est désactivé : réactivez-le avant de lui assigner un sondage.",
+    "GESTIONNAIRE_INTROUVABLE": "Ce gestionnaire est introuvable dans votre entreprise.",
+    "IDENTIFIANTS_INVALIDES": "Courriel ou mot de passe incorrect.",
+    "INTERLOCUTEUR_INTROUVABLE": "Vous ne pouvez pas écrire à ce compte.",
+    "JETON_INVALIDE": "Ce lien est invalide, expiré ou déjà utilisé. Demandez un nouveau lien.",
+    "JETON_RAFRAICHISSEMENT_INVALIDE": "Session expirée ou révoquée : reconnectez-vous.",
+    "LIMITE_ATTEINTE": "La limite est atteinte (nombre maximal de sections ou de questions).",
+    "LOGO_DIMENSIONS": "Le logo est trop grand (en pixels).",
+    "LOGO_FORMAT_INVALIDE": "Le logo doit être une image PNG ou JPEG.",
+    "LOGO_ILLISIBLE": "Le logo est illisible ou endommagé : enregistrez-le de nouveau en PNG ou en JPEG (couleurs RVB).",
+    "LOGO_INTROUVABLE": "Ce logo n’existe pas.",
+    "LOGO_VIDE": "Le fichier du logo est vide.",
+    "METHODE_NON_AUTORISEE": "Cette action n’est pas acceptée à cette adresse.",
+    "MOOSYL_ERREUR": "Le service de paiement mobile a rencontré un problème. Réessayez dans un instant.",
+    "MOTS_DE_PASSE_DIFFERENTS": "Le mot de passe et sa confirmation ne correspondent pas.",
+    "MOT_DE_PASSE_ACTUEL_INCORRECT": "Le mot de passe actuel est incorrect.",
+    "MOT_DE_PASSE_IDENTIQUE": "Le nouveau mot de passe doit être différent de l’actuel.",
+    "MOT_DE_PASSE_TEMPORAIRE": "Choisissez un nouveau mot de passe pour continuer.",
+    "MOT_DE_PASSE_TEMPORAIRE_EXPIRE": "Votre mot de passe temporaire a expiré (24 h). Demandez-en un nouveau à votre administrateur ou utilisez « mot de passe oublié ».",
+    "NON_AUTHENTIFIE": "Vous devez être connecté.",
+    "NOTIFICATION_INTROUVABLE": "Cette notification est introuvable.",
+    "ORDRE_INVALIDE": "Le nouvel ordre est invalide : rechargez la page.",
+    "PAIEMENT_INTROUVABLE": "Ce paiement est introuvable.",
+    "PAIEMENT_INVALIDE": "Ce paiement ne correspond pas à l’abonnement de votre entreprise.",
+    "PAIEMENT_NON_REUSSI": "Le paiement n’a pas été validé. L’abonnement n’est pas modifié.",
+    "PAIEMENT_MOBILE_NON_CONFIGURE": "Le paiement mobile n’est pas encore disponible.",
+    "PARAMETRE_INVALIDE": "Un paramètre de la requête est invalide.",
+    "PARAMETRE_MANQUANT": "Un paramètre obligatoire manque.",
+    "PERIODE_INVALIDE": "La date « du » doit être antérieure ou égale à « au ».",
+    "PERMISSION_SONDAGES_REQUISE": "Votre admin ne vous a pas donné la permission de créer ou modifier des sondages.",
+    "POSITION_INVALIDE": "Cette position n’est pas valide.",
+    "QUESTION_INTROUVABLE": "Cette question est introuvable.",
+    "QUESTION_NON_TEXTE": "Cette question n’est pas une question à texte libre.",
+    "REPONSE_OBLIGATOIRE": "Expliquez le refus à l’admin dans la réponse.",
+    "SECTION_INTROUVABLE": "Cette section est introuvable.",
+    "SONDAGE_BROUILLON": "Ce sondage est un brouillon : il n’a jamais été publié.",
+    "SONDAGE_INCOMPLET": "Le sondage est incomplet : chaque section doit contenir au moins une question.",
+    "SONDAGE_NON_EN_COURS": "Ce sondage n’est pas en cours.",
+    "SONDAGE_NON_TERMINE": "Les statistiques ne s’envoient que pour un sondage terminé.",
+    "SONDAGE_PUBLIE": "Ce sondage est publié : son contenu ne peut plus changer. Créez une nouvelle version pour le modifier.",
+    "SONDAGE_TERMINE": "Ce sondage est terminé.",
+    "STATUT_INVALIDE": "Une demande se traite ou se refuse.",
+    "STRIPE_ERREUR": "Le service de paiement par carte a rencontré un problème. Réessayez dans un instant.",
+    "STRIPE_MODE_TEST_REQUIS": "Seules les clés Stripe de test sont acceptées pendant le développement.",
+    "STRIPE_NON_CONFIGURE": "Le paiement par carte n’est pas configuré.",
+    "SUPER_ADMIN_PROTEGE": "Le compte du super admin ne peut pas être consulté, modifié, désactivé ni supprimé ici.",
+    "TEXTE_CONSENTEMENT_REQUIS": "Le consentement est exigé : indiquez le texte de la case à cocher.",
+    "UTILISATEUR_INTROUVABLE": "Compte introuvable.",
+    "VALEUR_OPTION_EN_DOUBLE": "Deux options de la même question ont la même valeur.",
+    "VERSION_INTROUVABLE": "Cette version du sondage est introuvable.",
+    "VERSION_OBSOLETE": "Ce n’est pas la dernière version : partez de la plus récente."
+  },
+  "gestionnaires": {
+    "actions": {
+      "cree": "{{nom}} a été créé. Un mot de passe temporaire a été envoyé à {{courriel}}.",
+      "reactive": "{{nom}} est de nouveau actif.",
+      "desactiverTitre": "Désactiver ce gestionnaire ?",
+      "desactiverMessage": "{{nom}} ne pourra plus se connecter. Ses sondages et ses assignations sont conservés ; vous pourrez le réactiver.",
+      "desactive": "{{nom}} est désactivé.",
+      "renvoyerTitre": "Renvoyer un mot de passe temporaire ?",
+      "renvoyerMessage": "Un nouveau mot de passe, valable 24 heures, sera envoyé à {{courriel}}. L’ancien ne fonctionnera plus.",
+      "motDePasseEnvoye": "Mot de passe temporaire envoyé à {{courriel}}.",
+      "supprimerTitre": "Supprimer ce gestionnaire ?",
+      "supprimerMessage": "{{nom}} sera supprimé définitivement. Cette action est irréversible. Pour lui couper l’accès sans rien perdre, désactivez-le plutôt.",
+      "supprime": "{{nom}} a été supprimé.",
+      "permissionDonnee": "{{nom}} peut maintenant créer des sondages.",
+      "permissionRetiree": "{{nom}} ne peut plus créer de sondages."
+    },
+    "liste": {
+      "sousTitre": "Les comptes de votre équipe : accès, permission de créer des sondages et assignations.",
+      "nouveau": "Nouveau gestionnaire",
+      "aideRecherche": "Prénom, nom ou courriel",
+      "filtrerEtat": "Filtrer par état",
+      "actifs": "Actifs",
+      "desactives": "Désactivés",
+      "chargement": "Chargement des gestionnaires",
+      "erreur": "La liste des gestionnaires n’a pas pu être chargée.",
+      "renvoyerMotDePasse": "Renvoyer un mot de passe temporaire",
+      "autoriser": "Autoriser {{nom}} à créer des sondages",
+      "peutCreer": "Peut créer des sondages",
+      "aucun": "Aucun gestionnaire pour le moment. Créez-en un pour lui confier des sondages.",
+      "caption": "Gestionnaires de l’entreprise",
+      "creationSondages": "Création de sondages",
+      "pagination": "Pagination des gestionnaires",
+      "aucunRecherche": {
+        "tous": "Aucun gestionnaire ne correspond à « {{terme}} ».",
+        "actifs": "Aucun gestionnaire actif ne correspond à « {{terme}} ».",
+        "desactives": "Aucun gestionnaire désactivé ne correspond à « {{terme}} »."
+      },
+      "aucunFiltre": {
+        "tous": "Aucun gestionnaire.",
+        "actifs": "Aucun gestionnaire actif.",
+        "desactives": "Aucun gestionnaire désactivé."
+      }
+    },
+    "detail": {
+      "chargement": "Chargement du gestionnaire",
+      "erreur": "Ce gestionnaire n’a pas pu être chargé.",
+      "compte": "Compte",
+      "temporaire": "Temporaire",
+      "valableJusquau": "Valable jusqu’au {{date}}",
+      "defini": "Défini par le gestionnaire",
+      "autorisee": "Autorisée",
+      "bloquee": "Bloquée",
+      "creeLe": "Créé le",
+      "sesSondages": "Ses sondages",
+      "activezDabord": "Activez d’abord ce gestionnaire.",
+      "assigner": "Assigner des sondages",
+      "chargementSondages": "Chargement de ses sondages",
+      "erreurSondages": "Ses sondages n’ont pas pu être chargés.",
+      "aucunSondage": "Aucun sondage créé ni assigné.",
+      "ligneSondage": "Version {{version}} · {{relation}} · modifié le {{date}}",
+      "retirer": "Retirer l’assignation",
+      "retirerDe": "Retirer l’assignation de « {{titre}} »",
+      "pagination": "Pagination de ses sondages",
+      "assignationsEnregistrees": "Assignations enregistrées.",
+      "retirerTitre": "Retirer cette assignation ?",
+      "retirerMessage": "{{nom}} ne verra plus le sondage « {{titre}} » (toutes ses versions). Il en sera notifié.",
+      "assignationRetiree": "Assignation retirée."
+    },
+    "dialogue": {
+      "modifier": "Modifier le gestionnaire",
+      "aide": "Un mot de passe temporaire, valable 24 heures, lui sera envoyé par courriel. Il ne pourra pas créer de sondages tant que vous ne l’y autorisez pas.",
+      "creer": "Créer le gestionnaire"
+    }
+  },
+  "assignation": {
+    "aideGestionnaire": "{{nom}} pourra voir ces sondages, suivre leur collecte et consulter leurs statistiques, pour toutes leurs versions. Il recevra une notification et un courriel.",
+    "chargementSondages": "Chargement des sondages",
+    "erreurSondages": "Les sondages n’ont pas pu être chargés.",
+    "sondagesAssignes": {
+      "one": "{{n}} sondage assigné.",
+      "other": "{{n}} sondages assignés."
+    },
+    "nonAssignes": "Non assignés :",
+    "aucunAutre": "Aucun autre sondage à lui assigner.",
+    "rechercherSondage": "Rechercher un sondage",
+    "sondagesAAssigner": "Sondages à assigner",
+    "ligneSondage": "Version {{version}} · {{etat}}",
+    "aucunCorrespond": "Aucun sondage ne correspond à « {{terme}} ».",
+    "limite": "Seuls les {{limite}} sondages modifiés le plus récemment sont proposés.",
+    "enCours": "Assignation en cours",
+    "assigner": "Assigner",
+    "aideSondage": "Les gestionnaires choisis verront « {{titre}} » (toutes ses versions), suivront sa collecte et ses statistiques. Ils recevront une notification et un courriel.",
+    "aucunAutreGestionnaire": "Aucun autre gestionnaire actif à assigner.",
+    "gestionnairesAAssigner": "Gestionnaires à assigner"
+  },
+  "menu": {
+    "tableauDeBord": "Tableau de bord",
+    "admins": "Admins et entreprises",
+    "abonnements": "Abonnements",
+    "demandesAbonnement": "Demandes d’abonnement",
+    "messagerie": "Messagerie",
+    "notifications": "Notifications",
+    "abonnement": "Abonnement",
+    "gestionnaires": "Gestionnaires",
+    "sondages": "Sondages",
+    "statistiquesRecues": "Statistiques reçues",
+    "apparence": "Apparence",
+    "mesSondages": "Mes sondages",
+    "statistiquesEnvoyees": "Statistiques envoyées",
+    "principal": "Menu principal",
+    "nonLus": {
+      "one": "({{n}} non lu)",
+      "other": "({{n}} non lus)"
+    },
+    "nonLues": {
+      "one": "({{n}} non lue)",
+      "other": "({{n}} non lues)"
+    }
+  },
+  "layout": {
+    "abonnementExpireGestionnaire": "L’abonnement de votre entreprise est expiré : l’accès est en lecture seule. Votre administrateur doit le renouveler."
+  },
+  "bandeau": {
+    "votreAbonnement": "Votre abonnement",
+    "expireLe": "Expiré le {{date}} : accès en lecture seule.",
+    "expirera": "Expire le {{date}}",
+    "renouveler": "Renouveler",
+    "joursRestants": {
+      "one": "{{n}} jour restant",
+      "other": "{{n}} jours restants"
+    }
+  },
+  "barre": {
+    "ouvrirMenu": "Ouvrir le menu",
+    "accueil": "Batulo, accueil",
+    "compteDe": "Compte de {{nom}}",
+    "changerMotDePasse": "Changer le mot de passe",
+    "seDeconnecter": "Se déconnecter"
+  },
+  "messagerie": {
+    "ecrireBatuloToujours": "Vous pouvez toujours écrire à Batulo.",
+    "conversations": "Conversations",
+    "chargement": "Chargement des conversations",
+    "erreur": "Les conversations n’ont pas pu être chargées.",
+    "aucune": "Aucune conversation pour le moment.",
+    "vous": "Vous :",
+    "aucunMessage": "Aucun message",
+    "ecrireAdmin": "Écrire à mon admin",
+    "nouvelle": "Nouvelle conversation",
+    "nonLus": {
+      "one": "{{n}} non lu",
+      "other": "{{n}} non lus"
+    },
+    "liens": {
+      "voirEnvoi": "Voir mon envoi",
+      "voirEnvois": "Voir mes envois",
+      "voirDemande": "Voir la demande"
+    },
+    "retour": "Retour aux conversations",
+    "equipeBatulo": "Équipe Batulo",
+    "chargementMessages": "Chargement des messages",
+    "erreurMessages": "Les messages n’ont pas pu être chargés.",
+    "plusAnciens": "Messages plus anciens",
+    "aucunMessageFil": "Aucun message. Écrivez le premier.",
+    "messages": "Messages",
+    "erreurEnvoi": "Le message n’a pas pu être envoyé.",
+    "aideSaisie": "Ctrl + Entrée (ou ⌘ + Entrée) pour envoyer",
+    "ecrivez": "Écrivez un message.",
+    "envoyer": "Envoyer",
+    "automatique": "Message automatique",
+    "lu": "Lu",
+    "envoye": "Envoyé",
+    "messageDe": "Message de {{nom}}",
+    "dialogue": {
+      "rechercherAdmin": "Rechercher un admin ou une entreprise",
+      "rechercherGestionnaire": "Rechercher un gestionnaire",
+      "chargement": "Chargement des interlocuteurs",
+      "interlocuteurs": "Interlocuteurs",
+      "desactive": "désactivé",
+      "aucun": "Aucun interlocuteur ne correspond.",
+      "detailBatulo": "L’équipe Batulo (abonnement, assistance)"
+    },
+    "choisissez": "Choisissez une conversation pour lire ses messages.",
+    "conversation": "Conversation"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Super administrateur",
+    "ADMIN": "Administrateur",
+    "GESTIONNAIRE": "Gestionnaire"
+  },
+  "statutsAbonnement": {
+    "EN_ATTENTE_PAIEMENT": "En attente de paiement",
+    "ACTIF": "Actif",
+    "EXPIRE_BIENTOT": "Expire bientôt",
+    "EXPIRE": "Expiré",
+    "DESACTIVE": "Désactivé"
+  },
+  "formules": {
+    "MENSUEL": "Formule mensuelle",
+    "ANNUEL": "Formule annuelle"
+  },
+  "fournisseurs": {
+    "STRIPE": "Carte",
+    "MOOSYL": "Mobile"
+  },
+  "statutsDemande": {
+    "EN_ATTENTE": "En attente",
+    "TRAITEE": "Acceptée",
+    "REFUSEE": "Refusée"
+  },
+  "typesMessage": {
+    "STATISTIQUES": "Statistiques envoyées",
+    "DEMANDE_ABONNEMENT": "Demande d’augmentation d’abonnement",
+    "REPONSE_DEMANDE": "Réponse à une demande d’abonnement"
+  },
+  "statutsSondage": {
+    "NON_COMMENCE": "Non commencé",
+    "EN_COURS": "En cours",
+    "TERMINE": "Terminé"
+  },
+  "etatsSondage": {
+    "BROUILLON": "Brouillon",
+    "PLANIFIE": "Planifié",
+    "EN_COURS": "En cours",
+    "TERMINE": "Terminé"
+  },
+  "relationsSondage": {
+    "CREATEUR": "Créé par lui",
+    "ASSIGNE": "Assigné"
+  },
+  "typesQuestion": {
+    "CHOIX_UNIQUE": "Choix unique",
+    "CHOIX_MULTIPLE": "Choix multiple",
+    "OUI_NON": "Oui / Non",
+    "TEXTE_COURT": "Texte court",
+    "TEXTE_LONG": "Texte long",
+    "ECHELLE": "Échelle",
+    "CLASSEMENT": "Classement",
+    "NUMERIQUE": "Nombre",
+    "DATE": "Date",
+    "MATRICE": "Grille (matrice)"
+  },
+  "operateurs": {
+    "EGAL": "est égal à",
+    "EGAL_DATE": "est le",
+    "DIFFERENT": "est différent de",
+    "DIFFERENT_DATE": "n’est pas le",
+    "PARMI": "est l’une de",
+    "PARMI_MULTIPLE": "contient au moins une de",
+    "CONTIENT": "contient",
+    "SUPERIEUR": "est supérieur à",
+    "SUPERIEUR_DATE": "est après le",
+    "INFERIEUR": "est inférieur à",
+    "INFERIEUR_DATE": "est avant le",
+    "ENTRE": "est entre",
+    "REPONDUE": "a reçu une réponse",
+    "NON_REPONDUE": "n’a pas reçu de réponse"
+  },
+  "notifications": {
+    "liens": {
+      "voirInscriptions": "Voir les inscriptions",
+      "voirAbonnements": "Voir les abonnements",
+      "voirMonAbonnement": "Voir mon abonnement",
+      "ouvrirSondage": "Ouvrir le sondage",
+      "voirSondages": "Voir les sondages",
+      "ouvrirConversation": "Ouvrir la conversation",
+      "ouvrirMessagerie": "Ouvrir la messagerie",
+      "ouvrirStatistiques": "Ouvrir les statistiques",
+      "voirStatistiquesRecues": "Voir les statistiques reçues",
+      "ouvrirDemande": "Ouvrir la demande",
+      "voirDemandes": "Voir les demandes",
+      "voirReponse": "Voir la réponse",
+      "voirMesDemandes": "Voir mes demandes"
+    },
+    "titre": "Notifications",
+    "toutMarquerLu": "Tout marquer comme lu",
+    "chargement": "Chargement des notifications",
+    "aucune": "Aucune notification.",
+    "nonLuePrefixe": "Non lue : ",
+    "voirToutes": "Voir toutes les notifications",
+    "cloche": {
+      "aucune": "Notifications, aucune non lue",
+      "nonLues": {
+        "one": "Notifications, {{n}} non lue",
+        "other": "Notifications, {{n}} non lues"
+      }
+    },
+    "erreurChargement": "Les notifications n’ont pas pu être chargées.",
+    "dernieres": "Dernières notifications",
+    "page": {
+      "affichees": "Notifications affichées",
+      "nonLues": "Non lues",
+      "lues": "Lues",
+      "aucuneNonLue": "Aucune notification non lue.",
+      "aucuneLue": "Aucune notification lue.",
+      "aucune": "Aucune notification pour le moment.",
+      "nNonLues": {
+        "one": "{{n}} notification non lue.",
+        "other": "{{n}} notifications non lues."
+      },
+      "marquerLue": "Marquer « {{titre}} » comme lue",
+      "pagination": "Pagination des notifications",
+      "marquees": {
+        "one": "{{n}} notification marquée comme lue.",
+        "other": "{{n}} notifications marquées comme lues."
+      },
+      "marqueesSans": "Notifications marquées comme lues."
+    }
+  },
+  "sondages": {
+    "liste": {
+      "titreAdmin": "Sondages de l’entreprise",
+      "creer": "Créer un sondage",
+      "versionsAffichees": "Versions affichées",
+      "derniereVersion": "Dernière version",
+      "filtrerStatut": "Filtrer par statut",
+      "enPreparationDe": "Nouvelle version en préparation : {{titre}}",
+      "enPreparation": "Nouvelle version en préparation",
+      "dont": "dont {{n}} pour la v{{version}}",
+      "aucunStatut": "Aucun sondage « {{statut}} ».",
+      "aucun": "Aucun sondage pour le moment.",
+      "reponses": {
+        "one": "{{n}} réponse",
+        "other": "{{n}} réponses"
+      },
+      "assignesDeuxPoints": "Assignés :",
+      "par": "Par {{nom}}",
+      "modifieLe": "modifié le {{date}}",
+      "colTitre": "Titre",
+      "modele": "Modèle",
+      "colVersion": "Version",
+      "assignes": "Assignés",
+      "creePar": "Créé par",
+      "colModifie": "Modifié le",
+      "pagination": "Pagination des sondages",
+      "desactive": "{{nom}} (désactivé)"
+    },
+    "droits": {
+      "publie": "Ce sondage est publié : son contenu est figé pour ne pas fausser les réponses. Pour le modifier, créez-en une nouvelle version.",
+      "ferme": "Ce sondage est fermé : son contenu ne se modifie plus. Pour le rouvrir ou le modifier, créez-en une nouvelle version.",
+      "reserveCreateur": "Vous pouvez consulter ce sondage, mais seuls son créateur et l’admin peuvent le modifier.",
+      "sansPermission": "Votre admin ne vous a pas donné la permission de créer ou modifier des sondages."
+    },
+    "onglets": {
+      "rubriques": "Rubriques du sondage",
+      "fiche": "Fiche",
+      "statistiques": "Statistiques"
+    },
+    "fiche": {
+      "chargement": "Chargement du sondage",
+      "erreur": "Ce sondage n’a pas pu être chargé.",
+      "actions": "Actions du sondage",
+      "voirContenu": "Voir le contenu",
+      "previsualiser": "Prévisualiser",
+      "publier": "Publier",
+      "diffuser": "Diffuser",
+      "autresActions": "Autres actions",
+      "modifierDates": "Modifier les dates",
+      "ouvrirVersion": "Ouvrir la version {{version}} en préparation",
+      "nouvelleVersion": "Créer une nouvelle version",
+      "dupliquer": "Dupliquer",
+      "retirerModele": "Retirer des modèles",
+      "marquerModele": "Marquer comme modèle",
+      "fermer": "Fermer le sondage",
+      "informations": "Informations",
+      "creeParLe": "{{nom}}, le {{date}}",
+      "ouverture": "Ouverture",
+      "fermeture": "Fermeture",
+      "nonPrevue": "Non prévue",
+      "uneParAppareil": "Une seule par appareil",
+      "plusieursParAppareil": "Plusieurs par appareil (collecte terrain)",
+      "collecte": "Collecte",
+      "reponsesTotal": {
+        "one": "réponse au total",
+        "other": "réponses au total"
+      },
+      "dontVersion": ", dont {{n}} pour la version {{version}}",
+      "collecteOuverte": "Collecte ouverte",
+      "collecteFermee": "Collecte fermée",
+      "derniereReponse": "Dernière réponse le {{date}}",
+      "suiviIndisponible": "Le suivi de la collecte n’est pas disponible pour le moment.",
+      "gestionnairesAssignes": "Gestionnaires assignés",
+      "assigner": "Assigner des gestionnaires",
+      "assignationLignee": "L’assignation porte sur le sondage et toutes ses versions.",
+      "chargementAssignes": "Chargement des gestionnaires assignés",
+      "erreurAssignes": "Les gestionnaires assignés n’ont pas pu être chargés.",
+      "aucunAssigne": "Aucun gestionnaire assigné.",
+      "assigneLe": "assigné le {{date}}",
+      "retirerDe": "Retirer l’assignation de {{nom}}",
+      "versions": "Versions",
+      "affichee": "(affichée)",
+      "ouvriraLe": "Ouvrira le {{date}}",
+      "ouverteLe": "Ouverte le {{date}}",
+      "fermeeLe": "fermée le {{date}}",
+      "fermetureLe": "fermeture le {{date}}",
+      "creeeLe": "Créée le {{date}}",
+      "ouvrirBrouillon": "Ouvrir le brouillon",
+      "retirerMessage": "{{nom}} ne verra plus « {{titre}} » (toutes ses versions), sauf s’il en a créé une. Il en sera notifié."
+    },
+    "creation": {
+      "sousTitre": "Partez d’un formulaire vide, ou réutilisez les questions d’un sondage existant ou d’un modèle.",
+      "pointDepart": "Point de départ",
+      "vide": "Sondage vide",
+      "aPartir": "À partir d’un formulaire",
+      "aReutiliser": "Formulaire à réutiliser",
+      "aideSource": "Ses sections, questions et options sont copiées (avec les mêmes valeurs, pour comparer les statistiques). Ni les dates, ni les assignations, ni les réponses ne sont reprises.",
+      "choisissez": "Choisissez le formulaire à réutiliser.",
+      "titre": "Titre du sondage",
+      "titreObligatoire": "Le titre est obligatoire.",
+      "description": "Description (facultative)",
+      "descriptionAide": "Vide : celle du formulaire choisi est reprise.",
+      "reponseUnique": "Une seule réponse par appareil",
+      "reponseUniqueAide": "Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Modifiable jusqu’à la publication.",
+      "reponseUniqueReprise": "Le réglage « une seule réponse par appareil » est repris du formulaire choisi.",
+      "erreur": "Le sondage n’a pas pu être créé.",
+      "enCours": "Création en cours",
+      "creer": "Créer et modifier"
+    },
+    "choix": {
+      "modelesSeulement": "Modèles seulement",
+      "chargement": "Chargement des formulaires",
+      "erreur": "Les formulaires n’ont pas pu être chargés.",
+      "aucunModele": "Aucun modèle pour le moment.",
+      "aucun": "Aucun formulaire à réutiliser pour le moment.",
+      "questions": {
+        "one": "{{n}} question",
+        "other": "{{n}} questions"
+      },
+      "pagination": "Pagination des formulaires"
+    },
+    "actions": {
+      "planifiee": "Publication planifiée le {{date}}.",
+      "publie": "Sondage publié : il accepte maintenant les réponses.",
+      "datesEnregistrees": "Dates enregistrées.",
+      "fermerTitre": "Fermer ce sondage ?",
+      "fermerMessage": "« {{titre}} » passera à Terminé : plus aucune réponse ne sera acceptée. C’est définitif ; pour le rouvrir, il faudra créer une nouvelle version. Les réponses reçues sont conservées.",
+      "ferme": "Sondage fermé.",
+      "versionCreee": "Version {{version}} créée : modifiez-la puis publiez-la.",
+      "copieCreee": "Copie créée : elle s’ouvre dans l’éditeur.",
+      "marqueModele": "Marqué comme modèle : il apparaît en tête des formulaires à réutiliser.",
+      "retireModele": "Retiré des modèles.",
+      "elleSOuvre": "Elle s’ouvre."
+    },
+    "publication": {
+      "aucuneSection": "Le sondage n’a aucune section : rien à publier.",
+      "sectionVide": "La section « {{titre}} » n’a aucune question.",
+      "titresErreur": {
+        "reglage": "Le réglage « une réponse par appareil » n’a pas été enregistré : rien n’a été publié",
+        "publication": "Le sondage n’a pas été publié",
+        "dates": "Les dates n’ont pas été enregistrées"
+      },
+      "publierTitre": "Publier « {{titre}} »",
+      "dates": "Dates du sondage",
+      "erreurPublier": "Le sondage n’a pas pu être publié.",
+      "erreurDates": "Les dates n’ont pas pu être enregistrées.",
+      "verifiez": "Vérifiez le formulaire",
+      "invalides": "Certaines informations ne sont pas valides : vérifiez les dates indiquées.",
+      "pasEncore": "Le sondage ne peut pas encore être publié",
+      "fige": "Le contenu ne sera plus modifiable",
+      "figeTexte": "Une fois publié, les sections, les questions et les options sont figées pour ne pas fausser les réponses. Pour les changer, il faudra créer une nouvelle version. Les critères d’analyse resteront modifiables.",
+      "ouvertDepuis": "Ouvert depuis le {{date}} : l’ouverture ne se modifie plus.",
+      "maintenant": "Maintenant",
+      "ouvrirMaintenant": "Ouvrir maintenant",
+      "planifiee": "À une date planifiée",
+      "dateOuverture": "Date et heure d’ouverture",
+      "ouvertureManquante": "Indiquez la date et l’heure d’ouverture.",
+      "ouverturePassee": "L’ouverture planifiée doit être dans le futur.",
+      "avecFermeture": "Prévoir une date de fermeture",
+      "dateFermeture": "Date et heure de fermeture",
+      "fermetureManquante": "Indiquez la date et l’heure de fermeture.",
+      "fermetureAvant": "La fermeture doit venir après l’ouverture et après maintenant.",
+      "sansDate": "Sans date, le sondage reste ouvert jusqu’à ce que vous le fermiez.",
+      "reponseUniqueAide": "Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.",
+      "planifier": "Planifier la publication",
+      "publierMaintenant": "Publier maintenant",
+      "enregistrerDates": "Enregistrer les dates"
+    },
+    "partage": {
+      "messageAvecTitre": "Bonjour, merci de répondre à notre enquête « {{titre}} » : {{url}}",
+      "message": "Bonjour, merci de répondre à notre enquête : {{url}}",
+      "aEnvoyer": "Message à envoyer",
+      "aide": "Modifiable avant l’envoi ; le destinataire se choisit dans l’application.",
+      "whatsapp": "Partager par WhatsApp (nouvel onglet)",
+      "sms": "Partager par SMS",
+      "parDefaut": "Message par défaut",
+      "ecrivez": "Écrivez un message pour pouvoir le partager.",
+      "aideSms": "Le bouton SMS ouvre l’application Messages de votre téléphone."
+    },
+    "diffuser": {
+      "fiche": "Fiche du sondage",
+      "titre": "Diffuser le sondage",
+      "sousTitre": "Partagez le lien ou le QR code : il mène toujours à la version ouverte du sondage.",
+      "chargementLien": "Chargement du lien",
+      "erreurLien": "Le lien n’a pas pu être chargé.",
+      "pasDeLien": "Pas encore de lien",
+      "jamaisPublie": "Ce sondage n’a jamais été publié : son lien et son QR code seront créés à la publication.",
+      "retourFiche": "Retour à la fiche",
+      "lienPublic": "Lien public",
+      "adresse": "Adresse du formulaire",
+      "copier": "Copier",
+      "ouvrir": "Ouvrir",
+      "memeLien": "Le même lien pour toutes les versions ; les réponses ne sont acceptées que si le sondage est ouvert.",
+      "partager": "Partager par WhatsApp ou SMS",
+      "termine": "Ce sondage est terminé : le lien affiche qu’il est fermé.",
+      "qr": "QR code",
+      "qrDu": "QR code du lien {{url}}",
+      "chargementQr": "Chargement du QR code",
+      "taille": "Taille du fichier",
+      "telecharger": "Télécharger le PNG",
+      "imprimer": "À imprimer sur une affiche ou un flyer : 1000 px pour une grande affiche.",
+      "erreurQr": "Le QR code n’a pas pu être chargé.",
+      "copie": "Lien copié.",
+      "copieEchouee": "La copie a échoué : sélectionnez le lien et copiez-le."
+    },
+    "apercu": {
+      "titre": "Aperçu",
+      "taille": "Taille de l’aperçu",
+      "ordinateur": "Ordinateur",
+      "telephone": "Téléphone",
+      "chargement": "Chargement de l’aperçu",
+      "erreur": "L’aperçu n’a pas pu être chargé."
+    },
+    "reponses": {
+      "surMax": "{{valeur}} sur {{max}}",
+      "repondues": {
+        "one": "{{n}} question répondue",
+        "other": "{{n}} questions répondues"
+      },
+      "reponduesSur": {
+        "one": "{{n}} question répondue sur {{total}}",
+        "other": "{{n}} questions répondues sur {{total}}"
+      },
+      "chargement": "Chargement des réponses",
+      "erreur": "Les réponses n’ont pas pu être chargées.",
+      "affichees": "Réponses affichées",
+      "totalToutes": {
+        "one": "{{n}} réponse pour toutes les versions, les plus récentes d’abord.",
+        "other": "{{n}} réponses pour toutes les versions, les plus récentes d’abord."
+      },
+      "totalVersion": {
+        "one": "{{n}} réponse pour la version {{version}}, les plus récentes d’abord.",
+        "other": "{{n}} réponses pour la version {{version}}, les plus récentes d’abord."
+      },
+      "aucune": "Aucune réponse pour le moment.",
+      "numero": "N° {{id}}",
+      "pagination": "Pagination des réponses"
+    },
+    "reponse": {
+      "titre": "Réponse n° {{id}}",
+      "envoyee": "Envoyée le {{date}} · version {{version}}",
+      "parLigne": "Réponses par ligne",
+      "sansReponse": "Sans réponse"
+    }
+  },
+  "statistiques": {
+    "envoi": {
+      "toutesVersions": "toutes les versions",
+      "version": "version {{version}}",
+      "periode": "du {{du}} au {{au}}",
+      "debut": "début",
+      "dernierJour": "dernier jour",
+      "criteres": {
+        "one": "{{n}} critère",
+        "other": "{{n}} critères"
+      },
+      "nonEnvoyees": "Les statistiques n’ont pas été envoyées",
+      "aide": "L’admin recevra ces statistiques, recalculées à l’ouverture avec les filtres suivants : {{filtres}}.",
+      "commentaire": "Commentaire (facultatif)"
+    },
+    "filtres": {
+      "toutesVersions": "Toutes les versions",
+      "version": "Version {{version}}",
+      "periode": "Du {{du}} au {{au}}",
+      "ou": " ou ",
+      "titre": "Filtres des statistiques",
+      "du": "Du",
+      "au": "Au",
+      "datesPar": "Dates par",
+      "automatique": "Automatique",
+      "jour": "Jour",
+      "mois": "Mois",
+      "filtres": "Filtres :",
+      "periodePastille": "Période {{du}} → {{au}}",
+      "retirer": "Retirer le filtre {{filtre}}",
+      "toutEffacer": "Tout effacer"
+    },
+    "calcul": "Calcul des statistiques",
+    "preparation": "Préparation…",
+    "rapportPdf": "Rapport PDF",
+    "resumeReponses": {
+      "one": "{{n}} réponse.",
+      "other": "{{n}} réponses."
+    },
+    "resumeReponsesPeriode": {
+      "one": "{{n}} réponse, du {{du}} au {{au}}.",
+      "other": "{{n}} réponses, du {{du}} au {{au}}."
+    },
+    "petitEffectif": "Moins de 5 réponses : résultats à interpréter avec prudence.",
+    "section": "Section {{titre}}",
+    "page": {
+      "exporter": "Exporter",
+      "envoyer": "Envoyer les statistiques à l’admin",
+      "erreur": "Les statistiques n’ont pas pu être calculées.",
+      "resume": "Résumé",
+      "reponses": {
+        "one": "réponse",
+        "other": "réponses"
+      },
+      "premiere": "première réponse",
+      "derniere": "dernière réponse",
+      "toutes": "Toutes",
+      "versionsListe": "versions {{versions}}",
+      "portee": "portée",
+      "petitEffectif": "Moins de 5 réponses avec ces filtres : résultats à interpréter avec prudence.",
+      "aucune": "Aucune réponse avec ces filtres.",
+      "envoyees": "Statistiques envoyées : votre admin est prévenu."
+    },
+    "carte": {
+      "rangMoyen": "rang moyen {{rang}} · 1er : {{premiers}}",
+      "intervalle": "de {{de}} à moins de {{a}}",
+      "repondants": {
+        "one": "{{n}} répondant",
+        "other": "{{n}} répondants"
+      },
+      "sansReponse": {
+        "one": "{{n}} sans réponse",
+        "other": "{{n}} sans réponse"
+      },
+      "vueParSur": {
+        "one": "Question conditionnelle : vue par {{n}} répondant sur {{total}}",
+        "other": "Question conditionnelle : vue par {{n}} répondants sur {{total}}"
+      },
+      "vuePar": {
+        "one": "Question conditionnelle : vue par {{n}} répondant",
+        "other": "Question conditionnelle : vue par {{n}} répondants"
+      },
+      "pourcentagesRepondu": "(pourcentages calculés sur ceux qui ont répondu)",
+      "petitEffectif": "Moins de 5 répondants : résultats à interpréter avec prudence.",
+      "aucune": "Aucune réponse à cette question avec ces filtres.",
+      "reponsesA": "Réponses à « {{libelle}} »",
+      "plusieursChoix": "Plusieurs choix possibles : les parts dépassent 100 % au total.",
+      "classementNote": "Du mieux classé au moins bien classé (rang moyen : 1 = toujours premier).",
+      "classementDe": "Classement de « {{libelle}} »",
+      "option": "Option",
+      "enteteRang": "Rang moyen et nombre de premières places",
+      "notesDonnees": "Notes données à « {{libelle}} »",
+      "note": "Note",
+      "distribution": "Distribution de « {{libelle}} »",
+      "datesParJour": "Du {{du}} au {{au}}, par jour.",
+      "datesParMois": "Du {{du}} au {{au}}, par mois.",
+      "datesDonnees": "Dates données à « {{libelle}} »",
+      "periode": "Période",
+      "matriceCaption": "Réponses par ligne à « {{libelle}} » (nombre et part de la ligne)",
+      "repondantsCol": "Répondants",
+      "precedents": "Précédents",
+      "suivants": "Suivants",
+      "pageTextes": {
+        "one": "Page {{page}} sur {{total}} ({{n}} texte)",
+        "other": "Page {{page}} sur {{total}} ({{n}} textes)"
+      },
+      "moyenne": "Moyenne",
+      "mediane": "Médiane",
+      "minimum": "Minimum",
+      "maximum": "Maximum"
+    },
+    "graphique": {
+      "voirGraphique": "Voir le graphique",
+      "voirTableau": "Voir le tableau",
+      "reponse": "Réponse",
+      "nombreEtPart": "Nombre et part",
+      "valeur": "Valeur",
+      "nombre": "Nombre",
+      "aucuneDonnee": "{{titre}} : aucune donnée.",
+      "resumeColonnes": "{{titre}} : {{n}} valeurs, de {{premier}} à {{dernier}} ; la plus fréquente : {{pic}} ({{nombre}}). Le détail est dans la vue tableau."
+    },
+    "croise": {
+      "titre": "Tableau croisé",
+      "exportEnCours": "Export en cours…",
+      "exporter": "Exporter le tableau",
+      "condition": "Le tableau croisé demande une question à choix, oui / non, échelle ou nombre, et au moins un critère d’analyse (à définir sur une question dans l’éditeur du sondage).",
+      "question": "Question",
+      "par": "Par (critère)",
+      "valeursAffichees": "Valeurs affichées",
+      "nombres": "Nombres",
+      "pctLigne": "% ligne",
+      "pctColonne": "% colonne",
+      "calcul": "Calcul du tableau croisé",
+      "erreur": "Le tableau croisé n’a pas pu être calculé.",
+      "caption": "« {{question}} » par « {{par}} » :",
+      "modeNombres": "nombres de répondants",
+      "modeLigne": "pourcentages de ligne",
+      "modeColonne": "pourcentages de colonne",
+      "rep": "{{n}} rép.",
+      "total": "Total",
+      "petitEffectifTitre": "Petit effectif : à interpréter avec prudence",
+      "petitEffectif": "(petit effectif)",
+      "captionNumerique": "Statistiques de « {{question}} » par « {{par}} »",
+      "min": "Min",
+      "max": "Max",
+      "nonRenseigne": "Non renseigné"
+    },
+    "export": {
+      "echec": "L’export a échoué",
+      "erreur": "L’export n’a pas pu être créé.",
+      "filtres": "Filtres appliqués : {{filtres}}.",
+      "fichier": "Fichier",
+      "fichierAExporter": "Fichier à exporter",
+      "pdf": "Rapport des statistiques (PDF)",
+      "xlsx": "Statistiques (Excel : un onglet par question)",
+      "csv": "Réponses brutes (CSV)",
+      "reponsesXlsx": "Réponses brutes (Excel)",
+      "valeurs": "Valeurs des choix",
+      "libelles": "Libellés (« Kayes »), pour lire",
+      "codes": "Codes (« kayes »), pour analyser",
+      "formatNombres": "Format des nombres",
+      "virgule": "Excel en français (« ; » et virgule décimale)",
+      "point": "Python, R… (« , » et point décimal)",
+      "telecharger": "Télécharger"
+    }
+  },
+  "statsRecues": {
+    "sousTitre": "Les statistiques de sondages terminés que vos gestionnaires vous ont envoyées, recalculées à l’ouverture.",
+    "chargement": "Chargement des statistiques reçues",
+    "erreur": "Les statistiques reçues n’ont pas pu être chargées.",
+    "aucune": "Aucune statistique reçue pour le moment.",
+    "nouveau": "Nouveau",
+    "ligne": "De {{nom}}, le {{date}} · {{resume}}",
+    "pagination": "Pagination des statistiques reçues",
+    "erreurOuverture": "Ces statistiques n’ont pas pu être ouvertes.",
+    "envoyeesPar": "Envoyées par {{nom}} le {{date}}."
+  },
+  "statsEnvoyees": {
+    "sousTitre": "Les statistiques de sondages terminés que vous avez envoyées à votre admin.",
+    "chargement": "Chargement des statistiques envoyées",
+    "erreur": "Les statistiques envoyées n’ont pas pu être chargées.",
+    "aucun": "Aucun envoi pour le moment. Depuis l’onglet Statistiques d’un sondage terminé, choisissez « Envoyer à l’admin ».",
+    "consulte": "Consulté",
+    "pasConsulte": "Pas encore consulté",
+    "ligne": "Envoyé le {{date}} · {{resume}}",
+    "consulteLe": "· consulté le {{date}}",
+    "pagination": "Pagination des statistiques envoyées",
+    "chargementEnvoi": "Chargement de l’envoi",
+    "erreurEnvoi": "Cet envoi n’a pas pu être chargé.",
+    "voir": "Voir ces statistiques",
+    "envoyeesLe": "Envoyées à votre admin le {{date}}.",
+    "consulteesLe": "Consultées par votre admin le {{date}}.",
+    "pasConsultees": "Pas encore consultées par votre admin.",
+    "votreCommentaire": "Votre commentaire"
+  },
+  "stripe": {
+    "refus": {
+      "insufficient_funds": "Votre carte a été refusée : fonds insuffisants.",
+      "lost_card": "Votre carte a été refusée : elle est déclarée perdue.",
+      "stolen_card": "Votre carte a été refusée : elle est déclarée volée.",
+      "expired_card": "Votre carte est expirée.",
+      "incorrect_cvc": "Le code de sécurité de la carte est incorrect.",
+      "incorrect_number": "Le numéro de carte est incorrect.",
+      "processing_error": "Une erreur est survenue pendant le traitement de la carte. Réessayez.",
+      "card_velocity_exceeded": "Votre carte a été refusée : la limite de dépenses est atteinte.",
+      "do_not_honor": "Votre carte a été refusée par votre banque. Contactez-la ou utilisez une autre carte.",
+      "fraudulent": "Votre carte a été refusée. Contactez votre banque ou utilisez une autre carte.",
+      "generic_decline": "Votre carte a été refusée. Contactez votre banque ou utilisez une autre carte."
+    },
+    "code": {
+      "expired_card": "Votre carte est expirée.",
+      "incorrect_cvc": "Le code de sécurité de la carte est incorrect.",
+      "invalid_cvc": "Le code de sécurité de la carte n’est pas valide.",
+      "incorrect_number": "Le numéro de carte est incorrect.",
+      "invalid_number": "Le numéro de carte n’est pas valide.",
+      "invalid_expiry_month": "Le mois d’expiration n’est pas valide.",
+      "invalid_expiry_year": "L’année d’expiration n’est pas valide.",
+      "incomplete_number": "Le numéro de carte est incomplet.",
+      "incomplete_expiry": "La date d’expiration est incomplète.",
+      "incomplete_cvc": "Le code de sécurité est incomplet.",
+      "processing_error": "Une erreur est survenue pendant le traitement de la carte. Réessayez.",
+      "authentication_required": "Votre banque demande une vérification (3-D Secure). Réessayez et suivez ses instructions.",
+      "payment_intent_authentication_failure": "La vérification de votre banque (3-D Secure) a échoué ou a été annulée. Aucun montant n’a été prélevé.",
+      "payment_intent_payment_attempt_failed": "Le paiement a échoué. Aucun montant n’a été prélevé. Réessayez ou utilisez une autre carte.",
+      "payment_intent_unexpected_state": "Ce paiement a déjà été traité ou n’est plus valable. Rechargez la page pour recommencer.",
+      "rate_limit": "Trop de tentatives de paiement. Patientez un instant puis réessayez."
+    },
+    "indisponible": "Le service de paiement est injoignable. Vérifiez votre connexion (ou un bloqueur de publicité) puis réessayez.",
+    "inattendu": "Le paiement n’a pas pu être effectué. Aucun montant n’a été prélevé. Réessayez ou utilisez une autre carte."
+  },
+  "titres": {
+    "vitrine": "Batulo · Sondages et enquêtes terrain",
+    "connexion": "Connexion · Batulo",
+    "inscription": "Créer un compte · Batulo",
+    "motDePasseOublie": "Mot de passe oublié · Batulo",
+    "nouveauMotDePasse": "Nouveau mot de passe · Batulo",
+    "changerMotDePasse": "Changer le mot de passe · Batulo",
+    "accesRefuse": "Accès refusé · Batulo",
+    "accesSuspendu": "Accès suspendu · Batulo",
+    "apparence": "Apparence · Batulo",
+    "messagerie": "Messagerie · Batulo",
+    "conversation": "Conversation · Batulo",
+    "tableauDeBord": "Tableau de bord · Batulo",
+    "statistiquesEnvoyees": "Statistiques envoyées · Batulo",
+    "sondages": "Sondages · Batulo",
+    "nouveauSondage": "Nouveau sondage · Batulo",
+    "modifierSondage": "Modifier le sondage · Batulo",
+    "apercu": "Aperçu du sondage · Batulo",
+    "diffuser": "Diffuser le sondage · Batulo",
+    "reponses": "Réponses du sondage · Batulo",
+    "statistiques": "Statistiques du sondage · Batulo",
+    "sondage": "Sondage · Batulo",
+    "statistiquesRecues": "Statistiques reçues · Batulo",
+    "gestionnaires": "Gestionnaires · Batulo",
+    "gestionnaire": "Gestionnaire · Batulo",
+    "monAbonnement": "Mon abonnement · Batulo",
+    "demandesAugmentation": "Demandes d’augmentation · Batulo",
+    "paiementMobile": "Paiement mobile · Batulo",
+    "souscrire": "S’abonner · Batulo",
+    "abonnements": "Abonnements · Batulo",
+    "demandesAbonnement": "Demandes d’abonnement · Batulo",
+    "admins": "Admins et entreprises · Batulo",
+    "entreprise": "Entreprise · Batulo",
+    "notifications": "Notifications · Batulo"
+  },
+  "vitrine": {
+    "sections": {
+      "fonctionnalites": "Fonctionnalités",
+      "comment_ca_marche": "Comment ça marche",
+      "tarifs": "Tarifs",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "fonctionnalites": {
+      "dynamic_form": {
+        "titre": "Formulaires dynamiques",
+        "texte": "Dix types de questions : choix, oui/non, échelle, nombre, date, texte, classement, grille. Sections, glisser-déposer et enregistrement automatique."
+      },
+      "qr_code_2": {
+        "titre": "Partage par lien et QR code",
+        "texte": "Chaque sondage publié a son lien. Imprimez son QR code ; les répondants n’ont besoin d’aucun compte."
+      },
+      "smartphone": {
+        "titre": "Collecte terrain sur téléphone",
+        "texte": "Formulaire pensé pour le téléphone, plusieurs réponses depuis le même appareil, réponses en cours gardées sur l’appareil."
+      },
+      "insights": {
+        "titre": "Statistiques et tableaux croisés",
+        "texte": "Graphiques par question calculés à partir des dernières réponses, filtres par période et par critère, tableaux croisés."
+      },
+      "download": {
+        "titre": "Exports Excel, CSV et PDF",
+        "texte": "Téléchargez les réponses brutes pour Excel, Python ou R, et un rapport PDF prêt à partager."
+      },
+      "groups": {
+        "titre": "Gestionnaires de l’entreprise",
+        "texte": "Créez les comptes de votre équipe, choisissez qui crée des sondages et assignez-leur ceux à suivre."
+      },
+      "titre": "Tout pour vos enquêtes, de la question à l’analyse",
+      "chapeau": "Conçu pour les équipes qui collectent en ligne et sur le terrain."
+    },
+    "etapes": {
+      "e1": {
+        "titre": "Créez votre compte et abonnez-vous",
+        "texte": "Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle et payez par carte bancaire ou par application mobile (Bankily, Masrvi, Sedad)."
+      },
+      "e2": {
+        "titre": "Construisez votre sondage",
+        "texte": "Ajoutez sections et questions, prévisualisez sur ordinateur et sur téléphone, puis publiez."
+      },
+      "e3": {
+        "titre": "Partagez le lien",
+        "texte": "Envoyez le lien ou affichez le QR code ; collectez aussi sur le terrain depuis un téléphone."
+      },
+      "e4": {
+        "titre": "Analysez et exportez",
+        "texte": "Suivez les résultats, croisez les réponses, exportez en Excel, CSV ou PDF."
+      }
+    },
+    "faq": {
+      "q1": {
+        "question": "Faut-il un compte pour répondre à un sondage ?",
+        "reponse": "Non. Les répondants ouvrent simplement le lien ou scannent le QR code, sur ordinateur ou sur téléphone."
+      },
+      "q2": {
+        "question": "Les réponses sont-elles confidentielles ?",
+        "reponse": "Une réponse n’est liée à aucun compte : seules les informations demandées par le sondage sont enregistrées. Les résultats ne sont visibles que par l’admin de votre entreprise et les gestionnaires concernés."
+      },
+      "q3": {
+        "question": "Comment se fait le paiement ?",
+        "reponse": "Par carte bancaire, avec un paiement sécurisé par Stripe, en dollars canadiens, ou par application mobile (Bankily, Masrvi, Sedad), en ouguiyas. Pour un mois ou pour un an."
+      },
+      "q4": {
+        "question": "Puis-je annuler ?",
+        "reponse": "Il n’y a pas de renouvellement automatique : chaque période est payée à part. Sans renouvellement, l’abonnement expire et votre espace reste consultable en lecture seule."
+      },
+      "q5": {
+        "question": "Puis-je travailler en équipe ?",
+        "reponse": "Oui. L’admin crée les comptes de ses gestionnaires, leur donne ou non le droit de créer des sondages et leur assigne ceux à suivre."
+      },
+      "q6": {
+        "question": "Peut-on répondre sans connexion Internet ?",
+        "reponse": "Les réponses en cours sont gardées sur l’appareil, mais l’envoi demande une connexion."
+      },
+      "titre": "Questions fréquentes"
+    },
+    "tarifs": {
+      "chapeau": "Une formule pour toute votre entreprise, au mois ou à l’année.",
+      "chargement": "Chargement des tarifs",
+      "erreur": "Les tarifs n’ont pas pu être chargés.",
+      "avantageux": "Le plus avantageux",
+      "duree": {
+        "MENSUEL": "1 mois",
+        "ANNUEL": "1 an"
+      },
+      "ou": "ou",
+      "parMobile": "par paiement mobile",
+      "inclus1": "Toutes les fonctionnalités",
+      "inclus2": "Gestionnaires de votre entreprise",
+      "inclus3": "Carte bancaire ou paiement mobile, sans renouvellement automatique",
+      "moyens": "Payez par carte bancaire ou par application mobile : {{applications}}.",
+      "libelle": {
+        "MENSUEL": "Abonnement mensuel",
+        "ANNUEL": "Abonnement annuel"
+      }
+    },
+    "contact": {
+      "titre": "Une question ? Écrivez-nous",
+      "chapeau": "Nous répondons aux entreprises qui veulent découvrir Batulo."
+    },
+    "pied": {
+      "liens": "Liens du pied de page",
+      "copyright": "© {{annee}} Batulo. Tous droits réservés."
+    },
+    "heros": {
+      "surTitre": "Sondages et enquêtes terrain pour les entreprises",
+      "titre": "Créez vos sondages, partagez un lien, analysez les résultats.",
+      "sousTitre": "Batulo réunit la création des formulaires, la collecte en ligne ou sur le terrain et l’analyse des réponses, pour toute votre équipe.",
+      "envoyer": "Envoyer"
+    },
+    "commencer": "Commencer",
+    "barre": {
+      "haut": "Batulo, haut de la page",
+      "menu": "Menu",
+      "sections": "Sections de la page"
+    }
+  }
+}

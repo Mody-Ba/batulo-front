@@ -6,7 +6,7 @@ import { AbonnementService } from '../../../../core/services/abonnement.service'
 import { AuthService } from '../../../../core/services/auth.service';
 import { abonnementDeTest, statutMobileDeTest } from '../../../../testing/donnees-test';
 import { RetourPaiementMobile } from './retour-paiement-mobile';
-import { MESSAGE_ECHEC_MOBILE, MESSAGE_RECONNEXION } from './suivi-paiement-mobile';
+import { messageEchecMobile, MESSAGE_RECONNEXION } from './suivi-paiement-mobile';
 
 describe('RetourPaiementMobile (/admin/abonnement/paiement-mobile?reference=)', () => {
   let fixture: ComponentFixture<RetourPaiementMobile>;
@@ -81,7 +81,7 @@ describe('RetourPaiementMobile (/admin/abonnement/paiement-mobile?reference=)', 
   it('échoué : message clair et « Réessayer » vers un nouveau paiement mobile de la même formule', async () => {
     statutMobile.mockReturnValue(of(statutMobileDeTest({ statut: 'ECHOUE', formule: 'MENSUEL' })));
     await creer('ref-123');
-    expect(element.querySelector('[role="alert"]')?.textContent).toContain(MESSAGE_ECHEC_MOBILE);
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain(messageEchecMobile());
     expect(lien('Réessayer')?.getAttribute('href')).toBe('/admin/abonnement/souscrire?moyen=mobile&formule=MENSUEL');
     expect(auth.rafraichir).not.toHaveBeenCalled();
   });

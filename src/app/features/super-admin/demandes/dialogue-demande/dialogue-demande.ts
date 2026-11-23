@@ -20,6 +20,9 @@ import { aLeCode } from '../../../../core/utils/erreur-http';
 import { nonVide } from '../../../../core/utils/validateurs';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
 export interface DonneesDialogueDemande {
   demande: DemandeAbonnementResponse;
@@ -37,7 +40,7 @@ export type ResultatDialogueDemande = DemandeAbonnementResponse | 'recharger';
  */
 @Component({
   selector: 'app-dialogue-demande',
-  imports: [DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe, 
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -124,9 +127,9 @@ export class DialogueDemande {
   private decrireTraitement(dates: DateLPipe): string {
     const { statut, traiteeParNom, dateTraitement } = this.demande;
     return [
-      statut === 'TRAITEE' ? 'Acceptée' : 'Refusée',
-      traiteeParNom ? `par ${traiteeParNom}` : null,
-      dateTraitement ? `le ${dates.transform(dateTraitement, 'longHeure')}` : null,
+      traduire(statut === 'TRAITEE' ? 'statutsDemande.TRAITEE' : 'statutsDemande.REFUSEE'),
+      traiteeParNom ? traduire('superAdmin.demande.par', { nom: traiteeParNom }) : null,
+      dateTraitement ? traduire('superAdmin.demande.le', { date: dates.transform(dateTraitement, 'longHeure') }) : null,
     ]
       .filter(Boolean)
       .join(' ');

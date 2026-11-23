@@ -3,6 +3,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Accès impossible à cause de l'abonnement : entreprise désactivée par Batulo, ou (gestionnaire)
@@ -10,7 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
  */
 @Component({
   selector: 'app-compte-suspendu',
-  imports: [MatIconModule, MatButtonModule, RouterLink],
+  imports: [TranslocoPipe, MatIconModule, MatButtonModule, RouterLink],
   template: `
     <section class="conteneur-page etroit page-erreur">
       <span class="icone-erreur" aria-hidden="true">
@@ -21,11 +23,11 @@ import { AuthService } from '../../../core/services/auth.service';
       <div class="actions">
         @if (auth.redirectionObligatoire() === null) {
           <a mat-flat-button class="bouton-principal" [routerLink]="auth.urlAccueil()">
-            <mat-icon fontIcon="home" aria-hidden="true" />Retour à l’accueil
+            <mat-icon fontIcon="home" aria-hidden="true" />{{ 'commun.retourAccueil' | transloco }}
           </a>
         }
         <button mat-stroked-button type="button" (click)="auth.deconnexion()">
-          <mat-icon fontIcon="logout" aria-hidden="true" />Se déconnecter
+          <mat-icon fontIcon="logout" aria-hidden="true" />{{ 'barre.seDeconnecter' | transloco }}
         </button>
       </div>
     </section>
@@ -36,17 +38,17 @@ export class CompteSuspendu {
   protected readonly auth = inject(AuthService);
 
   protected readonly titre = computed(() =>
-    this.auth.statutAbonnement() === 'DESACTIVE' ? 'Accès suspendu' : 'Abonnement non actif',
+    traduire(this.auth.statutAbonnement() === 'DESACTIVE' ? 'erreurs.suspendu.titreDesactive' : 'erreurs.suspendu.titreNonActif'),
   );
 
   protected readonly explication = computed(() => {
     switch (this.auth.statutAbonnement()) {
       case 'DESACTIVE':
-        return 'Votre entreprise a été désactivée par Batulo : aucun accès n’est possible pour le moment. Contactez Batulo pour en savoir plus.';
+        return traduire('erreurs.suspendu.desactive');
       case 'EN_ATTENTE_PAIEMENT':
-        return 'L’abonnement de votre entreprise n’est pas encore payé. Votre administrateur doit choisir une formule pour que vous puissiez accéder à Batulo.';
+        return traduire('erreurs.suspendu.enAttente');
       default:
-        return 'Votre accès est de nouveau ouvert.';
+        return traduire('erreurs.suspendu.ouvert');
     }
   });
 }

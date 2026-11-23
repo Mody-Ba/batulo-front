@@ -18,6 +18,9 @@ import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
+import { NombreLPipe } from '../../../../core/i18n/formats.pipes';
 
 /** Tailles proposées pour l'historique des paiements. */
 export const TAILLES_PAIEMENTS = [5, 10, 20];
@@ -29,7 +32,7 @@ export const TAILLES_PAIEMENTS = [5, 10, 20];
  */
 @Component({
   selector: 'app-mon-abonnement',
-  imports: [DateLPipe, 
+  imports: [NombreLPipe, PlurielPipe, TranslocoPipe, DateLPipe, 
     RouterLink,
     MatButtonModule,
     MatIconModule,

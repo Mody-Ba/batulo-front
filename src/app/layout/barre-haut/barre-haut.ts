@@ -9,12 +9,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { LIBELLES_ROLE } from '../../core/models/role.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ClocheNotifications } from '../cloche-notifications/cloche-notifications';
+import { SelecteurLangue } from '../../shared/components/selecteur-langue/selecteur-langue';
 
 /** Barre du haut : bouton du menu (petit écran), marque, notifications et menu du compte. */
 @Component({
   selector: 'app-barre-haut',
-  imports: [
-    MatToolbarModule,
+  imports: [SelecteurLangue, MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,

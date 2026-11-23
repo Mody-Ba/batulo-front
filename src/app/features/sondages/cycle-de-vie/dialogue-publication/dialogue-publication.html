@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ publier ? 'Publier « ' + sondage.titre + ' »' : 'Dates du sondage' }}</h2>
+<h2 mat-dialog-title>{{ publier ? ('sondages.publication.publierTitre' | transloco: { titre: sondage.titre }) : ('sondages.publication.dates' | transloco) }}</h2>
 
 <form [formGroup]="formulaire" (ngSubmit)="valider()" novalidate>
   <mat-dialog-content>
@@ -7,76 +7,71 @@
       <app-message-erreur
         [erreur]="erreur()"
         [titre]="titreErreur()"
-        [parDefaut]="publier ? 'Le sondage n’a pas pu être publié.' : 'Les dates n’ont pas pu être enregistrées.'"
+        [parDefaut]="(publier ? 'sondages.publication.erreurPublier' : 'sondages.publication.erreurDates') | transloco"
       />
       @if (invalideSansDetail()) {
-        <app-encadre type="erreur" role="alert" titre="Vérifiez le formulaire">
-          <p>Certaines informations ne sont pas valides : vérifiez les dates indiquées.</p>
+        <app-encadre type="erreur" role="alert" [titre]="'sondages.publication.verifiez' | transloco">
+          <p>{{ 'sondages.publication.invalides' | transloco }}</p>
         </app-encadre>
       }
     </div>
     @if (incomplet) {
-      <app-encadre type="erreur" role="alert" titre="Le sondage ne peut pas encore être publié">
+      <app-encadre type="erreur" role="alert" [titre]="'sondages.publication.pasEncore' | transloco">
         <p>{{ incomplet }}</p>
       </app-encadre>
     } @else if (publier) {
-      <app-encadre type="avertissement" titre="Le contenu ne sera plus modifiable">
-        <p>
-          Une fois publié, les sections, les questions et les options sont figées pour ne pas fausser les réponses.
-          Pour les changer, il faudra créer une nouvelle version. Les critères d’analyse resteront modifiables.
-        </p>
+      <app-encadre type="avertissement" [titre]="'sondages.publication.fige' | transloco">
+        <p>{{ 'sondages.publication.figeTexte' | transloco }}</p>
       </app-encadre>
     }
 
     <fieldset class="groupe">
-      <legend>Ouverture</legend>
+      <legend>{{ 'sondages.fiche.ouverture' | transloco }}</legend>
       @if (dejaOuvert) {
-        <p class="texte-aide">Ouvert depuis le {{ sondage.datePublication | dateL: 'longHeure' }} : l’ouverture ne se modifie plus.</p>
+        <p class="texte-aide">{{ 'sondages.publication.ouvertDepuis' | transloco: { date: (sondage.datePublication | dateL: 'longHeure') } }}</p>
       } @else {
-        <mat-radio-group formControlName="ouverture" class="choix" aria-label="Ouverture">
-          <mat-radio-button value="maintenant">{{ publier ? 'Maintenant' : 'Ouvrir maintenant' }}</mat-radio-button>
-          <mat-radio-button value="planifiee">À une date planifiée</mat-radio-button>
+        <mat-radio-group formControlName="ouverture" class="choix" [attr.aria-label]="'sondages.fiche.ouverture' | transloco">
+          <mat-radio-button value="maintenant">{{ (publier ? 'sondages.publication.maintenant' : 'sondages.publication.ouvrirMaintenant') | transloco }}</mat-radio-button>
+          <mat-radio-button value="planifiee">{{ 'sondages.publication.planifiee' | transloco }}</mat-radio-button>
         </mat-radio-group>
         @if (planifiee()) {
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-date">
-            <mat-label>Date et heure d’ouverture</mat-label>
+            <mat-label>{{ 'sondages.publication.dateOuverture' | transloco }}</mat-label>
             <input matInput type="datetime-local" formControlName="dateOuverture" [min]="minimum" required />
           </mat-form-field>
           @if (aErreur('ouvertureManquante')) {
-            <p class="erreur" role="alert">Indiquez la date et l’heure d’ouverture.</p>
+            <p class="erreur" role="alert">{{ 'sondages.publication.ouvertureManquante' | transloco }}</p>
           } @else if (aErreur('ouverturePassee')) {
-            <p class="erreur" role="alert">L’ouverture planifiée doit être dans le futur.</p>
+            <p class="erreur" role="alert">{{ 'sondages.publication.ouverturePassee' | transloco }}</p>
           }
         }
       }
     </fieldset>
 
     <fieldset class="groupe">
-      <legend>Fermeture</legend>
-      <mat-checkbox formControlName="avecFermeture">Prévoir une date de fermeture</mat-checkbox>
+      <legend>{{ 'sondages.fiche.fermeture' | transloco }}</legend>
+      <mat-checkbox formControlName="avecFermeture">{{ 'sondages.publication.avecFermeture' | transloco }}</mat-checkbox>
       @if (avecFermeture()) {
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-date">
-          <mat-label>Date et heure de fermeture</mat-label>
+          <mat-label>{{ 'sondages.publication.dateFermeture' | transloco }}</mat-label>
           <input matInput type="datetime-local" formControlName="dateFermeture" [min]="minimum" required />
         </mat-form-field>
         @if (aErreur('fermetureManquante')) {
-          <p class="erreur" role="alert">Indiquez la date et l’heure de fermeture.</p>
+          <p class="erreur" role="alert">{{ 'sondages.publication.fermetureManquante' | transloco }}</p>
         } @else if (aErreur('fermetureAvantOuverture')) {
-          <p class="erreur" role="alert">La fermeture doit venir après l’ouverture et après maintenant.</p>
+          <p class="erreur" role="alert">{{ 'sondages.publication.fermetureAvant' | transloco }}</p>
         }
       } @else {
-        <p class="texte-aide">Sans date, le sondage reste ouvert jusqu’à ce que vous le fermiez.</p>
+        <p class="texte-aide">{{ 'sondages.publication.sansDate' | transloco }}</p>
       }
     </fieldset>
 
     @if (publier) {
       <fieldset class="groupe">
-        <legend>Réponses</legend>
+        <legend>{{ 'admin.tdb.reponses' | transloco }}</legend>
         <mat-checkbox formControlName="reponseUnique">
-          Une seule réponse par appareil
-          <span class="cellule-secondaire">
-            Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.
-          </span>
+          {{ 'sondages.creation.reponseUnique' | transloco }}
+          <span class="cellule-secondaire">{{ 'sondages.publication.reponseUniqueAide' | transloco }}</span>
         </mat-checkbox>
       </fieldset>
     }
@@ -84,14 +79,14 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button matButton type="button" mat-dialog-close [disabled]="enCours()" cdkFocusInitial>Annuler</button>
+    <button matButton type="button" mat-dialog-close [disabled]="enCours()" cdkFocusInitial>{{ 'commun.annuler' | transloco }}</button>
     <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours() || !!incomplet">
       @if (enCours()) {
-        <mat-spinner diameter="20" aria-label="Enregistrement en cours" />
+        <mat-spinner diameter="20" [attr.aria-label]="'commun.enregistrementEnCours' | transloco" />
       } @else if (publier) {
-        {{ planifiee() ? 'Planifier la publication' : 'Publier maintenant' }}
+        {{ (planifiee() ? 'sondages.publication.planifier' : 'sondages.publication.publierMaintenant') | transloco }}
       } @else {
-        Enregistrer les dates
+        {{ 'sondages.publication.enregistrerDates' | transloco }}
       }
     </button>
   </mat-dialog-actions>

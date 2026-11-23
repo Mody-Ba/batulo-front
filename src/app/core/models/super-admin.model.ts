@@ -1,6 +1,7 @@
 import { AbonnementResponse, Formule, JOURS_ALERTE_EXPIRATION, StatutAbonnement } from './abonnement.model';
 import { PersonnalisationResponse } from './personnalisation.model';
 import { UtilisateurResponse } from './utilisateur.model';
+import { traduire } from '../../core/i18n/traduire';
 
 /** Ordre d'affichage des statuts d'abonnement (filtres et compteurs du super admin). */
 export const STATUTS_ABONNEMENT: readonly StatutAbonnement[] = [
@@ -169,7 +170,7 @@ export function compteDepuisDetail({ admin }: AdminDetailResponse): CompteAdmin 
     nom: admin.nom,
     courriel: admin.courriel,
     actif: admin.actif,
-    entreprise: admin.entreprise ?? `Entreprise de ${admin.prenom} ${admin.nom}`.trim(),
+    entreprise: admin.entreprise ?? traduire('superAdmin.entrepriseDe', { nom: `${admin.prenom} ${admin.nom}`.trim() }),
   };
 }
 

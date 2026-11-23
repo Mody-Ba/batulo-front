@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/d
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { map, Observable } from 'rxjs';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DonneesConfirmation {
   titre: string;
@@ -30,17 +31,17 @@ export function saisieConforme(saisie: string, attendue: string): boolean {
  */
 @Component({
   selector: 'app-dialogue-confirmation',
-  imports: [MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [TranslocoPipe, MatDialogModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   template: `
     <h2 mat-dialog-title>{{ donnees.titre }}</h2>
     <mat-dialog-content>
       <p>{{ donnees.message }}</p>
       @if (donnees.saisieAttendue; as attendue) {
         <p class="consigne" id="consigne-saisie">
-          Pour confirmer, tapez <strong class="attendu">{{ attendue }}</strong> ci-dessous.
+          {{ 'commun.confirmation.tapezAvant' | transloco }}<strong class="attendu" dir="auto">{{ attendue }}</strong>{{ 'commun.confirmation.tapezApres' | transloco }}
         </p>
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-saisie">
-          <mat-label>Texte de confirmation</mat-label>
+          <mat-label>{{ 'commun.confirmation.texte' | transloco }}</mat-label>
           <input
             matInput
             autocomplete="off"
@@ -55,9 +56,9 @@ export function saisieConforme(saisie: string, attendue: string): boolean {
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       @if (donnees.saisieAttendue) {
-        <button matButton type="button" [mat-dialog-close]="false">Annuler</button>
+        <button matButton type="button" [mat-dialog-close]="false">{{ 'commun.annuler' | transloco }}</button>
       } @else {
-        <button matButton type="button" [mat-dialog-close]="false" cdkFocusInitial>Annuler</button>
+        <button matButton type="button" [mat-dialog-close]="false" cdkFocusInitial>{{ 'commun.annuler' | transloco }}</button>
       }
       <button
         matButton="filled"

@@ -12,6 +12,7 @@ import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../.
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Gestionnaire : statistiques qu'il a envoyées à son admin, les plus récentes d'abord (?page=&taille=), avec la portée,
@@ -19,46 +20,46 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
  */
 @Component({
   selector: 'app-statistiques-envoyees',
-  imports: [DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressBarModule, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page">
       <app-entete-page
-        titre="Statistiques envoyées"
+        [titre]="'menu.statistiquesEnvoyees' | transloco"
         icone="outbox"
-        sousTitre="Les statistiques de sondages terminés que vous avez envoyées à votre admin."
+        [sousTitre]="'statsEnvoyees.sousTitre' | transloco"
       />
       <div class="zone-progression">
         @if (chargement()) {
-          <mat-progress-bar mode="indeterminate" aria-label="Chargement des statistiques envoyées" />
+          <mat-progress-bar mode="indeterminate" [attr.aria-label]="'statsEnvoyees.chargement' | transloco" />
         }
       </div>
-      <app-message-erreur [erreur]="erreur()" parDefaut="Les statistiques envoyées n’ont pas pu être chargées.">
-        <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+      <app-message-erreur [erreur]="erreur()" [parDefaut]="'statsEnvoyees.erreur' | transloco">
+        <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
       </app-message-erreur>
 
       @if (page(); as p) {
         @if (p.contenu.length === 0) {
           <p class="etat-vide" role="status">
-            Aucun envoi pour le moment. Depuis l’onglet Statistiques d’un sondage terminé, choisissez « Envoyer à l’admin ».
+            {{ 'statsEnvoyees.aucun' | transloco }}
           </p>
         } @else {
           <ul class="envois">
             @for (e of p.contenu; track e.id) {
               <li class="envoi">
                 <p class="titre">
-                  <a [routerLink]="['/gestionnaire/statistiques-envoyees', e.id]">{{ e.sondageTitre }}</a>
+                  <a [routerLink]="['/gestionnaire/statistiques-envoyees', e.id]" dir="auto">{{ e.sondageTitre }}</a>
                   <span class="pastille-statut" [class.compte-temporaire]="!e.consulteLe">
-                    {{ e.consulteLe ? 'Consulté' : 'Pas encore consulté' }}
+                    {{ (e.consulteLe ? 'statsEnvoyees.consulte' : 'statsEnvoyees.pasConsulte') | transloco }}
                   </span>
                 </p>
                 <p class="cellule-secondaire">
-                  Envoyé le {{ e.dateEnvoi | dateL: 'courtHeure' }} · {{ resume(e) }}
+                  {{ 'statsEnvoyees.ligne' | transloco: { date: (e.dateEnvoi | dateL: 'courtHeure'), resume: resume(e) } }}
                   @if (e.consulteLe) {
-                    · consulté le {{ e.consulteLe | dateL: 'court' }}
+                    {{ 'statsEnvoyees.consulteLe' | transloco: { date: (e.consulteLe | dateL: 'court') } }}
                   }
                 </p>
                 @if (e.commentaire) {
-                  <p class="commentaire">« {{ e.commentaire }} »</p>
+                  <p class="commentaire" dir="auto">« {{ e.commentaire }} »</p>
                 }
               </li>
             }
@@ -69,7 +70,7 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
             [pageSize]="taillePage()"
             [pageSizeOptions]="tailles"
             (page)="changerPage($event)"
-            aria-label="Pagination des statistiques envoyées"
+            [attr.aria-label]="'statsEnvoyees.pagination' | transloco"
           />
         }
       }

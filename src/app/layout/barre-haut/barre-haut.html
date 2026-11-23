@@ -5,12 +5,14 @@
     </button>
   }
 
-  <a class="marque" [routerLink]="auth.urlAccueil()" aria-label="Batulo, accueil">
+  <a class="marque" [routerLink]="auth.urlAccueil()" [attr.aria-label]="'barre.accueil' | transloco">
     <mat-icon fontIcon="ballot" aria-hidden="true" />
     <span>Batulo</span>
   </a>
 
   <span class="espace"></span>
+
+  <app-selecteur-langue class="compact-telephone" apparence="bandeau" />
 
   @if (notificationsDisponibles()) {
     <app-cloche-notifications />
@@ -21,7 +23,7 @@
     type="button"
     class="bouton-compte"
     [matMenuTriggerFor]="menuCompte"
-    [attr.aria-label]="'Compte de ' + auth.nomAffiche()"
+    [attr.aria-label]="'barre.compteDe' | transloco: { nom: auth.nomAffiche() }"
   >
     <span class="avatar" aria-hidden="true">{{ initiales() }}</span>
     <span class="nom">{{ auth.nomAffiche() }}</span>
@@ -44,11 +46,11 @@
     <mat-divider />
     <a mat-menu-item routerLink="/changer-mot-de-passe">
       <mat-icon fontIcon="lock_reset" aria-hidden="true" />
-      <span>Changer le mot de passe</span>
+      <span>{{ 'barre.changerMotDePasse' | transloco }}</span>
     </a>
     <button mat-menu-item type="button" (click)="seDeconnecter()">
       <mat-icon fontIcon="logout" aria-hidden="true" />
-      <span>Se déconnecter</span>
+      <span>{{ 'barre.seDeconnecter' | transloco }}</span>
     </button>
   </mat-menu>
 </mat-toolbar>

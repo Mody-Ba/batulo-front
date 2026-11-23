@@ -10,6 +10,8 @@ import { FormulaireResponse, LIBELLES_STATUT_SONDAGE } from '../../../../core/mo
 import { SondageService } from '../../../../core/services/sondage.service';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
 export const TAILLE_FORMULAIRES = 10;
 
@@ -19,7 +21,7 @@ export const TAILLE_FORMULAIRES = 10;
  */
 @Component({
   selector: 'app-choix-formulaire',
-  imports: [DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, DateLPipe, 
     MatButtonModule,
     MatIconModule,
     MatPaginatorModule,
@@ -31,42 +33,42 @@ export const TAILLE_FORMULAIRES = 10;
   template: `
     <div class="barre-outils">
       <mat-slide-toggle [checked]="modelesSeulement()" (change)="filtrer($event.checked)">
-        Modèles seulement
+        {{ 'sondages.choix.modelesSeulement' | transloco }}
       </mat-slide-toggle>
     </div>
 
     <div class="zone-progression">
       @if (chargement()) {
-        <mat-progress-bar mode="indeterminate" aria-label="Chargement des formulaires" />
+        <mat-progress-bar mode="indeterminate" [attr.aria-label]="'sondages.choix.chargement' | transloco" />
       }
     </div>
-    <app-message-erreur [erreur]="erreur()" parDefaut="Les formulaires n’ont pas pu être chargés.">
-      <p><button matButton type="button" (click)="charger()">Réessayer</button></p>
+    <app-message-erreur [erreur]="erreur()" [parDefaut]="'sondages.choix.erreur' | transloco">
+      <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
     </app-message-erreur>
 
     @if (!chargement() && !erreur() && formulaires().length === 0) {
       <p class="etat-vide" role="status">
-        {{ modelesSeulement() ? 'Aucun modèle pour le moment.' : 'Aucun formulaire à réutiliser pour le moment.' }}
+        {{ (modelesSeulement() ? 'sondages.choix.aucunModele' : 'sondages.choix.aucun') | transloco }}
       </p>
     } @else if (formulaires().length) {
       <mat-radio-group
         class="liste-formulaires"
-        aria-label="Formulaire à réutiliser"
+        [attr.aria-label]="'sondages.creation.aReutiliser' | transloco"
         [value]="choisi()?.id ?? null"
         (change)="choisir($event.value)"
       >
         @for (f of formulaires(); track f.id) {
           <mat-radio-button [value]="f.id" class="formulaire" [class.choisi]="choisi()?.id === f.id">
             <span class="titre">
-              {{ f.titre }}
+              <span dir="auto">{{ f.titre }}</span>
               @if (f.estModele) {
-                <span class="pastille-statut etiquette-modele">Modèle</span>
+                <span class="pastille-statut etiquette-modele">{{ 'sondages.liste.modele' | transloco }}</span>
               }
             </span>
             <span class="cellule-secondaire">
-              Version {{ f.version }} · {{ libellesStatut[f.statut] }} ·
-              {{ f.nombreQuestions === 1 ? '1 question' : f.nombreQuestions + ' questions' }} · modifié le
-              {{ f.dateModification | dateL: 'court' }}
+              {{ 'statistiques.filtres.version' | transloco: { version: f.version } }} · {{ libellesStatut[f.statut] }} ·
+              {{ 'sondages.choix.questions' | pluriel: f.nombreQuestions }} ·
+              {{ 'sondages.liste.modifieLe' | transloco: { date: (f.dateModification | dateL: 'court') } }}
             </span>
           </mat-radio-button>
         }
@@ -78,7 +80,7 @@ export const TAILLE_FORMULAIRES = 10;
           [pageSize]="taille"
           [hidePageSize]="true"
           (page)="changerPage($event)"
-          aria-label="Pagination des formulaires"
+          [attr.aria-label]="'sondages.choix.pagination' | transloco"
         />
       }
     }

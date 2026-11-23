@@ -20,6 +20,8 @@ import { StatistiquesService } from '../../../core/services/statistiques.service
 import { messageErreur } from '../../../core/utils/erreur-http';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { decimal, nombre, pourcentage } from './graphiques/format';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export type ModeCroisement = 'nombres' | 'ligne' | 'colonne';
 
@@ -30,7 +32,7 @@ export type ModeCroisement = 'nombres' | 'ligne' | 'colonne';
  */
 @Component({
   selector: 'app-tableau-croise',
-  imports: [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatMenuModule, MatProgressBarModule, MatSelectModule, MessageErreur],
+  imports: [TranslocoPipe, MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatMenuModule, MatProgressBarModule, MatSelectModule, MessageErreur],
   templateUrl: './tableau-croise.html',
   styleUrl: './tableau-croise.scss',
 })
@@ -115,7 +117,7 @@ export class TableauCroise {
 
   /** Libellé d'une colonne d'après sa valeur (null : « Non renseigné »). */
   protected libelleColonne(croisement: CroisementResponse, valeur: string | null): string {
-    return croisement.colonnes.find((c) => c.valeur === valeur)?.libelle ?? valeur ?? 'Non renseigné';
+    return croisement.colonnes.find((c) => c.valeur === valeur)?.libelle ?? valeur ?? traduire('statistiques.croise.nonRenseigne');
   }
 
   protected exporter(format: 'PDF' | 'XLSX'): void {
@@ -135,7 +137,7 @@ export class TableauCroise {
         },
         error: (erreur: unknown) => {
           this.exportEnCours.set(false);
-          this.snackBar.open(messageErreur(erreur), 'Fermer', { duration: 6000 });
+          this.snackBar.open(messageErreur(erreur), traduire('commun.fermer'), { duration: 6000 });
         },
       });
   }

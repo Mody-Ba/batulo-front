@@ -22,20 +22,23 @@ import {
   STATUTS_SONDAGE,
   SondageResumeResponse,
 } from '../../../core/models/sondage.model';
-import { AuthService, MESSAGE_LECTURE_SEULE } from '../../../core/services/auth.service';
+import { AuthService, messageLectureSeule } from '../../../core/services/auth.service';
 import { FiltreSondages, SondageService } from '../../../core/services/sondage.service';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { numeroPageUrl, parametresPage, taillePageUrl, TAILLES_PAGE } from '../../../core/utils/pagination-url';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
 import { NombreLPipe } from '../../../core/i18n/formats.pipes';
+import { traduire } from '../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /** Assignés affichés en clair dans une ligne ; les autres sont résumés par « +N ». */
 export const ASSIGNES_VISIBLES = 2;
 
 /** Nom d'un assigné, avec la mention « désactivé » s'il ne peut plus se connecter. */
 export function libelleAssigne(gestionnaire: GestionnaireAssigneResponse): string {
-  return gestionnaire.actif ? nomComplet(gestionnaire) : `${nomComplet(gestionnaire)} (désactivé)`;
+  return gestionnaire.actif ? nomComplet(gestionnaire) : traduire('sondages.liste.desactive', { nom: nomComplet(gestionnaire) });
 }
 
 /**
@@ -45,7 +48,7 @@ export function libelleAssigne(gestionnaire: GestionnaireAssigneResponse): strin
  */
 @Component({
   selector: 'app-liste-sondages',
-  imports: [NombreLPipe, DateLPipe, 
+  imports: [PlurielPipe, TranslocoPipe, NombreLPipe, DateLPipe, 
     NgTemplateOutlet,
     RouterLink,
     MatButtonModule,
@@ -67,7 +70,7 @@ export class ListeSondages {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
-  protected readonly messageLectureSeule = MESSAGE_LECTURE_SEULE;
+  protected readonly messageLectureSeule = messageLectureSeule;
   protected readonly statuts = STATUTS_SONDAGE;
   protected readonly libellesStatut = LIBELLES_STATUT_SONDAGE;
   protected readonly libelleEtat = libelleEtatSondage;

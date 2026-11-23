@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -12,11 +12,13 @@ import { cheminInterne } from '../../../core/utils/redirection';
 import { nonVide } from '../../../core/utils/validateurs';
 import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
+import { traduireSiConnu } from '../../../core/i18n/traduire';
+import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-connexion',
-  imports: [
-    ReactiveFormsModule,
+  imports: [TranslocoPipe, SelecteurLangue, ReactiveFormsModule,
     RouterLink,
     MatCardModule,
     MatFormFieldModule,
@@ -47,7 +49,12 @@ export class Connexion {
   protected readonly erreur = signal<unknown>(null);
   protected readonly motDePasseVisible = signal(false);
   /** Message laissé par une déconnexion automatique ou une réinitialisation. */
-  protected readonly information = signal(this.auth.consommerMessageConnexion());
+  /** Message laissé par la session précédente : clé de traduction (relue au changement de langue) ou texte. */
+  private readonly messageRecu = this.auth.consommerMessageConnexion();
+  private readonly informationVisible = signal(this.messageRecu !== null);
+  protected readonly information = computed(() =>
+    this.informationVisible() && this.messageRecu ? (traduireSiConnu(this.messageRecu) ?? this.messageRecu) : null,
+  );
 
   protected seConnecter(): void {
     if (this.formulaire.invalid || this.enCours()) {
@@ -56,7 +63,7 @@ export class Connexion {
     }
     this.enCours.set(true);
     this.erreur.set(null);
-    this.information.set(null);
+    this.informationVisible.set(false);
 
     const { courriel, motDePasse } = this.formulaire.getRawValue();
     this.auth.connexion({ courriel: courriel.trim(), motDePasse }).subscribe({

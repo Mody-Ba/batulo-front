@@ -173,7 +173,7 @@
 .libelle-stripe {
   position: absolute;
   top: 6px;
-  left: 16px;
+  inset-inline-start: 16px;
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-body-small);
 }

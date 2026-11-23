@@ -1,5 +1,7 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { nombre } from './format';
+import { traduire } from '../../../../core/i18n/traduire';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Une colonne : étiquette courte (axe), libellé complet (tableau, info-bulle), effectif. */
 export interface ColonneGraphique {
@@ -19,14 +21,15 @@ let compteur = 0;
  */
 @Component({
   selector: 'app-colonnes',
+  imports: [TranslocoPipe],
   template: `
     @if (vueTableau()) {
       <table class="tableau-graphique">
         <caption class="visuellement-cache">{{ titre() }}</caption>
         <thead>
           <tr>
-            <th scope="col">{{ enteteLibelle() }}</th>
-            <th scope="col">Nombre</th>
+            <th scope="col">{{ enteteLibelle() ?? ('statistiques.graphique.valeur' | transloco) }}</th>
+            <th scope="col">{{ 'statistiques.graphique.nombre' | transloco }}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,7 +58,7 @@ let compteur = 0;
       </div>
     }
     <button type="button" class="bascule" [attr.aria-controls]="id" (click)="vueTableau.set(!vueTableau())" [attr.aria-pressed]="vueTableau()">
-      {{ vueTableau() ? 'Voir le graphique' : 'Voir le tableau' }}
+      {{ (vueTableau() ? 'statistiques.graphique.voirGraphique' : 'statistiques.graphique.voirTableau') | transloco }}
     </button>
   `,
   styleUrl: './graphiques.scss',
@@ -66,7 +69,8 @@ export class Colonnes {
   protected readonly nombre = nombre;
   readonly colonnes = input.required<ColonneGraphique[]>();
   readonly titre = input.required<string>();
-  readonly enteteLibelle = input('Valeur');
+  /** En-tête de la vue tableau ; absent : « Valeur » dans la langue courante. */
+  readonly enteteLibelle = input<string | null>(null);
 
   protected readonly vueTableau = signal(false);
   protected readonly max = computed(() => Math.max(0, ...this.colonnes().map((c) => c.nombre)));
@@ -77,10 +81,17 @@ export class Colonnes {
   protected readonly resume = computed(() => {
     const colonnes = this.colonnes();
     if (!colonnes.length) {
-      return `${this.titre()} : aucune donnée.`;
+      return traduire('statistiques.graphique.aucuneDonnee', { titre: this.titre() });
     }
     const pic = colonnes.reduce((a, b) => (b.nombre > a.nombre ? b : a));
-    return `${this.titre()} : ${colonnes.length} valeurs, de ${colonnes[0].libelle} à ${colonnes[colonnes.length - 1].libelle} ; la plus fréquente : ${pic.libelle} (${nombre(pic.nombre)}). Le détail est dans la vue tableau.`;
+    return traduire('statistiques.graphique.resumeColonnes', {
+      titre: this.titre(),
+      n: nombre(colonnes.length),
+      premier: colonnes[0].libelle,
+      dernier: colonnes[colonnes.length - 1].libelle,
+      pic: pic.libelle,
+      nombre: nombre(pic.nombre),
+    });
   });
 
   protected hauteur(colonne: ColonneGraphique): number {

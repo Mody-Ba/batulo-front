@@ -17,7 +17,7 @@ import { ChampBase } from './champ-base';
             (change)="basculer(option, $any($event.target).checked)"
             (blur)="controle().markAsTouched()"
           />
-          <span>{{ option.libelle }}</span>
+          <span dir="auto">{{ option.libelle }}</span>
         </label>
       }
     </div>
