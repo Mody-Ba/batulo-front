@@ -58,10 +58,11 @@ src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
                    gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
-                   formulaire-public, statistiques, messagerie, personnalisation)
+                   formulaire-public, statistiques, messagerie, personnalisation, traduction)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
-                   super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie, personnalisation)
+                   super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie, personnalisation,
+                   traduction = langues et traductions du contenu d'un sondage)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     i18n/          langues.ts (fr, en, ar, dir, locales), langue.service.ts (choix, RTL), traduire.ts (traduire, pluriels,
@@ -470,8 +471,9 @@ src/app/
 ## Langues de l'interface (phase 4, étape 3, partie 1)
 - **Transloco** (`@jsverse/transloco`, seule bibliothèque ajoutée) : changement de langue à l'exécution, sans
   rechargement. Langues dans `core/i18n/langues.ts` : `fr` (fr-CA), `en` (en-CA), `ar` (RTL, Intl `ar-u-nu-latn` :
-  **chiffres occidentaux** 1 234). Seule l'interface est traduite ; le contenu saisi par les admins (titres, questions,
-  options) s'affiche tel quel, avec `dir="auto"` pour qu'un texte français reste lisible dans une page arabe.
+  **chiffres occidentaux** 1 234). Le contenu saisi par les admins (titres, questions, options) a ses propres langues
+  (voir « Langues du contenu des sondages ») ; il s'affiche avec `dir="auto"` pour qu'un texte français reste lisible
+  dans une page arabe.
 - Fichiers (hors bundle, servis depuis `public/`, chargés à la demande) : `public/i18n/{fr,en,ar}.json` (application) et
   `public/i18n/public/{fr,en,ar}.json` (clés `public.*` seulement : formulaire du répondant, sélecteur de langue, messages
   d'erreur communs, codes d'erreur vus par le répondant). `/s/:jeton` ne charge que le petit fichier ; le reste de
@@ -531,6 +533,59 @@ src/app/
 3. Créer `public/i18n/xx.json` et `public/i18n/public/xx.json` (copie du français, traduite) ; ajouter le fichier dans
    `FICHIERS` de `traductions.spec.ts`, et dans `FORMATS_DATE` (`formats.pipes.ts`) ses motifs de dates.
 4. Stripe : vérifier que la langue est acceptée par `localeStripe()` (`stripe.service.ts`).
+5. Contenu des sondages : `LANGUES_CONTENU` (`traduction.model.ts`) et clé `langues.xx` ; seulement si le backend
+   accepte la langue (énumération `Langue`).
+
+## Langues du contenu des sondages (phase 4, étape 3, partie 3)
+- Contrat vérifié dans l'OpenAPI (jar du backend lancé sur 8092) : `LanguesRequest`, `CompletudeLangueResponse`
+  (`TexteNonTraduit`), `TraductionsLangueResponse` (`TexteTraduction`), `TraductionsRequest`, `LibellesMatriceResponse`,
+  `SoumissionRequest.langue`, `ReponseResponse.langue`, `StatistiquesResponse.langue|languesReponse|repartitionLangues`,
+  `Matrice.libellesColonnes`, `LigneMatrice.libelle`, `EnvoiStatistiqueRequest.langueReponse`, `?langue=` et
+  `?langueReponse=` des routes ; langues en énumération `fr|en|ar`. Les corps d'erreur ne sont pas documentés dans
+  l'OpenAPI : `ErrorResponse.manquants` ({langue, cle, source}) vient du code (`TexteManquant`). Modèle `core/models/traduction.model.ts`
+  (`LangueContenu` = `Langue` de l'interface, `LIBELLES_LANGUE` clés `langues.*`, `languesDuSondage()` : principale
+  d'abord), service `TraductionService`.
+- Sondage : `languePrincipale` (fr par défaut) et `languesSupplementaires` (sans la principale, 2 au plus : avec trois
+  langues, ce sont au plus les deux autres). Éditeur : carte « Langues du sondage » (`editeur/langues/carte-langues`, sous
+  la page d'accueil) : liste de la principale, cases des supplémentaires, enregistrées tout de suite par la file du store
+  (`definirLangues`, PUT .../langues ; la nouvelle principale sort des supplémentaires) ; complétude de chaque langue
+  (GET .../traductions, relue 600 ms après chaque écriture : un texte principal modifié perd ses traductions) et lien
+  « Traduire » ; lecture seule comme le reste (résumé + « Voir les traductions »).
+- Écran `/sondages/:id/traductions/:langue[?manquants=true]` (`features/sondages/traductions`, garde
+  `quitterEditeurGuard`, beforeunload) : textes de GET .../traductions/{langue} dans l'ordre du formulaire, regroupés par
+  `grouperTraductions` (sondage, section, question avec ses options, lignes et colonnes) ; texte principal à gauche
+  (`lang` et `dir` de la principale), champ à droite (`lang` et `dir` de la langue, `rtl` en arabe, `maxlength` =
+  `longueurMax`, zone de plusieurs lignes pour les textes longs) ; une colonne sous 840 px. Barre collée en haut :
+  « X / Y traduits » en direct, filtre « Seulement les textes manquants » (clés manquantes figées quand on le coche : un
+  texte reste visible pendant qu'on le remplit), « Enregistrer les traductions ». PUT en une fois des **seuls textes
+  modifiés** (vide -> null = effacé), réponse qui remplace l'écran, message de succès (role=status) ; erreurs
+  (TRADUCTION_INVALIDE, LANGUE_INVALIDE, SONDAGE_PUBLIE) par `app-message-erreur`, saisies gardées. Lecture seule hors
+  brouillon modifiable (`raisonLectureSeule`).
+- Publication : 400 TRADUCTIONS_INCOMPLETES -> `cycle-de-vie/textes-manquants` dans le dialogue de publication (à la
+  place du message générique) : `manquants` groupés par langue (`manquantsParLangue`), 8 textes montrés puis « et N
+  autres », bouton « Compléter les traductions » -> `/sondages/:id/traductions/:langue?manquants=true` (ferme le dialogue).
+- Formulaire public : **un seul sélecteur** quand le sondage a plusieurs `languesDisponibles` : `app-selecteur-langue
+  [disponibles] [memoriser]="false"` ne montre que ses langues et change à la fois l'interface et le contenu, pour la
+  visite seulement (`LangueService.utiliser`, sans toucher `batulo.langue`). Le GET demande `?langue=` = langue de
+  l'interface ; si le serveur sert une autre langue (non proposée), l'interface s'y aligne (`alignerInterface`). Sondage en
+  une seule langue : sélecteur habituel (trois langues, mémorisé), contenu inchangé. Changement de langue (`suivreLangue`,
+  effet sur `LangueService.langue()`) : contenu relu, même écran, réponses, section, brouillon et case de consentement
+  gardés ; échec : message `public.langueContenu.erreur` et interface ramenée à la langue affichée. Envoi : `langue` = la
+  langue servie.
+- `FormulaireSondage` ne reconstruit pas ses contrôles si la **structure** est la même (`structureFormulaire` : ids,
+  types, obligatoire, configuration, valeurs d'options, conditions) : seuls les textes changent. `ContenuFormulaire.langue`
+  et `ContenuAccueil.langue` posent `lang` et `dir` (rtl en arabe) sur le formulaire et la page d'accueil. Matrice :
+  libellés de `libellesMatrice` au même rang, valeurs envoyées = `configuration.lignes/colonnes` (langue principale).
+- Aperçu : sélecteur « Langue du contenu » à part (mat-select, visible si plusieurs langues) : la langue de l'interface de
+  l'admin ne change pas ; premier chargement dans la langue de l'interface si proposée ; réponses gardées au changement.
+  Les textes fixes du formulaire (Suivant, Envoyer…) y restent dans la langue de l'interface.
+- Statistiques : `FiltresStatistiques.langue` (libellés, absente = principale, la choisir la retire de l'URL) et
+  `languesReponse` (OU), dans l'URL `?langue=&langueReponse=` (répété ; codes inconnus ignorés), transmis par
+  `parametresFiltres` à statistiques, textes, croisement et exports ; critères relus avec `langue` ; envoi à l'admin :
+  `langueReponse`. Choix montrés seulement pour un sondage en plusieurs langues ; pastille retirable par langue de réponse ;
+  « Tout effacer » garde la langue des libellés. Résumé : tuile « Réponses par langue » (`repartitionLangues`) ; matrice :
+  `libellesColonnes` et `LigneMatrice.libelle`. Réponses : colonne « Langue » (`reponse.langue`, fr si absente) et ligne
+  dans le détail. La liste des réponses n'a pas de filtre par langue côté backend.
 
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
@@ -558,7 +613,8 @@ src/app/
   front le traduise : `erreurs[]` par question des réponses refusées (REPONSES_INVALIDES), titre et message des
   notifications, contenu des messages automatiques, `raisonFermeture` de la collecte, messages de succès
   (`MessageResponse`). Aujourd'hui ils restent en français dans les trois langues (sauf les messages de succès connus,
-  traduits par le front : `texteServeur`). Les courriels et les rapports PDF/XLSX restent en français.
+  traduits par le front : `texteServeur`). Les courriels et les textes fixes des rapports PDF/XLSX restent en français
+  (le backend prévoit de les traduire).
 - Exposer, pour chaque question des statistiques, le nombre de réponses aux versions qui contiennent la question
   (`reponsesAuxVersions` de `StatistiqueServiceImpl`, ou les réponses où elle était masquée) : le front pourra alors
   afficher « vue par X répondants sur Y » aussi en vue « toutes les versions ».
@@ -597,7 +653,10 @@ src/app/
 
 - [x] **Phase 4, étape 3 (partie 1) – Langues de l'interface** : français, anglais, arabe (RTL) avec Transloco, sélecteur
   (barre du haut, vitrine, pages de connexion, formulaire public), erreurs du backend par code, formats selon la langue.
-  Le contenu des sondages n'est pas encore traduit (partie 2).
+  Le contenu des sondages est traduit en partie 3.
+- [x] **Phase 4, étape 3 (partie 3) – Langues du contenu des sondages** : langues de l'éditeur, écran « Traductions »,
+  publication refusée avec les textes manquants, sélecteur unique du formulaire public, aperçu, statistiques et réponses
+  par langue (voir la section dédiée ; contrat vérifié dans l'OpenAPI).
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

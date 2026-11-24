@@ -141,6 +141,9 @@
       <app-message-erreur [erreur]="erreurAccueil()" [parDefaut]="'editeur.accueil.erreur' | transloco" />
     </section>
 
+    <!-- Langues du contenu (traductions dans leur propre écran) -->
+    <app-carte-langues />
+
     <!-- Sections -->
     @if (sections().length === 0) {
       <div class="vide" role="status">

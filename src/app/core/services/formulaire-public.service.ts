@@ -21,11 +21,13 @@ export class FormulairePublicService {
 
   /**
    * `jetonRepondant` (s'il existe déjà sur cet appareil) : envoyé dans l'en-tête X-Jeton-Repondant, jamais dans
-   * l'URL ; le backend répond alors `dejaRepondu` pour un sondage à réponse unique.
+   * l'URL ; le backend répond alors `dejaRepondu` pour un sondage à réponse unique. `langue` : langue du contenu
+   * souhaitée (non proposée : la principale ; la langue servie est dans `langue` de la réponse).
    */
-  lire(jeton: string, jetonRepondant?: string | null): Observable<FormulairePublicResponse> {
+  lire(jeton: string, jetonRepondant?: string | null, langue?: string | null): Observable<FormulairePublicResponse> {
     return this.http.get<FormulairePublicResponse>(`${this.url}/${encodeURIComponent(jeton)}`, {
       context: this.contexte(),
+      ...(langue ? { params: { langue } } : {}),
       ...(jetonRepondant ? { headers: new HttpHeaders({ 'X-Jeton-Repondant': jetonRepondant }) } : {}),
     });
   }

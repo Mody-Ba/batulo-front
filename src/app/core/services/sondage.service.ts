@@ -140,11 +140,15 @@ export class SondageService {
   // ---------------------------------------------------------------- Cycle de vie (F5b)
 
   /** Le formulaire tel que le verra le répondant (brouillon compris). */
-  apercu(id: number): Observable<ApercuResponse> {
-    return this.http.get<ApercuResponse>(`${this.url}/${id}/apercu`);
+  /** `langue` : langue du contenu (non proposée ou absente : la principale). */
+  apercu(id: number, langue?: string | null): Observable<ApercuResponse> {
+    return this.http.get<ApercuResponse>(`${this.url}/${id}/apercu`, langue ? { params: { langue } } : {});
   }
 
-  /** Brouillon -> publié ; contenu gelé ensuite. 400 SONDAGE_INCOMPLET ou DATES_INVALIDES. */
+  /**
+   * Brouillon -> publié ; contenu gelé ensuite. 400 SONDAGE_INCOMPLET, DATES_INVALIDES ou TRADUCTIONS_INCOMPLETES
+   * (`manquants` : textes non traduits).
+   */
   publier(id: number, dates: DatesSondageRequest): Observable<SondageResponse> {
     return this.http.post<SondageResponse>(`${this.url}/${id}/publier`, dates);
   }

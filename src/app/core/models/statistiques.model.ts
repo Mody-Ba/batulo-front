@@ -1,5 +1,6 @@
 import { traduire, traduirePluriel } from '../i18n/traduire';
 import { TypeQuestion } from './sondage.model';
+import { LangueContenu } from './traduction.model';
 
 /** Granularité de la répartition des dates (absente : choisie par le backend selon l'écart). */
 export type GranulariteDate = 'JOUR' | 'MOIS';
@@ -16,6 +17,10 @@ export interface FiltresStatistiques {
   au: string | null;
   granularite: GranulariteDate | null;
   criteres: string[];
+  /** Langue des libellés (?langue=) ; absente : langue principale du sondage. */
+  langue?: LangueContenu | null;
+  /** Filtre sur la langue de réponse (?langueReponse= répété, OU) ; vide : toutes. */
+  languesReponse?: LangueContenu[];
 }
 
 export const FILTRES_PAR_DEFAUT: FiltresStatistiques = {
@@ -84,9 +89,11 @@ export interface CelluleStat {
   pourcentage: number;
 }
 
+/** colonnes et ligne : textes principaux (valeurs stables) ; libellesColonnes et libelle : dans la langue demandée. */
 export interface StatMatrice {
   colonnes: string[];
-  lignes: { ligne: string; nombre: number; cellules: CelluleStat[] }[];
+  libellesColonnes?: string[] | null;
+  lignes: { ligne: string; libelle?: string | null; nombre: number; cellules: CelluleStat[] }[];
 }
 
 export interface Texte {
@@ -143,6 +150,12 @@ export interface StatistiquesResponse {
   du: string | null;
   au: string | null;
   criteres: CritereResponse[];
+  /** Langue des libellés servie. */
+  langue?: LangueContenu | null;
+  /** Filtre appliqué sur la langue de réponse ; vide : toutes. */
+  languesReponse?: LangueContenu[] | null;
+  /** Réponses retenues par langue (langues sans réponse omises). */
+  repartitionLangues?: { langue: LangueContenu; nombre: number }[] | null;
   resume: {
     nombreReponses: number;
     petitEffectif: boolean;
@@ -202,6 +215,8 @@ export interface ReponseResponse {
   /** Numéro de cette version dans la lignée. */
   version: number;
   dateSoumission: string;
+  /** Langue dans laquelle le répondant a vu le formulaire (anciennes réponses : fr). */
+  langue?: LangueContenu | null;
   valeurs: { questionId: number; libelle: string; type: TypeQuestion; valeur: unknown }[];
 }
 
@@ -213,6 +228,8 @@ export interface EnvoiStatistiqueRequest {
   au: string | null;
   critere: string[];
   granulariteDate: GranulariteDate | null;
+  /** Filtre sur la langue de réponse ; absent : toutes. */
+  langueReponse?: LangueContenu[];
 }
 
 /** Envoi de statistiques (reçu par l'admin, ou envoyé par le gestionnaire). */

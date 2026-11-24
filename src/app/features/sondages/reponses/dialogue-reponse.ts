@@ -1,3 +1,4 @@
+import { LangueContenu, LIBELLES_LANGUE } from '../../../core/models/traduction.model';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -29,6 +30,7 @@ interface LigneDetail {
     <mat-dialog-content>
       <p class="texte-aide">
         {{ 'sondages.reponse.envoyee' | transloco: { date: (donnees.reponse.dateSoumission | dateL: 'longHeure'), version: donnees.reponse.version } }}
+        <br />{{ 'sondages.reponse.langue' | transloco: { langue: nomLangue(donnees.reponse.langue ?? 'fr') } }}
       </p>
       <dl class="detail">
         @for (ligne of lignes; track ligne.numero) {
@@ -121,6 +123,7 @@ interface LigneDetail {
 })
 export class DialogueReponse {
   protected readonly donnees = inject<DonneesDialogueReponse>(MAT_DIALOG_DATA);
+  protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
   protected readonly lignes = this.construire();
 
   /**

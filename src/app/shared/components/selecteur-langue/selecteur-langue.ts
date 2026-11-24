@@ -1,13 +1,14 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LangueService } from '../../../core/i18n/langue.service';
-import { estLangue, LANGUES } from '../../../core/i18n/langues';
+import { estLangue, Langue, LANGUES } from '../../../core/i18n/langues';
 
 /**
  * Choix de la langue de l'interface (Français, English, العربية) : liste native, légère (barre du haut, vitrine,
  * connexion, formulaire public sans Angular Material). Le choix est mémorisé par LangueService.
  * `apparence` : « clair » sur fond clair, « bandeau » sur la barre colorée. Classe `compact-telephone` : bouton rond
- * sous 600 px.
+ * sous 600 px. `disponibles` : seulement ces langues (formulaire public d'un sondage en plusieurs langues : un seul choix
+ * pour l'interface et le contenu) ; `memoriser` false : le choix vaut pour cette visite seulement.
  */
 @Component({
   selector: 'app-selecteur-langue',
@@ -17,7 +18,7 @@ import { estLangue, LANGUES } from '../../../core/i18n/langues';
       <span class="material-icons icone" aria-hidden="true">language</span>
       <span class="visuellement-cache">{{ 'public.langue.libelle' | transloco }}</span>
       <select [value]="langues.langue()" (change)="choisir($event)">
-        @for (langue of liste; track langue.code) {
+        @for (langue of liste(); track langue.code) {
           <option [value]="langue.code" [attr.lang]="langue.code" [selected]="langue.code === langues.langue()">
             {{ langue.nom }}
           </option>
@@ -93,13 +94,19 @@ import { estLangue, LANGUES } from '../../../core/i18n/langues';
 })
 export class SelecteurLangue {
   protected readonly langues = inject(LangueService);
-  protected readonly liste = LANGUES;
   readonly apparence = input<'clair' | 'bandeau'>('clair');
+  readonly disponibles = input<readonly Langue[] | null>(null);
+  readonly memoriser = input(true);
+  protected readonly liste = computed(() => {
+    const disponibles = this.disponibles();
+    return disponibles ? LANGUES.filter((l) => disponibles.includes(l.code)) : LANGUES;
+  });
 
   protected choisir(evenement: Event): void {
     const valeur = (evenement.target as HTMLSelectElement).value;
-    if (estLangue(valeur)) {
-      void this.langues.changer(valeur);
+    if (!estLangue(valeur) || !this.liste().some((l) => l.code === valeur)) {
+      return;
     }
+    void (this.memoriser() ? this.langues.changer(valeur) : this.langues.utiliser(valeur));
   }
 }

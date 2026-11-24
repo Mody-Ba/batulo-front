@@ -1,3 +1,5 @@
+import { TexteManquant } from './traduction.model';
+
 /** Erreur d'une question, seulement pour les réponses à un sondage (formulaire public). */
 export interface ErreurQuestion {
   questionId: number;
@@ -9,6 +11,8 @@ export interface ErreurApi {
   code: string;
   message: string;
   erreurs?: ErreurQuestion[];
+  /** Seulement pour TRADUCTIONS_INCOMPLETES (publication refusée) : textes non traduits. */
+  manquants?: TexteManquant[];
 }
 
 /** Codes d'erreur du backend utilisés par le front (liste non exhaustive). */

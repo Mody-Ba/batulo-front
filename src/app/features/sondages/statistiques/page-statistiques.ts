@@ -32,6 +32,7 @@ import { TableauCroise } from './tableau-croise';
 import { DateLPipe } from '../../../core/i18n/formats.pipes';
 import { traduire } from '../../../core/i18n/traduire';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { languesDuSondage, LIBELLES_LANGUE, LangueContenu } from '../../../core/models/traduction.model';
 import { PlurielPipe } from '../../../core/i18n/formats.pipes';
 
 /**
@@ -68,6 +69,7 @@ export class PageStatistiques {
   protected readonly totalUneVersion = totalUneVersion;
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
+  protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
 
   /** Paramètre de route :id et paramètres d'URL des filtres. */
   readonly id = input.required<string>();
@@ -76,6 +78,8 @@ export class PageStatistiques {
   readonly au = input<string | undefined>(undefined);
   readonly granularite = input<string | undefined>(undefined);
   readonly critere = input<string | string[] | undefined>(undefined);
+  readonly langue = input<string | undefined>(undefined);
+  readonly langueReponse = input<string | string[] | undefined>(undefined);
 
   protected readonly identifiant = computed(() => Number(this.id()));
   protected readonly filtres = computed<FiltresStatistiques>(() =>
@@ -85,8 +89,15 @@ export class PageStatistiques {
       au: this.au(),
       granularite: this.granularite(),
       critere: this.critere(),
+      langue: this.langue(),
+      langueReponse: this.langueReponse(),
     }),
   );
+  /** Langues du sondage (libellés et filtre par langue de réponse), la principale d'abord. */
+  protected readonly languesSondage = computed(() => {
+    const s = this.sondage();
+    return s ? languesDuSondage(s) : [];
+  });
 
   protected readonly sondage = signal<SondageResponse | null>(null);
   protected readonly versions = signal<VersionResponse[]>([]);
@@ -106,13 +117,14 @@ export class PageStatistiques {
       const id = this.identifiant();
       untracked(() => this.chargerSondage(id));
     });
-    // Les valeurs des critères dépendent de la portée (version ou lignée).
+    // Les valeurs des critères dépendent de la portée (version ou lignée) ; leurs libellés, de la langue.
     effect(() => {
       const id = this.identifiant();
       const lignee = this.filtres().lignee;
+      const langue = this.filtres().langue ?? null;
       untracked(() =>
         this.service
-          .criteres(id, lignee)
+          .criteres(id, lignee, langue)
           .pipe(takeUntilDestroyed(this.destroyRef))
           .subscribe({ next: (c) => this.criteres.set(c), error: () => this.criteres.set([]) }),
       );
@@ -169,7 +181,7 @@ export class PageStatistiques {
   }
 
   private resume(sondage: SondageResponse): string[] {
-    return resumeFiltres(this.filtres(), this.criteres(), sondage.version);
+    return resumeFiltres(this.filtres(), this.criteres(), sondage.version, this.languesSondage().length > 1);
   }
 
   private chargerSondage(id: number): void {

@@ -13,6 +13,11 @@ import { variablesApparence } from '../../../shared/formulaire/apparence/apparen
 import { BandeauApparence } from '../../../shared/formulaire/apparence/bandeau-apparence';
 import { FormulaireSondage } from '../../../shared/formulaire/formulaire-sondage';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { LangueService } from '../../../core/i18n/langue.service';
+import { estLangue } from '../../../core/i18n/langues';
+import { LangueContenu, LIBELLES_LANGUE } from '../../../core/models/traduction.model';
 
 export type Appareil = 'ordinateur' | 'telephone';
 
@@ -20,14 +25,18 @@ export type Appareil = 'ordinateur' | 'telephone';
  * Prévisualisation (GET .../apercu) : le formulaire tel que le verra le répondant, avec les composants du formulaire
  * public (F6), sans envoi. Le cadre « téléphone » (390 px) montre la mise en page mobile, les champs suivant la
  * largeur du formulaire (container queries). La page d'accueil (objet, confidentialité, consentement) vient d'abord,
- * comme pour le répondant ; « Recommencer » y ramène.
+ * comme pour le répondant ; « Recommencer » y ramène. Sondage en plusieurs langues : sélecteur « Langue du contenu »
+ * propre à l'aperçu (la langue de l'interface de l'admin ne change pas), contenu relu sans perdre les réponses, cadre en
+ * RTL pour l'arabe.
  */
 @Component({
   selector: 'app-apercu-sondage',
   imports: [TranslocoPipe, RouterLink,
     MatButtonModule,
     MatButtonToggleModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatSelectModule,
     MatProgressBarModule,
     MessageErreur,
     AccueilSondage,
@@ -42,6 +51,16 @@ export type Appareil = 'ordinateur' | 'telephone';
         </a>
         <h1 class="titre-page">{{ 'sondages.apercu.titre' | transloco }}</h1>
         <span class="espace"></span>
+        @if (languesContenu(); as langues) {
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-langue">
+            <mat-label>{{ 'sondages.apercu.langueContenu' | transloco }}</mat-label>
+            <mat-select [value]="apercu()?.langue" (selectionChange)="changerLangue($event.value)">
+              @for (l of langues; track l) {
+                <mat-option [value]="l">{{ nomLangue(l) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
         <mat-button-toggle-group
           [attr.aria-label]="'sondages.apercu.taille' | transloco"
           [value]="appareil()"
@@ -99,6 +118,10 @@ export type Appareil = 'ordinateur' | 'telephone';
       }
     }
 
+    .champ-langue {
+      width: 180px;
+    }
+
     .retour {
       margin-inline-start: calc(-1 * var(--bt-espace-3));
     }
@@ -141,7 +164,9 @@ export type Appareil = 'ordinateur' | 'telephone';
 })
 export class ApercuSondage {
   private readonly service = inject(SondageService);
+  private readonly langueInterface = inject(LangueService);
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
 
   /** Paramètre de route :id. */
   readonly id = input.required<string>();
@@ -158,6 +183,16 @@ export class ApercuSondage {
   protected readonly variablesApparence = computed(() => variablesApparence(this.apercu()?.apparence));
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
+  /** Langues du sondage s'il en a plusieurs (sélecteur « Langue du contenu », à part de celui de l'interface). */
+  protected readonly languesContenu = computed<LangueContenu[] | null>(() => {
+    const disponibles = (this.apercu()?.languesDisponibles ?? []).filter(estLangue);
+    return disponibles.length > 1 ? disponibles : null;
+  });
+  /**
+   * Langue demandée : d'abord celle de l'interface (le serveur sert la principale si elle n'est pas proposée), puis
+   * celle choisie dans le sélecteur.
+   */
+  private langueDemandee: string | null = null;
 
   constructor() {
     effect(() => {
@@ -166,11 +201,17 @@ export class ApercuSondage {
     });
   }
 
+  /** Contenu relu dans une autre langue ; réponses saisies et page d'accueil passée gardées (même formulaire). */
+  protected changerLangue(langue: LangueContenu): void {
+    this.langueDemandee = langue;
+    this.charger();
+  }
+
   protected charger(id = Number(this.id())): void {
     this.chargement.set(true);
     this.erreur.set(null);
     this.service
-      .apercu(id)
+      .apercu(id, this.langueDemandee ?? this.langueInterface.langue())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (apercu) => {

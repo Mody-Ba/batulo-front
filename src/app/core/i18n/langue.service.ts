@@ -53,6 +53,16 @@ export class LangueService {
     await this.appliquer(langue);
   }
 
+  /**
+   * Langue appliquée pour cette visite sans être mémorisée : le formulaire public d'un sondage en plusieurs langues
+   * aligne l'interface sur la langue de son contenu, sans changer le choix gardé pour le reste de l'application.
+   */
+  async utiliser(langue: Langue): Promise<void> {
+    if (langue !== this._langue()) {
+      await this.appliquer(langue);
+    }
+  }
+
   private langueInitiale(): Langue {
     const gardee = lireLocal<unknown>(CLE_STOCKAGE_LANGUE);
     if (estLangue(gardee)) {

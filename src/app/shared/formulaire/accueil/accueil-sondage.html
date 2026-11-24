@@ -1,4 +1,4 @@
-<article class="accueil-sondage" aria-labelledby="titre-accueil">
+<article class="accueil-sondage" aria-labelledby="titre-accueil" [attr.lang]="contenu().langue ?? null" [attr.dir]="dir()">
   @if (niveauTitre() === 1) {
     <h1 id="titre-accueil" class="titre" tabindex="-1" dir="auto">{{ contenu().titre }}</h1>
   } @else {

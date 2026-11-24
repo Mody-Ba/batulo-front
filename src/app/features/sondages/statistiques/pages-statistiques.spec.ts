@@ -59,7 +59,7 @@ describe('Pages des statistiques et des réponses', () => {
       croisement: vi.fn(() => of(null)),
       reponses: vi.fn(() =>
         of({
-          contenu: [{ id: 41, sondageId: 3, version: 1, dateSoumission: '2026-11-04T10:00:00Z', valeurs: [{ questionId: 101, libelle: 'Secteur', type: 'CHOIX_UNIQUE', valeur: 'commerce' }] }],
+          contenu: [{ id: 41, sondageId: 3, version: 1, dateSoumission: '2026-11-04T10:00:00Z', langue: 'ar', valeurs: [{ questionId: 101, libelle: 'Secteur', type: 'CHOIX_UNIQUE', valeur: 'commerce' }] }],
           page: 0,
           taille: 20,
           totalElements: 1,
@@ -91,7 +91,7 @@ describe('Pages des statistiques et des réponses', () => {
   it('statistiques : filtres de l’URL transmis, résumé, cartes regroupées par section', async () => {
     const f = await afficher(PageStatistiques, { id: '3', lignee: 'true', critere: ['region:kayes'] });
     expect(stats['statistiques']).toHaveBeenCalledWith(3, { lignee: true, du: null, au: null, granularite: null, criteres: ['region:kayes'] });
-    expect(stats['criteres']).toHaveBeenCalledWith(3, true);
+    expect(stats['criteres']).toHaveBeenCalledWith(3, true, null);
     expect(texte(f)).toContain('128 réponses');
     expect(Array.from((f.nativeElement as HTMLElement).querySelectorAll('.titre-section')).map((h) => h.textContent?.trim())).toEqual(['Profil', 'Avis']);
     expect(f.nativeElement.querySelectorAll('app-carte-question-stat').length).toBe(2);
@@ -102,7 +102,7 @@ describe('Pages des statistiques et des réponses', () => {
     const naviguer = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     (f.componentInstance as unknown as { changerFiltres(x: unknown): void }).changerFiltres({ ...FILTRES, du: '2026-11-01', criteres: ['a:1'] });
     expect(naviguer).toHaveBeenCalledWith([], {
-      queryParams: { lignee: null, du: '2026-11-01', au: null, granularite: null, critere: ['a:1'] },
+      queryParams: { lignee: null, du: '2026-11-01', au: null, granularite: null, critere: ['a:1'], langue: null, langueReponse: null },
       queryParamsHandling: 'merge',
     });
   });
@@ -116,11 +116,12 @@ describe('Pages des statistiques et des réponses', () => {
     expect(texte(f)).toContain('Envoyer les statistiques à l’admin');
   });
 
-  it('réponses : liste paginée (date, version) ; le détail s’ouvre avec le contenu du sondage', async () => {
+  it('réponses : liste paginée (date, version, langue) ; le détail s’ouvre avec le contenu du sondage', async () => {
     const f = await afficher(ListeReponses, { id: '3' });
     expect(stats['reponses']).toHaveBeenCalledWith(3, 0, 20, false);
     expect(texte(f)).toContain('N° 41');
     expect(texte(f)).toContain('Version 1');
+    expect((f.nativeElement as HTMLElement).querySelector('.reponse .langue')!.textContent).toContain('Arabe');
     expect(texte(f)).toContain('1 question répondue sur 2');
     (f.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.reponse')!.click();
     expect(dialog.open.mock.calls[0][0]).toBe(DialogueReponse);

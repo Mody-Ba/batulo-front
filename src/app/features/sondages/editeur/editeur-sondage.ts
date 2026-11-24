@@ -30,6 +30,7 @@ import { Encadre } from '../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
 import { ActionsSondage } from '../cycle-de-vie/actions-sondage';
 import { CarteSection } from './carte-section/carte-section';
+import { CarteLangues } from './langues/carte-langues';
 import { EditeurSondageStore } from './editeur-sondage.store';
 import { EnregistrementAuto, EtatEnregistrement } from './enregistrement-auto';
 import { EtatEnregistrementIndicateur } from './etat-enregistrement/etat-enregistrement';
@@ -63,6 +64,7 @@ export interface PeutQuitter {
     Encadre,
     MessageErreur,
     CarteSection,
+    CarteLangues,
     EtatEnregistrementIndicateur,
   ],
   providers: [EditeurSondageStore],

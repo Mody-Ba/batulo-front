@@ -18,7 +18,8 @@
       "TROP_DE_REQUETES": "Trop de requêtes en peu de temps. Patientez un instant puis réessayez.",
       "INTROUVABLE": "Cette adresse n’existe pas.",
       "ERREUR_INTERNE": "Une erreur inattendue est survenue.",
-      "REQUETE_INVALIDE": "La requête est absente ou mal formée."
+      "REQUETE_INVALIDE": "La requête est absente ou mal formée.",
+      "LANGUE_INVALIDE": "Cette langue n’est pas proposée par ce sondage."
     },
     "commun": {
       "allerAuContenu": "Aller au contenu"
@@ -152,6 +153,9 @@
     },
     "apparence": {
       "logo": "Logo de l’organisation"
+    },
+    "langueContenu": {
+      "erreur": "Le formulaire n’a pas pu être chargé dans cette langue. Vos réponses sont gardées."
     }
   }
 }

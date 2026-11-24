@@ -5,7 +5,7 @@ import { ChampBase } from './champ-base';
 /**
  * MATRICE : une colonne pour chaque ligne (une grille commencée doit être complète). Une carte par ligne sur un
  * formulaire étroit, un tableau sur un formulaire large (container query) ; chaque ligne est un groupe de boutons
- * radio natifs.
+ * radio natifs. Libellés de `libellesMatrice` (langue servie), valeurs de `configuration` (langue principale).
  */
 @Component({
   selector: 'app-champ-matrice',
@@ -13,15 +13,15 @@ import { ChampBase } from './champ-base';
     <div class="matrice" role="group" [attr.aria-labelledby]="idLibelle" [attr.aria-describedby]="decrit()" [style.--bt-colonnes]="colonnes().length">
       <div class="matrice-entete" aria-hidden="true">
         <span></span>
-        @for (colonne of colonnes(); track colonne) {
-          <span>{{ colonne }}</span>
+        @for (colonne of colonnes(); track colonne; let j = $index) {
+          <span dir="auto">{{ libelleColonne(j) }}</span>
         }
       </div>
       @for (ligne of lignes(); track ligne; let i = $index) {
         <div class="matrice-ligne" role="radiogroup" [attr.aria-labelledby]="idBase() + '-ligne-' + i">
-          <span class="matrice-libelle" dir="auto" [id]="idBase() + '-ligne-' + i">{{ ligne }}</span>
+          <span class="matrice-libelle" dir="auto" [id]="idBase() + '-ligne-' + i">{{ libelleLigne(i) }}</span>
           <div class="matrice-choix">
-            @for (colonne of colonnes(); track colonne) {
+            @for (colonne of colonnes(); track colonne; let j = $index) {
               <label class="choix">
                 <input
                   type="radio"
@@ -30,8 +30,8 @@ import { ChampBase } from './champ-base';
                   [disabled]="controle().disabled"
                   (change)="choisir(ligne, colonne)"
                 />
-                <span class="matrice-colonne-etroit">{{ colonne }}</span>
-                <span class="visuellement-cache matrice-colonne-large">{{ colonne }}</span>
+                <span class="matrice-colonne-etroit" dir="auto">{{ libelleColonne(j) }}</span>
+                <span class="visuellement-cache matrice-colonne-large">{{ libelleColonne(j) }}</span>
               </label>
             }
           </div>
@@ -47,6 +47,15 @@ export class ChampMatrice extends ChampBase {
   protected readonly colonnes = computed(
     () => (this.question().configuration as Partial<ConfigurationMatrice>).colonnes ?? [],
   );
+
+  /** Libellés affichés (libellesMatrice, dans la langue servie) ; les valeurs envoyées restent lignes / colonnes. */
+  protected libelleLigne(i: number): string {
+    return this.question().libellesMatrice?.lignes?.[i] || this.lignes()[i];
+  }
+
+  protected libelleColonne(j: number): string {
+    return this.question().libellesMatrice?.colonnes?.[j] || this.colonnes()[j];
+  }
 
   protected reponse(): Record<string, string> {
     const valeur = this.controle().value;

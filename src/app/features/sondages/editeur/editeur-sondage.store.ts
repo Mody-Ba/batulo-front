@@ -14,6 +14,8 @@ import {
   VersionResponse,
 } from '../../../core/models/sondage.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { LanguesRequest } from '../../../core/models/traduction.model';
+import { TraductionService } from '../../../core/services/traduction.service';
 import { SondageService } from '../../../core/services/sondage.service';
 import { aLeCode, messageErreur } from '../../../core/utils/erreur-http';
 import { REGLES_SONDAGE } from '../../../core/utils/regles-question';
@@ -53,6 +55,7 @@ interface Ecriture {
 @Injectable()
 export class EditeurSondageStore {
   private readonly service = inject(SondageService);
+  private readonly traductions = inject(TraductionService);
   private readonly auth = inject(AuthService);
 
   readonly sondage = signal<SondageResponse | null>(null);
@@ -365,6 +368,12 @@ export class EditeurSondageStore {
   definirCritere(questionId: number, critere: CritereRequest): Observable<SondageResponse> {
     const id = this.id;
     return this.executer(() => this.service.definirCritere(id, questionId, critere));
+  }
+
+  /** Langue principale et langues supplémentaires (PUT .../langues, brouillon seulement). */
+  definirLangues(langues: LanguesRequest): Observable<SondageResponse> {
+    const id = this.id;
+    return this.executer(() => this.traductions.definirLangues(id, langues));
   }
 
   /** Condition d'affichage d'une question enregistrée ; null la retire (DELETE). Brouillon seulement. */

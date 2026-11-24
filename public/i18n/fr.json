@@ -635,6 +635,20 @@
       "invalide": "À corriger avant l’enregistrement",
       "enregistrement": "Enregistrement…",
       "erreur": "Échec de l’enregistrement"
+    },
+    "langues": {
+      "titre": "Langues du sondage",
+      "aide": "Saisissez le contenu dans la langue principale, puis traduisez-le dans les langues supplémentaires. Le répondant choisit sa langue sur le formulaire.",
+      "principale": "Langue principale",
+      "principaleAide": "Celle de la saisie. La changer ne traduit rien.",
+      "supplementaires": "Langues supplémentaires ({{max}} au plus)",
+      "resumePrincipale": "Langue principale : {{langue}}",
+      "resumeSupplementaires": "Langues supplémentaires : {{langues}}",
+      "progression": "{{traduits}} / {{total}} textes traduits",
+      "complet": "Traduction complète ({{traduits}} / {{total}})",
+      "traduire": "Traduire",
+      "voir": "Voir les traductions",
+      "erreur": "Les langues n’ont pas pu être enregistrées."
     }
   },
   "superAdmin": {
@@ -858,7 +872,10 @@
     "UTILISATEUR_INTROUVABLE": "Compte introuvable.",
     "VALEUR_OPTION_EN_DOUBLE": "Deux options de la même question ont la même valeur.",
     "VERSION_INTROUVABLE": "Cette version du sondage est introuvable.",
-    "VERSION_OBSOLETE": "Ce n’est pas la dernière version : partez de la plus récente."
+    "VERSION_OBSOLETE": "Ce n’est pas la dernière version : partez de la plus récente.",
+    "LANGUE_INVALIDE": "Cette langue n’est pas proposée par ce sondage.",
+    "TRADUCTION_INVALIDE": "Une traduction est invalide (texte inconnu, en double ou trop long).",
+    "TRADUCTIONS_INCOMPLETES": "Des textes ne sont pas encore traduits : complétez les traductions avant de publier."
   },
   "gestionnaires": {
     "actions": {
@@ -1335,7 +1352,17 @@
       "reponseUniqueAide": "Décochez pour une collecte terrain (plusieurs réponses depuis le même appareil). Figé à la publication.",
       "planifier": "Planifier la publication",
       "publierMaintenant": "Publier maintenant",
-      "enregistrerDates": "Enregistrer les dates"
+      "enregistrerDates": "Enregistrer les dates",
+      "traductionsIncompletes": "Publication impossible : des textes ne sont pas encore traduits.",
+      "textesManquants": {
+        "one": "{{n}} texte manquant",
+        "other": "{{n}} textes manquants"
+      },
+      "etAutres": {
+        "one": "et {{n}} autre",
+        "other": "et {{n}} autres"
+      },
+      "completer": "Compléter les traductions ({{langue}})"
     },
     "partage": {
       "messageAvecTitre": "Bonjour, merci de répondre à notre enquête « {{titre}} » : {{url}}",
@@ -1380,7 +1407,8 @@
       "ordinateur": "Ordinateur",
       "telephone": "Téléphone",
       "chargement": "Chargement de l’aperçu",
-      "erreur": "L’aperçu n’a pas pu être chargé."
+      "erreur": "L’aperçu n’a pas pu être chargé.",
+      "langueContenu": "Langue du contenu"
     },
     "reponses": {
       "surMax": "{{valeur}} sur {{max}}",
@@ -1405,13 +1433,15 @@
       },
       "aucune": "Aucune réponse pour le moment.",
       "numero": "N° {{id}}",
-      "pagination": "Pagination des réponses"
+      "pagination": "Pagination des réponses",
+      "langue": "Langue :"
     },
     "reponse": {
       "titre": "Réponse n° {{id}}",
       "envoyee": "Envoyée le {{date}} · version {{version}}",
       "parLigne": "Réponses par ligne",
-      "sansReponse": "Sans réponse"
+      "sansReponse": "Sans réponse",
+      "langue": "Langue du formulaire : {{langue}}"
     }
   },
   "statistiques": {
@@ -1444,7 +1474,13 @@
       "filtres": "Filtres :",
       "periodePastille": "Période {{du}} → {{au}}",
       "retirer": "Retirer le filtre {{filtre}}",
-      "toutEffacer": "Tout effacer"
+      "toutEffacer": "Tout effacer",
+      "langueLibelles": "Langue des libellés",
+      "langueReponse": "Langue de réponse",
+      "toutesLangues": "Toutes",
+      "pastilleLangue": "Réponses en {{langue}}",
+      "resumeLangueReponse": "Réponses en {{langues}}",
+      "resumeLangueLibelles": "Libellés en {{langue}}"
     },
     "calcul": "Calcul des statistiques",
     "preparation": "Préparation…",
@@ -1475,7 +1511,9 @@
       "portee": "portée",
       "petitEffectif": "Moins de 5 réponses avec ces filtres : résultats à interpréter avec prudence.",
       "aucune": "Aucune réponse avec ces filtres.",
-      "envoyees": "Statistiques envoyées : votre admin est prévenu."
+      "envoyees": "Statistiques envoyées : votre admin est prévenu.",
+      "repartitionLangues": "Réponses par langue",
+      "langueNombre": "{{langue}} : {{nombre}}"
     },
     "carte": {
       "rangMoyen": "rang moyen {{rang}} · 1er : {{premiers}}",
@@ -1677,7 +1715,8 @@
     "demandesAbonnement": "Demandes d’abonnement · Batulo",
     "admins": "Admins et entreprises · Batulo",
     "entreprise": "Entreprise · Batulo",
-    "notifications": "Notifications · Batulo"
+    "notifications": "Notifications · Batulo",
+    "traductions": "Traductions du sondage · Batulo"
   },
   "vitrine": {
     "sections": {
@@ -1799,6 +1838,59 @@
       "haut": "Batulo, haut de la page",
       "menu": "Menu",
       "sections": "Sections de la page"
+    }
+  },
+  "langues": {
+    "fr": "Français",
+    "en": "Anglais",
+    "ar": "Arabe"
+  },
+  "traductions": {
+    "titre": "Traductions : {{langue}}",
+    "titreSimple": "Traductions",
+    "retourEditeur": "Retour à l’éditeur",
+    "autresLangues": "Autres langues",
+    "versLangue": "Traduire en {{langue}}",
+    "langueInconnue": "Langue inconnue",
+    "langueInconnueTexte": "Cette adresse ne désigne pas une langue proposée (français, anglais ou arabe).",
+    "chargement": "Chargement des traductions",
+    "erreurChargement": "Les traductions n’ont pas pu être chargées.",
+    "completude": "{{traduits}} / {{total}} traduits",
+    "seulementManquants": "Seulement les textes manquants",
+    "enregistrer": "Enregistrer les traductions",
+    "enregistrement": "Enregistrement…",
+    "enregistrees": "Traductions enregistrées : {{traduits}} / {{total}} traduits.",
+    "rienAEnregistrer": "Aucune modification à enregistrer.",
+    "nonEnregistres": {
+      "one": "{{n}} traduction pas encore enregistrée",
+      "other": "{{n}} traductions pas encore enregistrées"
+    },
+    "erreurEnregistrement": "Les traductions n’ont pas pu être enregistrées.",
+    "aucunTexte": "Ce sondage n’a encore aucun texte à traduire.",
+    "toutTraduit": "Tous les textes sont traduits.",
+    "textePrincipal": "Texte principal ({{langue}})",
+    "traductionEn": "Traduction ({{langue}})",
+    "groupeSondage": "Sondage",
+    "groupeSection": "Section {{numero}}",
+    "groupeQuestion": "Question {{numero}}",
+    "champ": "{{champ}} en {{langue}}",
+    "manquant": "À traduire",
+    "quitterTitre": "Quitter sans enregistrer ?",
+    "quitterMessage": "Des traductions saisies ne sont pas enregistrées : elles seront perdues.",
+    "quitter": "Quitter sans enregistrer",
+    "champs": {
+      "titre": "Titre",
+      "description": "Description",
+      "objetEnquete": "Objet de l’enquête",
+      "texteConfidentialite": "Confidentialité",
+      "texteConsentement": "Case de consentement",
+      "question": "Question",
+      "aide": "Aide",
+      "libelleMin": "Libellé du minimum",
+      "libelleMax": "Libellé du maximum",
+      "option": "Option",
+      "ligne": "Ligne",
+      "colonne": "Colonne"
     }
   }
 }

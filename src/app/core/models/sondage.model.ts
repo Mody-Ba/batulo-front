@@ -1,5 +1,6 @@
 import { libelles, traduire } from '../i18n/traduire';
 import { ApparenceResponse } from './personnalisation.model';
+import { LangueContenu } from './traduction.model';
 
 /** Statut calculé à partir des dates (StatutSondage du backend). Un brouillon est NON_COMMENCE et publie=false. */
 export type StatutSondage = 'NON_COMMENCE' | 'EN_COURS' | 'TERMINE';
@@ -107,6 +108,10 @@ export interface SondageResponse {
   texteConfidentialite?: string | null;
   consentementRequis?: boolean;
   texteConsentement?: string | null;
+  /** Langue de saisie du contenu (fr par défaut) ; PUT .../langues en brouillon. */
+  languePrincipale?: LangueContenu;
+  /** Langues traduites dans l'écran « Traductions » (sans la principale, 2 au plus). */
+  languesSupplementaires?: LangueContenu[];
   creePar: AuteurResponse | null;
   dateCreation: string;
   dateModification: string;
@@ -349,6 +354,26 @@ export interface QuestionResponse {
   critereConfig: unknown;
   /** Condition d'affichage ; absente : toujours affichée (si sa section l'est). Posée par PUT .../condition. */
   condition?: ConditionAffichage | null;
+  /**
+   * MATRICE (aperçu et formulaire public) : libellés affichés dans la langue servie, au même rang que
+   * configuration.lignes / colonnes, qui restent les valeurs à envoyer.
+   */
+  libellesMatrice?: LibellesMatrice | null;
+}
+
+/** LibellesMatriceResponse */
+export interface LibellesMatrice {
+  lignes: string[];
+  colonnes: string[];
+}
+
+/** Langue servie par l'aperçu et le formulaire public (?langue=), et langues proposées. */
+export interface LanguesServies {
+  /** Langue des textes renvoyés : celle demandée si proposée, sinon la principale. */
+  langue?: LangueContenu;
+  languePrincipale?: LangueContenu;
+  /** La principale d'abord. */
+  languesDisponibles?: LangueContenu[];
 }
 
 /**
@@ -521,7 +546,7 @@ export interface LienSondageResponse {
 }
 
 /** GET .../apercu : le formulaire tel que le verra le répondant (brouillon compris). */
-export interface ApercuResponse extends PageAccueil {
+export interface ApercuResponse extends PageAccueil, LanguesServies {
   id: number;
   titre: string;
   description: string | null;
