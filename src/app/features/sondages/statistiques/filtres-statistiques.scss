@@ -16,6 +16,7 @@
 }
 
 .champ-critere,
+.champ-langue,
 .champ-granularite {
   width: 200px;
 }
@@ -65,6 +66,7 @@
 @media (max-width: 599.98px) {
   .champ-date,
   .champ-critere,
+  .champ-langue,
   .champ-granularite {
     width: 100%;
   }

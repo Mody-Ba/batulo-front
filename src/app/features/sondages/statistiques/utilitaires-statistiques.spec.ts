@@ -18,10 +18,10 @@ describe('Filtres d’URL, mise en forme et regroupement', () => {
 
   it('paramètres d’URL : valeurs par défaut retirées ; aller-retour sans perte', () => {
     const filtres = { lignee: true, du: '2026-11-01', au: null, granularite: 'JOUR' as const, criteres: ['a:1'] };
-    expect(parametresUrl(filtres)).toEqual({ lignee: 'true', du: '2026-11-01', au: null, granularite: 'JOUR', critere: ['a:1'] });
+    expect(parametresUrl(filtres)).toEqual({ lignee: 'true', du: '2026-11-01', au: null, granularite: 'JOUR', critere: ['a:1'], langue: null, langueReponse: null });
     expect(filtresDepuisUrl({ lignee: 'true', du: '2026-11-01', granularite: 'JOUR', critere: ['a:1'] })).toEqual(filtres);
     expect(parametresUrl({ lignee: false, du: null, au: null, granularite: null, criteres: [] })).toEqual({
-      lignee: null, du: null, au: null, granularite: null, critere: null,
+      lignee: null, du: null, au: null, granularite: null, critere: null, langue: null, langueReponse: null,
     });
     expect(filtresActifs(filtres)).toBe(true);
   });

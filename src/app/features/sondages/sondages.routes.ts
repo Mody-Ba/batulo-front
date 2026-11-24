@@ -31,6 +31,13 @@ export const routes: Routes = [
         loadComponent: () => import('./editeur/editeur-sondage').then((m) => m.EditeurSondage),
       },
       {
+        // Traductions d'une langue supplémentaire, côte à côte ; ?manquants=true : seulement les textes manquants.
+        path: ':id/traductions/:langue',
+        title: 'titres.traductions',
+        canDeactivate: [quitterEditeurGuard],
+        loadComponent: () => import('./traductions/ecran-traductions').then((m) => m.EcranTraductions),
+      },
+      {
         path: ':id/apercu',
         title: 'titres.apercu',
         loadComponent: () => import('./apercu-sondage/apercu-sondage').then((m) => m.ApercuSondage),

@@ -29,6 +29,8 @@ import { DateLPipe } from '../../../core/i18n/formats.pipes';
 import { texteServeur, traduire } from '../../../core/i18n/traduire';
 import { TitreTraduit } from '../../../core/i18n/titre-traduit';
 import { SelecteurLangue } from '../../../shared/components/selecteur-langue/selecteur-langue';
+import { LangueService } from '../../../core/i18n/langue.service';
+import { estLangue, Langue } from '../../../core/i18n/langues';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Délai après la dernière saisie avant d'écrire le brouillon dans le navigateur. */
@@ -105,6 +107,7 @@ export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndi
 })
 export class FormulairePublic {
   private readonly service = inject(FormulairePublicService);
+  private readonly langues = inject(LangueService);
   private readonly titre = inject(TitreTraduit);
   private readonly hote = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -119,6 +122,18 @@ export class FormulairePublic {
     const e = this.etat();
     return 'formulaire' in e ? (e.formulaire.apparence ?? null) : null;
   });
+  /**
+   * Langues proposées par le sondage s'il en a plusieurs : le sélecteur ne montre qu'elles, et un seul choix change
+   * l'interface et le contenu (sans être mémorisé). Null : sondage en une langue, sélecteur habituel de l'interface.
+   */
+  protected readonly languesContenu = computed<Langue[] | null>(() => {
+    const e = this.etat();
+    const disponibles = 'formulaire' in e ? (e.formulaire.languesDisponibles ?? []).filter(estLangue) : [];
+    return disponibles.length > 1 ? disponibles : null;
+  });
+  /** Contenu en cours de relecture dans une autre langue. */
+  protected readonly changementLangue = signal(false);
+  protected readonly erreurLangue = signal<string | null>(null);
   /** Couleur de l'entreprise (variables CSS), seulement si elle est valide et personnalisée. */
   protected readonly variablesApparence = computed(() => variablesApparence(this.apparence()));
   protected readonly envoiEnCours = signal(false);
@@ -146,6 +161,11 @@ export class FormulairePublic {
       const jeton = this.jeton();
       untracked(() => this.charger(jeton));
     });
+    // Langue choisie dans le sélecteur : le contenu suit s'il existe dans cette langue (réponses gardées).
+    effect(() => {
+      const langue = this.langues.langue();
+      untracked(() => this.suivreLangue(langue));
+    });
     this.saisies
       .pipe(debounceTime(DELAI_BROUILLON_MS), takeUntilDestroyed())
       .subscribe((reponses) => memoireRepondant.ecrireBrouillon(this.jeton(), this.sectionCourante, reponses));
@@ -155,7 +175,8 @@ export class FormulairePublic {
     this.etat.set({ type: 'chargement' });
     this.service
       // Le jeton de l'appareil, s'il existe déjà, permet au serveur de dire « déjà répondu » avant la saisie.
-      .lire(jeton, memoireRepondant.jetonExistant(jeton))
+      // Contenu demandé dans la langue de l'interface ; non proposée : le serveur sert la langue principale.
+      .lire(jeton, memoireRepondant.jetonExistant(jeton), this.langues.langue())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (formulaire) => {
@@ -168,6 +189,7 @@ export class FormulairePublic {
           // Le serveur fait foi : pas encore répondu (ou collecte terrain) -> le drapeau local est oublié.
           memoireRepondant.oublierRepondu(jeton);
           this.titre.personnaliser(() => traduire('public.titres.sondage', { titre: formulaire.titre }));
+          this.alignerInterface(formulaire);
           const brouillon = memoireRepondant.lireBrouillon(jeton);
           this.reponsesInitiales.set(brouillon?.reponses ?? null);
           this.sectionInitiale.set(brouillon?.section ?? 0);
@@ -242,6 +264,8 @@ export class FormulairePublic {
       .repondre(jeton, {
         ...(formulaire.reponseUnique ? { jetonRepondant: memoireRepondant.jetonRepondant(jeton) } : {}),
         ...(formulaire.consentementRequis ? { consentement: this.consentementDonne } : {}),
+        // Langue dans laquelle le formulaire a été vu (celle servie par le serveur).
+        ...(formulaire.langue ? { langue: formulaire.langue } : {}),
         reponses,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -306,6 +330,57 @@ export class FormulairePublic {
     this.erreurConsentement.set(null);
     this.etat.set({ type: accueilNecessaire(formulaire) ? 'accueil' : 'formulaire', formulaire });
     this.focaliserTitre();
+  }
+
+  /**
+   * Sondage en plusieurs langues : l'interface prend la langue du contenu servi (celle demandée n'était pas proposée),
+   * pour cette visite seulement.
+   */
+  private alignerInterface(formulaire: FormulairePublicResponse): void {
+    const servie = formulaire.langue;
+    if (servie && estLangue(servie) && (formulaire.languesDisponibles ?? []).length > 1 && servie !== this.langues.langue()) {
+      void this.langues.utiliser(servie);
+    }
+  }
+
+  /** Relit le contenu dans la langue choisie, sans quitter l'écran ni perdre les réponses ou la case cochée. */
+  private suivreLangue(langue: Langue): void {
+    const e = this.etat();
+    if (!('formulaire' in e)) {
+      return;
+    }
+    const formulaire = e.formulaire;
+    if (formulaire.langue === langue || !(formulaire.languesDisponibles ?? []).includes(langue)) {
+      return;
+    }
+    const jeton = this.jeton();
+    this.changementLangue.set(true);
+    this.erreurLangue.set(null);
+    this.service
+      .lire(jeton, memoireRepondant.jetonExistant(jeton), langue)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (relu) => {
+          this.changementLangue.set(false);
+          const actuel = this.etat();
+          if (!('formulaire' in actuel)) {
+            return;
+          }
+          // Si la structure avait changé (nouvelle version), le formulaire est reconstruit avec les réponses en cours.
+          this.reponsesInitiales.set(this.derniereSaisie);
+          this.sectionInitiale.set(this.sectionCourante);
+          this.titre.personnaliser(() => traduire('public.titres.sondage', { titre: relu.titre }));
+          this.etat.set({ ...actuel, formulaire: relu });
+        },
+        error: () => {
+          this.changementLangue.set(false);
+          this.erreurLangue.set(traduire('public.langueContenu.erreur'));
+          // L'interface revient à la langue du contenu affiché.
+          if (formulaire.langue && estLangue(formulaire.langue)) {
+            void this.langues.utiliser(formulaire.langue);
+          }
+        },
+      });
   }
 
   protected readonly titreIndisponible = titreIndisponible;

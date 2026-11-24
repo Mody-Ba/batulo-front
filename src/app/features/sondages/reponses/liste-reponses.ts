@@ -1,3 +1,4 @@
+import { LangueContenu, LIBELLES_LANGUE } from '../../../core/models/traduction.model';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -56,6 +57,8 @@ export class ListeReponses {
   protected readonly tailles = [...TAILLES_PAGE];
   protected readonly libelleEtat = libelleEtatSondage;
   protected readonly classeEtat = classeEtatSondage;
+  /** Langue dans laquelle le répondant a vu le formulaire (anciennes réponses : fr). */
+  protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
 
   /** Paramètre de route :id et paramètres d'URL ?lignee=&page=&taille=. */
   readonly id = input.required<string>();

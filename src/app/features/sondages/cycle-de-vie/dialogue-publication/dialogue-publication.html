@@ -4,11 +4,15 @@
   <mat-dialog-content>
     <!-- En haut : toujours visible, même quand le contenu défile. -->
     <div #zoneErreur class="zone-erreur" tabindex="-1">
-      <app-message-erreur
-        [erreur]="erreur()"
-        [titre]="titreErreur()"
-        [parDefaut]="(publier ? 'sondages.publication.erreurPublier' : 'sondages.publication.erreurDates') | transloco"
-      />
+      @if (traductionsIncompletes()) {
+        <app-textes-manquants [sondageId]="sondage.id" [erreur]="erreur()" />
+      } @else {
+        <app-message-erreur
+          [erreur]="erreur()"
+          [titre]="titreErreur()"
+          [parDefaut]="(publier ? 'sondages.publication.erreurPublier' : 'sondages.publication.erreurDates') | transloco"
+        />
+      }
       @if (invalideSansDetail()) {
         <app-encadre type="erreur" role="alert" [titre]="'sondages.publication.verifiez' | transloco">
           <p>{{ 'sondages.publication.invalides' | transloco }}</p>

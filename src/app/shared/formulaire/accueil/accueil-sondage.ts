@@ -1,11 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { PageAccueil } from '../../../core/models/sondage.model';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { definitionLangue, Langue } from '../../../core/i18n/langues';
 
 /** Ce qu'affiche la page d'accueil : en-tête du sondage et textes d'accueil. */
 export interface ContenuAccueil extends PageAccueil {
   titre: string;
   description: string | null;
+  /** Langue du contenu servie : lang et dir de la page (arabe : de droite à gauche). */
+  langue?: Langue;
 }
 
 /** Brouillon à reprendre (section où le répondant s'était arrêté). */
@@ -45,6 +48,10 @@ export class AccueilSondage {
   readonly commencer = output<DepartQuestionnaire>();
 
   protected readonly coche = signal(false);
+  protected readonly dir = computed(() => {
+    const langue = this.contenu().langue;
+    return langue ? definitionLangue(langue).dir : null;
+  });
   protected readonly bloque = computed(() => !!this.contenu().consentementRequis && !this.coche());
   protected readonly objet = computed(() => this.contenu().objetEnquete?.trim() || null);
   protected readonly confidentialite = computed(() => this.contenu().texteConfidentialite?.trim() || null);

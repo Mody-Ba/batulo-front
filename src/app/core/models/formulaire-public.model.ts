@@ -1,12 +1,12 @@
 import { ApparenceResponse } from './personnalisation.model';
-import { PageAccueil, SectionAffichee } from './sondage.model';
+import { LanguesServies, PageAccueil, SectionAffichee } from './sondage.model';
 import { ReponseQuestionRequest } from '../../shared/formulaire/reponses';
 
 /**
  * GET /api/public/sondages/{jeton} (sans compte) : seulement ce qu'il faut pour répondre. Le jeton du lien désigne la
  * lignée ; on répond à sa version ouverte. 404 SONDAGE_INTROUVABLE, 403 SONDAGE_NON_OUVERT, 410 SONDAGE_FERME.
  */
-export interface FormulairePublicResponse extends PageAccueil {
+export interface FormulairePublicResponse extends PageAccueil, LanguesServies {
   titre: string;
   description: string | null;
   /** true : une seule réponse par appareil ; le front envoie alors son jetonRepondant. */
@@ -33,6 +33,8 @@ export interface SoumissionRequest {
   jetonRepondant?: string;
   /** true quand le sondage exige le consentement (case cochée sur la page d'accueil, à chaque visite). */
   consentement?: boolean;
+  /** Langue dans laquelle le formulaire a été vu ; absente : principale (400 LANGUE_INVALIDE si non proposée). */
+  langue?: string;
   reponses: ReponseQuestionRequest[];
 }
 

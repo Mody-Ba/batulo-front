@@ -18,6 +18,7 @@
         [criteres]="criteres()"
         [version]="s.version"
         [plusieursVersions]="versions().length > 1"
+        [langues]="languesSondage()"
         (changer)="changerFiltres($event)"
       />
       <div class="actions-stat">
@@ -60,6 +61,16 @@
         <span class="valeur petite">{{ st.lignee ? ('statistiques.page.toutes' | transloco) : ('statistiques.filtres.version' | transloco: { version: st.versions.join(', ') }) }}</span>{{ ' ' }}
         <span class="libelle">{{ st.lignee ? ('statistiques.page.versionsListe' | transloco: { versions: st.versions.join(', ') }) : ('statistiques.page.portee' | transloco) }}</span>
       </div>
+      @if (st.repartitionLangues?.length && languesSondage().length > 1) {
+        <div class="tuile-stat repartition-langues">
+          <ul class="valeur petite" [attr.aria-label]="'statistiques.page.repartitionLangues' | transloco">
+            @for (r of st.repartitionLangues; track r.langue) {
+              <li>{{ 'statistiques.page.langueNombre' | transloco: { langue: nomLangue(r.langue), nombre: nombre(r.nombre) } }}</li>
+            }
+          </ul>
+          <span class="libelle">{{ 'statistiques.page.repartitionLangues' | transloco }}</span>
+        </div>
+      }
     </section>
     @if (st.resume.petitEffectif && st.resume.nombreReponses > 0) {
       <p class="avertissement" role="note">

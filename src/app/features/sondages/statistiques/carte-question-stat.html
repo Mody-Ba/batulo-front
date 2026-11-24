@@ -70,8 +70,8 @@
               <thead>
                 <tr>
                   <td></td>
-                  @for (c of m.colonnes; track c) {
-                    <th scope="col" dir="auto">{{ c }}</th>
+                  @for (c of m.colonnes; track c; let j = $index) {
+                    <th scope="col" dir="auto">{{ m.libellesColonnes?.[j] || c }}</th>
                   }
                   <th scope="col">{{ 'statistiques.carte.repondantsCol' | transloco }}</th>
                 </tr>
@@ -79,7 +79,7 @@
               <tbody>
                 @for (l of m.lignes; track l.ligne) {
                   <tr>
-                    <th scope="row" dir="auto">{{ l.ligne }}</th>
+                    <th scope="row" dir="auto">{{ l.libelle || l.ligne }}</th>
                     @for (cel of l.cellules; track cel.colonne) {
                       <td [style.background]="fond(cel.pourcentage)">
                         <span class="part">{{ pourcentage(cel.pourcentage) }}</span>

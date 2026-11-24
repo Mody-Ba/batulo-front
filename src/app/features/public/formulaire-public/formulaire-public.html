@@ -1,5 +1,14 @@
 <main class="page-publique" id="contenu" [style]="variablesApparence()">
-  <div class="barre-langue"><app-selecteur-langue /></div>
+  <div class="barre-langue" [attr.aria-busy]="changementLangue() || null">
+    @if (languesContenu(); as langues) {
+      <app-selecteur-langue [disponibles]="langues" [memoriser]="false" />
+    } @else {
+      <app-selecteur-langue />
+    }
+  </div>
+  @if (erreurLangue(); as message) {
+    <p class="encart-public erreur erreur-langue" role="alert">{{ message }}</p>
+  }
   <app-bandeau-apparence [apparence]="apparence()" />
   @switch (etat().type) {
     @case ('chargement') {

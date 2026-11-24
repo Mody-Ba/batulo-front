@@ -13,6 +13,8 @@ import { DatesSondageRequest, requeteSondage, SondageResponse } from '../../../.
 import { SondageService } from '../../../../core/services/sondage.service';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
+import { TextesManquants } from '../textes-manquants';
+import { aLeCode } from '../../../../core/utils/erreur-http';
 import { raisonIncomplet, versIso, versLocal } from '../dates-sondage';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 import { libelles } from '../../../../core/i18n/traduire';
@@ -76,7 +78,7 @@ function datesValides(groupe: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-dialogue-publication',
-  imports: [TranslocoPipe, DateLPipe, 
+  imports: [TranslocoPipe, DateLPipe, TextesManquants,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -123,6 +125,8 @@ export class DialoguePublication {
 
   protected readonly enCours = signal(false);
   protected readonly erreur = signal<unknown>(null);
+  /** 400 TRADUCTIONS_INCOMPLETES : liste des textes manquants et liens vers les traductions. */
+  protected readonly traductionsIncompletes = computed(() => aLeCode(this.erreur(), 'TRADUCTIONS_INCOMPLETES'));
   protected readonly titreErreur = signal<string | null>(null);
   /** Formulaire refusé sans message plus précis (cas imprévu) : jamais d'échec silencieux. */
   protected readonly invalideSansDetail = signal(false);

@@ -32,6 +32,25 @@
       </mat-form-field>
     }
 
+    @if (plusieursLangues()) {
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-langue">
+        <mat-label>{{ 'statistiques.filtres.langueLibelles' | transloco }}</mat-label>
+        <mat-select [value]="langueLibelles()" (selectionChange)="changerLangue($event.value)">
+          @for (l of langues(); track l) {
+            <mat-option [value]="l">{{ nomLangue(l) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-langue">
+        <mat-label>{{ 'statistiques.filtres.langueReponse' | transloco }}</mat-label>
+        <mat-select multiple [value]="filtres().languesReponse ?? []" (selectionChange)="changerLanguesReponse($event.value)" [placeholder]="'statistiques.filtres.toutesLangues' | transloco">
+          @for (l of langues(); track l) {
+            <mat-option [value]="l">{{ nomLangue(l) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-granularite">
       <mat-label>{{ 'statistiques.filtres.datesPar' | transloco }}</mat-label>
       <mat-select [value]="filtres().granularite" (selectionChange)="changerGranularite($event.value)">
@@ -50,6 +69,14 @@
       }
       @if (filtres().du || filtres().au) {
         <span class="pastille-filtre">{{ 'statistiques.filtres.periodePastille' | transloco: { du: filtres().du ?? '…', au: filtres().au ?? '…' } }}</span>
+      }
+      @for (l of filtres().languesReponse ?? []; track l) {
+        <span class="pastille-filtre">
+          {{ 'statistiques.filtres.pastilleLangue' | transloco: { langue: nomLangue(l) } }}
+          <button type="button" class="retirer" (click)="retirerLangueReponse(l)" [attr.aria-label]="'statistiques.filtres.retirer' | transloco: { filtre: nomLangue(l) }">
+            <mat-icon fontIcon="close" aria-hidden="true" />
+          </button>
+        </span>
       }
       @for (p of pastilles(); track p.critere) {
         <span class="pastille-filtre">

@@ -26,6 +26,7 @@ import {
   ValeurReponse,
 } from './reponses';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { definitionLangue, Langue } from '../../core/i18n/langues';
 import { traduire, traduirePluriel } from '../../core/i18n/traduire';
 
 /** Ce qu'il faut pour afficher un formulaire (aperçu F5b, formulaire public F6). */
@@ -33,6 +34,22 @@ export interface ContenuFormulaire {
   titre: string;
   description: string | null;
   sections: SectionAffichee[];
+  /** Langue du contenu servie (aperçu, formulaire public) : lang et dir du formulaire (arabe : de droite à gauche). */
+  langue?: Langue;
+}
+
+/**
+ * Structure du formulaire (sections, questions, types, options et lignes de matrice) : la même dans toutes les langues
+ * d'un sondage. Un contenu relu dans une autre langue garde donc les réponses en cours.
+ */
+export function structureFormulaire(sections: readonly SectionAffichee[]): string {
+  return JSON.stringify(
+    sections.map((s) => [
+      s.id,
+      s.condition ?? null,
+      s.questions.map((q) => [q.id, q.type, q.obligatoire, q.configuration, q.options.map((o) => o.valeur), q.condition ?? null]),
+    ]),
+  );
 }
 
 /** Réponses en cours, par id de question (brouillon du navigateur). */
@@ -124,10 +141,23 @@ export class FormulaireSondage {
   });
 
   private abonnement: { unsubscribe(): void } | null = null;
+  /** Structure du dernier formulaire construit (structureFormulaire). */
+  private structure: string | null = null;
+  /** lang et dir du formulaire selon la langue du contenu (absente : ceux de la page). */
+  protected readonly dir = computed(() => {
+    const langue = this.contenu().langue;
+    return langue ? definitionLangue(langue).dir : null;
+  });
 
   constructor() {
     effect(() => {
       const sections = this.contenu().sections;
+      const structure = structureFormulaire(sections);
+      if (structure === this.structure) {
+        // Même formulaire dans une autre langue : seuls les textes changent, réponses et section sont gardées.
+        return;
+      }
+      this.structure = structure;
       untracked(() => this.recommencer(sections, this.reponsesInitiales(), this.sectionInitiale()));
     });
     effect(() => {

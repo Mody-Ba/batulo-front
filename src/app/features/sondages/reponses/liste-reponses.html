@@ -47,6 +47,10 @@
                 <span class="numero">{{ 'sondages.reponses.numero' | transloco: { id: r.id } }}</span>
                 <span class="date">{{ r.dateSoumission | dateL: 'courtHeure' }}</span>
                 <span class="version">{{ 'statistiques.filtres.version' | transloco: { version: r.version } }}</span>
+                <span class="langue">
+                  <span class="visuellement-cache">{{ 'sondages.reponses.langue' | transloco }}</span>
+                  {{ nomLangue(r.langue ?? 'fr') }}
+                </span>
                 <span class="cellule-secondaire resume">{{ resume(r, s) }}</span>
                 <mat-icon fontIcon="chevron_right" aria-hidden="true" />
               </button>

@@ -1,0 +1,153 @@
+<section class="conteneur-page traductions">
+  <a matButton [routerLink]="['/sondages', id(), 'modifier']" class="retour">
+    <mat-icon fontIcon="arrow_back" aria-hidden="true" />{{ 'traductions.retourEditeur' | transloco }}
+  </a>
+
+  @if (langueValide(); as langue) {
+    <header class="entete">
+      <h1>{{ 'traductions.titre' | transloco: { langue: nomLangue(langue) } }}</h1>
+      @if (sondage(); as s) {
+        <p class="sous-titre" dir="auto">{{ s.titre }}</p>
+      }
+      @if (autresLangues().length) {
+        <nav class="autres-langues" [attr.aria-label]="'traductions.autresLangues' | transloco">
+          @for (l of autresLangues(); track l) {
+            <a matButton [routerLink]="['/sondages', id(), 'traductions', l]">
+              <mat-icon fontIcon="translate" aria-hidden="true" />{{ 'traductions.versLangue' | transloco: { langue: nomLangue(l) } }}
+            </a>
+          }
+        </nav>
+      }
+    </header>
+  } @else {
+    <h1>{{ 'traductions.titreSimple' | transloco }}</h1>
+    <app-encadre type="erreur" role="alert" [titre]="'traductions.langueInconnue' | transloco">
+      <p>{{ 'traductions.langueInconnueTexte' | transloco }}</p>
+    </app-encadre>
+  }
+
+  <div class="zone-progression">
+    @if (chargement()) {
+      <mat-progress-bar mode="indeterminate" [attr.aria-label]="'traductions.chargement' | transloco" />
+    }
+  </div>
+  <app-message-erreur [erreur]="erreur()" [parDefaut]="'traductions.erreurChargement' | transloco">
+    <p><button matButton type="button" (click)="charger()">{{ 'commun.reessayer' | transloco }}</button></p>
+  </app-message-erreur>
+
+  @if (donnees(); as d) {
+    @if (raisonLectureSeule(); as raison) {
+      <app-encadre type="info" icone="lock" role="status" [titre]="'editeur.lectureSeule' | transloco">
+        <p>{{ raison }}</p>
+      </app-encadre>
+    }
+
+    <div class="barre-traductions">
+      <div class="completude">
+        <label for="completude-traductions" class="texte-completude">
+          {{ 'traductions.completude' | transloco: { traduits: traduits(), total: total() } }}
+        </label>
+        <progress id="completude-traductions" [max]="total() || 1" [value]="total() ? traduits() : 1">{{ pourcentage() }} %</progress>
+      </div>
+      <mat-checkbox [checked]="filtreManquants() !== null" (change)="basculerFiltre($event.checked)">
+        {{ 'traductions.seulementManquants' | transloco }}
+      </mat-checkbox>
+      @if (modifiable()) {
+        <button matButton="filled" type="button" class="enregistrer" (click)="enregistrer()" [disabled]="enregistrement()">
+          <mat-icon fontIcon="save" aria-hidden="true" />
+          {{ (enregistrement() ? 'traductions.enregistrement' : 'traductions.enregistrer') | transloco }}
+        </button>
+      }
+    </div>
+    <div class="messages">
+      @if (succes(); as message) {
+        <app-encadre type="succes" role="status"><p>{{ message }}</p></app-encadre>
+      }
+      @if (modifiable() && modifies().length) {
+        <p class="texte-aide" role="status">{{ 'traductions.nonEnregistres' | pluriel: modifies().length }}</p>
+      }
+      <app-message-erreur [erreur]="erreurEnregistrement()" [parDefaut]="'traductions.erreurEnregistrement' | transloco" />
+    </div>
+
+    @if (total() === 0) {
+      <p class="vide" role="status">{{ 'traductions.aucunTexte' | transloco }}</p>
+    } @else if (groupes().length === 0) {
+      <p class="vide" role="status">{{ 'traductions.toutTraduit' | transloco }}</p>
+    }
+
+    <div class="entetes-colonnes" aria-hidden="true">
+      <span>{{ 'traductions.textePrincipal' | transloco: { langue: nomLangue(d.languePrincipale) } }}</span>
+      <span>{{ 'traductions.traductionEn' | transloco: { langue: nomLangue(d.langue) } }}</span>
+    </div>
+
+    @for (g of groupes(); track g.cle) {
+      <section class="groupe" [class]="'groupe-' + g.niveau" [attr.aria-labelledby]="'groupe-' + g.cle">
+        <h2 class="titre-groupe" [id]="'groupe-' + g.cle">
+          @switch (g.niveau) {
+            @case ('sondage') {
+              {{ 'traductions.groupeSondage' | transloco }}
+            }
+            @case ('section') {
+              {{ 'traductions.groupeSection' | transloco: { numero: g.numero } }}
+            }
+            @default {
+              {{ 'traductions.groupeQuestion' | transloco: { numero: g.numero } }}
+            }
+          }
+          @if (g.nom) {
+            <span class="nom-groupe" dir="auto" [attr.lang]="d.languePrincipale">{{ g.nom }}</span>
+          }
+        </h2>
+        @for (t of g.textes; track t.cle) {
+          <div class="ligne-texte" [class.manquant]="manquant(t)">
+            <div class="source">
+              <span class="libelle-champ" [id]="'source-' + t.cle">{{ libelleChamp(t) }}</span>
+              <p class="texte-source" [attr.lang]="d.languePrincipale" [attr.dir]="dir(d.languePrincipale)">{{ t.source }}</p>
+            </div>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="champ-traduction">
+              <mat-label>{{ 'traductions.champ' | transloco: { champ: libelleChamp(t), langue: nomLangue(d.langue) } }}</mat-label>
+              @if (texteLong(t)) {
+                <textarea
+                  matInput
+                  cdkTextareaAutosize
+                  cdkAutosizeMinRows="2"
+                  [attr.lang]="d.langue"
+                  [attr.dir]="dir(d.langue)"
+                  [attr.aria-describedby]="'source-' + t.cle"
+                  [value]="saisie(t)"
+                  [attr.maxlength]="t.longueurMax"
+                  [readonly]="!modifiable()"
+                  (input)="changer(t, $any($event.target).value)"
+                ></textarea>
+              } @else {
+                <input
+                  matInput
+                  [attr.lang]="d.langue"
+                  [attr.dir]="dir(d.langue)"
+                  [attr.aria-describedby]="'source-' + t.cle"
+                  [value]="saisie(t)"
+                  [attr.maxlength]="t.longueurMax"
+                  [readonly]="!modifiable()"
+                  autocomplete="off"
+                  (input)="changer(t, $any($event.target).value)"
+                />
+              }
+              @if (manquant(t)) {
+                <mat-hint>{{ 'traductions.manquant' | transloco }}</mat-hint>
+              }
+            </mat-form-field>
+          </div>
+        }
+      </section>
+    }
+
+    @if (modifiable() && groupes().length > 3) {
+      <div class="pied">
+        <button matButton="filled" type="button" (click)="enregistrer()" [disabled]="enregistrement()">
+          <mat-icon fontIcon="save" aria-hidden="true" />
+          {{ (enregistrement() ? 'traductions.enregistrement' : 'traductions.enregistrer') | transloco }}
+        </button>
+      </div>
+    }
+  }
+</section>

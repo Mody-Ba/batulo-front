@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { CritereResponse, FiltresStatistiques, GranulariteDate } from '../../../core/models/statistiques.model';
 import { decouperCritere, filtresActifs } from './filtres-url';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LangueContenu, LIBELLES_LANGUE } from '../../../core/models/traduction.model';
 
 /** Filtre actif, affiché en pastille retirable (« Région = Kayes »). */
 interface Pastille {
@@ -32,7 +33,13 @@ export class FiltresStatistiquesComposant {
   readonly version = input.required<number>();
   /** Une seule version : la portée « toutes les versions » ne change rien, elle est masquée. */
   readonly plusieursVersions = input(true);
+  /** Langues du sondage, la principale d'abord ; choix de langue proposés seulement s'il y en a plusieurs. */
+  readonly langues = input<readonly LangueContenu[]>([]);
   readonly changer = output<FiltresStatistiques>();
+  protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
+  protected readonly plusieursLangues = computed(() => this.langues().length > 1);
+  /** Langue des libellés affichée : celle demandée, sinon la principale. */
+  protected readonly langueLibelles = computed(() => this.filtres().langue ?? this.langues()[0] ?? null);
 
   protected readonly actifs = computed(() => filtresActifs(this.filtres()));
 
@@ -71,11 +78,26 @@ export class FiltresStatistiquesComposant {
     this.changer.emit({ ...this.filtres(), criteres: [...autres, ...valeurs.map((v) => `${cle}:${v}`)] });
   }
 
+  /** La langue principale est la valeur par défaut : elle sort de l'URL. */
+  protected changerLangue(langue: LangueContenu): void {
+    this.changer.emit({ ...this.filtres(), langue: langue === this.langues()[0] ? null : langue });
+  }
+
+  protected changerLanguesReponse(langues: LangueContenu[]): void {
+    this.changer.emit({ ...this.filtres(), languesReponse: this.langues().filter((l) => langues.includes(l)) });
+  }
+
+  protected retirerLangueReponse(langue: LangueContenu): void {
+    this.changer.emit({ ...this.filtres(), languesReponse: (this.filtres().languesReponse ?? []).filter((l) => l !== langue) });
+  }
+
   protected retirer(critere: string): void {
     this.changer.emit({ ...this.filtres(), criteres: this.filtres().criteres.filter((c) => c !== critere) });
   }
 
   protected toutEffacer(): void {
-    this.changer.emit({ lignee: false, du: null, au: null, granularite: null, criteres: [] });
+    // La langue des libellés n'est pas un filtre : elle est gardée.
+    const langue = this.filtres().langue;
+    this.changer.emit({ lignee: false, du: null, au: null, granularite: null, criteres: [], ...(langue ? { langue } : {}) });
   }
 }

@@ -650,6 +650,20 @@
       "invalide": "يجب التصحيح قبل الحفظ",
       "enregistrement": "جارٍ الحفظ…",
       "erreur": "فشل الحفظ"
+    },
+    "langues": {
+      "titre": "لغات الاستطلاع",
+      "aide": "أدخل المحتوى باللغة الرئيسية، ثم ترجمه إلى اللغات الإضافية. يختار المجيب لغته في الاستمارة.",
+      "principale": "اللغة الرئيسية",
+      "principaleAide": "لغة الإدخال. تغييرها لا يترجم شيئًا.",
+      "supplementaires": "اللغات الإضافية ({{max}} على الأكثر)",
+      "resumePrincipale": "اللغة الرئيسية: {{langue}}",
+      "resumeSupplementaires": "اللغات الإضافية: {{langues}}",
+      "progression": "{{traduits}} / {{total}} نصوص مترجمة",
+      "complet": "الترجمة مكتملة ({{traduits}} / {{total}})",
+      "traduire": "ترجمة",
+      "voir": "عرض الترجمات",
+      "erreur": "تعذّر حفظ اللغات."
     }
   },
   "superAdmin": {
@@ -882,7 +896,10 @@
     "UTILISATEUR_INTROUVABLE": "الحساب غير موجود.",
     "VALEUR_OPTION_EN_DOUBLE": "خياران في السؤال نفسه لهما القيمة نفسها.",
     "VERSION_INTROUVABLE": "هذه النسخة من الاستبيان غير موجودة.",
-    "VERSION_OBSOLETE": "هذه ليست أحدث نسخة: انطلق من الأحدث."
+    "VERSION_OBSOLETE": "هذه ليست أحدث نسخة: انطلق من الأحدث.",
+    "LANGUE_INVALIDE": "هذه اللغة غير متاحة في هذا الاستطلاع.",
+    "TRADUCTION_INVALIDE": "إحدى الترجمات غير صالحة (نص غير معروف أو مكرر أو طويل جدًا).",
+    "TRADUCTIONS_INCOMPLETES": "بعض النصوص لم تُترجم بعد: أكمل الترجمات قبل النشر."
   },
   "gestionnaires": {
     "actions": {
@@ -1375,7 +1392,25 @@
       "reponseUniqueAide": "أزل العلامة للجمع الميداني (عدة إجابات من الجهاز نفسه). يُجمَّد عند النشر.",
       "planifier": "جدولة النشر",
       "publierMaintenant": "النشر الآن",
-      "enregistrerDates": "حفظ التواريخ"
+      "enregistrerDates": "حفظ التواريخ",
+      "traductionsIncompletes": "تعذّر النشر: بعض النصوص لم تُترجم بعد.",
+      "textesManquants": {
+        "zero": "لا توجد نصوص ناقصة",
+        "one": "نص واحد ناقص",
+        "two": "نصان ناقصان",
+        "few": "{{n}} نصوص ناقصة",
+        "many": "{{n}} نصًا ناقصًا",
+        "other": "{{n}} نص ناقص"
+      },
+      "etAutres": {
+        "zero": "ولا غير",
+        "one": "ونص آخر",
+        "two": "ونصان آخران",
+        "few": "و{{n}} نصوص أخرى",
+        "many": "و{{n}} نصًا آخر",
+        "other": "و{{n}} نص آخر"
+      },
+      "completer": "إكمال الترجمات ({{langue}})"
     },
     "partage": {
       "messageAvecTitre": "مرحبًا، شكرًا على الإجابة عن استبياننا «{{titre}}»: {{url}}",
@@ -1420,7 +1455,8 @@
       "ordinateur": "الحاسوب",
       "telephone": "الهاتف",
       "chargement": "جارٍ تحميل المعاينة",
-      "erreur": "تعذّر تحميل المعاينة."
+      "erreur": "تعذّر تحميل المعاينة.",
+      "langueContenu": "لغة المحتوى"
     },
     "reponses": {
       "surMax": "{{valeur}} من {{max}}",
@@ -1461,13 +1497,15 @@
       },
       "aucune": "لا توجد إجابات حتى الآن.",
       "numero": "رقم {{id}}",
-      "pagination": "ترقيم صفحات الإجابات"
+      "pagination": "ترقيم صفحات الإجابات",
+      "langue": "اللغة:"
     },
     "reponse": {
       "titre": "الإجابة رقم {{id}}",
       "envoyee": "أُرسلت في {{date}} · النسخة {{version}}",
       "parLigne": "الإجابات حسب الصف",
-      "sansReponse": "دون إجابة"
+      "sansReponse": "دون إجابة",
+      "langue": "لغة الاستمارة: {{langue}}"
     }
   },
   "statistiques": {
@@ -1503,7 +1541,13 @@
       "filtres": "المرشحات:",
       "periodePastille": "الفترة {{du}} ← {{au}}",
       "retirer": "إزالة المرشح {{filtre}}",
-      "toutEffacer": "مسح الكل"
+      "toutEffacer": "مسح الكل",
+      "langueLibelles": "لغة التسميات",
+      "langueReponse": "لغة الإجابة",
+      "toutesLangues": "الكل",
+      "pastilleLangue": "الإجابات بـ{{langue}}",
+      "resumeLangueReponse": "الإجابات بـ{{langues}}",
+      "resumeLangueLibelles": "التسميات بـ{{langue}}"
     },
     "calcul": "جارٍ حساب الإحصاءات",
     "preparation": "جارٍ التحضير…",
@@ -1545,7 +1589,9 @@
       "portee": "النطاق",
       "petitEffectif": "أقل من 5 إجابات بهذه المرشحات: يجب تفسير النتائج بحذر.",
       "aucune": "لا توجد إجابات بهذه المرشحات.",
-      "envoyees": "أُرسلت الإحصاءات: تم إخطار المسؤول."
+      "envoyees": "أُرسلت الإحصاءات: تم إخطار المسؤول.",
+      "repartitionLangues": "الإجابات حسب اللغة",
+      "langueNombre": "{{langue}}: {{nombre}}"
     },
     "carte": {
       "rangMoyen": "متوسط الترتيب {{rang}} · الأول: {{premiers}}",
@@ -1747,7 +1793,8 @@
     "demandesAbonnement": "طلبات الاشتراك · Batulo",
     "admins": "المسؤولون والشركات · Batulo",
     "entreprise": "الشركة · Batulo",
-    "notifications": "الإشعارات · Batulo"
+    "notifications": "الإشعارات · Batulo",
+    "traductions": "ترجمات الاستطلاع · Batulo"
   },
   "vitrine": {
     "sections": {
@@ -1869,6 +1916,63 @@
       "haut": "Batulo، أعلى الصفحة",
       "menu": "القائمة",
       "sections": "أقسام الصفحة"
+    }
+  },
+  "langues": {
+    "fr": "الفرنسية",
+    "en": "الإنجليزية",
+    "ar": "العربية"
+  },
+  "traductions": {
+    "titre": "الترجمات: {{langue}}",
+    "titreSimple": "الترجمات",
+    "retourEditeur": "العودة إلى المحرر",
+    "autresLangues": "لغات أخرى",
+    "versLangue": "الترجمة إلى {{langue}}",
+    "langueInconnue": "لغة غير معروفة",
+    "langueInconnueTexte": "هذا العنوان لا يشير إلى لغة متاحة (الفرنسية أو الإنجليزية أو العربية).",
+    "chargement": "جارٍ تحميل الترجمات",
+    "erreurChargement": "تعذّر تحميل الترجمات.",
+    "completude": "{{traduits}} / {{total}} مترجمة",
+    "seulementManquants": "النصوص الناقصة فقط",
+    "enregistrer": "حفظ الترجمات",
+    "enregistrement": "جارٍ الحفظ…",
+    "enregistrees": "تم حفظ الترجمات: {{traduits}} / {{total}} مترجمة.",
+    "rienAEnregistrer": "لا توجد تعديلات للحفظ.",
+    "nonEnregistres": {
+      "zero": "لا توجد ترجمات غير محفوظة",
+      "one": "ترجمة واحدة لم تُحفظ بعد",
+      "two": "ترجمتان لم تُحفظا بعد",
+      "few": "{{n}} ترجمات لم تُحفظ بعد",
+      "many": "{{n}} ترجمة لم تُحفظ بعد",
+      "other": "{{n}} ترجمة لم تُحفظ بعد"
+    },
+    "erreurEnregistrement": "تعذّر حفظ الترجمات.",
+    "aucunTexte": "لا يحتوي هذا الاستطلاع بعد على أي نص للترجمة.",
+    "toutTraduit": "جميع النصوص مترجمة.",
+    "textePrincipal": "النص الرئيسي ({{langue}})",
+    "traductionEn": "الترجمة ({{langue}})",
+    "groupeSondage": "الاستطلاع",
+    "groupeSection": "القسم {{numero}}",
+    "groupeQuestion": "السؤال {{numero}}",
+    "champ": "{{champ}} بـ{{langue}}",
+    "manquant": "بحاجة إلى ترجمة",
+    "quitterTitre": "المغادرة دون حفظ؟",
+    "quitterMessage": "بعض الترجمات المُدخلة غير محفوظة: ستُفقد.",
+    "quitter": "المغادرة دون حفظ",
+    "champs": {
+      "titre": "العنوان",
+      "description": "الوصف",
+      "objetEnquete": "موضوع الاستطلاع",
+      "texteConfidentialite": "السرية",
+      "texteConsentement": "خانة الموافقة",
+      "question": "السؤال",
+      "aide": "المساعدة",
+      "libelleMin": "تسمية الحد الأدنى",
+      "libelleMax": "تسمية الحد الأقصى",
+      "option": "خيار",
+      "ligne": "صف",
+      "colonne": "عمود"
     }
   }
 }

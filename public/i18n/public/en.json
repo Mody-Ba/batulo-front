@@ -18,7 +18,8 @@
       "TROP_DE_REQUETES": "Too many requests in a short time. Wait a moment and try again.",
       "INTROUVABLE": "This address does not exist.",
       "ERREUR_INTERNE": "An unexpected error occurred.",
-      "REQUETE_INVALIDE": "The request is missing or malformed."
+      "REQUETE_INVALIDE": "The request is missing or malformed.",
+      "LANGUE_INVALIDE": "This language is not offered by this survey."
     },
     "commun": {
       "allerAuContenu": "Skip to content"
@@ -152,6 +153,9 @@
     },
     "apparence": {
       "logo": "Organization logo"
+    },
+    "langueContenu": {
+      "erreur": "The form could not be loaded in this language. Your answers are kept."
     }
   }
 }

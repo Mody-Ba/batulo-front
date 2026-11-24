@@ -635,6 +635,20 @@
       "invalide": "Fix before saving",
       "enregistrement": "Saving…",
       "erreur": "Saving failed"
+    },
+    "langues": {
+      "titre": "Survey languages",
+      "aide": "Enter the content in the main language, then translate it into the additional languages. Respondents choose their language on the form.",
+      "principale": "Main language",
+      "principaleAide": "The language you write in. Changing it translates nothing.",
+      "supplementaires": "Additional languages ({{max}} at most)",
+      "resumePrincipale": "Main language: {{langue}}",
+      "resumeSupplementaires": "Additional languages: {{langues}}",
+      "progression": "{{traduits}} / {{total}} texts translated",
+      "complet": "Translation complete ({{traduits}} / {{total}})",
+      "traduire": "Translate",
+      "voir": "View translations",
+      "erreur": "The languages could not be saved."
     }
   },
   "superAdmin": {
@@ -858,7 +872,10 @@
     "UTILISATEUR_INTROUVABLE": "Account not found.",
     "VALEUR_OPTION_EN_DOUBLE": "Two options of the same question have the same value.",
     "VERSION_INTROUVABLE": "This survey version cannot be found.",
-    "VERSION_OBSOLETE": "This is not the latest version: start from the most recent one."
+    "VERSION_OBSOLETE": "This is not the latest version: start from the most recent one.",
+    "LANGUE_INVALIDE": "This language is not offered by this survey.",
+    "TRADUCTION_INVALIDE": "A translation is invalid (unknown, duplicated or too long text).",
+    "TRADUCTIONS_INCOMPLETES": "Some texts are not translated yet: complete the translations before publishing."
   },
   "gestionnaires": {
     "actions": {
@@ -1335,7 +1352,17 @@
       "reponseUniqueAide": "Untick for field collection (several responses from the same device). Frozen at publication.",
       "planifier": "Schedule publication",
       "publierMaintenant": "Publish now",
-      "enregistrerDates": "Save the dates"
+      "enregistrerDates": "Save the dates",
+      "traductionsIncompletes": "Cannot publish: some texts are not translated yet.",
+      "textesManquants": {
+        "one": "{{n}} missing text",
+        "other": "{{n}} missing texts"
+      },
+      "etAutres": {
+        "one": "and {{n}} more",
+        "other": "and {{n}} more"
+      },
+      "completer": "Complete translations ({{langue}})"
     },
     "partage": {
       "messageAvecTitre": "Hello, thank you for answering our survey “{{titre}}”: {{url}}",
@@ -1380,7 +1407,8 @@
       "ordinateur": "Computer",
       "telephone": "Phone",
       "chargement": "Loading the preview",
-      "erreur": "The preview could not be loaded."
+      "erreur": "The preview could not be loaded.",
+      "langueContenu": "Content language"
     },
     "reponses": {
       "surMax": "{{valeur}} out of {{max}}",
@@ -1405,13 +1433,15 @@
       },
       "aucune": "No responses yet.",
       "numero": "No. {{id}}",
-      "pagination": "Responses pagination"
+      "pagination": "Responses pagination",
+      "langue": "Language:"
     },
     "reponse": {
       "titre": "Response no. {{id}}",
       "envoyee": "Sent on {{date}} · version {{version}}",
       "parLigne": "Answers by row",
-      "sansReponse": "No answer"
+      "sansReponse": "No answer",
+      "langue": "Form language: {{langue}}"
     }
   },
   "statistiques": {
@@ -1444,7 +1474,13 @@
       "filtres": "Filters:",
       "periodePastille": "Period {{du}} → {{au}}",
       "retirer": "Remove the filter {{filtre}}",
-      "toutEffacer": "Clear all"
+      "toutEffacer": "Clear all",
+      "langueLibelles": "Label language",
+      "langueReponse": "Response language",
+      "toutesLangues": "All",
+      "pastilleLangue": "Responses in {{langue}}",
+      "resumeLangueReponse": "Responses in {{langues}}",
+      "resumeLangueLibelles": "Labels in {{langue}}"
     },
     "calcul": "Computing statistics",
     "preparation": "Preparing…",
@@ -1475,7 +1511,9 @@
       "portee": "scope",
       "petitEffectif": "Fewer than 5 responses with these filters: interpret results with caution.",
       "aucune": "No responses with these filters.",
-      "envoyees": "Statistics sent: your admin has been notified."
+      "envoyees": "Statistics sent: your admin has been notified.",
+      "repartitionLangues": "Responses by language",
+      "langueNombre": "{{langue}}: {{nombre}}"
     },
     "carte": {
       "rangMoyen": "average rank {{rang}} · 1st: {{premiers}}",
@@ -1677,7 +1715,8 @@
     "demandesAbonnement": "Subscription requests · Batulo",
     "admins": "Admins and companies · Batulo",
     "entreprise": "Company · Batulo",
-    "notifications": "Notifications · Batulo"
+    "notifications": "Notifications · Batulo",
+    "traductions": "Survey translations · Batulo"
   },
   "vitrine": {
     "sections": {
@@ -1799,6 +1838,59 @@
       "haut": "Batulo, top of page",
       "menu": "Menu",
       "sections": "Page sections"
+    }
+  },
+  "langues": {
+    "fr": "French",
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "traductions": {
+    "titre": "Translations: {{langue}}",
+    "titreSimple": "Translations",
+    "retourEditeur": "Back to the editor",
+    "autresLangues": "Other languages",
+    "versLangue": "Translate into {{langue}}",
+    "langueInconnue": "Unknown language",
+    "langueInconnueTexte": "This address does not refer to an available language (French, English or Arabic).",
+    "chargement": "Loading translations",
+    "erreurChargement": "The translations could not be loaded.",
+    "completude": "{{traduits}} / {{total}} translated",
+    "seulementManquants": "Missing texts only",
+    "enregistrer": "Save translations",
+    "enregistrement": "Saving…",
+    "enregistrees": "Translations saved: {{traduits}} / {{total}} translated.",
+    "rienAEnregistrer": "No changes to save.",
+    "nonEnregistres": {
+      "one": "{{n}} translation not saved yet",
+      "other": "{{n}} translations not saved yet"
+    },
+    "erreurEnregistrement": "The translations could not be saved.",
+    "aucunTexte": "This survey has no text to translate yet.",
+    "toutTraduit": "All texts are translated.",
+    "textePrincipal": "Main text ({{langue}})",
+    "traductionEn": "Translation ({{langue}})",
+    "groupeSondage": "Survey",
+    "groupeSection": "Section {{numero}}",
+    "groupeQuestion": "Question {{numero}}",
+    "champ": "{{champ}} in {{langue}}",
+    "manquant": "To translate",
+    "quitterTitre": "Leave without saving?",
+    "quitterMessage": "Some translations you entered are not saved: they will be lost.",
+    "quitter": "Leave without saving",
+    "champs": {
+      "titre": "Title",
+      "description": "Description",
+      "objetEnquete": "Purpose of the survey",
+      "texteConfidentialite": "Privacy",
+      "texteConsentement": "Consent checkbox",
+      "question": "Question",
+      "aide": "Help",
+      "libelleMin": "Minimum label",
+      "libelleMax": "Maximum label",
+      "option": "Option",
+      "ligne": "Row",
+      "colonne": "Column"
     }
   }
 }

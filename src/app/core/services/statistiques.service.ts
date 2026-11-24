@@ -14,7 +14,10 @@ import {
   StatistiquesResponse,
 } from '../models/statistiques.model';
 
-/** Paramètres du périmètre d'analyse : lignee, du, au, granulariteDate (si demandée), critere répété. */
+/**
+ * Paramètres du périmètre d'analyse : lignee, du, au, granulariteDate (si demandée), critere répété, langue (libellés)
+ * et langueReponse répété.
+ */
 export function parametresFiltres(filtres: FiltresStatistiques, avecGranularite = true): HttpParams {
   let params = new HttpParams().set('lignee', filtres.lignee);
   if (filtres.du) {
@@ -28,6 +31,12 @@ export function parametresFiltres(filtres: FiltresStatistiques, avecGranularite 
   }
   for (const critere of filtres.criteres) {
     params = params.append('critere', critere);
+  }
+  if (filtres.langue) {
+    params = params.set('langue', filtres.langue);
+  }
+  for (const langue of filtres.languesReponse ?? []) {
+    params = params.append('langueReponse', langue);
   }
   return params;
 }
@@ -54,9 +63,10 @@ export class StatistiquesService {
     });
   }
 
-  criteres(id: number, lignee: boolean): Observable<CritereResponse[]> {
+  /** `langue` : langue des libellés (absente : principale). */
+  criteres(id: number, lignee: boolean, langue?: string | null): Observable<CritereResponse[]> {
     return this.http.get<CritereResponse[]>(`${this.url}/api/sondages/${id}/statistiques/criteres`, {
-      params: { lignee },
+      params: langue ? { lignee, langue } : { lignee },
     });
   }
 

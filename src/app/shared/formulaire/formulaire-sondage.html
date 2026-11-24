@@ -1,4 +1,4 @@
-<article class="formulaire-sondage">
+<article class="formulaire-sondage" [attr.lang]="contenu().langue ?? null" [attr.dir]="dir()">
   <header class="entete">
     <h2 class="titre" dir="auto">{{ contenu().titre }}</h2>
     @if (contenu().description) {

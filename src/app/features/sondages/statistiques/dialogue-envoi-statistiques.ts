@@ -79,6 +79,7 @@ export class DialogueEnvoiStatistiques {
         au: filtres.au,
         critere: filtres.criteres,
         granulariteDate: filtres.granularite,
+        ...(filtres.languesReponse?.length ? { langueReponse: filtres.languesReponse } : {}),
       })
       .subscribe({
         next: (envoi) => this.reference.close(envoi),

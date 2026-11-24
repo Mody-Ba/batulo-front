@@ -20,7 +20,7 @@
 // Une ligne cliquable par réponse : grille sur ordinateur, empilée sur téléphone.
 .reponse {
   display: grid;
-  grid-template-columns: 90px 180px 100px 1fr 24px;
+  grid-template-columns: 90px 180px 100px 110px 1fr 24px;
   align-items: center;
   gap: var(--bt-espace-3);
   width: 100%;
@@ -53,13 +53,14 @@
 
     .date,
     .version,
+    .langue,
     .resume {
       grid-column: 1;
     }
 
     .mat-icon {
       grid-column: 2;
-      grid-row: 1 / span 4;
+      grid-row: 1 / span 5;
     }
   }
 }
