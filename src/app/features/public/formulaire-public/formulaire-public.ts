@@ -174,6 +174,8 @@ export class FormulairePublic {
   private readonly saisies = new Subject<ReponsesParQuestion>();
   private derniereSaisie: ReponsesParQuestion = {};
   private sectionCourante = 0;
+  /** Langue vers laquelle l'interface est en train de s'aligner (contenu servi dans une autre langue), ou null. */
+  private alignementVers: Langue | null = null;
 
   constructor() {
     effect(() => {
@@ -377,7 +379,14 @@ export class FormulairePublic {
   private alignerInterface(formulaire: FormulairePublicResponse): void {
     const servie = formulaire.langue;
     if (servie && estLangue(servie) && (formulaire.languesDisponibles ?? []).length > 1 && servie !== this.langues.langue()) {
-      void this.langues.utiliser(servie);
+      // Tant que l'interface n'a pas rejoint la langue servie, l'ancienne langue ne doit pas faire relire le contenu
+      // (lien personnel : langue de l'invité, proposée par le sondage).
+      this.alignementVers = servie;
+      void this.langues.utiliser(servie).finally(() => {
+        if (this.alignementVers === servie) {
+          this.alignementVers = null;
+        }
+      });
     }
   }
 
@@ -388,6 +397,9 @@ export class FormulairePublic {
       return;
     }
     const formulaire = e.formulaire;
+    if (this.alignementVers && this.alignementVers !== langue) {
+      return;
+    }
     if (formulaire.langue === langue || !(formulaire.languesDisponibles ?? []).includes(langue)) {
       return;
     }

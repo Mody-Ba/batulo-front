@@ -84,7 +84,7 @@
             <h1 id="titre-etat" tabindex="-1">{{ 'public.confirmation.merci' | transloco }}</h1>
             <p role="status">{{ messageConfirmation(e.confirmation.message) }}</p>
             <p class="secondaire">{{ 'public.confirmation.envoyeLe' | transloco: { date: (e.confirmation.dateSoumission | dateL: 'longHeure') } }}</p>
-            @if (!e.formulaire.reponseUnique) {
+            @if (!e.formulaire.reponseUnique && !jetonInvitation()) {
               <button type="button" class="bouton-public" (click)="nouvelleReponse(e.formulaire)">{{ 'public.confirmation.nouvelle' | transloco }}</button>
               <p class="secondaire">{{ 'public.confirmation.collecte' | transloco }}</p>
             } @else {

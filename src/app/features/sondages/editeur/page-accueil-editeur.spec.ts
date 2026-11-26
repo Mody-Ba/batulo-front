@@ -115,4 +115,27 @@ describe('Éditeur : carte « Page d’accueil »', () => {
     expect(carte(el).textContent).toContain('Le texte de consentement est obligatoire.');
     expect(el.querySelector('.carte-entete:not(.carte-accueil)')!.textContent).not.toContain('Le texte de consentement est obligatoire.');
   });
+  it('« Associer les réponses aux personnes invitées » : désactivée par défaut, explication qui suit le choix, enregistrée avec l’en-tête', async () => {
+    const el = await ouvrir(brouillon);
+    const entete = el.querySelector<HTMLElement>('.carte-entete:not(.carte-accueil)')!;
+    const caseNominative = entete.querySelector<HTMLInputElement>('[formcontrolname="reponsesNominatives"] input')!;
+    expect(caseNominative.checked).toBe(false);
+    expect(caseNominative.getAttribute('aria-describedby')).toContain('aide-nominatif');
+    expect(entete.querySelector('#aide-nominatif')!.textContent).toContain('les réponses restent anonymes');
+
+    caseNominative.click();
+    fixture.detectChanges();
+    expect(entete.querySelector('#aide-nominatif')!.textContent).toContain('le nom et le courriel de la personne invitée');
+    entete.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    fixture.detectChanges();
+    const requete = serveur.expectOne((r) => r.method === 'PUT' && r.url === `${url}/api/sondages/1`);
+    expect(requete.request.body).toEqual(expect.objectContaining({ reponsesNominatives: true, reponseUnique: brouillon.reponseUnique }));
+  });
+
+  it('option nominative reprise d’un sondage publié, en lecture seule', async () => {
+    const el = await ouvrir(sondageDeTest({ id: 1, publie: true, statut: 'EN_COURS', reponsesNominatives: true }));
+    const caseNominative = el.querySelector<HTMLInputElement>('[formcontrolname="reponsesNominatives"] input')!;
+    expect(caseNominative.checked).toBe(true);
+    expect(caseNominative.disabled).toBe(true);
+  });
 });

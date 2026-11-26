@@ -78,8 +78,13 @@ export class ListeReponses {
   /** Contenu des autres versions, relu une fois (libellés des options pour le détail). */
   private readonly contenus = new Map<number, SondageResponse>();
   protected readonly reponses = signal<PageResponse<ReponseResponse> | null>(null);
-  /** Mode nominatif : colonne « Invité » (nom et courriel) seulement si une réponse de la page porte un invité. */
-  protected readonly nominatif = computed(() => !!this.reponses()?.contenu.some((r) => r.invite));
+  /**
+   * Mode nominatif : colonne « Invité » (nom et courriel) si le sondage est nominatif, ou si une réponse affichée porte
+   * un invité (vue « toutes les versions » : une autre version peut l'être). Sinon, aucune colonne.
+   */
+  protected readonly nominatif = computed(
+    () => !!this.sondage()?.reponsesNominatives || !!this.reponses()?.contenu.some((r) => r.invite),
+  );
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
 
