@@ -17,6 +17,8 @@ export interface DonneesExport {
   filtres: FiltresStatistiques;
   /** Filtres en clair (resumeFiltres). */
   resume: string[];
+  /** Sondage nominatif : les exports de réponses ont les colonnes « Invité » et « Courriel de l'invité ». */
+  nominatif?: boolean;
 }
 
 /**
@@ -43,6 +45,9 @@ export interface DonneesExport {
         </mat-radio-group>
       </fieldset>
 
+      @if ((choix === 'reponses-csv' || choix === 'reponses-xlsx') && donnees.nominatif) {
+        <p class="texte-aide note-nominative" role="note">{{ 'statistiques.export.nominatif' | transloco }}</p>
+      }
       @if (choix === 'reponses-csv' || choix === 'reponses-xlsx') {
         <fieldset>
           <legend>{{ 'statistiques.export.valeurs' | transloco }}</legend>

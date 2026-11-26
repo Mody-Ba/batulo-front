@@ -97,6 +97,18 @@
         {{ 'sondages.creation.reponseUnique' | transloco }}
         <span class="cellule-secondaire">{{ 'sondages.publication.reponseUniqueAide' | transloco }}</span>
       </mat-checkbox>
+      <div class="option-nominative">
+        <mat-checkbox formControlName="reponsesNominatives" aria-describedby="aide-nominatif">
+          {{ 'editeur.nominatif.libelle' | transloco }}
+        </mat-checkbox>
+        <p class="texte-aide" id="aide-nominatif">
+          @if (formulaire.controls.reponsesNominatives.value) {
+            {{ 'editeur.nominatif.active' | transloco }}
+          } @else {
+            {{ 'editeur.nominatif.inactive' | transloco }}
+          }
+        </p>
+      </div>
       <app-message-erreur [erreur]="erreurEnTete()" [parDefaut]="'editeur.erreurEnTete' | transloco" />
     </header>
 

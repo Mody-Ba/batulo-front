@@ -19,7 +19,9 @@
       "INTROUVABLE": "This address does not exist.",
       "ERREUR_INTERNE": "An unexpected error occurred.",
       "REQUETE_INVALIDE": "The request is missing or malformed.",
-      "LANGUE_INVALIDE": "This language is not offered by this survey."
+      "LANGUE_INVALIDE": "This language is not offered by this survey.",
+      "INVITATION_INVALIDE": "This personal link is not valid.",
+      "INVITATION_REVOQUEE": "This personal link has been disabled."
     },
     "commun": {
       "allerAuContenu": "Skip to content"
@@ -59,7 +61,10 @@
       "introuvable": "Link not found",
       "trop-de-requetes": "Too many requests",
       "injoignable": "Cannot connect",
-      "inattendu": "The survey cannot be displayed"
+      "inattendu": "The survey cannot be displayed",
+      "lien-revoque": "Link disabled",
+      "lien-invalide": "Invalid personal link",
+      "lien-utilise": "Link already used"
     },
     "titres": {
       "sondage": "{{titre}} · Batulo",
@@ -156,6 +161,12 @@
     },
     "langueContenu": {
       "erreur": "The form could not be loaded in this language. Your answers are kept."
+    },
+    "invitation": {
+      "nominatif": "Personal link: your answers will be linked to your name and email.",
+      "revoque": "This personal link has been disabled by the survey organizer. If you think this is a mistake, please contact them.",
+      "invalide": "This personal link is not valid. Check that it is complete, as received by email.",
+      "utilise": "This personal link has already been used: your response was recorded. Thank you!"
     }
   }
 }

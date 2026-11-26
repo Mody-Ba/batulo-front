@@ -24,6 +24,11 @@
             [erreur]="erreurConsentement()"
             (commencer)="commencer(e.formulaire, $event)"
           >
+            @if (nominatif()) {
+              <p class="encart-public info mention-nominative" role="note">
+              <span aria-hidden="true">ⓘ</span> {{ 'public.invitation.nominatif' | transloco }}
+            </p>
+            }
             @if (e.formulaire.dateFermeture) {
               <p class="fermeture">{{ 'public.fermeLe' | transloco: { date: (e.formulaire.dateFermeture | dateL: 'longHeure') } }}</p>
             }
@@ -47,6 +52,11 @@
             (sectionChangee)="surSection($event)"
             (envoyer)="envoyer(e.formulaire, $event)"
           >
+            @if (nominatif()) {
+              <p entete class="encart-public info mention-nominative" role="note">
+              <span aria-hidden="true">ⓘ</span> {{ 'public.invitation.nominatif' | transloco }}
+            </p>
+            }
             @if (e.formulaire.dateFermeture) {
               <p entete class="fermeture">{{ 'public.fermeLe' | transloco: { date: (e.formulaire.dateFermeture | dateL: 'longHeure') } }}</p>
             }
@@ -89,7 +99,7 @@
       @if (etat(); as e) {
         @if (e.type === 'indisponible') {
           <section class="carte-etat" [class]="'raison-' + e.raison" aria-labelledby="titre-etat">
-            <span class="icone" aria-hidden="true">{{ e.raison === 'deja-repondu' ? '✓' : 'ⓘ' }}</span>
+            <span class="icone" aria-hidden="true">{{ e.raison === 'deja-repondu' || e.raison === 'lien-utilise' ? '✓' : 'ⓘ' }}</span>
             <h1 id="titre-etat" tabindex="-1">{{ titreIndisponible(e.raison) }}</h1>
             @switch (e.raison) {
               @case ('non-ouvert') {
@@ -100,6 +110,15 @@
               }
               @case ('deja-repondu') {
                 <p>{{ 'public.etat.dejaRepondu' | transloco }}</p>
+              }
+              @case ('lien-utilise') {
+                <p>{{ 'public.invitation.utilise' | transloco }}</p>
+              }
+              @case ('lien-revoque') {
+                <p>{{ 'public.invitation.revoque' | transloco }}</p>
+              }
+              @case ('lien-invalide') {
+                <p>{{ 'public.invitation.invalide' | transloco }}</p>
               }
               @case ('introuvable') {
                 <p>{{ 'public.etat.introuvable' | transloco }}</p>

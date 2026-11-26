@@ -1,3 +1,4 @@
+import { nomInvite } from '../../../core/models/invitation.model';
 import { LangueContenu, LIBELLES_LANGUE } from '../../../core/models/traduction.model';
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -59,6 +60,7 @@ export class ListeReponses {
   protected readonly classeEtat = classeEtatSondage;
   /** Langue dans laquelle le répondant a vu le formulaire (anciennes réponses : fr). */
   protected readonly nomLangue = (l: LangueContenu) => LIBELLES_LANGUE[l];
+  protected readonly nomInvite = nomInvite;
 
   /** Paramètre de route :id et paramètres d'URL ?lignee=&page=&taille=. */
   readonly id = input.required<string>();
@@ -76,6 +78,8 @@ export class ListeReponses {
   /** Contenu des autres versions, relu une fois (libellés des options pour le détail). */
   private readonly contenus = new Map<number, SondageResponse>();
   protected readonly reponses = signal<PageResponse<ReponseResponse> | null>(null);
+  /** Mode nominatif : colonne « Invité » (nom et courriel) seulement si une réponse de la page porte un invité. */
+  protected readonly nominatif = computed(() => !!this.reponses()?.contenu.some((r) => r.invite));
   protected readonly chargement = signal(true);
   protected readonly erreur = signal<unknown>(null);
 

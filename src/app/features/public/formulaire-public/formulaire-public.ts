@@ -44,7 +44,10 @@ export type RaisonIndisponible =
   | 'introuvable'
   | 'trop-de-requetes'
   | 'injoignable'
-  | 'inattendu';
+  | 'inattendu'
+  | 'lien-revoque'
+  | 'lien-invalide'
+  | 'lien-utilise';
 
 type Etat =
   | { type: 'chargement' }
@@ -68,14 +71,19 @@ export function estRefusConsentement(erreur: unknown): boolean {
 }
 
 /** Raison selon l'erreur du serveur (GET ou POST), ou null si elle ne rend pas le formulaire indisponible. */
-export function raisonSelonErreur(erreur: unknown, lecture: boolean): RaisonIndisponible | null {
+export function raisonSelonErreur(erreur: unknown, lecture: boolean, invitation = false): RaisonIndisponible | null {
   switch (codeErreur(erreur)) {
+    case 'INVITATION_REVOQUEE':
+      return 'lien-revoque';
+    case 'INVITATION_INVALIDE':
+      return 'lien-invalide';
     case 'SONDAGE_NON_OUVERT':
       return 'non-ouvert';
     case 'SONDAGE_FERME':
       return 'ferme';
     case 'DEJA_REPONDU':
-      return 'deja-repondu';
+      // Lien personnel : une seule réponse par invitation.
+      return invitation ? 'lien-utilise' : 'deja-repondu';
     case 'SONDAGE_INTROUVABLE':
       return 'introuvable';
   }
@@ -115,6 +123,17 @@ export class FormulairePublic {
 
   /** Paramètre de route :jeton (le lien public, le même pour toutes les versions). */
   readonly jeton = input.required<string>();
+  /** Paramètre ?i= : jeton du lien personnel reçu par courriel (invitation nominative). */
+  readonly i = input<string | undefined>(undefined);
+  /** Jeton du lien personnel, ou null (lien public). Envoyé en en-tête et dans le corps, jamais dans l'URL de l'API. */
+  protected readonly jetonInvitation = computed(() => this.i()?.trim() || null);
+  /** Brouillon d'un lien personnel à part de celui du lien public sur le même appareil. */
+  protected readonly cleBrouillon = computed(() => (this.jetonInvitation() ? `${this.jeton()}.invitation` : this.jeton()));
+  /** Réponses associées à la personne invitée : mention visible sur l'accueil et le questionnaire. */
+  protected readonly nominatif = computed(() => {
+    const e = this.etat();
+    return 'formulaire' in e && !!e.formulaire.invitation?.reponsesNominatives;
+  });
 
   protected readonly etat = signal<Etat>({ type: 'chargement' });
   /** Apparence de l'entreprise, une fois le sondage lu (aucune avant : écrans de chargement et d'erreur Batulo). */
@@ -168,29 +187,42 @@ export class FormulairePublic {
     });
     this.saisies
       .pipe(debounceTime(DELAI_BROUILLON_MS), takeUntilDestroyed())
-      .subscribe((reponses) => memoireRepondant.ecrireBrouillon(this.jeton(), this.sectionCourante, reponses));
+      .subscribe((reponses) => memoireRepondant.ecrireBrouillon(this.cleBrouillon(), this.sectionCourante, reponses));
   }
 
   protected charger(jeton = this.jeton()): void {
+    const invitation = this.jetonInvitation();
     this.etat.set({ type: 'chargement' });
     this.service
       // Le jeton de l'appareil, s'il existe déjà, permet au serveur de dire « déjà répondu » avant la saisie.
-      // Contenu demandé dans la langue de l'interface ; non proposée : le serveur sert la langue principale.
-      .lire(jeton, memoireRepondant.jetonExistant(jeton), this.langues.langue())
+      // Contenu demandé dans la langue de l'interface (non proposée : la principale) ; avec un lien personnel, aucune
+      // langue : le serveur sert la langue préférée de l'invité.
+      .lire(
+        jeton,
+        invitation ? null : memoireRepondant.jetonExistant(jeton),
+        invitation ? null : this.langues.langue(),
+        invitation,
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (formulaire) => {
-          if (formulaire.reponseUnique && formulaire.dejaRepondu) {
+          if (invitation && formulaire.invitation?.dejaRepondu) {
+            this.afficherIndisponible('lien-utilise');
+            return;
+          }
+          if (!invitation && formulaire.reponseUnique && formulaire.dejaRepondu) {
             memoireRepondant.marquerRepondu(jeton);
-            memoireRepondant.effacerBrouillon(jeton);
+            memoireRepondant.effacerBrouillon(this.cleBrouillon());
             this.afficherIndisponible('deja-repondu');
             return;
           }
           // Le serveur fait foi : pas encore répondu (ou collecte terrain) -> le drapeau local est oublié.
-          memoireRepondant.oublierRepondu(jeton);
+          if (!invitation) {
+            memoireRepondant.oublierRepondu(jeton);
+          }
           this.titre.personnaliser(() => traduire('public.titres.sondage', { titre: formulaire.titre }));
           this.alignerInterface(formulaire);
-          const brouillon = memoireRepondant.lireBrouillon(jeton);
+          const brouillon = memoireRepondant.lireBrouillon(this.cleBrouillon());
           this.reponsesInitiales.set(brouillon?.reponses ?? null);
           this.sectionInitiale.set(brouillon?.section ?? 0);
           this.sectionCourante = brouillon?.section ?? 0;
@@ -209,9 +241,9 @@ export class FormulairePublic {
           this.etat.set({ type: 'formulaire', formulaire });
         },
         error: (erreur: unknown) => {
-          const raison = raisonSelonErreur(erreur, true) ?? 'inattendu';
+          const raison = raisonSelonErreur(erreur, true, !!invitation) ?? 'inattendu';
           // Serveur injoignable mais envoi déjà fait depuis cet appareil : on le dit plutôt que « connexion impossible ».
-          if (raison === 'injoignable' && memoireRepondant.dejaRepondu(jeton)) {
+          if (raison === 'injoignable' && !invitation && memoireRepondant.dejaRepondu(jeton)) {
             this.afficherIndisponible('deja-repondu');
             return;
           }
@@ -225,7 +257,7 @@ export class FormulairePublic {
     this.consentementDonne = depart.consentement;
     this.erreurConsentement.set(null);
     if (!depart.reprendre) {
-      memoireRepondant.effacerBrouillon(this.jeton());
+      memoireRepondant.effacerBrouillon(this.cleBrouillon());
       this.reponsesInitiales.set(null);
       this.sectionInitiale.set(0);
       this.sectionCourante = 0;
@@ -243,12 +275,12 @@ export class FormulairePublic {
 
   protected surSection(index: number): void {
     this.sectionCourante = index;
-    memoireRepondant.ecrireBrouillon(this.jeton(), index, this.derniereSaisie);
+    memoireRepondant.ecrireBrouillon(this.cleBrouillon(), index, this.derniereSaisie);
   }
 
   /** « Tout effacer » : brouillon oublié, formulaire vide. */
   protected effacerBrouillon(): void {
-    memoireRepondant.effacerBrouillon(this.jeton());
+    memoireRepondant.effacerBrouillon(this.cleBrouillon());
     this.brouillonRepris.set(false);
     this.derniereSaisie = {};
     this.sectionCourante = 0;
@@ -257,12 +289,18 @@ export class FormulairePublic {
 
   protected envoyer(formulaire: FormulairePublicResponse, reponses: ReponseQuestionRequest[]): void {
     const jeton = this.jeton();
+    const invitation = this.jetonInvitation();
     this.envoiEnCours.set(true);
     this.erreurEnvoi.set(null);
     this.erreursServeur.set(null);
     this.service
       .repondre(jeton, {
-        ...(formulaire.reponseUnique ? { jetonRepondant: memoireRepondant.jetonRepondant(jeton) } : {}),
+        // Lien personnel : l'invitation fait foi (une réponse par invitation), le jeton de l'appareil ne sert pas.
+        ...(invitation
+          ? { jetonInvitation: invitation }
+          : formulaire.reponseUnique
+            ? { jetonRepondant: memoireRepondant.jetonRepondant(jeton) }
+            : {}),
         ...(formulaire.consentementRequis ? { consentement: this.consentementDonne } : {}),
         // Langue dans laquelle le formulaire a été vu (celle servie par le serveur).
         ...(formulaire.langue ? { langue: formulaire.langue } : {}),
@@ -272,8 +310,8 @@ export class FormulairePublic {
       .subscribe({
         next: (confirmation) => {
           this.envoiEnCours.set(false);
-          memoireRepondant.effacerBrouillon(jeton);
-          if (formulaire.reponseUnique) {
+          memoireRepondant.effacerBrouillon(this.cleBrouillon());
+          if (formulaire.reponseUnique && !invitation) {
             memoireRepondant.marquerRepondu(jeton);
           }
           this.etat.set({ type: 'confirmation', formulaire, confirmation });
@@ -297,13 +335,13 @@ export class FormulairePublic {
             this.focaliserTitre();
             return;
           }
-          const raison = raisonSelonErreur(erreur, false);
+          const raison = raisonSelonErreur(erreur, false, !!invitation);
           if (raison) {
-            if (raison === 'deja-repondu') {
+            if (raison === 'deja-repondu' && !invitation) {
               memoireRepondant.marquerRepondu(jeton);
             }
             if (raison !== 'non-ouvert') {
-              memoireRepondant.effacerBrouillon(jeton);
+              memoireRepondant.effacerBrouillon(this.cleBrouillon());
             }
             this.afficherIndisponible(raison, erreur);
             return;
@@ -357,7 +395,7 @@ export class FormulairePublic {
     this.changementLangue.set(true);
     this.erreurLangue.set(null);
     this.service
-      .lire(jeton, memoireRepondant.jetonExistant(jeton), langue)
+      .lire(jeton, this.jetonInvitation() ? null : memoireRepondant.jetonExistant(jeton), langue, this.jetonInvitation())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (relu) => {

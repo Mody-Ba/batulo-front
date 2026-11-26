@@ -14,7 +14,7 @@ import { traduire } from '../../../core/i18n/traduire';
     @if (logo(); as url) {
       @if (!illisible()) {
         <div class="bandeau-apparence">
-          <img [src]="url" [alt]="nom()" class="logo-apparence" decoding="async" (error)="illisible.set(true)" />
+          <img [src]="url" [alt]="nom()" class="logo-apparence" decoding="async" referrerpolicy="no-referrer" (error)="illisible.set(true)" />
           <span class="nom-apparence" aria-hidden="true" dir="auto">{{ nom() }}</span>
         </div>
       }

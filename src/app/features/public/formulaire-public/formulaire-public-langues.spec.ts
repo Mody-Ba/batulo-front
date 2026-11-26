@@ -101,7 +101,7 @@ describe('FormulairePublic : langue du contenu', () => {
 
     await choisirLangue(element, 'ar');
 
-    expect(service.lire).toHaveBeenLastCalledWith('Ab3x', null, 'ar');
+    expect(service.lire).toHaveBeenLastCalledWith('Ab3x', null, 'ar', null);
     expect(element.textContent).toContain('هل تم تطعيمه؟');
     // Matrice : libellés traduits (libellesMatrice).
     expect(element.querySelector('app-champ-matrice .matrice-libelle')!.textContent).toContain('الاستقبال');
@@ -139,7 +139,7 @@ describe('FormulairePublic : langue du contenu', () => {
     service.lire.mockImplementation(() => of(formulaire('fr')));
     await creer();
 
-    expect(service.lire).toHaveBeenCalledWith('Ab3x', null, 'en');
+    expect(service.lire).toHaveBeenCalledWith('Ab3x', null, 'en', null);
     expect(TestBed.inject(LangueService).langue()).toBe('fr');
     expect(localStorage.getItem(CLE_STOCKAGE_LANGUE)).toBe('"en"');
   });

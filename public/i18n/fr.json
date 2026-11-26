@@ -649,6 +649,11 @@
       "traduire": "Traduire",
       "voir": "Voir les traductions",
       "erreur": "Les langues n’ont pas pu être enregistrées."
+    },
+    "nominatif": {
+      "libelle": "Associer les réponses aux personnes invitées",
+      "inactive": "Désactivé (par défaut) : les réponses restent anonymes, même reçues par un lien personnel. Vous voyez seulement qui a répondu, au jour près, dans le suivi des invitations.",
+      "active": "Activé : le nom et le courriel de la personne invitée apparaissent avec sa réponse et dans les exports. Le répondant en est averti sur le formulaire. Les réponses reçues par le lien public restent anonymes."
     }
   },
   "superAdmin": {
@@ -875,7 +880,17 @@
     "VERSION_OBSOLETE": "Ce n’est pas la dernière version : partez de la plus récente.",
     "LANGUE_INVALIDE": "Cette langue n’est pas proposée par ce sondage.",
     "TRADUCTION_INVALIDE": "Une traduction est invalide (texte inconnu, en double ou trop long).",
-    "TRADUCTIONS_INCOMPLETES": "Des textes ne sont pas encore traduits : complétez les traductions avant de publier."
+    "TRADUCTIONS_INCOMPLETES": "Des textes ne sont pas encore traduits : complétez les traductions avant de publier.",
+    "INVITE_INVALIDE": "Les informations de cet invité ne sont pas valides.",
+    "INVITE_EXISTANT": "Cette adresse est déjà invitée à ce sondage.",
+    "INVITE_A_REPONDU": "Cette personne a déjà répondu : son invitation ne peut plus changer.",
+    "INVITATION_REVOQUEE": "Cette invitation a été révoquée.",
+    "INVITATION_INVALIDE": "Ce lien personnel n’est pas valide.",
+    "LIMITE_ENVOIS": "Limite d’envois par heure atteinte : réessayez plus tard.",
+    "IMPORT_TROP_GRAND": "Le fichier dépasse 1000 lignes : découpez-le en plusieurs fichiers.",
+    "REPRISE_INVALIDE": "Choisissez un autre sondage que celui-ci.",
+    "SONDAGE_NON_OUVERT": "Ce sondage n’est pas ouvert.",
+    "SONDAGE_FERME": "Ce sondage est fermé."
   },
   "gestionnaires": {
     "actions": {
@@ -1223,7 +1238,8 @@
     "onglets": {
       "rubriques": "Rubriques du sondage",
       "fiche": "Fiche",
-      "statistiques": "Statistiques"
+      "statistiques": "Statistiques",
+      "invitations": "Invitations"
     },
     "fiche": {
       "chargement": "Chargement du sondage",
@@ -1434,14 +1450,17 @@
       "aucune": "Aucune réponse pour le moment.",
       "numero": "N° {{id}}",
       "pagination": "Pagination des réponses",
-      "langue": "Langue :"
+      "langue": "Langue :",
+      "invite": "Invité :",
+      "anonyme": "Anonyme (lien public)"
     },
     "reponse": {
       "titre": "Réponse n° {{id}}",
       "envoyee": "Envoyée le {{date}} · version {{version}}",
       "parLigne": "Réponses par ligne",
       "sansReponse": "Sans réponse",
-      "langue": "Langue du formulaire : {{langue}}"
+      "langue": "Langue du formulaire : {{langue}}",
+      "invite": "Invité :"
     }
   },
   "statistiques": {
@@ -1615,7 +1634,8 @@
       "formatNombres": "Format des nombres",
       "virgule": "Excel en français (« ; » et virgule décimale)",
       "point": "Python, R… (« , » et point décimal)",
-      "telecharger": "Télécharger"
+      "telecharger": "Télécharger",
+      "nominatif": "Réponses associées aux invités : l’export contient les colonnes « Invité » et « Courriel de l’invité »."
     }
   },
   "statsRecues": {
@@ -1716,7 +1736,8 @@
     "admins": "Admins et entreprises · Batulo",
     "entreprise": "Entreprise · Batulo",
     "notifications": "Notifications · Batulo",
-    "traductions": "Traductions du sondage · Batulo"
+    "traductions": "Traductions du sondage · Batulo",
+    "invitations": "Invitations · Batulo"
   },
   "vitrine": {
     "sections": {
@@ -1891,6 +1912,196 @@
       "option": "Option",
       "ligne": "Ligne",
       "colonne": "Colonne"
+    }
+  },
+  "statutsInvitation": {
+    "A_INVITER": "À inviter",
+    "INVITEE": "Invité",
+    "OUVERTE": "Ouvert",
+    "A_REPONDU": "A répondu",
+    "EN_ECHEC": "Échec d’envoi",
+    "REVOQUEE": "Révoqué"
+  },
+  "invitations": {
+    "compteurs": {
+      "titre": "Suivi des invitations",
+      "invites": {
+        "one": "invité",
+        "other": "invités"
+      },
+      "ouverts": {
+        "one": "ouvert",
+        "other": "ouverts"
+      },
+      "repondus": {
+        "one": "a répondu",
+        "other": "ont répondu"
+      },
+      "taux": "Taux de réponse",
+      "tauxValeur": "{{taux}} %",
+      "tauxAide": {
+        "one": "sur {{n}} invitation envoyée",
+        "other": "sur {{n}} invitations envoyées"
+      },
+      "details": "À inviter : {{aInviter}} · En échec : {{enEchec}} · Révoqués : {{revoquees}}"
+    },
+    "actions": {
+      "ajouter": "Ajouter un invité",
+      "importer": "Importer un CSV",
+      "reprendre": "Reprendre la liste d’un autre sondage",
+      "exporter": "Exporter le suivi (CSV)",
+      "revoquer": "Révoquer",
+      "ajoute": "Invité ajouté.",
+      "modifie": "Invité modifié.",
+      "supprime": "Invité supprimé.",
+      "revoque": "Invitation révoquée.",
+      "supprimerTitre": "Supprimer cet invité ?",
+      "supprimerMessage": "{{nom}} sera retiré de la liste et son lien ne marchera plus.",
+      "revoquerTitre": "Révoquer cette invitation ?",
+      "revoquerMessage": "Définitif : le lien personnel de {{nom}} ne marchera plus et cette invitation ne pourra pas être réactivée."
+    },
+    "champs": {
+      "courriel": "Courriel",
+      "prenom": "Prénom",
+      "nom": "Nom",
+      "telephone": "Téléphone",
+      "langue": "Langue"
+    },
+    "colonnes": {
+      "nom": "Nom",
+      "statut": "Statut",
+      "envoi": "Invité le",
+      "relance": "Relancé le",
+      "reponse": "Répondu le"
+    },
+    "dialogue": {
+      "ajouter": "Ajouter un invité",
+      "modifier": "Modifier l’invité",
+      "ajouterBouton": "Ajouter",
+      "erreur": "L’invité n’a pas pu être enregistré.",
+      "courrielObligatoire": "Le courriel est obligatoire.",
+      "courrielInvalide": "Courriel invalide.",
+      "telephoneAide": "Facultatif (diffusion par SMS plus tard).",
+      "languePrincipale": "Langue principale du sondage",
+      "langueAide": "Langue du courriel et du formulaire, si le sondage la propose."
+    },
+    "import": {
+      "titre": "Importer des invités (CSV)",
+      "aide": "Fichier CSV en UTF-8, séparateur « ; » ou « , ». Colonnes : prenom, nom, courriel (obligatoire), telephone, langue (fr, en ou ar). 1000 lignes au plus.",
+      "modele": "Télécharger le modèle CSV",
+      "deposer": "Déposez votre fichier CSV ici",
+      "choisir": "Choisir un fichier",
+      "formatInvalide": "Choisissez un fichier .csv.",
+      "importer": "Importer",
+      "enCours": "Import…",
+      "erreur": "Le fichier n’a pas pu être importé.",
+      "autreFichier": "Importer un autre fichier"
+    },
+    "reprise": {
+      "titre": "Reprendre la liste d’un autre sondage",
+      "aide": "Copie le prénom, le nom, le courriel, le téléphone et la langue des invités d’un autre sondage, sans leur statut ni leur lien. Les adresses déjà invitées ici sont ignorées.",
+      "chargement": "Chargement des sondages",
+      "source": "Sondage source",
+      "aucuneSource": "Aucun autre sondage disponible.",
+      "erreurSources": "Les sondages n’ont pas pu être chargés.",
+      "reprendre": "Reprendre la liste",
+      "enCours": "Reprise…",
+      "erreur": "La liste n’a pas pu être reprise."
+    },
+    "rapport": {
+      "acceptees": {
+        "one": "{{n}} ligne acceptée",
+        "other": "{{n}} lignes acceptées"
+      },
+      "ajoutees": {
+        "one": "{{n}} personne ajoutée",
+        "other": "{{n}} personnes ajoutées"
+      },
+      "doublons": {
+        "one": "{{n}} personne ignorée (déjà invitée)",
+        "other": "{{n}} personnes ignorées (déjà invitées)"
+      },
+      "refusees": {
+        "one": "{{n}} ligne refusée",
+        "other": "{{n}} lignes refusées"
+      },
+      "caption": "Lignes refusées et raison",
+      "ligne": "Ligne",
+      "raison": "Raison"
+    },
+    "refus": {
+      "COURRIEL_MANQUANT": "Courriel manquant",
+      "COURRIEL_INVALIDE": "Courriel invalide",
+      "DOUBLON_FICHIER": "En double dans le fichier",
+      "DEJA_INVITE": "Déjà invité",
+      "LANGUE_INVALIDE": "Langue invalide (fr, en ou ar)",
+      "TEXTE_TROP_LONG": "Texte trop long",
+      "TELEPHONE_INVALIDE": "Téléphone invalide",
+      "LIMITE_INVITES": "Limite de 10 000 invités atteinte"
+    },
+    "envoi": {
+      "titre": "Envoi des invitations par courriel",
+      "envoyerTous": "Envoyer les invitations",
+      "envoyerSelection": "Envoyer aux {{n}} sélectionnés",
+      "impossible": "Envoi impossible :",
+      "nonPublie": "publiez le sondage avant d’envoyer les invitations (la liste peut être préparée dans le brouillon).",
+      "termine": "ce sondage est terminé : publiez une nouvelle version pour inviter ou relancer.",
+      "limite": "limite d’envois par heure atteinte ; réessayez après {{heure}}.",
+      "aucunInvite": "ajoutez d’abord des invités.",
+      "tousInvites": "tous les invités ont déjà reçu leur invitation (utilisez « Relancer »).",
+      "selectionDejaInvitee": "les invités sélectionnés ont déjà reçu leur invitation (utilisez « Relancer »).",
+      "enArrierePlan": "Envoi en cours en arrière-plan : la liste se met à jour toute seule.",
+      "erreur": "L’envoi n’a pas pu être lancé."
+    },
+    "relance": {
+      "relancerTous": "Relancer ceux qui n’ont pas répondu",
+      "relancerSelection": "Relancer les {{n}} sélectionnés",
+      "impossible": "Relance impossible :",
+      "aucune": "personne n’attend de réponse (aucun invité sans réponse).",
+      "selectionAucune": "aucun invité sélectionné n’est à relancer (jamais invité, déjà répondu ou révoqué).",
+      "delai": "une relance au plus toutes les 24 h ; possible à partir du {{date}}."
+    },
+    "resultat": {
+      "enFile": {
+        "one": "{{n}} invitation en cours d’envoi.",
+        "other": "{{n}} invitations en cours d’envoi."
+      },
+      "relancesEnFile": {
+        "one": "{{n}} relance en cours d’envoi.",
+        "other": "{{n}} relances en cours d’envoi."
+      },
+      "ignorees": {
+        "one": "{{n}} ignoré",
+        "other": "{{n}} ignorés"
+      }
+    },
+    "ignorees": {
+      "INTROUVABLE": "introuvable",
+      "REVOQUEE": "révoqué",
+      "A_REPONDU": "a déjà répondu",
+      "DEJA_INVITEE": "déjà invité",
+      "ENVOI_EN_COURS": "envoi déjà en cours",
+      "DELAI_RELANCE": "relancé il y a moins de 24 h",
+      "JAMAIS_INVITEE": "jamais invité"
+    },
+    "liste": {
+      "aideRecherche": "Prénom, nom ou courriel",
+      "filtrerStatut": "Filtrer par statut",
+      "chargement": "Chargement des invités",
+      "erreur": "Les invités n’ont pas pu être chargés.",
+      "aucun": "Aucun invité pour l’instant : ajoutez-en un, importez un CSV ou reprenez la liste d’un autre sondage.",
+      "aucunFiltre": "Aucun invité ne correspond à ces critères.",
+      "caption": "Invités du sondage",
+      "cocherPage": "Sélectionner toute la page",
+      "selectionner": "Sélectionner {{nom}}",
+      "selectionnes": {
+        "one": "{{n}} invité sélectionné",
+        "other": "{{n}} invités sélectionnés"
+      },
+      "deselectionner": "Tout désélectionner",
+      "envoiEnCours": "Envoi en cours…",
+      "languePrincipale": "Principale",
+      "pagination": "Pagination des invités"
     }
   }
 }

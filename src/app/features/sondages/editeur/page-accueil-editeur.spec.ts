@@ -76,6 +76,7 @@ describe('Éditeur : carte « Page d’accueil »', () => {
       texteConfidentialite: null,
       consentementRequis: false,
       texteConsentement: null,
+      reponsesNominatives: false,
     });
   });
 

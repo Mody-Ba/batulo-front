@@ -649,6 +649,11 @@
       "traduire": "Translate",
       "voir": "View translations",
       "erreur": "The languages could not be saved."
+    },
+    "nominatif": {
+      "libelle": "Link responses to invited people",
+      "inactive": "Off (default): responses stay anonymous, even when received through a personal link. The invitation tracking only shows who answered, to the day.",
+      "active": "On: the invitee’s name and email appear with their response and in exports. Respondents are told so on the form. Responses received through the public link stay anonymous."
     }
   },
   "superAdmin": {
@@ -875,7 +880,17 @@
     "VERSION_OBSOLETE": "This is not the latest version: start from the most recent one.",
     "LANGUE_INVALIDE": "This language is not offered by this survey.",
     "TRADUCTION_INVALIDE": "A translation is invalid (unknown, duplicated or too long text).",
-    "TRADUCTIONS_INCOMPLETES": "Some texts are not translated yet: complete the translations before publishing."
+    "TRADUCTIONS_INCOMPLETES": "Some texts are not translated yet: complete the translations before publishing.",
+    "INVITE_INVALIDE": "This invitee’s details are not valid.",
+    "INVITE_EXISTANT": "This address is already invited to this survey.",
+    "INVITE_A_REPONDU": "This person has already answered: their invitation can no longer change.",
+    "INVITATION_REVOQUEE": "This invitation has been revoked.",
+    "INVITATION_INVALIDE": "This personal link is not valid.",
+    "LIMITE_ENVOIS": "Hourly sending limit reached: try again later.",
+    "IMPORT_TROP_GRAND": "The file has more than 1,000 rows: split it into several files.",
+    "REPRISE_INVALIDE": "Choose a survey other than this one.",
+    "SONDAGE_NON_OUVERT": "This survey is not open.",
+    "SONDAGE_FERME": "This survey is closed."
   },
   "gestionnaires": {
     "actions": {
@@ -1223,7 +1238,8 @@
     "onglets": {
       "rubriques": "Survey sections",
       "fiche": "Overview",
-      "statistiques": "Statistics"
+      "statistiques": "Statistics",
+      "invitations": "Invitations"
     },
     "fiche": {
       "chargement": "Loading the survey",
@@ -1434,14 +1450,17 @@
       "aucune": "No responses yet.",
       "numero": "No. {{id}}",
       "pagination": "Responses pagination",
-      "langue": "Language:"
+      "langue": "Language:",
+      "invite": "Invitee:",
+      "anonyme": "Anonymous (public link)"
     },
     "reponse": {
       "titre": "Response no. {{id}}",
       "envoyee": "Sent on {{date}} · version {{version}}",
       "parLigne": "Answers by row",
       "sansReponse": "No answer",
-      "langue": "Form language: {{langue}}"
+      "langue": "Form language: {{langue}}",
+      "invite": "Invitee:"
     }
   },
   "statistiques": {
@@ -1615,7 +1634,8 @@
       "formatNombres": "Number format",
       "virgule": "Excel in French (“;” and decimal comma)",
       "point": "Python, R… (“,” and decimal point)",
-      "telecharger": "Download"
+      "telecharger": "Download",
+      "nominatif": "Responses linked to invitees: the export includes the “Invitee” and “Invitee email” columns."
     }
   },
   "statsRecues": {
@@ -1716,7 +1736,8 @@
     "admins": "Admins and companies · Batulo",
     "entreprise": "Company · Batulo",
     "notifications": "Notifications · Batulo",
-    "traductions": "Survey translations · Batulo"
+    "traductions": "Survey translations · Batulo",
+    "invitations": "Invitations · Batulo"
   },
   "vitrine": {
     "sections": {
@@ -1891,6 +1912,196 @@
       "option": "Option",
       "ligne": "Row",
       "colonne": "Column"
+    }
+  },
+  "statutsInvitation": {
+    "A_INVITER": "To invite",
+    "INVITEE": "Invited",
+    "OUVERTE": "Opened",
+    "A_REPONDU": "Answered",
+    "EN_ECHEC": "Sending failed",
+    "REVOQUEE": "Revoked"
+  },
+  "invitations": {
+    "compteurs": {
+      "titre": "Invitation tracking",
+      "invites": {
+        "one": "invitee",
+        "other": "invitees"
+      },
+      "ouverts": {
+        "one": "opened",
+        "other": "opened"
+      },
+      "repondus": {
+        "one": "answered",
+        "other": "answered"
+      },
+      "taux": "Response rate",
+      "tauxValeur": "{{taux}}%",
+      "tauxAide": {
+        "one": "out of {{n}} invitation sent",
+        "other": "out of {{n}} invitations sent"
+      },
+      "details": "To invite: {{aInviter}} · Failed: {{enEchec}} · Revoked: {{revoquees}}"
+    },
+    "actions": {
+      "ajouter": "Add an invitee",
+      "importer": "Import a CSV",
+      "reprendre": "Reuse another survey’s list",
+      "exporter": "Export tracking (CSV)",
+      "revoquer": "Revoke",
+      "ajoute": "Invitee added.",
+      "modifie": "Invitee updated.",
+      "supprime": "Invitee deleted.",
+      "revoque": "Invitation revoked.",
+      "supprimerTitre": "Delete this invitee?",
+      "supprimerMessage": "{{nom}} will be removed from the list and their link will stop working.",
+      "revoquerTitre": "Revoke this invitation?",
+      "revoquerMessage": "Permanent: {{nom}}’s personal link will stop working and this invitation cannot be reactivated."
+    },
+    "champs": {
+      "courriel": "Email",
+      "prenom": "First name",
+      "nom": "Last name",
+      "telephone": "Phone",
+      "langue": "Language"
+    },
+    "colonnes": {
+      "nom": "Name",
+      "statut": "Status",
+      "envoi": "Invited on",
+      "relance": "Reminded on",
+      "reponse": "Answered on"
+    },
+    "dialogue": {
+      "ajouter": "Add an invitee",
+      "modifier": "Edit invitee",
+      "ajouterBouton": "Add",
+      "erreur": "The invitee could not be saved.",
+      "courrielObligatoire": "Email is required.",
+      "courrielInvalide": "Invalid email.",
+      "telephoneAide": "Optional (for SMS later).",
+      "languePrincipale": "Survey’s main language",
+      "langueAide": "Language of the email and the form, if the survey offers it."
+    },
+    "import": {
+      "titre": "Import invitees (CSV)",
+      "aide": "UTF-8 CSV file, “;” or “,” separator. Columns: prenom, nom, courriel (required), telephone, langue (fr, en or ar). 1,000 rows at most.",
+      "modele": "Download the CSV template",
+      "deposer": "Drop your CSV file here",
+      "choisir": "Choose a file",
+      "formatInvalide": "Choose a .csv file.",
+      "importer": "Import",
+      "enCours": "Importing…",
+      "erreur": "The file could not be imported.",
+      "autreFichier": "Import another file"
+    },
+    "reprise": {
+      "titre": "Reuse another survey’s list",
+      "aide": "Copies the first name, last name, email, phone and language of another survey’s invitees, without their status or link. Addresses already invited here are ignored.",
+      "chargement": "Loading surveys",
+      "source": "Source survey",
+      "aucuneSource": "No other survey available.",
+      "erreurSources": "The surveys could not be loaded.",
+      "reprendre": "Reuse the list",
+      "enCours": "Copying…",
+      "erreur": "The list could not be copied."
+    },
+    "rapport": {
+      "acceptees": {
+        "one": "{{n}} row accepted",
+        "other": "{{n}} rows accepted"
+      },
+      "ajoutees": {
+        "one": "{{n}} person added",
+        "other": "{{n}} people added"
+      },
+      "doublons": {
+        "one": "{{n}} person ignored (already invited)",
+        "other": "{{n}} people ignored (already invited)"
+      },
+      "refusees": {
+        "one": "{{n}} row rejected",
+        "other": "{{n}} rows rejected"
+      },
+      "caption": "Rejected rows and reason",
+      "ligne": "Row",
+      "raison": "Reason"
+    },
+    "refus": {
+      "COURRIEL_MANQUANT": "Missing email",
+      "COURRIEL_INVALIDE": "Invalid email",
+      "DOUBLON_FICHIER": "Duplicate in the file",
+      "DEJA_INVITE": "Already invited",
+      "LANGUE_INVALIDE": "Invalid language (fr, en or ar)",
+      "TEXTE_TROP_LONG": "Text too long",
+      "TELEPHONE_INVALIDE": "Invalid phone",
+      "LIMITE_INVITES": "10,000 invitee limit reached"
+    },
+    "envoi": {
+      "titre": "Sending invitations by email",
+      "envoyerTous": "Send invitations",
+      "envoyerSelection": "Send to the {{n}} selected",
+      "impossible": "Cannot send:",
+      "nonPublie": "publish the survey before sending invitations (the list can be prepared in the draft).",
+      "termine": "this survey has ended: publish a new version to invite or remind.",
+      "limite": "hourly sending limit reached; try again after {{heure}}.",
+      "aucunInvite": "add invitees first.",
+      "tousInvites": "every invitee has already received their invitation (use “Remind”).",
+      "selectionDejaInvitee": "the selected invitees have already received their invitation (use “Remind”).",
+      "enArrierePlan": "Sending in the background: the list updates by itself.",
+      "erreur": "Sending could not be started."
+    },
+    "relance": {
+      "relancerTous": "Remind those who have not answered",
+      "relancerSelection": "Remind the {{n}} selected",
+      "impossible": "Cannot remind:",
+      "aucune": "nobody is awaiting a response (no invitee without an answer).",
+      "selectionAucune": "none of the selected invitees can be reminded (never invited, already answered or revoked).",
+      "delai": "one reminder every 24 hours at most; possible from {{date}}."
+    },
+    "resultat": {
+      "enFile": {
+        "one": "{{n}} invitation being sent.",
+        "other": "{{n}} invitations being sent."
+      },
+      "relancesEnFile": {
+        "one": "{{n}} reminder being sent.",
+        "other": "{{n}} reminders being sent."
+      },
+      "ignorees": {
+        "one": "{{n}} skipped",
+        "other": "{{n}} skipped"
+      }
+    },
+    "ignorees": {
+      "INTROUVABLE": "not found",
+      "REVOQUEE": "revoked",
+      "A_REPONDU": "already answered",
+      "DEJA_INVITEE": "already invited",
+      "ENVOI_EN_COURS": "already being sent",
+      "DELAI_RELANCE": "reminded less than 24 hours ago",
+      "JAMAIS_INVITEE": "never invited"
+    },
+    "liste": {
+      "aideRecherche": "First name, last name or email",
+      "filtrerStatut": "Filter by status",
+      "chargement": "Loading invitees",
+      "erreur": "The invitees could not be loaded.",
+      "aucun": "No invitees yet: add one, import a CSV or reuse another survey’s list.",
+      "aucunFiltre": "No invitee matches these criteria.",
+      "caption": "Survey invitees",
+      "cocherPage": "Select the whole page",
+      "selectionner": "Select {{nom}}",
+      "selectionnes": {
+        "one": "{{n}} invitee selected",
+        "other": "{{n}} invitees selected"
+      },
+      "deselectionner": "Clear selection",
+      "envoiEnCours": "Sending…",
+      "languePrincipale": "Main",
+      "pagination": "Invitee pagination"
     }
   }
 }

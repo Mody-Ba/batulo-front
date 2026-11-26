@@ -78,7 +78,7 @@ describe('FormulairePublic (/s/:jeton)', () => {
   it('affiche le formulaire, sa fermeture prévue et le titre de la page ; aucun Angular Material', async () => {
     const element = await creer();
     // Premier passage : pas encore de jeton sur l'appareil, rien n'est envoyé.
-    expect(service.lire).toHaveBeenCalledWith('Ab3x', null, 'fr');
+    expect(service.lire).toHaveBeenCalledWith('Ab3x', null, 'fr', null);
     expect(element.querySelector('h1')!.textContent).toContain('Malnutrition');
     expect(element.textContent).toContain('Ce sondage ferme le');
     expect(element.textContent).toContain('Section 1 sur 2');
@@ -106,7 +106,7 @@ describe('FormulairePublic (/s/:jeton)', () => {
     // Revenir sur le lien : le jeton est envoyé, le serveur répond dejaRepondu.
     service.lire.mockReturnValue(of({ ...FORMULAIRE, dejaRepondu: true }));
     const retour = await creer();
-    expect(service.lire).toHaveBeenLastCalledWith('Ab3x', memoireRepondant.jetonRepondant('Ab3x'), 'fr');
+    expect(service.lire).toHaveBeenLastCalledWith('Ab3x', memoireRepondant.jetonRepondant('Ab3x'), 'fr', null);
     expect(retour.textContent).toContain('Vous avez déjà répondu');
   });
 
@@ -115,7 +115,7 @@ describe('FormulairePublic (/s/:jeton)', () => {
     memoireRepondant.ecrireBrouillon('Ab3x', 0, { 1: true });
     service.lire.mockReturnValue(of({ ...FORMULAIRE, dejaRepondu: true }));
     const element = await creer();
-    expect(service.lire).toHaveBeenCalledWith('Ab3x', jeton, 'fr');
+    expect(service.lire).toHaveBeenCalledWith('Ab3x', jeton, 'fr', null);
     expect(element.querySelector('h1')!.textContent).toContain('Vous avez déjà répondu');
     expect(element.querySelector('app-formulaire-sondage')).toBeNull();
     expect(memoireRepondant.dejaRepondu('Ab3x')).toBe(true);

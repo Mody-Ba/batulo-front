@@ -1,4 +1,5 @@
 import { ApparenceResponse } from './personnalisation.model';
+import { InvitationPubliqueResponse } from './invitation.model';
 import { LanguesServies, PageAccueil, SectionAffichee } from './sondage.model';
 import { ReponseQuestionRequest } from '../../shared/formulaire/reponses';
 
@@ -22,6 +23,8 @@ export interface FormulairePublicResponse extends PageAccueil, LanguesServies {
    * false sans jeton ou avec un jeton mal formé. Absent sinon.
    */
   dejaRepondu?: boolean;
+  /** Lien personnel (en-tête X-Jeton-Invitation) : jamais d'identité. */
+  invitation?: InvitationPubliqueResponse | null;
 }
 
 /**
@@ -31,6 +34,8 @@ export interface FormulairePublicResponse extends PageAccueil, LanguesServies {
 export interface SoumissionRequest {
   /** UUID gardé par le navigateur (un par sondage) ; obligatoire si reponseUnique. */
   jetonRepondant?: string;
+  /** Jeton du lien personnel (paramètre « i » du lien reçu par courriel) : une seule réponse par invitation. */
+  jetonInvitation?: string;
   /** true quand le sondage exige le consentement (case cochée sur la page d'accueil, à chaque visite). */
   consentement?: boolean;
   /** Langue dans laquelle le formulaire a été vu ; absente : principale (400 LANGUE_INVALIDE si non proposée). */

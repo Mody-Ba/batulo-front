@@ -1,6 +1,7 @@
 import { traduire, traduirePluriel } from '../i18n/traduire';
 import { TypeQuestion } from './sondage.model';
 import { LangueContenu } from './traduction.model';
+import { InviteResponse } from './invitation.model';
 
 /** Granularité de la répartition des dates (absente : choisie par le backend selon l'écart). */
 export type GranulariteDate = 'JOUR' | 'MOIS';
@@ -217,6 +218,8 @@ export interface ReponseResponse {
   dateSoumission: string;
   /** Langue dans laquelle le répondant a vu le formulaire (anciennes réponses : fr). */
   langue?: LangueContenu | null;
+  /** Mode nominatif seulement : la personne invitée qui a répondu. */
+  invite?: InviteResponse | null;
   valeurs: { questionId: number; libelle: string; type: TypeQuestion; valeur: unknown }[];
 }
 
