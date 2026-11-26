@@ -14,6 +14,33 @@
   }
 }
 
+// Carte « Acheter des sondages » : toute la largeur, sous les deux autres.
+.carte-achat {
+  @media (min-width: 840px) {
+    grid-column: 1 / -1;
+  }
+
+  .solde {
+    margin: 0 0 var(--bt-espace-3);
+    font: var(--mat-sys-title-small);
+  }
+
+  .actions-achat {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bt-espace-2);
+    margin-top: var(--bt-espace-3);
+
+    button {
+      min-height: 44px;
+    }
+  }
+}
+
+.defilement {
+  overflow-x: auto;
+}
+
 .carte {
   padding: var(--bt-espace-4);
   border: 1px solid var(--mat-sys-outline-variant);
@@ -60,7 +87,8 @@
 
   th,
   td {
-    padding: var(--bt-espace-2) var(--bt-espace-2) var(--bt-espace-2) 0;
+    padding-block: var(--bt-espace-2);
+    padding-inline: 0 var(--bt-espace-2);
     border-bottom: 1px solid var(--mat-sys-outline-variant);
     text-align: start;
     vertical-align: top;
@@ -73,6 +101,10 @@
 
   tbody tr:last-child td {
     border-bottom: 0;
+  }
+
+  .colonne-quantite {
+    text-align: end;
   }
 
   .colonne-montant {

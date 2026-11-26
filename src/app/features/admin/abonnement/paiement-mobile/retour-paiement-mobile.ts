@@ -21,7 +21,7 @@ import {
   MESSAGE_RECONNEXION,
   suivrePaiementMobile,
 } from './suivi-paiement-mobile';
-import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { DateLPipe, PlurielPipe } from '../../../../core/i18n/formats.pipes';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuvable' | 'erreur';
@@ -33,7 +33,7 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
  */
 @Component({
   selector: 'app-retour-paiement-mobile',
-  imports: [TranslocoPipe, DateLPipe,  RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
+  imports: [TranslocoPipe, DateLPipe, PlurielPipe, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule, Encadre, EntetePage, MessageErreur],
   template: `
     <section class="conteneur-page etroit">
       <app-entete-page [titre]="'abonnement.retour.titre' | transloco" icone="smartphone" />
@@ -51,15 +51,28 @@ type EtatRetour = 'attente' | 'reussi' | 'echoue' | 'attente-longue' | 'introuva
           @if (statut(); as s) {
             <div class="succes">
               <span class="icone-succes" aria-hidden="true"><mat-icon fontIcon="check_circle" aria-hidden="true" /></span>
-              <h2 class="titre-etat" tabindex="-1">{{ 'abonnement.retour.active' | transloco }}</h2>
-              <p role="status">
-                {{ 'abonnement.retour.recu' | transloco: { montant: montant(s.montant, s.devise) } }}
-                @if (s.abonnement.dateExpiration; as fin) {
-                  {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[s.formule], date: (fin | dateL: 'longDate') } }}
-                } @else {
-                  {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[s.formule] } }}
-                }
-              </p>
+              @if (s.type === 'ACHAT_SONDAGES') {
+                <h2 class="titre-etat" tabindex="-1">{{ 'achat.succes.titre' | transloco }}</h2>
+                <p role="status">
+                  {{ 'abonnement.retour.recu' | transloco: { montant: montant(s.montant, s.devise) } }}
+                  {{ 'achat.succes.ajoutes' | pluriel: s.quantite ?? 0 }}
+                  @if (s.credits; as c) {
+                    {{ 'achat.disponibles' | transloco: { nombre: c.solde } }}
+                  }
+                </p>
+              } @else {
+                <h2 class="titre-etat" tabindex="-1">{{ 'abonnement.retour.active' | transloco }}</h2>
+                <p role="status">
+                  {{ 'abonnement.retour.recu' | transloco: { montant: montant(s.montant, s.devise) } }}
+                  @if (s.formule; as formule) {
+                    @if (s.abonnement?.dateExpiration; as fin) {
+                      {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[formule], date: (fin | dateL: 'longDate') } }}
+                    } @else {
+                      {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[formule] } }}
+                    }
+                  }
+                </p>
+              }
               <a matButton="filled" class="bouton-principal" routerLink="/admin">{{ 'abonnement.succes.allerTdb' | transloco }}</a>
             </div>
           }
@@ -163,9 +176,13 @@ export class RetourPaiementMobile {
     });
   }
 
-  /** « Réessayer » : un nouveau paiement mobile, même formule si elle est connue. */
+  /** « Réessayer » : un nouveau paiement mobile, même formule (ou même achat de sondages) si elle est connue. */
   protected parametresReessai(): Record<string, string> {
-    const formule = this.statut()?.formule;
+    const statut = this.statut();
+    if (statut?.type === 'ACHAT_SONDAGES') {
+      return { moyen: 'mobile', offre: 'ACHAT_SONDAGES', ...(statut.quantite ? { quantite: String(statut.quantite) } : {}) };
+    }
+    const formule = statut?.formule;
     return formule ? { moyen: 'mobile', formule } : { moyen: 'mobile' };
   }
 

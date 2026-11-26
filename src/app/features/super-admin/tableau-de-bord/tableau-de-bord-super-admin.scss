@@ -33,3 +33,29 @@
     color: inherit;
   }
 }
+
+.liste-revenus {
+  display: grid;
+  gap: var(--bt-espace-3);
+  margin: 0;
+
+  dt {
+    font: var(--mat-sys-title-small);
+  }
+
+  dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--bt-espace-2);
+    margin: var(--bt-espace-1) 0 0;
+  }
+}
+
+.montant-revenus {
+  font: var(--mat-sys-title-medium);
+}
+
+.sondages-vendus {
+  margin: var(--bt-espace-3) 0 0;
+}

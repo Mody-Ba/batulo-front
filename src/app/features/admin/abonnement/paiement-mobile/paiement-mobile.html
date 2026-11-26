@@ -2,7 +2,14 @@
 
 <div class="resume">
   <div>
-    <p class="resume-formule">{{ libellesFormule[formule()] }} · {{ 'abonnement.mobile.application' | transloco }}</p>
+    <p class="resume-formule">
+      @if (formule(); as f) {
+        {{ libellesFormule[f] }}
+      } @else {
+        {{ 'achat.nSondages' | pluriel: quantite() ?? 0 }}
+      }
+      · {{ 'abonnement.mobile.application' | transloco }}
+    </p>
     @if (session(); as s) {
       <p class="resume-montant">{{ montant(s.montant, s.devise) }}</p>
     }

@@ -2,13 +2,18 @@ import { Component, computed, DestroyRef, effect, inject, input, signal, untrack
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Router, RouterLink } from '@angular/router';
 import {
   abonnementEnAlerte,
   LIBELLES_FORMULE,
+  LIBELLES_FOURNISSEUR,
   LIBELLES_STATUT_ABONNEMENT,
+  PaiementResponse,
 } from '../../../../core/models/abonnement.model';
+import { PageResponse } from '../../../../core/models/page.model';
+import { montantEnClair } from '../../../../core/utils/montant';
 import { nomComplet } from '../../../../core/models/gestionnaire.model';
 import { AdminDetailResponse, compteDepuisDetail } from '../../../../core/models/super-admin.model';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
@@ -20,12 +25,18 @@ import { urlLogoSure } from '../../../../shared/formulaire/apparence/apparence';
 import { DateLPipe } from '../../../../core/i18n/formats.pipes';
 import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { PlurielPipe } from '../../../../core/i18n/formats.pipes';
+import { NombreLPipe, PlurielPipe } from '../../../../core/i18n/formats.pipes';
 
-/** Détail d'un admin : entreprise, compte de l'admin, abonnement (jours restants) et actions. */
+/** Taille d'une page de l'historique des achats de sondages. */
+export const TAILLE_ACHATS = 5;
+
+/**
+ * Détail d'un admin : entreprise, compte de l'admin, abonnement (jours restants), sondages achetés (solde et historique
+ * des achats, lecture seule) et actions.
+ */
 @Component({
   selector: 'app-detail-admin',
-  imports: [PlurielPipe, TranslocoPipe, MontantLPipe, DateLPipe, 
+  imports: [PlurielPipe, NombreLPipe, TranslocoPipe, MontantLPipe, DateLPipe, MatPaginatorModule,
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -45,6 +56,13 @@ export class DetailAdmin {
   protected readonly libelleGestionnaires = libelleGestionnaires;
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly libellesStatut = LIBELLES_STATUT_ABONNEMENT;
+  protected readonly libellesFournisseur = LIBELLES_FOURNISSEUR;
+  protected readonly montant = montantEnClair;
+  protected readonly tailleAchats = TAILLE_ACHATS;
+
+  /** Historique des achats de sondages (GET .../admins/{id}/achats-sondages), paginé dans la carte. */
+  protected readonly achats = signal<PageResponse<PaiementResponse> | null>(null);
+  protected readonly erreurAchats = signal<unknown>(null);
 
   /** Paramètre de route :id. */
   readonly id = input.required<string>();
@@ -62,8 +80,26 @@ export class DetailAdmin {
   constructor() {
     effect(() => {
       const id = this.identifiant();
-      untracked(() => this.charger(id));
+      untracked(() => {
+        this.charger(id);
+        this.chargerAchats(id, 0);
+      });
     });
+  }
+
+  protected chargerAchats(id = this.identifiant(), page = this.achats()?.page ?? 0): void {
+    this.erreurAchats.set(null);
+    this.service
+      .achatsSondages(id, page, TAILLE_ACHATS)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (achats) => this.achats.set(achats),
+        error: (erreur: unknown) => this.erreurAchats.set(erreur),
+      });
+  }
+
+  protected changerPageAchats(evenement: PageEvent): void {
+    this.chargerAchats(this.identifiant(), evenement.pageIndex);
   }
 
   protected charger(id = this.identifiant()): void {

@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, Injector, signal } from '@angular/core';
 import { catchError, EMPTY, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   AbonnementResponse,
+  CreditsResponse,
   Formule,
   FormuleResponse,
   IntentionPaiementRequest,
@@ -14,6 +15,7 @@ import {
   StatutPaiementMobileResponse,
 } from '../models/abonnement.model';
 import { PageResponse } from '../models/page.model';
+import { AuthService } from './auth.service';
 
 /**
  * Abonnement de l'entreprise de l'admin connecté, paiement Stripe (carte) et Moosyl (mobile).
@@ -24,6 +26,8 @@ export class AbonnementService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/api/abonnements`;
 
+  /** AuthService dépend de ce service : il est lu à la demande (crédits reçus d'une réponse). */
+  private readonly injector = inject(Injector);
   private readonly _abonnement = signal<AbonnementResponse | null>(null);
   /** Dernier abonnement connu (bandeau, pages d'abonnement). */
   readonly abonnement = this._abonnement.asReadonly();
@@ -37,7 +41,27 @@ export class AbonnementService {
   monAbonnement(): Observable<AbonnementResponse> {
     return this.http
       .get<AbonnementResponse>(`${this.url}/moi`)
-      .pipe(tap((abonnement) => this._abonnement.set(abonnement)));
+      .pipe(
+        tap((abonnement) => {
+          this._abonnement.set(abonnement);
+          this.transmettreCredits(abonnement.credits);
+        }),
+      );
+  }
+
+  /** GET /credits : solde de sondages achetés (admin). */
+  credits(): Observable<CreditsResponse> {
+    return this.http.get<CreditsResponse>(`${this.url}/credits`).pipe(tap((credits) => this.transmettreCredits(credits)));
+  }
+
+  /** Achat de sondages par carte : PaymentIntent de quantité × prix d'un sondage, puis confirmer(). */
+  creerIntentionAchat(quantite: number): Observable<IntentionPaiementResponse> {
+    return this.http.post<IntentionPaiementResponse>(`${this.url}/achat-sondages/intention`, { quantite });
+  }
+
+  /** Achat de sondages par paiement mobile (Moosyl, en MRU) ; suivi par statutMobile(). */
+  acheterMobile(quantite: number): Observable<PaiementMobileResponse> {
+    return this.http.post<PaiementMobileResponse>(`${this.url}/achat-sondages/paiement-mobile`, { quantite });
   }
 
   /** Recharge le signal partagé sans remonter d'erreur (bandeau). */
@@ -69,7 +93,7 @@ export class AbonnementService {
   confirmer(paymentIntentId: string): Observable<PaiementConfirmeResponse> {
     return this.http
       .post<PaiementConfirmeResponse>(`${this.url}/paiement/confirmer`, { paymentIntentId })
-      .pipe(tap((reponse) => this._abonnement.set(reponse.abonnement)));
+      .pipe(tap((reponse) => this.apresPaiement(reponse.abonnement, reponse.credits)));
   }
 
   /**
@@ -87,9 +111,27 @@ export class AbonnementService {
       .pipe(
         tap((reponse) => {
           if (reponse.statut === 'REUSSI') {
-            this._abonnement.set(reponse.abonnement);
+            this.apresPaiement(reponse.abonnement, reponse.credits);
           }
         }),
       );
+  }
+
+  /** Abonnement et solde reçus après un paiement (abonnement ou achat de sondages). */
+  private apresPaiement(abonnement: AbonnementResponse | null | undefined, credits: CreditsResponse | null | undefined): void {
+    if (abonnement) {
+      this._abonnement.set(credits ? { ...abonnement, credits } : abonnement);
+    } else if (credits) {
+      this._abonnement.update((a) => (a ? { ...a, credits } : a));
+    }
+    this.transmettreCredits(credits);
+  }
+
+  /** Le solde est gardé dans la session (il décide de l'accès, voir AuthService.compteCredits). */
+  private transmettreCredits(credits: CreditsResponse | null | undefined): void {
+    if (credits) {
+      // Lu par l'injecteur au moment de l'appel : AuthService injecte ce service dans son constructeur.
+      this.injector.get(AuthService).mettreAJourCredits(credits);
+    }
   }
 }

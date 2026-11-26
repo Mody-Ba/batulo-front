@@ -890,7 +890,9 @@
     "IMPORT_TROP_GRAND": "The file has more than 1,000 rows: split it into several files.",
     "REPRISE_INVALIDE": "Choose a survey other than this one.",
     "SONDAGE_NON_OUVERT": "This survey is not open.",
-    "SONDAGE_FERME": "This survey is closed."
+    "SONDAGE_FERME": "This survey is closed.",
+    "CREDITS_EPUISES": "No surveys left: buy surveys or subscribe to publish.",
+    "QUANTITE_INVALIDE": "The number of surveys must be between 1 and 1000."
   },
   "gestionnaires": {
     "actions": {
@@ -1777,8 +1779,8 @@
     },
     "etapes": {
       "e1": {
-        "titre": "Create your account and subscribe",
-        "texte": "Register your company, then choose the monthly or annual plan and pay by bank card or mobile app (Bankily, Masrvi, Sedad)."
+        "titre": "Create your account and choose your plan",
+        "texte": "Register your company, then choose the monthly or annual plan, or buy surveys individually, and pay by bank card or mobile app (Bankily, Masrvi, Sedad)."
       },
       "e2": {
         "titre": "Build your survey",
@@ -1804,7 +1806,7 @@
       },
       "q3": {
         "question": "How does payment work?",
-        "reponse": "By bank card, with a payment secured by Stripe, in Canadian dollars, or by mobile app (Bankily, Masrvi, Sedad), in ouguiyas. For one month or one year."
+        "reponse": "By bank card, with a payment secured by Stripe, in Canadian dollars, or by mobile app (Bankily, Masrvi, Sedad), in ouguiyas. For one month, for one year, or per survey bought (from 1 to 1000 at a time, with no expiry date)."
       },
       "q4": {
         "question": "Can I cancel?",
@@ -1821,7 +1823,7 @@
       "titre": "Frequently asked questions"
     },
     "tarifs": {
-      "chapeau": "One plan for your whole company, monthly or yearly.",
+      "chapeau": "One plan for your whole company, monthly or yearly, or surveys bought individually.",
       "chargement": "Loading prices",
       "erreur": "Prices could not be loaded.",
       "avantageux": "Best value",
@@ -1838,7 +1840,9 @@
       "libelle": {
         "MENSUEL": "Monthly subscription",
         "ANNUEL": "Annual subscription"
-      }
+      },
+      "achatInclus2": "One survey bought = one survey published, new versions included",
+      "achatInclus3": "Bank card or mobile payment, no subscription"
     },
     "contact": {
       "titre": "A question? Write to us",
@@ -2103,5 +2107,81 @@
       "languePrincipale": "Main",
       "pagination": "Invitee pagination"
     }
+  },
+  "achat": {
+    "titre": "Buy surveys",
+    "libelle": "Survey purchase",
+    "acheter": "Buy surveys",
+    "sAbonner": "Subscribe",
+    "offre": "Plan",
+    "nombre": "Number of surveys",
+    "bornes": "From {{min}} to {{max}} surveys",
+    "erreurs": {
+      "requise": "Enter the number of surveys.",
+      "entiere": "Enter a whole number."
+    },
+    "prixUnitaire": "{{prix}} per survey",
+    "parSondage": "per survey",
+    "parCarte": "by card",
+    "total": "Total:",
+    "sansDate": "From {{min}} to {{max}} surveys, no expiry date",
+    "explication": "Each survey you buy lets you publish one new survey, with no expiry date; its new versions cost nothing more. From {{min}} to {{max}} surveys per purchase; purchases add up.",
+    "continuer": "Continue to payment",
+    "disponibles": "Surveys available: {{nombre}}",
+    "nSondages": {
+      "one": "{{n}} survey",
+      "other": "{{n}} surveys"
+    },
+    "succes": {
+      "titre": "Purchase confirmed",
+      "ajoutes": {
+        "one": "{{n}} survey has been added to your balance.",
+        "other": "{{n}} surveys have been added to your balance."
+      }
+    },
+    "historique": {
+      "type": "Type",
+      "quantite": "Quantity"
+    },
+    "inscription": {
+      "offre": "Your plan",
+      "aide": "Payment comes right after the account is created, by bank card or mobile app."
+    },
+    "publication": {
+      "utilisera": "This publication will use 1 survey (balance: {{solde}}).",
+      "nouvelleVersion": "Free if this survey was already published with a purchased survey; otherwise, this publication will use 1 survey (balance: {{solde}}).",
+      "epuiseTitre": "No surveys left",
+      "epuise": "Publishing this survey requires a purchased survey. Buy surveys, or subscribe to publish without limits.",
+      "demanderAdmin": "Ask your company’s admin to buy surveys or to subscribe."
+    },
+    "superAdmin": {
+      "titre": "Purchased surveys",
+      "solde": "Balance",
+      "totalAchete": "Total purchased",
+      "totalUtilise": "Total used",
+      "aucun": "This company has never bought surveys.",
+      "historique": "Purchase history",
+      "aucunAchat": "No survey purchases.",
+      "erreurHistorique": "The purchase history could not be loaded.",
+      "pagination": "Purchase history pages",
+      "colonne": "Surveys"
+    },
+    "revenus": {
+      "titre": "Revenue",
+      "paiements": {
+        "one": "{{n}} payment",
+        "other": "{{n}} payments"
+      },
+      "aucun": "No payments",
+      "sondagesVendus": {
+        "one": "{{n}} survey sold individually",
+        "other": "{{n}} surveys sold individually"
+      },
+      "indisponibles": "Revenue unavailable."
+    }
+  },
+  "typesPaiement": {
+    "ABONNEMENT": "Subscription",
+    "ACHAT_SONDAGES": "Survey purchase"
   }
 }

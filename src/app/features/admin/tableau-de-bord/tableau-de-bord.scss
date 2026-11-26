@@ -74,3 +74,15 @@
     color: var(--mat-sys-on-surface-variant);
   }
 }
+
+.solde-sondages {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+  margin: var(--bt-espace-2) 0;
+  font: var(--mat-sys-title-small);
+
+  &.epuise {
+    color: var(--mat-sys-error);
+  }
+}

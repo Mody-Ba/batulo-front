@@ -6,6 +6,7 @@ import { COURRIEL_CONTACT, FAQ, FONCTIONNALITES, SECTIONS_VITRINE } from './cont
 import { prixEnClair } from './tarifs-vitrine/tarifs-vitrine';
 import { Vitrine } from './vitrine';
 import { traduire } from '../../core/i18n/traduire';
+import { formulesDeTest } from '../../testing/donnees-test';
 
 const FORMULES = [
   { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois', prixMobile: 40, deviseMobile: 'MRU' },
@@ -64,6 +65,24 @@ describe('Vitrine publique', () => {
     expect(texte(cartes[0] as HTMLElement)).toContain('CAD / 1 mois');
     expect(cartes[1].classList).toContain('en-avant');
     expect(cartes[1].textContent).toContain('Le plus avantageux');
+  });
+
+  it('3e offre : achat de sondages, prix par sondage en CAD et en MRU, « de 1 à 1000 sondages, sans date limite »', async () => {
+    formules.mockReturnValue(of(formulesDeTest()));
+    const el = await creer();
+    const cartes = el.querySelectorAll<HTMLElement>('#tarifs .carte');
+    expect(cartes.length).toBe(3);
+    const achat = cartes[2];
+    expect(achat.classList).toContain('carte-achat');
+    expect(texte(achat)).toContain('Achat de sondages');
+    expect(texte(achat)).toContain(prixEnClair({ prix: 4.99, devise: 'CAD' }).replace(/\s+/g, ' '));
+    expect(texte(achat)).toContain('CAD par sondage');
+    expect(texte(achat)).toContain('ou 200 MRU par paiement mobile');
+    expect(texte(achat)).toContain('De 1 à 1000 sondages, sans date limite');
+    expect(achat.querySelector('a')!.getAttribute('href')).toBe('/inscription?offre=ACHAT_SONDAGES');
+    // L'annuel reste mis en avant (comparé au mensuel seulement) ; chaque carte mène à l'inscription avec son offre.
+    expect(cartes[1].classList).toContain('en-avant');
+    expect(cartes[0].querySelector('a')!.getAttribute('href')).toBe('/inscription?offre=MENSUEL');
   });
 
   it('tarifs : prix du paiement mobile en MRU, lus dans l’API, et applications acceptées', async () => {

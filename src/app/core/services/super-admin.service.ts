@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { PaiementResponse } from '../models/abonnement.model';
 import { PageResponse } from '../models/page.model';
 import {
   AbonnementAdminResponse,
@@ -42,6 +43,11 @@ export class SuperAdminService {
   /** L'admin, l'abonnement de son entreprise et son nombre de gestionnaires. */
   detailAdmin(id: number): Observable<AdminDetailResponse> {
     return this.http.get<AdminDetailResponse>(`${this.url}/admins/${id}`);
+  }
+
+  /** Achats de sondages réussis de l'entreprise de cet admin, du plus récent au plus ancien (lecture seule). */
+  achatsSondages(id: number, page = 0, taille = 5): Observable<PageResponse<PaiementResponse>> {
+    return this.http.get<PageResponse<PaiementResponse>>(`${this.url}/admins/${id}/achats-sondages`, { params: { page, taille } });
   }
 
   /** Crée l'entreprise, l'admin (mot de passe temporaire par courriel) et un abonnement en attente de paiement. */

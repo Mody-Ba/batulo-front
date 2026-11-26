@@ -3,18 +3,21 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   catchError,
+  concatMap,
   EMPTY,
   finalize,
   firstValueFrom,
   map,
   Observable,
+  of,
   shareReplay,
   tap,
   throwError,
 } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SANS_AUTHENTIFICATION } from '../interceptors/contexte-http';
-import { StatutAbonnement } from '../models/abonnement.model';
+import { CreditsResponse, StatutAbonnement } from '../models/abonnement.model';
+import { abonnementIllimite, soldeAAfficher } from '../utils/achat-sondages';
 import {
   ChangementMotDePasseRequest,
   ConnexionRequest,
@@ -37,6 +40,11 @@ interface Session {
   statutAbonnement: StatutAbonnement | null;
   motDePasseTemporaire: boolean;
   utilisateur: UtilisateurResponse;
+  /**
+   * Sondages achetés (GET /api/auth/moi, paiements) ; absent tant qu'ils ne sont pas connus (ConnexionResponse ne les
+   * donne pas). compteCredits ouvre l'accès malgré EN_ATTENTE_PAIEMENT ou EXPIRE.
+   */
+  credits?: CreditsResponse | null;
 }
 
 const CLE_SESSION = 'batulo.session';
@@ -67,12 +75,25 @@ export class AuthService {
   readonly utilisateur = computed(() => this.session()?.utilisateur ?? null);
   readonly statutAbonnement = computed(() => this.session()?.statutAbonnement ?? null);
   readonly motDePasseTemporaire = computed(() => this.session()?.motDePasseTemporaire ?? false);
+  /** Sondages achetés de l'entreprise, ou null s'ils ne sont pas connus (super admin compris). */
+  readonly credits = computed(() => this.session()?.credits ?? null);
   /**
-   * Abonnement expiré : le backend n'accepte plus que la lecture (GET). Les boutons d'écriture sont
-   * désactivés avec l'infobulle messageLectureSeule().
+   * L'entreprise a déjà acheté des sondages : sans abonnement en cours (EN_ATTENTE_PAIEMENT ou EXPIRE), l'accès reste
+   * complet ; seule la publication d'un nouveau sondage demande un crédit (AccesAbonnementInterceptor du backend).
+   */
+  readonly compteCredits = computed(() => this.role() !== 'SUPER_ADMIN' && !!this.credits()?.compteCredits);
+  /** Abonnement en cours (ACTIF ou EXPIRE_BIENTOT) : publication illimitée. */
+  readonly abonnementIllimite = computed(() => abonnementIllimite(this.statutAbonnement()));
+  /** « Sondages disponibles : X » : sans abonnement en cours et avec un compte de crédits ; null sinon. */
+  readonly soldeAffiche = computed(() =>
+    this.role() === 'SUPER_ADMIN' ? null : soldeAAfficher(this.statutAbonnement(), this.credits()),
+  );
+  /**
+   * Abonnement expiré sans compte de crédits : le backend n'accepte plus que la lecture (GET). Les boutons d'écriture
+   * sont désactivés avec l'infobulle messageLectureSeule().
    */
   readonly lectureSeule = computed(
-    () => this.role() !== 'SUPER_ADMIN' && this.statutAbonnement() === 'EXPIRE',
+    () => this.role() !== 'SUPER_ADMIN' && this.statutAbonnement() === 'EXPIRE' && !this.compteCredits(),
   );
   readonly nomAffiche = computed(() => {
     const utilisateur = this.utilisateur();
@@ -99,6 +120,10 @@ export class AuthService {
       case 'DESACTIVE':
         return '/compte-suspendu';
       case 'EN_ATTENTE_PAIEMENT':
+        // Sondages déjà achetés : accès complet sans abonnement.
+        if (session.credits?.compteCredits) {
+          return null;
+        }
         // Seul l'admin peut payer ; ses gestionnaires n'ont rien à faire en attendant.
         return session.role === 'ADMIN' ? '/admin/abonnement' : '/compte-suspendu';
       default:
@@ -119,6 +144,16 @@ export class AuthService {
         this._messageConnexion.set(null);
         this.ouvrirSession(reponse);
       }),
+      // Sans abonnement en cours, le solde de sondages achetés décide de la page d'accueil : il est lu avant d'y aller
+      // (jamais bloquant : en cas d'échec, la page imposée habituelle).
+      concatMap((reponse) =>
+        reponse.role !== 'SUPER_ADMIN' && (reponse.statutAbonnement === 'EN_ATTENTE_PAIEMENT' || reponse.statutAbonnement === 'EXPIRE')
+          ? this.chargerProfil().pipe(
+              map(() => reponse),
+              catchError(() => of(reponse)),
+            )
+          : of(reponse),
+      ),
     );
   }
 
@@ -158,6 +193,7 @@ export class AuthService {
           role: profil.utilisateur.role,
           motDePasseTemporaire: profil.utilisateur.motDePasseTemporaire,
           statutAbonnement: profil.statutAbonnement,
+          credits: profil.credits ?? null,
         }),
       ),
     );
@@ -215,6 +251,11 @@ export class AuthService {
     this.mettreAJourSession({ statutAbonnement: statut });
   }
 
+  /** Solde reçu d'un paiement, de GET /abonnements/moi ou /credits. */
+  mettreAJourCredits(credits: CreditsResponse): void {
+    this.mettreAJourSession({ credits });
+  }
+
   /** Le serveur a répondu 403 MOT_DE_PASSE_TEMPORAIRE. */
   signalerMotDePasseTemporaire(): void {
     this.mettreAJourSession({ motDePasseTemporaire: true });
@@ -242,6 +283,9 @@ export class AuthService {
   }
 
   private ouvrirSession(reponse: ConnexionResponse): void {
+    // Rafraîchissement : même compte, le solde déjà connu est gardé (ConnexionResponse ne le donne pas).
+    const precedente = this.session();
+    const credits = precedente && precedente.utilisateur.id === reponse.utilisateur.id ? precedente.credits : undefined;
     const session: Session = {
       jeton: reponse.jeton,
       jetonRafraichissement: reponse.jetonRafraichissement,
@@ -250,6 +294,7 @@ export class AuthService {
       statutAbonnement: reponse.statutAbonnement,
       motDePasseTemporaire: reponse.motDePasseTemporaire,
       utilisateur: reponse.utilisateur,
+      ...(credits !== undefined ? { credits } : {}),
     };
     this.session.set(session);
     this.ecrireStockage(session);

@@ -4,15 +4,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { FormControl } from '@angular/forms';
 import {
   abonnementEnAlerte,
+  FormuleResponse,
   LIBELLES_FORMULE,
   LIBELLES_FOURNISSEUR,
   LIBELLES_STATUT_ABONNEMENT,
+  LIBELLES_TYPE_PAIEMENT,
+  offreAchat,
   PaiementResponse,
 } from '../../../../core/models/abonnement.model';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { bornesAchat, quantiteValide, validateurQuantite } from '../../../../core/utils/achat-sondages';
+import { QuantiteSondages } from '../../../../shared/components/quantite-sondages/quantite-sondages';
 import { montantEnClair } from '../../../../core/utils/montant';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
@@ -32,7 +39,7 @@ export const TAILLES_PAIEMENTS = [5, 10, 20];
  */
 @Component({
   selector: 'app-mon-abonnement',
-  imports: [NombreLPipe, PlurielPipe, TranslocoPipe, DateLPipe, 
+  imports: [NombreLPipe, PlurielPipe, TranslocoPipe, DateLPipe, QuantiteSondages,
     RouterLink,
     MatButtonModule,
     MatIconModule,
@@ -48,10 +55,13 @@ export const TAILLES_PAIEMENTS = [5, 10, 20];
 export class MonAbonnement {
   private readonly service = inject(AbonnementService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  protected readonly auth = inject(AuthService);
 
   protected readonly abonnement = this.service.abonnement;
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly libellesFournisseur = LIBELLES_FOURNISSEUR;
+  protected readonly libellesType = LIBELLES_TYPE_PAIEMENT;
   protected readonly montant = montantEnClair;
   protected readonly libellesStatut = LIBELLES_STATUT_ABONNEMENT;
   protected readonly chargement = signal(true);
@@ -65,12 +75,43 @@ export class MonAbonnement {
   protected readonly chargementPaiements = signal(true);
   protected readonly erreurPaiements = signal<unknown>(null);
 
+  /** Offre d'achat de sondages (prix d'un sondage), lue dans /formules ; carte masquée si absente. */
+  protected readonly offreAchat = signal<FormuleResponse | null>(null);
+  protected readonly nombreSondages = new FormControl<number | null>(1, {
+    validators: [validateurQuantite(() => bornesAchat(this.offreAchat()))],
+  });
+  /** Solde affiché dans la carte d'achat si l'entreprise a déjà acheté. */
+  protected readonly credits = computed(() => this.abonnement()?.credits ?? this.auth.credits());
+
   protected readonly enAlerte = computed(() => abonnementEnAlerte(this.abonnement()));
   protected readonly expire = computed(() => this.abonnement()?.statut === 'EXPIRE');
 
   constructor() {
     this.charger();
     this.chargerPaiements();
+    this.service
+      .formules()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (formules) => {
+          this.offreAchat.set(offreAchat(formules) ?? null);
+          this.nombreSondages.updateValueAndValidity();
+        },
+        // Sans tarifs, pas de carte d'achat (la page reste utilisable).
+        error: () => this.offreAchat.set(null),
+      });
+  }
+
+  /** « Continuer vers le paiement » : souscription en mode achat, nombre gardé dans l'URL (carte ou mobile ensuite). */
+  protected acheter(): void {
+    const quantite = this.nombreSondages.value;
+    if (!quantiteValide(quantite, bornesAchat(this.offreAchat()))) {
+      this.nombreSondages.markAsTouched();
+      return;
+    }
+    void this.router.navigate(['/admin/abonnement/souscrire'], {
+      queryParams: { offre: 'ACHAT_SONDAGES', quantite },
+    });
   }
 
   protected changerPagePaiements(evenement: PageEvent): void {

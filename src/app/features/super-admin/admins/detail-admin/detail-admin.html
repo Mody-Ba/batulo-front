@@ -127,6 +127,66 @@
           <p class="texte-aide">{{ 'erreursApi.ABONNEMENT_INTROUVABLE' | transloco }}</p>
         }
       </article>
+
+      <article class="carte-section carte-achats" aria-labelledby="titre-achats">
+        <h2 id="titre-achats">{{ 'achat.superAdmin.titre' | transloco }}</h2>
+        @if (d.credits; as c) {
+          <dl class="liste-details">
+            <dt>{{ 'achat.superAdmin.solde' | transloco }}</dt>
+            <dd class="solde">{{ c.solde | nombreL }}</dd>
+            <dt>{{ 'achat.superAdmin.totalAchete' | transloco }}</dt>
+            <dd>{{ c.totalAchete | nombreL }}</dd>
+            <dt>{{ 'achat.superAdmin.totalUtilise' | transloco }}</dt>
+            <dd>{{ c.totalUtilise | nombreL }}</dd>
+          </dl>
+        } @else {
+          <p class="texte-aide">{{ 'achat.superAdmin.aucun' | transloco }}</p>
+        }
+
+        <h3 class="sous-titre-achats">{{ 'achat.superAdmin.historique' | transloco }}</h3>
+        <app-message-erreur [erreur]="erreurAchats()" [parDefaut]="'achat.superAdmin.erreurHistorique' | transloco">
+          <p><button matButton type="button" (click)="chargerAchats()">{{ 'commun.reessayer' | transloco }}</button></p>
+        </app-message-erreur>
+        @if (achats(); as page) {
+          @if (page.totalElements === 0) {
+            <p class="texte-aide">{{ 'achat.superAdmin.aucunAchat' | transloco }}</p>
+          } @else {
+            <div class="defilement">
+              <table class="achats">
+                <caption class="visuellement-cache">{{ 'achat.superAdmin.historique' | transloco }}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{{ 'abonnement.mon.date' | transloco }}</th>
+                    <th scope="col" class="nombre">{{ 'achat.historique.quantite' | transloco }}</th>
+                    <th scope="col">{{ 'abonnement.mon.moyen' | transloco }}</th>
+                    <th scope="col" class="nombre">{{ 'abonnement.mon.montant' | transloco }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of page.contenu; track p.id) {
+                    <tr>
+                      <td>{{ p.datePaiement | dateL: 'court' }}</td>
+                      <td class="nombre">{{ p.quantite != null ? (p.quantite | nombreL) : '—' }}</td>
+                      <td>{{ p.fournisseur ? libellesFournisseur[p.fournisseur] : '—' }}</td>
+                      <td class="nombre">{{ montant(p.montant, p.devise, true) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (page.totalElements > tailleAchats) {
+              <mat-paginator
+                [length]="page.totalElements"
+                [pageIndex]="page.page"
+                [pageSize]="tailleAchats"
+                [hidePageSize]="true"
+                (page)="changerPageAchats($event)"
+                [attr.aria-label]="'achat.superAdmin.pagination' | transloco"
+              />
+            }
+          }
+        }
+      </article>
     </div>
 
     <div class="actions">

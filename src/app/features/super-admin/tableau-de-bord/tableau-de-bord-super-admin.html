@@ -69,6 +69,37 @@
       }
     </article>
 
+    <!-- Revenus par type de paiement -->
+    <article class="carte-section revenus" aria-labelledby="titre-revenus">
+      <div class="entete-section">
+        <h2 id="titre-revenus">{{ 'achat.revenus.titre' | transloco }}</h2>
+      </div>
+      @if (chiffres(); as c) {
+        @if (c.revenus; as r) {
+          <dl class="liste-revenus">
+            @for (groupe of revenusParType(); track groupe.type) {
+              <div class="type-revenus">
+                <dt>{{ libellesType[groupe.type] }}</dt>
+                @for (l of groupe.lignes; track l.devise) {
+                  <dd>
+                    <strong class="montant-revenus">{{ montant(l.montant, l.devise, true) }}</strong>&ngsp;
+                    <span class="cellule-secondaire">{{ 'achat.revenus.paiements' | pluriel: l.nombrePaiements }}</span>
+                  </dd>
+                } @empty {
+                  <dd class="cellule-secondaire">{{ 'achat.revenus.aucun' | transloco }}</dd>
+                }
+              </div>
+            }
+          </dl>
+          <p class="sondages-vendus">{{ 'achat.revenus.sondagesVendus' | pluriel: r.sondagesVendus }}</p>
+        } @else {
+          <p class="texte-aide">{{ 'achat.revenus.indisponibles' | transloco }}</p>
+        }
+      } @else if (chargement()) {
+        <p class="texte-aide">{{ 'commun.chargement' | transloco }}</p>
+      }
+    </article>
+
     <!-- Dernières notifications -->
     <app-dernieres-notifications class="carte-section notifications" />
   </div>

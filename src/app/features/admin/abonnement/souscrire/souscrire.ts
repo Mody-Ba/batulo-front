@@ -29,10 +29,13 @@ import type {
   StripeElementChangeEvent,
   StripeElementStyle,
 } from '@stripe/stripe-js';
-import { catchError, firstValueFrom, map, of, switchMap, timer } from 'rxjs';
+import { catchError, firstValueFrom, map, of, startWith, switchMap, timer } from 'rxjs';
 import {
   Formule,
+  formulesAbonnement,
   FormuleResponse,
+  offreAchat,
+  Offre,
   IntentionPaiementResponse,
   APPLICATIONS_MOBILES,
   LIBELLES_FORMULE,
@@ -50,15 +53,18 @@ import {
 } from '../../../../core/utils/stripe-erreurs';
 import { montantEnClair } from '../../../../core/utils/montant';
 import { nonVide } from '../../../../core/utils/validateurs';
+import { bornesAchat, quantiteValide, totalAchat, validateurQuantite } from '../../../../core/utils/achat-sondages';
+import { QuantiteSondages } from '../../../../shared/components/quantite-sondages/quantite-sondages';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { EntetePage } from '../../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { PaiementMobile } from '../paiement-mobile/paiement-mobile';
 import { activerAbonnement, MESSAGE_RECONNEXION } from '../paiement-mobile/suivi-paiement-mobile';
-import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { DateLPipe, PlurielPipe } from '../../../../core/i18n/formats.pipes';
 import { MontantLPipe } from '../../../../core/i18n/formats.pipes';
 import { texteServeur, traduire } from '../../../../core/i18n/traduire';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type Etape = 'formule' | 'paiement' | 'mobile' | 'succes';
 type ChampCarte = 'numero' | 'expiration' | 'code';
@@ -72,6 +78,24 @@ export const messageCarteIncomplete = (): string => traduire('abonnement.carte.i
 export const messagePaiementEnTraitement = (): string => traduire('abonnement.carte.enTraitement');
 export { MESSAGE_RECONNEXION };
 
+/** Choix de l'étape 1 : une formule d'abonnement ou l'achat de sondages à l'unité. */
+export type ChoixOffre = Offre;
+
+/** Choix initial : ?offre= / ?formule= de l'URL, sinon l'offre choisie à l'inscription (premier paiement). */
+export function choixInitial(
+  offre: string | undefined,
+  formule: string | undefined,
+  offreChoisie: Offre | null | undefined,
+): ChoixOffre {
+  if (offre === 'ACHAT_SONDAGES') {
+    return 'ACHAT_SONDAGES';
+  }
+  if (formule === 'ANNUEL' || formule === 'MENSUEL') {
+    return formule;
+  }
+  return offreChoisie ?? 'MENSUEL';
+}
+
 /**
  * Souscription ou renouvellement :
  * 1. choix de la formule et du moyen de paiement (carte ou application mobile, ?moyen=) ;
@@ -82,7 +106,7 @@ export { MESSAGE_RECONNEXION };
  */
 @Component({
   selector: 'app-souscrire',
-  imports: [TranslocoPipe, MontantLPipe, DateLPipe, 
+  imports: [TranslocoPipe, MontantLPipe, DateLPipe, PlurielPipe, QuantiteSondages,
     ReactiveFormsModule,
     RouterLink,
     MatButtonModule,
@@ -112,6 +136,10 @@ export class Souscrire {
   readonly formule = input<string | undefined>(undefined);
   /** Paramètre ?moyen=carte|mobile (bouton « Réessayer » de la page de retour Moosyl). */
   readonly moyen = input<string | undefined>(undefined);
+  /** Paramètre ?offre=ACHAT_SONDAGES (carte « Acheter des sondages », dialogue de publication). */
+  readonly offre = input<string | undefined>(undefined);
+  /** Paramètre ?quantite= : nombre de sondages à acheter. */
+  readonly quantite = input<string | undefined>(undefined);
 
   protected readonly libellesFormule = LIBELLES_FORMULE;
   protected readonly applications = APPLICATIONS_MOBILES;
@@ -130,9 +158,42 @@ export class Souscrire {
   protected readonly etape = signal<Etape>('formule');
   protected readonly formules = signal<FormuleResponse[]>([]);
   protected readonly chargementFormules = signal(true);
-  protected readonly formuleChoisie = linkedSignal<Formule>(() =>
-    this.formule() === 'ANNUEL' ? 'ANNUEL' : 'MENSUEL',
-  );
+  /**
+   * Offre choisie (formule ou achat de sondages). En attente du premier paiement, l'offre de l'inscription est
+   * proposée d'abord si l'URL n'en indique pas.
+   */
+  protected readonly choix = linkedSignal<ChoixOffre>(() => {
+    const abonnement = this.abonnementActuel();
+    const inscription = abonnement?.statut === 'EN_ATTENTE_PAIEMENT' ? abonnement.offreChoisie : null;
+    return choixInitial(this.offre(), this.formule(), inscription);
+  });
+  protected readonly achat = computed(() => this.choix() === 'ACHAT_SONDAGES');
+  /** Formule d'abonnement choisie (MENSUEL par défaut quand l'achat est choisi). */
+  protected readonly formuleChoisie = computed<Formule>(() => (this.choix() === 'ANNUEL' ? 'ANNUEL' : 'MENSUEL'));
+  protected readonly offreAchat = computed(() => offreAchat(this.formules()));
+  protected readonly abonnements = computed(() => formulesAbonnement(this.formules()));
+  /** Nombre de sondages à acheter. */
+  protected readonly nombreSondages = new FormControl<number | null>(null, {
+    validators: [validateurQuantite(() => bornesAchat(this.offreAchat()))],
+  });
+  private readonly valeurNombre = toSignal(this.nombreSondages.valueChanges.pipe(startWith(this.nombreSondages.value)), {
+    initialValue: null,
+  });
+  protected readonly quantiteAchat = computed(() => {
+    const q = this.valeurNombre();
+    return quantiteValide(q, bornesAchat(this.offreAchat())) ? q : null;
+  });
+  /** Total de l'achat pour le moyen choisi (affichage ; le serveur calcule le montant facturé). */
+  protected readonly totalAchatMoyen = computed(() => {
+    const o = this.offreAchat();
+    if (!o) {
+      return null;
+    }
+    const mobile = this.moyenChoisi() === 'mobile';
+    const devise = mobile ? o.deviseMobile : o.devise;
+    const total = totalAchat(mobile ? o.prixMobile : o.prix, this.quantiteAchat(), devise, bornesAchat(o));
+    return total === null ? null : montantEnClair(total, devise);
+  });
   protected readonly moyenChoisi = linkedSignal<MoyenPaiement>(() => (this.moyen() === 'mobile' ? 'mobile' : 'carte'));
 
   protected readonly intention = signal<IntentionPaiementResponse | null>(null);
@@ -159,15 +220,25 @@ export class Souscrire {
 
   protected readonly renouvellement = computed(() => {
     const abonnement = this.abonnementActuel();
-    return !!abonnement?.formule && abonnement.statut !== 'EN_ATTENTE_PAIEMENT';
+    return !this.achat() && !!abonnement?.formule && abonnement.statut !== 'EN_ATTENTE_PAIEMENT';
   });
+  protected readonly titre = computed(() =>
+    this.achat()
+      ? 'achat.titre'
+      : this.renouvellement()
+        ? 'abonnement.souscrire.titreRenouveler'
+        : 'abonnement.souscrire.titreAbonner',
+  );
+  /** L'étape 1 peut continuer : formule connue, ou offre d'achat et nombre valide. */
   protected readonly formuleSelectionnee = computed(() =>
-    this.formules().find((f) => f.formule === this.formuleChoisie()),
+    this.achat()
+      ? !!this.offreAchat() && this.quantiteAchat() !== null
+      : !!this.abonnements().find((f) => f.formule === this.formuleChoisie()),
   );
   /** Économie de la formule annuelle par rapport à 12 mois (0 si aucune), dans la devise du moyen choisi. */
   protected readonly economieAnnuelle = computed(() => {
-    const mensuel = this.formules().find((f) => f.formule === 'MENSUEL');
-    const annuel = this.formules().find((f) => f.formule === 'ANNUEL');
+    const mensuel = this.abonnements().find((f) => f.formule === 'MENSUEL');
+    const annuel = this.abonnements().find((f) => f.formule === 'ANNUEL');
     if (!mensuel || !annuel) {
       return 0;
     }
@@ -199,6 +270,22 @@ export class Souscrire {
   }
 
   constructor() {
+    // Nombre de sondages : ?quantite= de l'URL, sinon celui de l'inscription (premier paiement), sinon 1. Une saisie
+    // n'est jamais écrasée.
+    effect(() => {
+      const url = Number(this.quantite());
+      const abonnement = this.abonnementActuel();
+      const inscription = abonnement?.statut === 'EN_ATTENTE_PAIEMENT' ? abonnement.nombreSondagesChoisi : null;
+      const valeur = this.quantite() && Number.isFinite(url) ? url : (inscription ?? 1);
+      if (!this.nombreSondages.dirty && this.nombreSondages.value !== valeur) {
+        this.nombreSondages.setValue(valeur);
+      }
+    });
+    // Bornes connues après la lecture de /formules : le contrôle est revalidé.
+    effect(() => {
+      this.offreAchat();
+      this.nombreSondages.updateValueAndValidity();
+    });
     this.chargerFormules();
     // Pour le texte du renouvellement (date à partir de laquelle la période est prolongée).
     this.service.actualiser();
@@ -235,8 +322,8 @@ export class Souscrire {
       });
   }
 
-  protected choisir(formule: Formule): void {
-    this.formuleChoisie.set(formule);
+  protected choisir(choix: ChoixOffre): void {
+    this.choix.set(choix);
   }
 
   /** Le moyen choisi est gardé dans l'URL (retour arrière, rechargement). */
@@ -268,6 +355,11 @@ export class Souscrire {
     if (this.preparation()) {
       return;
     }
+    const quantite = this.quantiteAchat();
+    if (this.achat() && quantite === null) {
+      this.nombreSondages.markAsTouched();
+      return;
+    }
     if (this.moyenChoisi() === 'mobile') {
       this.erreur.set(null);
       this.erreurPaiement.set(null);
@@ -280,7 +372,11 @@ export class Souscrire {
 
     let intention: IntentionPaiementResponse;
     try {
-      intention = await firstValueFrom(this.service.creerIntention({ formule: this.formuleChoisie() }));
+      intention = await firstValueFrom(
+        quantite !== null && this.achat()
+          ? this.service.creerIntentionAchat(quantite)
+          : this.service.creerIntention({ formule: this.formuleChoisie() }),
+      );
     } catch (erreur) {
       this.preparation.set(false);
       this.erreur.set(erreur);
@@ -380,7 +476,13 @@ export class Souscrire {
           this.auth.terminerSession(MESSAGE_RECONNEXION);
           return;
         }
-        this.afficherSucces({ message: '', abonnement: statut.abonnement });
+        this.afficherSucces({
+          message: '',
+          abonnement: statut.abonnement,
+          type: statut.type,
+          quantite: statut.quantite,
+          credits: statut.credits,
+        });
       });
   }
 
@@ -399,7 +501,9 @@ export class Souscrire {
       .confirmer(paymentIntentId)
       .pipe(
         switchMap((reponse) => {
-          this.auth.mettreAJourStatutAbonnement(reponse.abonnement.statut);
+          if (reponse.abonnement) {
+            this.auth.mettreAJourStatutAbonnement(reponse.abonnement.statut);
+          }
           // Le statut est écrit dans le jeton : sans nouveau jeton, le backend refuserait encore l'accès.
           return this.auth.rafraichir().pipe(
             map(() => reponse),

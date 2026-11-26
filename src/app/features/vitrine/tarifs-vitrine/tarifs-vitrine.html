@@ -2,6 +2,7 @@
   <div class="grille" role="status" [attr.aria-label]="'vitrine.tarifs.chargement' | transloco">
     <div class="carte emplacement" aria-hidden="true"></div>
     <div class="carte emplacement" aria-hidden="true"></div>
+    <div class="carte emplacement" aria-hidden="true"></div>
   </div>
 } @else if (erreur()) {
   <div class="erreur" role="alert">
@@ -11,9 +12,9 @@
       <a class="bouton plein" routerLink="/inscription">{{ 'auth.connexion.creerCompte' | transloco }}</a>
     </div>
   </div>
-} @else if (formules(); as liste) {
+} @else if (formules()) {
   <ul class="grille">
-    @for (f of liste; track f.formule) {
+    @for (f of abonnements(); track f.formule) {
       <li class="carte" [class.en-avant]="f.formule === 'ANNUEL' && annuelAvantageux()">
         @if (f.formule === 'ANNUEL' && annuelAvantageux()) {
           <p class="pastille">{{ 'vitrine.tarifs.avantageux' | transloco }}</p>
@@ -31,7 +32,33 @@
           <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.inclus2' | transloco }}</li>
           <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.inclus3' | transloco }}</li>
         </ul>
-        <a class="bouton" [class.plein]="f.formule === 'ANNUEL'" [class.contour]="f.formule !== 'ANNUEL'" routerLink="/inscription">
+        <a
+          class="bouton"
+          [class.plein]="f.formule === 'ANNUEL'"
+          [class.contour]="f.formule !== 'ANNUEL'"
+          routerLink="/inscription"
+          [queryParams]="{ offre: f.formule }"
+        >
+          {{ 'vitrine.commencer' | transloco }}
+        </a>
+      </li>
+    }
+    @if (achat(); as a) {
+      <li class="carte carte-achat">
+        <h3>{{ 'achat.libelle' | transloco }}</h3>
+        <p class="prix">
+          <span class="montant">{{ prix(a) }}</span>
+          <span class="devise">{{ a.devise }} {{ 'achat.parSondage' | transloco }}</span>
+        </p>
+        @if (a.prixMobile != null && a.deviseMobile) {
+          <p class="prix-mobile">{{ 'vitrine.tarifs.ou' | transloco }} <strong>{{ montant(a.prixMobile, a.deviseMobile) }}</strong> {{ 'vitrine.tarifs.parMobile' | transloco }}</p>
+        }
+        <ul class="inclus">
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'achat.sansDate' | transloco: { min: bornes().min, max: bornes().max } }}</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.achatInclus2' | transloco }}</li>
+          <li><span class="material-icons" aria-hidden="true">check</span>{{ 'vitrine.tarifs.achatInclus3' | transloco }}</li>
+        </ul>
+        <a class="bouton contour" routerLink="/inscription" [queryParams]="{ offre: 'ACHAT_SONDAGES' }">
           {{ 'vitrine.commencer' | transloco }}
         </a>
       </li>

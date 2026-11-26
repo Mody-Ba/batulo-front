@@ -8,7 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { concatMap, Observable, of, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { catchError, concatMap, EMPTY, Observable, of, tap } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth.service';
 import { DatesSondageRequest, requeteSondage, SondageResponse } from '../../../../core/models/sondage.model';
 import { SondageService } from '../../../../core/services/sondage.service';
 import { Encadre } from '../../../../shared/components/encadre/encadre';
@@ -16,7 +18,7 @@ import { MessageErreur } from '../../../../shared/components/message-erreur/mess
 import { TextesManquants } from '../textes-manquants';
 import { aLeCode } from '../../../../core/utils/erreur-http';
 import { raisonIncomplet, versIso, versLocal } from '../dates-sondage';
-import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { DateLPipe, NombreLPipe } from '../../../../core/i18n/formats.pipes';
 import { libelles } from '../../../../core/i18n/traduire';
 import { TranslocoPipe } from '@jsverse/transloco';
 
@@ -37,6 +39,13 @@ type Etape = 'reglage' | 'publication' | 'dates';
 const TITRES_ERREUR = libelles<Etape>('sondages.publication.titresErreur', ['reglage', 'publication', 'dates']);
 
 type Ouverture = 'maintenant' | 'planifiee';
+
+/**
+ * Coût de la publication hors abonnement en cours, pour une entreprise qui a acheté des sondages (le serveur décide) :
+ * credit : version 1, un sondage sera utilisé ; nouvelle-version : gratuite si la lignée a déjà été payée par un
+ * crédit, sinon un sondage (le front ne peut pas le savoir) ; epuise : solde à 0 (version 1) ou 402 CREDITS_EPUISES.
+ */
+export type CoutPublication = 'credit' | 'nouvelle-version' | 'epuise';
 
 /** Vérifications avant l'envoi (le backend renvoie DATES_INVALIDES sinon). */
 function datesValides(groupe: AbstractControl): ValidationErrors | null {
@@ -78,7 +87,7 @@ function datesValides(groupe: AbstractControl): ValidationErrors | null {
  */
 @Component({
   selector: 'app-dialogue-publication',
-  imports: [TranslocoPipe, DateLPipe, TextesManquants,
+  imports: [TranslocoPipe, DateLPipe, NombreLPipe, TextesManquants,
     ReactiveFormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -95,6 +104,8 @@ function datesValides(groupe: AbstractControl): ValidationErrors | null {
 })
 export class DialoguePublication {
   private readonly service = inject(SondageService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly reference = inject<MatDialogRef<DialoguePublication, SondageResponse>>(MatDialogRef);
   protected readonly donnees = inject<DonneesPublication>(MAT_DIALOG_DATA);
   protected readonly sondage = this.donnees.sondage;
@@ -125,6 +136,29 @@ export class DialoguePublication {
 
   protected readonly enCours = signal(false);
   protected readonly erreur = signal<unknown>(null);
+
+  /** Publication avec les sondages achetés : brouillon, sans abonnement en cours, compte de crédits. */
+  protected readonly avecCredits = computed(
+    () => this.publier && !this.auth.abonnementIllimite() && this.auth.compteCredits(),
+  );
+  protected readonly solde = computed(() => this.auth.credits()?.solde ?? 0);
+  protected readonly estAdmin = computed(() => this.auth.role() === 'ADMIN');
+  /** 402 CREDITS_EPUISES reçu à l'envoi (même sans compte de crédits connu). */
+  protected readonly refusCredits = computed(() => aLeCode(this.erreur(), 'CREDITS_EPUISES'));
+  protected readonly cout = computed<CoutPublication | null>(() => {
+    if (this.refusCredits()) {
+      return 'epuise';
+    }
+    if (!this.avecCredits()) {
+      return null;
+    }
+    if (this.sondage.version > 1) {
+      return 'nouvelle-version';
+    }
+    return this.solde() > 0 ? 'credit' : 'epuise';
+  });
+  /** Version 1 et plus aucun sondage : « Publier » est désactivé (le serveur refuserait par 402). */
+  protected readonly bloqueParSolde = computed(() => this.cout() === 'epuise');
   /** 400 TRADUCTIONS_INCOMPLETES : liste des textes manquants et liens vers les traductions. */
   protected readonly traductionsIncompletes = computed(() => aLeCode(this.erreur(), 'TRADUCTIONS_INCOMPLETES'));
   protected readonly titreErreur = signal<string | null>(null);
@@ -139,6 +173,13 @@ export class DialoguePublication {
 
   constructor() {
     this.reponseUniqueEnregistree = this.sondage.reponseUnique;
+    // Solde relu à l'ouverture (un autre onglet, ou un gestionnaire, a pu en utiliser) ; jamais bloquant.
+    if (this.publier && !this.auth.abonnementIllimite() && this.auth.role() !== 'SUPER_ADMIN' && this.auth.estConnecte()) {
+      this.auth
+        .chargerProfil()
+        .pipe(catchError(() => EMPTY))
+        .subscribe();
+    }
     if (this.dejaOuvert) {
       // Sondage ouvert : seule la fermeture prévue se règle (après maintenant).
       this.formulaire.setValidators((groupe) => {
@@ -159,8 +200,16 @@ export class DialoguePublication {
     return this.tente() && this.formulaire.hasError(code);
   }
 
+  /** « Acheter des sondages » ou « S'abonner » : la boîte se ferme, la page de souscription s'ouvre. */
+  protected allerVers(achat: boolean): void {
+    this.reference.close();
+    void this.router.navigate(['/admin/abonnement/souscrire'], {
+      queryParams: achat ? { offre: 'ACHAT_SONDAGES' } : {},
+    });
+  }
+
   protected valider(): void {
-    if (this.enCours() || this.incomplet) {
+    if (this.enCours() || this.incomplet || (this.bloqueParSolde() && !this.refusCredits())) {
       return;
     }
     this.tente.set(true);
@@ -176,8 +225,18 @@ export class DialoguePublication {
     this.titreErreur.set(null);
     this.reference.disableClose = true;
     let etape: Etape = this.publier ? 'publication' : 'dates';
+    const avecCredits = this.avecCredits();
     this.envoi((e) => (etape = e)).subscribe({
-      next: (sondage) => this.reference.close(sondage),
+      next: (sondage) => {
+        if (avecCredits) {
+          // Un sondage a peut-être été utilisé : solde relu (bandeau, tableau de bord).
+          this.auth
+            .chargerProfil()
+            .pipe(catchError(() => EMPTY))
+            .subscribe();
+        }
+        this.reference.close(sondage);
+      },
       error: (erreur: unknown) => {
         this.enCours.set(false);
         this.reference.disableClose = false;

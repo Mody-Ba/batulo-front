@@ -71,14 +71,16 @@ src/app/
     utils/         couleur.ts (#RRGGBB, contraste WCAG), erreur-http.ts (messages d'erreur), validateurs.ts (règles du backend), pagination-url.ts
                    (?page&taille), recherche.ts (DELAI_RECHERCHE_MS), stockage-local.ts (localStorage en try/catch),
                    interrogation.ts (interrogation périodique arrêtée onglet caché), montant.ts (montants selon la langue,
-                   MRU sans décimales), redirection.ts (?retour= : chemins internes seulement)
+                   MRU sans décimales), redirection.ts (?retour= : chemins internes seulement), achat-sondages.ts
+                   (total, bornes, validateur, solde à afficher)
   layout/          mise-en-page (sidenav + contenu), barre-haut, bandeau-abonnement, menu-lateral (+ liens-navigation.ts),
                    cloche-notifications
   features/        auth/, super-admin/, admin/, gestionnaire/, erreurs/ (un *.routes.ts par espace de rôle),
                    public/ (formulaire du répondant, sans compte), vitrine/ (site public sur « / »),
                    apparence/ (personnalisation de l'entreprise)
   shared/components/ encadre, message-erreur, entete-page, page-a-venir, accueil-provisoire, dialogue-confirmation,
-                   filtre-statut-abonnement, echeance-abonnement, dernieres-notifications, selecteur-langue
+                   filtre-statut-abonnement, echeance-abonnement, dernieres-notifications, selecteur-langue,
+                   quantite-sondages (nombre de sondages à acheter et total en direct)
   shared/formulaire/ formulaire côté répondant, partagé par l'aperçu (F5b) et le formulaire public (F6)
   testing/         données partagées par les tests unitaires (donnees-test.ts)
 ```
@@ -104,6 +106,9 @@ src/app/
   contrôle), relu par la page de connexion ; sinon `urlAccueil()`. Une page imposée reste prioritaire (gardes).
 - Le statut d'abonnement est écrit dans le jeton : après un paiement (F2), appeler `rafraichir()` (ou
   `mettreAJourStatutAbonnement`) pour que le front et le backend voient le nouveau statut.
+- Sondages achetés : la session garde aussi `credits` (`CreditsResponse`, de `GET /api/auth/moi` et des paiements),
+  gardé au rafraîchissement du jeton (même compte). `compteCredits` : `EN_ATTENTE_PAIEMENT` n'impose plus de page et
+  `EXPIRE` n'est plus en lecture seule (voir « Achat de sondages à l'unité »).
 
 ## Abonnement et paiement Stripe (F2)
 - Pages : `/admin/abonnement` (Mon abonnement ; redirige vers `souscrire` si EN_ATTENTE_PAIEMENT) et
@@ -625,6 +630,60 @@ src/app/
 - Textes : `invitations.*`, `statutsInvitation.*`, `editeur.nominatif.*`, `public.invitation.*` et
   `public.titresIndisponible.lien-*` dans les trois langues. Chunk `page-invitations` : environ 56 ko bruts.
 
+## Achat de sondages à l'unité
+- En plus des abonnements MENSUEL et ANNUEL (inchangés, illimités). Contrat vérifié dans l'OpenAPI (8090) :
+  `POST /api/abonnements/achat-sondages/intention { quantite }` (Stripe, puis le `/paiement/confirmer` habituel),
+  `POST .../achat-sondages/paiement-mobile { quantite }` (Moosyl, suivi par `GET .../paiement-mobile/{reference}`),
+  `GET /api/abonnements/credits` ; `CreditsResponse { solde, totalAchete, totalUtilise, compteCredits }` dans
+  `ProfilResponse`, `AbonnementResponse` (+ `offreChoisie`, `nombreSondagesChoisi`), `PaiementConfirmeResponse` et
+  `StatutPaiementMobileResponse` (+ `type`, `quantite`, `abonnement` alors facultatif) ; `FormuleResponse.type`
+  (ABONNEMENT | ACHAT_SONDAGES), 3e élément de `/formules` avec `formule` null, prix d'UN sondage, `quantiteMin|Max` ;
+  `PaiementResponse.type|quantite` ; `InscriptionRequest.offre|nombreSondages` ; super admin : `AdminDetailResponse.credits`,
+  `AdminLigneResponse.soldeCredits`, `GET .../admins/{id}/achats-sondages?page&taille`, `revenus { lignes[], sondagesVendus }`
+  du tableau de bord. Erreurs : 402 CREDITS_EPUISES (publication), 400 QUANTITE_INVALIDE.
+- `/formules` : toujours séparer `formulesAbonnement()` (formule non nulle) et `offreAchat()` (abonnement.model) ; ne jamais
+  boucler sur la liste brute (`track f.formule` en double, `formule` null).
+- Calculs (`core/utils/achat-sondages.ts`) : `totalAchat` (quantité × prix, en centimes pour le CAD, entiers en MRU ; null
+  hors bornes) — affichage seulement, le serveur calcule le montant facturé ; `bornesAchat` (quantiteMin/Max, sinon 1 et
+  1000) ; `validateurQuantite` (quantiteRequise, quantiteEntiere, quantiteMin, quantiteMax) ; `soldeAAfficher`. Import
+  `type` de `@angular/forms` seulement (le fichier est lu par AuthService, bundle initial).
+- `QuantiteSondages` (`shared/components/quantite-sondages`) : champ nombre (contrôle du parent) et total en direct, par
+  carte (CAD) et par paiement mobile (MRU), ou seulement le moyen choisi ; `aria-live` sur le total.
+- Accès : `AuthService.credits`, `compteCredits`, `abonnementIllimite` (ACTIF, EXPIRE_BIENTOT), `soldeAffiche` (null pour un
+  abonné ou sans achat) ; `redirectionObligatoire` ignore EN_ATTENTE_PAIEMENT avec un compte de crédits (admin et
+  gestionnaire), `lectureSeule` est faux en EXPIRE avec un compte de crédits ; DESACTIVE inchangé. `ConnexionResponse` n'a
+  pas les crédits : `connexion()` lit `GET /api/auth/moi` avant de rendre la main si le statut est EN_ATTENTE_PAIEMENT
+  ou EXPIRE (échec ignoré). `AbonnementService` transmet chaque solde reçu à `AuthService.mettreAJourCredits` (lu par
+  l'injecteur au moment de l'appel : AuthService injecte AbonnementService). Garde `enAttenteVersSouscrire` : laisse
+  « Mon abonnement » à un compte de crédits.
+- Inscription : offres Mensuel, Annuel, « Achat de sondages » (cartes radio natives, prix CAD et MRU de `/formules`, sans
+  prix s'ils sont illisibles), nombre et total pour l'achat ; `offre` toujours envoyée, `nombreSondages` pour l'achat ;
+  `?offre=` (liens de la vitrine) présélectionne.
+- Souscription (`souscrire?offre=ACHAT_SONDAGES&quantite=N[&moyen=]`) : 3e offre à côté des formules (`choix` = Formule |
+  ACHAT_SONDAGES ; en attente du premier paiement, `offreChoisie` et `nombreSondagesChoisi` de l'inscription d'abord),
+  nombre et total du moyen choisi ; carte : `creerIntentionAchat` puis l'écran Stripe existant ; mobile :
+  `<app-paiement-mobile [quantite]>` (`acheterMobile`). Succès : « Achat confirmé », « N sondages ont été ajoutés à votre
+  solde », « Sondages disponibles : X ». Retour Moosyl : même message ; « Réessayer » garde l'offre et le nombre.
+- « Mon abonnement » : 3e carte « Acheter des sondages » (solde si compte de crédits, nombre, totaux CAD et MRU) ->
+  souscription ; « S'abonner » quand aucune formule n'est payée. Historique : colonnes Type et Quantité (« — » pour un
+  abonnement ; Formule « — » pour un achat ; `type` absent = abonnement).
+- Solde : « Sondages disponibles : X » dans la carte Abonnement du tableau de bord admin et dans `bandeau-abonnement`
+  (avec « Acheter des sondages » ; mis en évidence à 0), seulement si `soldeAffiche()` n'est pas null.
+- Dialogue de publication (mode publier, sans abonnement en cours, compte de crédits ; solde relu par `chargerProfil()` à
+  l'ouverture et après la publication) : version 1 -> « Cette publication utilisera 1 sondage (solde : X) » ; version > 1
+  -> texte prudent « Gratuite si ce sondage a déjà été publié avec un sondage acheté ; sinon… » (le backend n'expose pas
+  `credit_utilise_le`, voir « À venir ») ; solde à 0 en version 1 ou 402 CREDITS_EPUISES -> encadré role=alert
+  « Plus aucun sondage disponible » avec « Acheter des sondages » et « S'abonner » (admin ; la boîte se ferme) ou « Demandez
+  à l'admin » (gestionnaire) ; « Publier » désactivé en version 1 à 0.
+- Super admin : fiche `detail-admin`, carte « Sondages achetés » (solde, total acheté, total utilisé) et historique paginé
+  (5 par page) ; tableau de bord : carte « Revenus » (par type puis par devise : montant avec code, nombre de paiements ;
+  sondages vendus) ; liste des admins : colonne « Sondages » (`soldeCredits`).
+- Vitrine : 3e carte (prix par sondage en CAD et MRU, « de 1 à 1000 sondages, sans date limite » d'après l'API), « Commencer »
+  -> `/inscription?offre=` ; étape 1 et FAQ (paiement) mentionnent l'achat à l'unité. Annuel mis en avant : comparé au
+  mensuel seulement.
+- Textes : `achat.*`, `typesPaiement.*`, `vitrine.tarifs.achatInclus*`, `erreursApi.CREDITS_EPUISES|QUANTITE_INVALIDE`.
+  Icône `shopping_cart` retournée en arabe.
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher l'erreur avec `<app-message-erreur [erreur]="…">` (message traduit par son code, voir « Langues de
@@ -633,13 +692,18 @@ src/app/
 - Règle du mot de passe : 8 caractères au moins, une lettre et un chiffre, 72 au plus (`validateurs.ts`).
 - Accès selon l'abonnement (AccesAbonnementInterceptor) : EN_ATTENTE_PAIEMENT -> seulement `/api/auth/**`,
   `/api/abonnements/**`, `/api/messagerie/**` ; EXPIRE -> lecture seule (GET) sauf ces routes et l'envoi des
-  statistiques ; DESACTIVE -> rien. Donc pas d'appel aux notifications tant qu'une page est imposée.
+  statistiques ; DESACTIVE -> rien. Donc pas d'appel aux notifications tant qu'une page est imposée. Compte de crédits
+  (l'entreprise a déjà acheté des sondages) : accès complet en EN_ATTENTE_PAIEMENT et EXPIRE ; seule la publication d'un
+  nouveau sondage demande un crédit (402 CREDITS_EPUISES).
 - Lien de réinitialisation : `http://localhost:4200/reinitialiser-mot-de-passe?jeton=…` (valable 1 h, usage
   unique, ferme toutes les sessions). Formulaire public : `http://localhost:4200/s/{jeton}` (F6).
 - Les règles métier détaillées (versions, assignations, collecte, statistiques, messagerie…) sont dans le
   `CLAUDE.md` du backend : le relire au début de chaque étape.
 
 ## À venir (backend)
+- Exposer, pour un brouillon, un champ indiquant si sa publication consommera un crédit (lignée déjà payée par crédit,
+  `credit_utilise_le` de la version 1, ou abonnement actif) : le dialogue de publication pourra alors afficher « gratuit »
+  de façon exacte pour une nouvelle version (aujourd'hui : texte prudent « Gratuite si… ; sinon 1 sondage »).
 - Envoi automatique par SMS/WhatsApp (Twilio ou fournisseur local) après la mise en ligne (aujourd'hui : liens wa.me et
   sms: ouverts par l'utilisateur, sans envoi par Batulo).
 - Logo : renvoyer un chemin relatif (`/api/public/logos/{jeton}`) dans `logo.url` et `apparence.logoUrl`, plutôt qu'une
@@ -698,6 +762,9 @@ src/app/
 - [x] **Phase 4, étape 4 – Invitations nominatives** : onglet « Invitations » (compteurs, tableau, ajout, import CSV,
   reprise, envoi, relance, suivi, export), option nominative de l'éditeur, lien personnel du formulaire public, colonne
   Invité des réponses (voir la section dédiée).
+- [x] **Achat de sondages à l'unité** : offre à l'inscription, carte d'achat et paiement (carte ou mobile), solde
+  (tableau de bord, bandeau), coût dans le dialogue de publication, historique (type, quantité), super admin (solde,
+  achats, revenus), vitrine (voir la section dédiée).
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

@@ -104,13 +104,30 @@
         @if (a.montant !== null && a.devise) {
           <p class="cellule-secondaire">{{ 'admin.tdb.dernierPaiement' | transloco: { montant: (a.montant | montantL: a.devise) } }}</p>
         }
+        @if (auth.soldeAffiche() !== null) {
+          <p class="solde-sondages" [class.epuise]="auth.soldeAffiche() === 0" role="status">
+            <mat-icon fontIcon="confirmation_number" aria-hidden="true" />
+            {{ 'achat.disponibles' | transloco: { nombre: (auth.soldeAffiche()! | nombreL) } }}
+          </p>
+        }
         <div class="actions">
+          @if (auth.soldeAffiche() !== null) {
+            <a
+              [matButton]="auth.soldeAffiche() === 0 ? 'filled' : 'tonal'"
+              routerLink="/admin/abonnement/souscrire"
+              [queryParams]="{ offre: 'ACHAT_SONDAGES' }"
+            >
+              <mat-icon fontIcon="shopping_cart" aria-hidden="true" />{{ 'achat.acheter' | transloco }}
+            </a>
+          }
           <a
             [matButton]="enAlerte() ? 'filled' : 'tonal'"
             routerLink="/admin/abonnement/souscrire"
             [queryParams]="{ formule: a.formule }"
           >
-            <mat-icon fontIcon="autorenew" aria-hidden="true" />{{ 'bandeau.renouveler' | transloco }}
+            <mat-icon [fontIcon]="a.formule ? 'autorenew' : 'card_membership'" aria-hidden="true" />{{
+              (a.formule ? 'bandeau.renouveler' : 'achat.sAbonner') | transloco
+            }}
           </a>
           <a matButton routerLink="/admin/abonnement">{{ 'admin.tdb.voirDetail' | transloco }}</a>
         </div>

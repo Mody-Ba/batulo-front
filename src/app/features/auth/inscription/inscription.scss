@@ -1,0 +1,75 @@
+// Choix de l'offre (éléments natifs, cibles de 44 px), une colonne sur téléphone.
+.offres {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  legend {
+    margin-bottom: var(--bt-espace-2);
+    padding: 0;
+    font: var(--mat-sys-title-small);
+  }
+
+  .texte-aide {
+    margin: var(--bt-espace-2) 0 0;
+  }
+}
+
+.choix-offres {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--bt-espace-2);
+
+  @media (max-width: 599.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.choix-offre {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bt-espace-2);
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: var(--bt-espace-2) var(--bt-espace-3);
+  border: 2px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  cursor: pointer;
+
+  &.choisie {
+    border-color: var(--mat-sys-primary);
+  }
+
+  &:has(input:focus-visible) {
+    outline: 3px solid var(--mat-sys-primary);
+    outline-offset: 2px;
+  }
+
+  input {
+    width: 20px;
+    height: 20px;
+    margin: 2px 0 0;
+    accent-color: var(--mat-sys-primary);
+  }
+}
+
+.texte-offre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.libelle-offre {
+  font: var(--mat-sys-title-small);
+}
+
+.prix-offre {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.quantite {
+  display: block;
+  margin-top: var(--bt-espace-3);
+}

@@ -12,6 +12,8 @@ import { TableauDeBord } from './tableau-de-bord';
 
 describe('TableauDeBord', () => {
   let lire: ReturnType<typeof vi.fn>;
+  /** Calculé par AuthService : null pour un abonné (illimité) ou sans achat. */
+  const soldeAffiche = signal<number | null>(null);
 
   async function creer(): Promise<HTMLElement> {
     const fixture = TestBed.createComponent(TableauDeBord);
@@ -28,6 +30,7 @@ describe('TableauDeBord', () => {
 
   beforeEach(() => {
     lire = vi.fn(() => of(tableauDeBordDeTest()));
+    soldeAffiche.set(null);
     TestBed.configureTestingModule({
       imports: [TableauDeBord],
       providers: [
@@ -40,7 +43,7 @@ describe('TableauDeBord', () => {
         },
         {
           provide: AuthService,
-          useValue: { utilisateur: signal({ prenom: 'Awa', entreprise: 'Entreprise Test' }) },
+          useValue: { utilisateur: signal({ prenom: 'Awa', entreprise: 'Entreprise Test' }), soldeAffiche },
         },
       ],
     });
@@ -83,5 +86,25 @@ describe('TableauDeBord', () => {
     ) as HTMLButtonElement;
     bouton.click();
     expect(lire).toHaveBeenCalledTimes(2);
+  });
+
+  it('abonné : pas de « Sondages disponibles » (illimité)', async () => {
+    const element = await creer();
+    expect(element.querySelector('.solde-sondages')).toBeNull();
+    expect(element.textContent).not.toContain('Acheter des sondages');
+  });
+
+  it('sans abonnement en cours, avec des sondages achetés : solde et « Acheter des sondages » ; à 0, mis en évidence', async () => {
+    soldeAffiche.set(6);
+    let element = await creer();
+    const solde = element.querySelector('.abonnement .solde-sondages')!;
+    expect(solde.textContent?.replace(/\s+/g, ' ').trim()).toBe('Sondages disponibles : 6');
+    expect(solde.classList).not.toContain('epuise');
+    const lien = Array.from(element.querySelectorAll('.abonnement a')).find((a) => a.textContent?.includes('Acheter des sondages'))!;
+    expect(lien.getAttribute('href')).toBe('/admin/abonnement/souscrire?offre=ACHAT_SONDAGES');
+
+    soldeAffiche.set(0);
+    element = await creer();
+    expect(element.querySelector('.abonnement .solde-sondages')!.classList).toContain('epuise');
   });
 });

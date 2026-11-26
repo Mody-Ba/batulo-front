@@ -72,7 +72,7 @@ export class ListeAdmins {
   protected readonly tailles = [...TAILLES_PAGE];
   /** Garde les lignes (et le focus) quand la page est relue. */
   protected readonly parId = (_index: number, element: AdminLigneResponse) => element.admin.id;
-  protected readonly colonnes = ['entreprise', 'statut', 'expiration', 'gestionnaires', 'actions'];
+  protected readonly colonnes = ['entreprise', 'statut', 'expiration', 'gestionnaires', 'sondages', 'actions'];
 
   /** Paramètres d'URL ?recherche=&statut=&page=&taille= (liaison des entrées par le routeur). */
   readonly recherche = input<string | undefined>(undefined);

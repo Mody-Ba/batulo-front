@@ -124,4 +124,42 @@ describe('TableauDeBordSuperAdmin', () => {
       .click();
     expect(tableauDeBord).toHaveBeenCalledTimes(2);
   });
+
+  it('revenus par type (abonnements, achats de sondages), une ligne par devise, et sondages vendus', async () => {
+    tableauDeBord.mockReturnValue(
+      of(
+        tableauDeBordSuperAdminDeTest({
+          revenus: {
+            lignes: [
+              { type: 'ABONNEMENT', devise: 'CAD', montant: 120, nombrePaiements: 12 },
+              { type: 'ABONNEMENT', devise: 'MRU', montant: 4000, nombrePaiements: 5 },
+              { type: 'ACHAT_SONDAGES', devise: 'CAD', montant: 49.9, nombrePaiements: 1 },
+            ],
+            sondagesVendus: 10,
+          },
+        }),
+      ),
+    );
+    const element = await creer();
+    const types = Array.from(element.querySelectorAll('.revenus .type-revenus')).map((t) => ({
+      type: texte(t.querySelector('dt')!),
+      lignes: Array.from(t.querySelectorAll('dd')).map((dd) => texte(dd)),
+    }));
+    expect(types).toEqual([
+      { type: 'Abonnement', lignes: ['120,00 CAD 12 paiements', '4 000 MRU 5 paiements'] },
+      { type: 'Achat de sondages', lignes: ['49,90 CAD 1 paiement'] },
+    ]);
+    expect(texte(element.querySelector('.revenus .sondages-vendus')!)).toBe('10 sondages vendus à l’unité');
+  });
+
+  it('aucun achat de sondages : « Aucun paiement » pour ce type ; backend sans revenus : message', async () => {
+    tableauDeBord.mockReturnValue(
+      of(tableauDeBordSuperAdminDeTest({ revenus: { lignes: [{ type: 'ABONNEMENT', devise: 'CAD', montant: 1, nombrePaiements: 1 }], sondagesVendus: 0 } })),
+    );
+    let element = await creer();
+    expect(texte(element.querySelectorAll('.revenus .type-revenus')[1])).toContain('Aucun paiement');
+    tableauDeBord.mockReturnValue(of(tableauDeBordSuperAdminDeTest()));
+    element = await creer();
+    expect(texte(element.querySelector('.revenus')!)).toContain('Revenus indisponibles.');
+  });
 });
