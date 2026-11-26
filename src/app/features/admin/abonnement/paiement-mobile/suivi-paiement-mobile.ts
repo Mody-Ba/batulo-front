@@ -88,10 +88,16 @@ export function suivrePaiementMobile(
 
 /**
  * Paiement réussi : le statut est écrit dans le jeton, il faut un nouveau jeton pour que le backend ouvre l'accès.
+ * Achat de sondages : le solde est gardé dans la session (le backend relit le compte de crédits en base).
  * Émet true si la session est à jour, false s'il faut se reconnecter (rafraîchissement refusé).
  */
 export function activerAbonnement(auth: AuthService, statut: StatutPaiementMobileResponse): Observable<boolean> {
-  auth.mettreAJourStatutAbonnement(statut.abonnement.statut);
+  if (statut.credits) {
+    auth.mettreAJourCredits(statut.credits);
+  }
+  if (statut.abonnement) {
+    auth.mettreAJourStatutAbonnement(statut.abonnement.statut);
+  }
   return auth.rafraichir().pipe(
     map(() => true),
     catchError(() => of(false)),

@@ -23,12 +23,35 @@ export const FORMULES: readonly Formule[] = ['MENSUEL', 'ANNUEL'];
 
 export const LIBELLES_FORMULE = libelles<Formule>('formules', ['MENSUEL', 'ANNUEL']);
 
+/** Offre choisie à l'inscription (enum Offre du backend). */
+export type Offre = Formule | 'ACHAT_SONDAGES';
+
+/** Nature d'un paiement ou d'un élément de /formules (enum TypePaiement du backend). */
+export type TypePaiement = 'ABONNEMENT' | 'ACHAT_SONDAGES';
+
+export const LIBELLES_TYPE_PAIEMENT = libelles<TypePaiement>('typesPaiement', ['ABONNEMENT', 'ACHAT_SONDAGES']);
+
+/**
+ * Sondages achetés à l'unité (CreditsResponse), sans date limite. compteCredits : l'entreprise a déjà acheté ; elle
+ * utilise alors Batulo sans abonnement actif (seule la publication d'un nouveau sondage demande un crédit).
+ */
+export interface CreditsResponse {
+  solde: number;
+  totalAchete: number;
+  totalUtilise: number;
+  compteCredits: boolean;
+}
+
 /** Seuil d'alerte avant l'expiration (batulo.abonnement.jours-alerte-expiration du backend). */
 export const JOURS_ALERTE_EXPIRATION = 7;
 
-/** GET /api/abonnements/formules (public) */
+/**
+ * GET /api/abonnements/formules (public) : les deux abonnements (type ABONNEMENT), puis l'achat de sondages
+ * (type ACHAT_SONDAGES, formule null, prix et prixMobile d'UN sondage, quantiteMin et quantiteMax).
+ */
 export interface FormuleResponse {
-  formule: Formule;
+  /** Null pour l'achat de sondages. */
+  formule: Formule | null;
   /** Ex. « Abonnement mensuel ». */
   libelle: string;
   prix: number;
@@ -40,6 +63,24 @@ export interface FormuleResponse {
   prixMobile: number;
   /** Ex. « MRU ». */
   deviseMobile: string;
+  /** Absent d'un backend plus ancien : abonnement. */
+  type?: TypePaiement;
+  /** Achat de sondages : quantité par achat ; null pour un abonnement. */
+  quantiteMin?: number | null;
+  quantiteMax?: number | null;
+}
+
+/** Élément de /formules qui est un abonnement (MENSUEL ou ANNUEL). */
+export type FormuleAbonnement = FormuleResponse & { formule: Formule };
+
+/** Les abonnements de /formules (sans l'achat de sondages). */
+export function formulesAbonnement(formules: readonly FormuleResponse[]): FormuleAbonnement[] {
+  return formules.filter((f): f is FormuleAbonnement => f.type !== 'ACHAT_SONDAGES' && f.formule != null);
+}
+
+/** L'offre d'achat de sondages de /formules, ou undefined si le serveur ne la propose pas. */
+export function offreAchat(formules: readonly FormuleResponse[]): FormuleResponse | undefined {
+  return formules.find((f) => f.type === 'ACHAT_SONDAGES');
 }
 
 /** Prestataire qui a encaissé un paiement (enum FournisseurPaiement du backend). */
@@ -69,17 +110,28 @@ export interface AbonnementResponse {
   /** Montant du dernier paiement. */
   montant: number | null;
   devise: string | null;
+  /** Offre choisie à l'inscription (guide le premier paiement) ; null si aucune. */
+  offreChoisie?: Offre | null;
+  /** Nombre de sondages choisi à l'inscription avec ACHAT_SONDAGES. */
+  nombreSondagesChoisi?: number | null;
+  /** Sondages achetés (GET /moi, fiche du super admin) ; null dans les listes. */
+  credits?: CreditsResponse | null;
 }
 
 /** GET /api/abonnements/paiements (paiements réussis seulement, du plus récent au plus ancien) */
 export interface PaiementResponse {
   id: number;
   datePaiement: string;
-  formule: Formule;
+  /** Null pour un achat de sondages. */
+  formule: Formule | null;
   montant: number;
   devise: string;
   /** STRIPE (carte) ou MOOSYL (paiement mobile). */
   fournisseur: FournisseurPaiement;
+  /** Absent d'un backend plus ancien : abonnement. */
+  type?: TypePaiement;
+  /** Nombre de sondages achetés ; null pour un abonnement. */
+  quantite?: number | null;
 }
 
 /** Statut d'un paiement (enum StatutPaiement du backend). */
@@ -97,12 +149,21 @@ export interface PaiementMobileResponse {
   reference: string;
   /** Page de paiement Moosyl. */
   checkoutUrl: string;
-  formule: Formule;
+  /** Null pour un achat de sondages. */
+  formule: Formule | null;
   montant: number;
   /** « MRU ». */
   devise: string;
   /** Fin de validité de la session ; absente si Moosyl ne la donne pas. */
   expireLe?: string | null;
+  type?: TypePaiement;
+  /** Nombre de sondages achetés ; null pour un abonnement. */
+  quantite?: number | null;
+}
+
+/** POST /api/abonnements/achat-sondages/intention et .../achat-sondages/paiement-mobile. 400 QUANTITE_INVALIDE. */
+export interface AchatSondagesRequest {
+  quantite: number;
 }
 
 /** GET /api/abonnements/paiement-mobile/{reference}. 404 PAIEMENT_INTROUVABLE. */
@@ -110,13 +171,18 @@ export interface StatutPaiementMobileResponse {
   reference: string;
   /** EN_ATTENTE : pas encore confirmé ; REUSSI : abonnement activé ; ECHOUE : refusé, annulé ou expiré. */
   statut: StatutPaiement;
-  formule: Formule;
+  /** Null pour un achat de sondages. */
+  formule: Formule | null;
   montant: number;
   devise: string;
   dateCreation: string;
   /** Absente tant que le paiement n'a pas réussi. */
   datePaiement?: string | null;
-  abonnement: AbonnementResponse;
+  abonnement: AbonnementResponse | null;
+  type?: TypePaiement;
+  quantite?: number | null;
+  /** Solde de sondages (crédité une seule fois quand un achat réussit). */
+  credits?: CreditsResponse | null;
 }
 
 /** POST /api/abonnements/paiement/intention */
@@ -131,9 +197,13 @@ export interface IntentionPaiementResponse {
   clientSecret: string;
   /** Clé publique Stripe (pk_test_...) pour initialiser Stripe.js. */
   clePublique: string;
-  formule: Formule;
+  /** Null pour un achat de sondages. */
+  formule: Formule | null;
   montant: number;
   devise: string;
+  type?: TypePaiement;
+  /** Nombre de sondages achetés ; null pour un abonnement. */
+  quantite?: number | null;
 }
 
 /** POST /api/abonnements/paiement/confirmer (idempotent) */
@@ -143,7 +213,11 @@ export interface ConfirmationPaiementRequest {
 
 export interface PaiementConfirmeResponse {
   message: string;
-  abonnement: AbonnementResponse;
+  abonnement: AbonnementResponse | null;
+  type?: TypePaiement;
+  quantite?: number | null;
+  /** Solde de sondages après ce paiement. */
+  credits?: CreditsResponse | null;
 }
 
 /**

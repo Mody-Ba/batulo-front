@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { AbonnementService } from '../../../../core/services/abonnement.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { abonnementDeTest, statutMobileDeTest } from '../../../../testing/donnees-test';
+import { abonnementDeTest, creditsDeTest, statutMobileDeTest } from '../../../../testing/donnees-test';
 import { RetourPaiementMobile } from './retour-paiement-mobile';
 import { messageEchecMobile, MESSAGE_RECONNEXION } from './suivi-paiement-mobile';
 
@@ -12,7 +12,12 @@ describe('RetourPaiementMobile (/admin/abonnement/paiement-mobile?reference=)', 
   let fixture: ComponentFixture<RetourPaiementMobile>;
   let element: HTMLElement;
   let statutMobile: ReturnType<typeof vi.fn>;
-  let auth: { mettreAJourStatutAbonnement: ReturnType<typeof vi.fn>; rafraichir: ReturnType<typeof vi.fn>; terminerSession: ReturnType<typeof vi.fn> };
+  let auth: {
+    mettreAJourStatutAbonnement: ReturnType<typeof vi.fn>;
+    rafraichir: ReturnType<typeof vi.fn>;
+    terminerSession: ReturnType<typeof vi.fn>;
+    mettreAJourCredits: ReturnType<typeof vi.fn>;
+  };
 
   const texte = () => (element.textContent ?? '').replace(/\s+/g, ' ');
   const lien = (libelle: string) => Array.from(element.querySelectorAll('a')).find((a) => a.textContent?.includes(libelle));
@@ -35,7 +40,12 @@ describe('RetourPaiementMobile (/admin/abonnement/paiement-mobile?reference=)', 
 
   beforeEach(() => {
     statutMobile = vi.fn(() => of(statutMobileDeTest()));
-    auth = { mettreAJourStatutAbonnement: vi.fn(), rafraichir: vi.fn(() => of('jeton')), terminerSession: vi.fn() };
+    auth = {
+      mettreAJourStatutAbonnement: vi.fn(),
+      rafraichir: vi.fn(() => of('jeton')),
+      terminerSession: vi.fn(),
+      mettreAJourCredits: vi.fn(),
+    };
     TestBed.configureTestingModule({
       imports: [RetourPaiementMobile],
       providers: [
@@ -111,5 +121,32 @@ describe('RetourPaiementMobile (/admin/abonnement/paiement-mobile?reference=)', 
     await stable();
     expect(statutMobile).toHaveBeenCalledTimes(2);
     expect(texte()).toContain('Paiement en cours…');
+  });
+
+  it('achat de sondages réussi : « Achat confirmé », sondages ajoutés et solde, solde gardé dans la session', async () => {
+    statutMobile.mockReturnValue(
+      of(
+        statutMobileDeTest({
+          statut: 'REUSSI',
+          type: 'ACHAT_SONDAGES',
+          formule: null,
+          quantite: 5,
+          montant: 1000,
+          devise: 'MRU',
+          credits: creditsDeTest({ solde: 8 }),
+        }),
+      ),
+    );
+    await creer('ref-achat');
+    expect(auth.mettreAJourCredits).toHaveBeenCalledWith(creditsDeTest({ solde: 8 }));
+    expect(texte()).toContain('Achat confirmé');
+    expect(texte()).toContain('5 sondages ont été ajoutés à votre solde.');
+    expect(texte()).toContain('Sondages disponibles : 8');
+  });
+
+  it('achat de sondages échoué : « Réessayer » relance le même achat par paiement mobile', async () => {
+    statutMobile.mockReturnValue(of(statutMobileDeTest({ statut: 'ECHOUE', type: 'ACHAT_SONDAGES', formule: null, quantite: 5 })));
+    await creer('ref-achat');
+    expect(lien('Réessayer')!.getAttribute('href')).toBe('/admin/abonnement/souscrire?moyen=mobile&offre=ACHAT_SONDAGES&quantite=5');
   });
 });

@@ -106,6 +106,7 @@
             <ng-container *ngTemplateOutlet="statut; context: { $implicit: l }" />
             <app-echeance-abonnement [abonnement]="l.abonnement" />
             <span class="cellule-secondaire">{{ libelleGestionnaires(l.nombreGestionnaires) }}</span>
+            <span class="cellule-secondaire solde-sondages">{{ 'achat.disponibles' | transloco: { nombre: ((l.soldeCredits ?? 0) | nombreL) } }}</span>
           </li>
         }
       </ul>
@@ -138,6 +139,11 @@
           <ng-container matColumnDef="gestionnaires">
             <th mat-header-cell *matHeaderCellDef>{{ 'menu.gestionnaires' | transloco }}</th>
             <td mat-cell *matCellDef="let l" class="cellule-nombre">{{ l.nombreGestionnaires | nombreL }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="sondages">
+            <th mat-header-cell *matHeaderCellDef>{{ 'achat.superAdmin.colonne' | transloco }}</th>
+            <td mat-cell *matCellDef="let l" class="cellule-nombre solde-sondages">{{ (l.soldeCredits ?? 0) | nombreL }}</td>
           </ng-container>
 
           <ng-container matColumnDef="actions">

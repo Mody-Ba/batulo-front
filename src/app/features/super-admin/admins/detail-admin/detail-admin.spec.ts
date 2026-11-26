@@ -2,13 +2,22 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { SuperAdminService } from '../../../../core/services/super-admin.service';
-import { abonnementDeTest, adminDeTest, adminDetailDeTest, personnalisationDeTest } from '../../../../testing/donnees-test';
+import { abonnementDeTest, adminDeTest, adminDetailDeTest, creditsDeTest, personnalisationDeTest } from '../../../../testing/donnees-test';
+import { PaiementResponse } from '../../../../core/models/abonnement.model';
 import { ActionsAdmin } from '../actions-admin';
 import { DetailAdmin } from './detail-admin';
 
 describe('DetailAdmin', () => {
   let fixture: ComponentFixture<DetailAdmin>;
   let detailAdmin: ReturnType<typeof vi.fn>;
+  let achatsSondages: ReturnType<typeof vi.fn>;
+  const pageAchats = (contenu: PaiementResponse[], totalElements = contenu.length, page = 0) => ({
+    contenu,
+    page,
+    taille: 5,
+    totalElements,
+    totalPages: Math.ceil(totalElements / 5),
+  });
   let actions: Record<string, ReturnType<typeof vi.fn>>;
 
   async function creer(): Promise<HTMLElement> {
@@ -25,6 +34,7 @@ describe('DetailAdmin', () => {
 
   beforeEach(() => {
     detailAdmin = vi.fn(() => of(adminDetailDeTest()));
+    achatsSondages = vi.fn(() => of(pageAchats([])));
     actions = {
       basculerActif: vi.fn(() => of(adminDetailDeTest({ admin: adminDeTest({ actif: false }) }))),
       supprimer: vi.fn(() => of(true)),
@@ -33,7 +43,7 @@ describe('DetailAdmin', () => {
       imports: [DetailAdmin],
       providers: [
         provideRouter([]),
-        { provide: SuperAdminService, useValue: { detailAdmin } },
+        { provide: SuperAdminService, useValue: { detailAdmin, achatsSondages } },
         { provide: ActionsAdmin, useValue: actions },
       ],
     });
@@ -116,5 +126,46 @@ describe('DetailAdmin', () => {
     const element = await creer();
     expect(element.textContent).toContain('#005CBB (couleur Batulo)');
     expect(element.querySelector('.logo-entreprise')).toBeNull();
+  });
+
+  describe('sondages achetés', () => {
+    const carte = (el: HTMLElement) => el.querySelector<HTMLElement>('.carte-achats')!;
+    const texte = (el: Element | null) => el?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+    const ACHAT: PaiementResponse = {
+      id: 9,
+      datePaiement: '2026-11-20T15:00:00Z',
+      formule: null,
+      montant: 4000,
+      devise: 'MRU',
+      fournisseur: 'MOOSYL',
+      type: 'ACHAT_SONDAGES',
+      quantite: 20,
+    };
+
+    it('solde, total acheté et total utilisé ; historique des achats (date, quantité, moyen, montant)', async () => {
+      detailAdmin.mockReturnValue(of(adminDetailDeTest({ credits: creditsDeTest({ solde: 12, totalAchete: 20, totalUtilise: 8 }) })));
+      achatsSondages.mockReturnValue(of(pageAchats([ACHAT])));
+      const el = await creer();
+      expect(achatsSondages).toHaveBeenCalledWith(3, 0, 5);
+      const valeurs = Array.from(carte(el).querySelectorAll('dd')).map((dd) => texte(dd));
+      expect(valeurs).toEqual(['12', '20', '8']);
+      const ligne = Array.from(carte(el).querySelectorAll('tbody td')).map((td) => texte(td));
+      expect(ligne).toEqual(['20 nov. 2026', '20', 'Mobile', '4 000 MRU']);
+      expect(carte(el).querySelector('mat-paginator')).toBeNull();
+    });
+
+    it('jamais acheté : message, et historique vide', async () => {
+      const el = await creer();
+      expect(texte(carte(el))).toContain('Cette entreprise n’a jamais acheté de sondages.');
+      expect(texte(carte(el))).toContain('Aucun achat de sondages.');
+    });
+
+    it('plus de 5 achats : paginateur, page suivante relue', async () => {
+      achatsSondages.mockReturnValue(of(pageAchats([ACHAT], 7)));
+      const el = await creer();
+      expect(carte(el).querySelector('mat-paginator')).not.toBeNull();
+      carte(el).querySelector<HTMLButtonElement>('.mat-mdc-paginator-navigation-next')!.click();
+      expect(achatsSondages).toHaveBeenLastCalledWith(3, 1, 5);
+    });
   });
 });

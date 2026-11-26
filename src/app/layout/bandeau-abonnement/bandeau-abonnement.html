@@ -1,36 +1,53 @@
 @if (visible()) {
-  @if (abonnement(); as abonnement) {
-    <aside
-      class="bandeau"
-      [class.alerte]="alerte()"
-      [class.expire]="expire()"
-      [attr.aria-label]="'bandeau.votreAbonnement' | transloco"
-      [attr.role]="alerte() || expire() ? 'status' : null"
-    >
-      <mat-icon
-        class="icone"
-        [fontIcon]="expire() ? 'event_busy' : alerte() ? 'schedule' : 'card_membership'"
-        aria-hidden="true"
-      />
-      <p class="texte">
-        @if (abonnement.formule; as formule) {
-          <strong>{{ libellesFormule[formule] }}</strong>
+  <aside
+    class="bandeau"
+    [class.alerte]="alerte() || (soldeEpuise() && !expire())"
+    [class.expire]="expire()"
+    [attr.aria-label]="'bandeau.votreAbonnement' | transloco"
+    [attr.role]="alerte() || expire() || soldeEpuise() ? 'status' : null"
+  >
+    <mat-icon
+      class="icone"
+      [fontIcon]="expire() ? 'event_busy' : alerte() ? 'schedule' : avecAbonnement() ? 'card_membership' : 'confirmation_number'"
+      aria-hidden="true"
+    />
+    <p class="texte">
+      @if (avecAbonnement()) {
+        @if (abonnement(); as abonnement) {
+          @if (abonnement.formule; as formule) {
+            <strong>{{ libellesFormule[formule] }}</strong>
+          }
+          @if (expire()) {
+            <span>{{ 'bandeau.expireLe' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
+          } @else {
+            <span [class.important]="alerte()">{{ texteJours() }}</span>
+            <span>{{ 'bandeau.expirera' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
+          }
         }
-        @if (expire()) {
-          <span>{{ 'bandeau.expireLe' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
-        } @else {
-          <span [class.important]="alerte()">{{ texteJours() }}</span>
-          <span>{{ 'bandeau.expirera' | transloco: { date: (abonnement.dateExpiration | dateL: 'long') } }}</span>
-        }
-      </p>
+      }
+      @if (solde() !== null) {
+        <span class="solde" [class.important]="soldeEpuise()">{{ 'achat.disponibles' | transloco: { nombre: (solde()! | nombreL) } }}</span>
+      }
+    </p>
+    @if (solde() !== null) {
+      <a
+        [matButton]="soldeEpuise() ? 'filled' : 'tonal'"
+        class="bouton"
+        routerLink="/admin/abonnement/souscrire"
+        [queryParams]="{ offre: 'ACHAT_SONDAGES' }"
+      >
+        {{ 'achat.acheter' | transloco }}
+      </a>
+    }
+    @if (avecAbonnement()) {
       <a
         [matButton]="alerte() || expire() ? 'filled' : 'tonal'"
         class="bouton"
         routerLink="/admin/abonnement/souscrire"
-        [queryParams]="{ formule: abonnement.formule }"
+        [queryParams]="{ formule: abonnement()?.formule }"
       >
         {{ 'bandeau.renouveler' | transloco }}
       </a>
-    </aside>
-  }
+    }
+  </aside>
 }

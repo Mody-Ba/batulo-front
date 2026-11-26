@@ -13,7 +13,9 @@ import {
 import { AbonnementService } from '../../../../core/services/abonnement.service';
 import {
   abonnementDeTest,
+  creditsDeTest,
   FORMULES_DE_TEST,
+  formulesDeTest,
   sessionMobileDeTest,
   statutMobileDeTest,
 } from '../../../../testing/donnees-test';
@@ -60,12 +62,15 @@ describe('Souscrire (parcours de paiement)', () => {
     confirmer: ReturnType<typeof vi.fn>;
     payerMobile: ReturnType<typeof vi.fn>;
     statutMobile: ReturnType<typeof vi.fn>;
+    creerIntentionAchat: ReturnType<typeof vi.fn>;
+    acheterMobile: ReturnType<typeof vi.fn>;
   };
   let auth: {
     utilisateur: ReturnType<typeof signal>;
     mettreAJourStatutAbonnement: ReturnType<typeof vi.fn>;
     rafraichir: ReturnType<typeof vi.fn>;
     terminerSession: ReturnType<typeof vi.fn>;
+    mettreAJourCredits: ReturnType<typeof vi.fn>;
   };
   let elementsCrees: Record<string, ReturnType<typeof fauxElement>>;
   let stripe: { elements: ReturnType<typeof vi.fn>; confirmCardPayment: ReturnType<typeof vi.fn> };
@@ -117,12 +122,19 @@ describe('Souscrire (parcours de paiement)', () => {
       ),
       payerMobile: vi.fn(() => of(sessionMobileDeTest())),
       statutMobile: vi.fn(() => of(statutMobileDeTest())),
+      creerIntentionAchat: vi.fn((quantite: number) =>
+        of({ ...INTENTION, formule: null, type: 'ACHAT_SONDAGES', quantite, montant: quantite * 4.99 }),
+      ),
+      acheterMobile: vi.fn((quantite: number) =>
+        of(sessionMobileDeTest({ formule: null, type: 'ACHAT_SONDAGES', quantite, montant: quantite * 200 })),
+      ),
     };
     auth = {
       utilisateur: signal({ courriel: 'awa@test.local' }),
       mettreAJourStatutAbonnement: vi.fn(),
       rafraichir: vi.fn(() => of('nouveau-jeton')),
       terminerSession: vi.fn(),
+      mettreAJourCredits: vi.fn(),
     };
     elementsCrees = {};
     stripe = {
@@ -316,5 +328,116 @@ describe('Souscrire (parcours de paiement)', () => {
     await allerAuPaiement();
     expect(texte()).toContain('Le service de paiement est injoignable');
     expect(bouton('Continuer vers le paiement')).toBeTruthy();
+  });
+
+  describe('achat de sondages', () => {
+    const champNombre = () => element.querySelector<HTMLInputElement>('app-quantite-sondages input[type="number"]')!;
+    async function saisirNombre(valeur: string): Promise<void> {
+      champNombre().value = valeur;
+      champNombre().dispatchEvent(new Event('input'));
+      champNombre().dispatchEvent(new Event('blur'));
+      await stable();
+    }
+
+    /** Le composant lit /formules à sa création : il est recréé avec l'offre d'achat. */
+    function recreer(): void {
+      fixture.destroy();
+      fixture = TestBed.createComponent(Souscrire);
+      element = fixture.nativeElement;
+    }
+
+    beforeEach(() => {
+      abonnementService.formules.mockReturnValue(of(formulesDeTest()));
+      recreer();
+    });
+
+    it('3e offre « Achat de sondages » (prix d’un sondage), choisie par ?offre= ; nombre et total en direct', async () => {
+      fixture.componentRef.setInput('offre', 'ACHAT_SONDAGES');
+      fixture.componentRef.setInput('quantite', '10');
+      await stable();
+      const offres = Array.from(element.querySelectorAll('.formules:not(.moyens) .formule'));
+      expect(offres.map((o) => o.querySelector('.formule-libelle')?.textContent?.trim())).toEqual([
+        'Abonnement mensuel',
+        'Abonnement annuel',
+        'Achat de sondages',
+      ]);
+      const achat = element.querySelector('.offre-achat.choisie')!;
+      expect(achat.querySelector('.prix')?.textContent?.replace(/\s+/g, ' ')).toBe('4,99 $');
+      expect(achat.querySelector('.duree')?.textContent?.trim()).toBe('par sondage');
+      expect(champNombre().value).toBe('10');
+      expect(element.querySelector('.montant-carte')?.textContent?.replace(/\s+/g, ' ')).toBe('49,90 $');
+      await saisirNombre('1000');
+      expect(element.querySelector('.montant-carte')?.textContent?.replace(/\s+/g, ' ')).toBe('4 990,00 $');
+    });
+
+    it('bornes : 0 et 1001 refusés (« Continuer » désactivé), 1 et 1000 acceptés', async () => {
+      fixture.componentRef.setInput('offre', 'ACHAT_SONDAGES');
+      await stable();
+      for (const [valeur, desactive] of [['0', true], ['1001', true], ['1', false], ['1000', false]] as const) {
+        await saisirNombre(valeur);
+        expect(bouton('Continuer vers le paiement')!.disabled).toBe(desactive);
+      }
+    });
+
+    it('carte : intention d’achat avec le nombre, puis succès « N sondages ajoutés » et le nouveau solde', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      abonnementService.confirmer.mockReturnValue(
+        of({ message: 'ok', abonnement: abonnementDeTest(), type: 'ACHAT_SONDAGES', quantite: 10, credits: creditsDeTest({ solde: 12 }) }),
+      );
+      stripe.confirmCardPayment.mockResolvedValue({ paymentIntent: { id: 'pi_123', status: 'succeeded' } });
+      fixture.componentRef.setInput('offre', 'ACHAT_SONDAGES');
+      fixture.componentRef.setInput('quantite', '10');
+      await stable();
+      bouton('Continuer vers le paiement')!.click();
+      await stable();
+      await stable();
+      expect(abonnementService.creerIntentionAchat).toHaveBeenCalledWith(10);
+      expect(abonnementService.creerIntention).not.toHaveBeenCalled();
+      expect(element.querySelector('.resume-formule')?.textContent?.trim()).toBe('10 sondages');
+      await remplirCarte();
+      await payer();
+      expect(abonnementService.confirmer).toHaveBeenCalledWith('pi_123');
+      expect(texte()).toContain('Achat confirmé');
+      expect(texte()).toContain('10 sondages ont été ajoutés à votre solde.');
+      expect(texte()).toContain('Sondages disponibles : 12');
+      vi.advanceTimersByTime(DELAI_REDIRECTION_MS);
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/admin');
+    });
+
+    it('mobile : total en MRU, paiement mobile de l’achat, solde gardé dans la session', async () => {
+      abonnementService.statutMobile.mockReturnValue(
+        of(statutMobileDeTest({ statut: 'REUSSI', type: 'ACHAT_SONDAGES', quantite: 3, formule: null, credits: creditsDeTest({ solde: 3 }) })),
+      );
+      fixture.componentRef.setInput('offre', 'ACHAT_SONDAGES');
+      fixture.componentRef.setInput('quantite', '3');
+      fixture.componentRef.setInput('moyen', 'mobile');
+      await stable();
+      expect(element.querySelector('.montant-mobile')?.textContent?.replace(/\s+/g, ' ')).toBe('600 MRU');
+      expect(element.querySelector('.montant-carte')).toBeNull();
+      bouton('Continuer vers le paiement mobile')!.click();
+      await stable();
+      await stable();
+      expect(abonnementService.acheterMobile).toHaveBeenCalledWith(3);
+      expect(abonnementService.payerMobile).not.toHaveBeenCalled();
+      expect(auth.mettreAJourCredits).toHaveBeenCalledWith(creditsDeTest({ solde: 3 }));
+      expect(texte()).toContain('3 sondages ont été ajoutés à votre solde.');
+    });
+
+    it('premier paiement après l’inscription : offre et nombre choisis à l’inscription proposés d’abord', async () => {
+      abonnementService.abonnement.set(
+        abonnementDeTest({ statut: 'EN_ATTENTE_PAIEMENT', formule: null, offreChoisie: 'ACHAT_SONDAGES', nombreSondagesChoisi: 25 }),
+      );
+      await stable();
+      expect(element.querySelector('.offre-achat.choisie')).not.toBeNull();
+      expect(champNombre().value).toBe('25');
+    });
+
+    it('backend sans offre d’achat : seulement les deux abonnements', async () => {
+      abonnementService.formules.mockReturnValue(of(FORMULES_DE_TEST));
+      recreer();
+      await stable();
+      expect(element.querySelector('.offre-achat')).toBeNull();
+      expect(element.querySelectorAll('.formules:not(.moyens) .formule')).toHaveLength(2);
+    });
   });
 });

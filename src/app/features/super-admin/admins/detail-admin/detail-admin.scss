@@ -45,3 +45,38 @@
   max-height: 64px;
   object-fit: contain;
 }
+
+.carte-achats {
+  @media (min-width: 960px) {
+    grid-column: 1 / -1;
+  }
+
+  .solde {
+    font-weight: 700;
+  }
+
+  .sous-titre-achats {
+    margin: var(--bt-espace-4) 0 var(--bt-espace-2);
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.defilement {
+  overflow-x: auto;
+}
+
+.achats {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: var(--bt-espace-1) var(--bt-espace-2);
+    border-block-end: 1px solid var(--mat-sys-outline-variant);
+    text-align: start;
+  }
+
+  .nombre {
+    text-align: end;
+  }
+}

@@ -890,7 +890,9 @@
     "IMPORT_TROP_GRAND": "Le fichier dépasse 1000 lignes : découpez-le en plusieurs fichiers.",
     "REPRISE_INVALIDE": "Choisissez un autre sondage que celui-ci.",
     "SONDAGE_NON_OUVERT": "Ce sondage n’est pas ouvert.",
-    "SONDAGE_FERME": "Ce sondage est fermé."
+    "SONDAGE_FERME": "Ce sondage est fermé.",
+    "CREDITS_EPUISES": "Plus aucun sondage disponible : achetez des sondages ou abonnez-vous pour publier.",
+    "QUANTITE_INVALIDE": "Le nombre de sondages doit être compris entre 1 et 1000."
   },
   "gestionnaires": {
     "actions": {
@@ -1777,8 +1779,8 @@
     },
     "etapes": {
       "e1": {
-        "titre": "Créez votre compte et abonnez-vous",
-        "texte": "Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle et payez par carte bancaire ou par application mobile (Bankily, Masrvi, Sedad)."
+        "titre": "Créez votre compte et choisissez votre offre",
+        "texte": "Inscrivez votre entreprise, puis choisissez la formule mensuelle ou annuelle, ou achetez des sondages à l’unité, et payez par carte bancaire ou par application mobile (Bankily, Masrvi, Sedad)."
       },
       "e2": {
         "titre": "Construisez votre sondage",
@@ -1804,7 +1806,7 @@
       },
       "q3": {
         "question": "Comment se fait le paiement ?",
-        "reponse": "Par carte bancaire, avec un paiement sécurisé par Stripe, en dollars canadiens, ou par application mobile (Bankily, Masrvi, Sedad), en ouguiyas. Pour un mois ou pour un an."
+        "reponse": "Par carte bancaire, avec un paiement sécurisé par Stripe, en dollars canadiens, ou par application mobile (Bankily, Masrvi, Sedad), en ouguiyas. Pour un mois, pour un an, ou par sondage acheté (de 1 à 1000 à la fois, sans date limite)."
       },
       "q4": {
         "question": "Puis-je annuler ?",
@@ -1821,7 +1823,7 @@
       "titre": "Questions fréquentes"
     },
     "tarifs": {
-      "chapeau": "Une formule pour toute votre entreprise, au mois ou à l’année.",
+      "chapeau": "Une formule pour toute votre entreprise, au mois ou à l’année, ou des sondages à l’unité.",
       "chargement": "Chargement des tarifs",
       "erreur": "Les tarifs n’ont pas pu être chargés.",
       "avantageux": "Le plus avantageux",
@@ -1838,7 +1840,9 @@
       "libelle": {
         "MENSUEL": "Abonnement mensuel",
         "ANNUEL": "Abonnement annuel"
-      }
+      },
+      "achatInclus2": "Un sondage acheté = un sondage publié, nouvelles versions comprises",
+      "achatInclus3": "Carte bancaire ou paiement mobile, sans abonnement"
     },
     "contact": {
       "titre": "Une question ? Écrivez-nous",
@@ -2103,5 +2107,81 @@
       "languePrincipale": "Principale",
       "pagination": "Pagination des invités"
     }
+  },
+  "achat": {
+    "titre": "Acheter des sondages",
+    "libelle": "Achat de sondages",
+    "acheter": "Acheter des sondages",
+    "sAbonner": "S’abonner",
+    "offre": "Offre",
+    "nombre": "Nombre de sondages",
+    "bornes": "De {{min}} à {{max}} sondages",
+    "erreurs": {
+      "requise": "Indiquez le nombre de sondages.",
+      "entiere": "Indiquez un nombre entier."
+    },
+    "prixUnitaire": "{{prix}} par sondage",
+    "parSondage": "par sondage",
+    "parCarte": "par carte",
+    "total": "Total :",
+    "sansDate": "De {{min}} à {{max}} sondages, sans date limite",
+    "explication": "Chaque sondage acheté permet de publier un nouveau sondage, sans date limite ; ses nouvelles versions ne coûtent rien de plus. De {{min}} à {{max}} sondages par achat ; les achats s’additionnent.",
+    "continuer": "Continuer vers le paiement",
+    "disponibles": "Sondages disponibles : {{nombre}}",
+    "nSondages": {
+      "one": "{{n}} sondage",
+      "other": "{{n}} sondages"
+    },
+    "succes": {
+      "titre": "Achat confirmé",
+      "ajoutes": {
+        "one": "{{n}} sondage a été ajouté à votre solde.",
+        "other": "{{n}} sondages ont été ajoutés à votre solde."
+      }
+    },
+    "historique": {
+      "type": "Type",
+      "quantite": "Quantité"
+    },
+    "inscription": {
+      "offre": "Votre offre",
+      "aide": "Le paiement se fait juste après la création du compte, par carte bancaire ou par application mobile."
+    },
+    "publication": {
+      "utilisera": "Cette publication utilisera 1 sondage (solde : {{solde}}).",
+      "nouvelleVersion": "Gratuite si ce sondage a déjà été publié avec un sondage acheté ; sinon, cette publication utilisera 1 sondage (solde : {{solde}}).",
+      "epuiseTitre": "Plus aucun sondage disponible",
+      "epuise": "Publier ce sondage demande un sondage acheté. Achetez des sondages, ou abonnez-vous pour publier sans limite.",
+      "demanderAdmin": "Demandez à l’admin de votre entreprise d’acheter des sondages ou de s’abonner."
+    },
+    "superAdmin": {
+      "titre": "Sondages achetés",
+      "solde": "Solde",
+      "totalAchete": "Total acheté",
+      "totalUtilise": "Total utilisé",
+      "aucun": "Cette entreprise n’a jamais acheté de sondages.",
+      "historique": "Historique des achats",
+      "aucunAchat": "Aucun achat de sondages.",
+      "erreurHistorique": "L’historique des achats n’a pas pu être chargé.",
+      "pagination": "Pages de l’historique des achats",
+      "colonne": "Sondages"
+    },
+    "revenus": {
+      "titre": "Revenus",
+      "paiements": {
+        "one": "{{n}} paiement",
+        "other": "{{n}} paiements"
+      },
+      "aucun": "Aucun paiement",
+      "sondagesVendus": {
+        "one": "{{n}} sondage vendu à l’unité",
+        "other": "{{n}} sondages vendus à l’unité"
+      },
+      "indisponibles": "Revenus indisponibles."
+    }
+  },
+  "typesPaiement": {
+    "ABONNEMENT": "Abonnement",
+    "ACHAT_SONDAGES": "Achat de sondages"
   }
 }

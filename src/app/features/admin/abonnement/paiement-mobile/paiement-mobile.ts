@@ -18,7 +18,7 @@ import { Encadre } from '../../../../shared/components/encadre/encadre';
 import { MessageErreur } from '../../../../shared/components/message-erreur/message-erreur';
 import { CodeQr } from './code-qr';
 import { finDuSuivi, messageEchecMobile, messageExpireMobile, suivrePaiementMobile } from './suivi-paiement-mobile';
-import { DateLPipe } from '../../../../core/i18n/formats.pipes';
+import { DateLPipe, PlurielPipe } from '../../../../core/i18n/formats.pipes';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur';
@@ -31,7 +31,7 @@ type EtatPaiementMobile = 'creation' | 'attente' | 'echoue' | 'expire' | 'erreur
  */
 @Component({
   selector: 'app-paiement-mobile',
-  imports: [TranslocoPipe, DateLPipe,  MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
+  imports: [TranslocoPipe, DateLPipe, PlurielPipe, MatButtonModule, MatIconModule, MatProgressBarModule, MatProgressSpinnerModule, Encadre, MessageErreur, CodeQr],
   templateUrl: './paiement-mobile.html',
   styleUrl: './paiement-mobile.scss',
 })
@@ -43,7 +43,10 @@ export class PaiementMobile {
   protected readonly applications = APPLICATIONS_MOBILES;
   protected readonly montant = montantEnClair;
 
-  readonly formule = input.required<Formule>();
+  /** Formule d'abonnement à payer ; null pour un achat de sondages (quantite). */
+  readonly formule = input<Formule | null>(null);
+  /** Achat de sondages : nombre de sondages (POST .../achat-sondages/paiement-mobile). */
+  readonly quantite = input<number | null>(null);
   /** Le paiement a réussi : abonnement activé côté backend. */
   readonly reussi = output<StatutPaiementMobileResponse>();
   readonly changerFormule = output<void>();
@@ -59,18 +62,21 @@ export class PaiementMobile {
   constructor() {
     effect(() => {
       const formule = this.formule();
-      untracked(() => this.demarrer(formule));
+      const quantite = this.quantite();
+      untracked(() => this.demarrer(formule, quantite));
     });
   }
 
   /** Nouveau paiement (premier essai ou « Réessayer » : une nouvelle session Moosyl). */
-  protected demarrer(formule = this.formule()): void {
+  protected demarrer(formule = this.formule(), quantite = this.quantite()): void {
+    if (!formule && !quantite) {
+      return;
+    }
     this.arreterSuivi();
     this.etat.set('creation');
     this.session.set(null);
     this.erreur.set(null);
-    this.service
-      .payerMobile(formule)
+    (quantite ? this.service.acheterMobile(quantite) : this.service.payerMobile(formule!))
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (session) => {

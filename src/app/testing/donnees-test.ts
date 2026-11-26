@@ -1,6 +1,7 @@
 import { InvitationResponse, ResumeInvitationsResponse } from '../core/models/invitation.model';
 import {
   AbonnementResponse,
+  CreditsResponse,
   FormuleResponse,
   PaiementMobileResponse,
   StatutPaiementMobileResponse,
@@ -67,6 +68,33 @@ export const FORMULES_DE_TEST: FormuleResponse[] = [
   { formule: 'MENSUEL', libelle: 'Abonnement mensuel', prix: 1, devise: 'CAD', duree: '1 mois', prixMobile: 40, deviseMobile: 'MRU' },
   { formule: 'ANNUEL', libelle: 'Abonnement annuel', prix: 2, devise: 'CAD', duree: '1 an', prixMobile: 80, deviseMobile: 'MRU' },
 ];
+
+/** Offre d'achat de sondages de /formules (type ACHAT_SONDAGES, formule null, prix d'UN sondage). */
+export const OFFRE_ACHAT_DE_TEST: FormuleResponse = {
+  formule: null,
+  libelle: 'Achat de sondages',
+  prix: 4.99,
+  devise: 'CAD',
+  duree: 'Sans date limite',
+  prixMobile: 200,
+  deviseMobile: 'MRU',
+  type: 'ACHAT_SONDAGES',
+  quantiteMin: 1,
+  quantiteMax: 1000,
+};
+
+/** /formules complet, comme le backend actuel : deux abonnements (type ABONNEMENT) puis l'achat de sondages. */
+export function formulesDeTest(): FormuleResponse[] {
+  return [
+    ...FORMULES_DE_TEST.map((f) => ({ ...f, type: 'ABONNEMENT' as const, quantiteMin: null, quantiteMax: null })),
+    OFFRE_ACHAT_DE_TEST,
+  ];
+}
+
+/** Solde de sondages achetés (CreditsResponse). */
+export function creditsDeTest(modifs: Partial<CreditsResponse> = {}): CreditsResponse {
+  return { solde: 3, totalAchete: 5, totalUtilise: 2, compteCredits: true, ...modifs };
+}
 
 export function sessionMobileDeTest(modifs: Partial<PaiementMobileResponse> = {}): PaiementMobileResponse {
   return {

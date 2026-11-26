@@ -12,6 +12,10 @@
       >
         <mat-icon fontIcon="autorenew" aria-hidden="true" />{{ 'bandeau.renouveler' | transloco }}
       </a>
+    } @else if (abonnement()) {
+      <a matButton="tonal" routerLink="/admin/abonnement/souscrire">
+        <mat-icon fontIcon="card_membership" aria-hidden="true" />{{ 'achat.sAbonner' | transloco }}
+      </a>
     }
     <a matButton="outlined" routerLink="/admin/abonnement/demandes">
       <mat-icon fontIcon="upgrade" aria-hidden="true" />{{ 'abonnement.mon.demanderAutre' | transloco }}
@@ -81,12 +85,15 @@
         @if (!chargementPaiements() && !erreurPaiements() && totalPaiements() === 0) {
           <p class="texte-aide">{{ 'abonnement.mon.aucunPaiement' | transloco }}</p>
         } @else if (paiements().length) {
+          <div class="defilement">
           <table class="historique">
             <caption class="visuellement-cache">{{ 'abonnement.mon.historique' | transloco }}</caption>
             <thead>
               <tr>
                 <th scope="col">{{ 'abonnement.mon.date' | transloco }}</th>
+                <th scope="col">{{ 'achat.historique.type' | transloco }}</th>
                 <th scope="col">{{ 'abonnement.mon.formule' | transloco }}</th>
+                <th scope="col" class="colonne-quantite">{{ 'achat.historique.quantite' | transloco }}</th>
                 <th scope="col">{{ 'abonnement.mon.moyen' | transloco }}</th>
                 <th scope="col" class="colonne-montant">{{ 'abonnement.mon.montant' | transloco }}</th>
               </tr>
@@ -95,13 +102,16 @@
               @for (p of paiements(); track p.id) {
                 <tr>
                   <td>{{ p.datePaiement | dateL: 'court' }}</td>
-                  <td>{{ libellesFormule[p.formule] }}</td>
+                  <td class="type-paiement">{{ libellesType[p.type ?? 'ABONNEMENT'] }}</td>
+                  <td>{{ p.formule ? libellesFormule[p.formule] : '—' }}</td>
+                  <td class="colonne-quantite">{{ p.quantite != null ? (p.quantite | nombreL) : '—' }}</td>
                   <td>{{ p.fournisseur ? libellesFournisseur[p.fournisseur] : '—' }}</td>
                   <td class="colonne-montant">{{ montant(p.montant, p.devise, true) }}</td>
                 </tr>
               }
             </tbody>
           </table>
+          </div>
           @if (totalPaiements() > taillesPaiements[0]) {
             <mat-paginator
               [length]="totalPaiements()"
@@ -114,6 +124,22 @@
           }
         }
       </article>
+
+      @if (offreAchat(); as o) {
+        <article class="carte carte-achat" aria-labelledby="titre-achat">
+          <h2 id="titre-achat">{{ 'achat.acheter' | transloco }}</h2>
+          @if (credits()?.compteCredits) {
+            <p class="solde" role="status">{{ 'achat.disponibles' | transloco: { nombre: (credits()!.solde | nombreL) } }}</p>
+          }
+          <p class="texte-aide">{{ 'achat.explication' | transloco: { min: o.quantiteMin ?? 1, max: o.quantiteMax ?? 1000 } }}</p>
+          <app-quantite-sondages [offre]="o" [controle]="nombreSondages" />
+          <div class="actions-achat">
+            <button matButton="filled" type="button" class="bouton-acheter" (click)="acheter()">
+              <mat-icon fontIcon="shopping_cart" aria-hidden="true" />{{ 'achat.continuer' | transloco }}
+            </button>
+          </div>
+        </article>
+      }
     </div>
 
     <app-encadre type="info" icone="info">

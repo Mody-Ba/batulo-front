@@ -13,6 +13,7 @@ describe('PaiementMobile (Moosyl)', () => {
   let element: HTMLElement;
   let payerMobile: ReturnType<typeof vi.fn>;
   let statutMobile: ReturnType<typeof vi.fn>;
+  let acheterMobile: ReturnType<typeof vi.fn>;
 
   const texte = () => (element.textContent ?? '').replace(/\s+/g, ' ');
   const bouton = (libelle: string) =>
@@ -43,9 +44,10 @@ describe('PaiementMobile (Moosyl)', () => {
   beforeEach(() => {
     payerMobile = vi.fn(() => of(sessionMobileDeTest()));
     statutMobile = vi.fn(() => of(statutMobileDeTest()));
+    acheterMobile = vi.fn(() => of(sessionMobileDeTest({ formule: null, type: 'ACHAT_SONDAGES', quantite: 4, montant: 800 })));
     TestBed.configureTestingModule({
       imports: [PaiementMobile],
-      providers: [{ provide: AbonnementService, useValue: { payerMobile, statutMobile } }],
+      providers: [{ provide: AbonnementService, useValue: { payerMobile, statutMobile, acheterMobile } }],
     });
   });
 
@@ -128,5 +130,16 @@ describe('PaiementMobile (Moosyl)', () => {
 
   it('tracé du code QR : un carré par module noir', () => {
     expect(cheminQr([[true, false], [false, true]])).toBe('M0 0h1v1h-1zM1 1h1v1h-1z');
+  });
+
+  it('achat de sondages : paiement mobile de l’achat (pas de formule), « 4 sondages » et montant en MRU', async () => {
+    fixture = TestBed.createComponent(PaiementMobile);
+    element = fixture.nativeElement;
+    fixture.componentRef.setInput('quantite', 4);
+    await stable();
+    expect(acheterMobile).toHaveBeenCalledWith(4);
+    expect(payerMobile).not.toHaveBeenCalled();
+    expect(element.querySelector('.resume-formule')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('4 sondages · application mobile');
+    expect(texte()).toContain('800 MRU');
   });
 });

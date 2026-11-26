@@ -1,6 +1,6 @@
 <section class="conteneur-page etroit">
   <app-entete-page
-    [titre]="(renouvellement() ? 'abonnement.souscrire.titreRenouveler' : 'abonnement.souscrire.titreAbonner') | transloco"
+    [titre]="titre() | transloco"
     icone="card_membership"
     [sousTitre]="etape() === 'succes' ? null : ((etape() === 'formule' ? 'abonnement.souscrire.etape1' : 'abonnement.souscrire.etape2') | transloco)"
   >
@@ -63,23 +63,23 @@
           }
         </div>
 
-        <h3 class="titre-groupe" id="titre-formule">{{ 'abonnement.mon.formule' | transloco }}</h3>
+        <h3 class="titre-groupe" id="titre-formule">{{ 'achat.offre' | transloco }}</h3>
         <div class="formules" role="radiogroup" aria-labelledby="titre-formule">
-          @for (formule of formules(); track formule.formule) {
-            <label class="formule" [class.choisie]="formule.formule === formuleChoisie()">
+          @for (formule of abonnements(); track formule.formule) {
+            <label class="formule" [class.choisie]="formule.formule === choix()">
               <input
                 type="radio"
                 name="formule"
                 class="visuellement-cache"
                 [value]="formule.formule"
-                [checked]="formule.formule === formuleChoisie()"
+                [checked]="formule.formule === choix()"
                 (change)="choisir(formule.formule)"
               />
               <span class="formule-entete">
                 <span class="formule-libelle">{{ libelleFormule(formule) }}</span>
                 <mat-icon
                   class="coche"
-                  [fontIcon]="formule.formule === formuleChoisie() ? 'radio_button_checked' : 'radio_button_unchecked'"
+                  [fontIcon]="formule.formule === choix() ? 'radio_button_checked' : 'radio_button_unchecked'"
                   aria-hidden="true"
                 />
               </span>
@@ -92,7 +92,32 @@
               }
             </label>
           }
+          @if (offreAchat(); as o) {
+            <label class="formule offre-achat" [class.choisie]="achat()">
+              <input
+                type="radio"
+                name="formule"
+                class="visuellement-cache"
+                value="ACHAT_SONDAGES"
+                [checked]="achat()"
+                (change)="choisir('ACHAT_SONDAGES')"
+              />
+              <span class="formule-entete">
+                <span class="formule-libelle">{{ 'achat.libelle' | transloco }}</span>
+                <mat-icon class="coche" [fontIcon]="achat() ? 'radio_button_checked' : 'radio_button_unchecked'" aria-hidden="true" />
+              </span>
+              <span class="prix">{{ prix(o) }}</span>
+              <span class="duree">{{ 'achat.parSondage' | transloco }}</span>
+              <span class="duree">{{ 'achat.sansDate' | transloco: { min: o.quantiteMin ?? 1, max: o.quantiteMax ?? 1000 } }}</span>
+            </label>
+          }
         </div>
+
+        @if (achat()) {
+          <div class="bloc-quantite">
+            <app-quantite-sondages [offre]="offreAchat()" [controle]="nombreSondages" [moyen]="moyenChoisi()" />
+          </div>
+        }
 
         <div class="actions">
           <button
@@ -123,7 +148,13 @@
 
         <div class="resume">
           <div>
-            <p class="resume-formule">{{ libellesFormule[intention.formule] }}</p>
+            <p class="resume-formule">
+              @if (intention.formule; as formule) {
+                {{ libellesFormule[formule] }}
+              } @else {
+                {{ 'achat.nSondages' | pluriel: intention.quantite ?? 0 }}
+              }
+            </p>
             <p class="resume-montant">{{ intention.montant | montantL: intention.devise }}</p>
           </div>
           @if (!paiementEnCours() && !paiementAVerifier()) {
@@ -234,7 +265,8 @@
     <!-- ---------- Étape 2 : application mobile (Moosyl) ---------- -->
     @case ('mobile') {
       <app-paiement-mobile
-        [formule]="formuleChoisie()"
+        [formule]="achat() ? null : formuleChoisie()"
+        [quantite]="achat() ? quantiteAchat() : null"
         (reussi)="paiementMobileReussi($event)"
         (changerFormule)="changerFormule()"
       />
@@ -247,16 +279,26 @@
           <span class="icone-succes" aria-hidden="true">
             <mat-icon fontIcon="check_circle" aria-hidden="true" />
           </span>
-          <h2 class="titre-etape" tabindex="-1">{{ 'abonnement.succes.titre' | transloco }}</h2>
-          <p role="status">
-            @if (confirmation.abonnement.formule; as formule) {
-              @if (confirmation.abonnement.dateExpiration; as dateExpiration) {
-                {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[formule], date: (dateExpiration | dateL: 'longDate') } }}
-              } @else {
-                {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[formule] } }}
+          @if (confirmation.type === 'ACHAT_SONDAGES') {
+            <h2 class="titre-etape" tabindex="-1">{{ 'achat.succes.titre' | transloco }}</h2>
+            <p role="status">
+              {{ 'achat.succes.ajoutes' | pluriel: confirmation.quantite ?? 0 }}
+              @if (confirmation.credits; as c) {
+                {{ 'achat.disponibles' | transloco: { nombre: c.solde } }}
               }
-            }
-          </p>
+            </p>
+          } @else {
+            <h2 class="titre-etape" tabindex="-1">{{ 'abonnement.succes.titre' | transloco }}</h2>
+            <p role="status">
+              @if (confirmation.abonnement?.formule; as formule) {
+                @if (confirmation.abonnement?.dateExpiration; as dateExpiration) {
+                  {{ 'abonnement.succes.activeJusquau' | transloco: { formule: libellesFormule[formule], date: (dateExpiration | dateL: 'longDate') } }}
+                } @else {
+                  {{ 'abonnement.succes.active' | transloco: { formule: libellesFormule[formule] } }}
+                }
+              }
+            </p>
+          }
           <p class="texte-aide">{{ 'abonnement.succes.redirection' | transloco }}</p>
           <button matButton="filled" type="button" class="bouton-principal" (click)="allerAuTableauDeBord()">
             {{ 'abonnement.succes.allerTdb' | transloco }}

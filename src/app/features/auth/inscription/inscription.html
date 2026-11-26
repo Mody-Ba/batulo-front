@@ -66,6 +66,27 @@
         }
       </mat-form-field>
 
+      <fieldset class="offres">
+        <legend>{{ 'achat.inscription.offre' | transloco }}</legend>
+        <div class="choix-offres">
+          @for (o of offres; track o) {
+            <label class="choix-offre" [class.choisie]="o === offreChoisie()">
+              <input type="radio" name="offre" [value]="o" [checked]="o === offreChoisie()" (change)="offreChoisie.set(o)" />
+              <span class="texte-offre">
+                <span class="libelle-offre">{{ libelleOffre(o) }}</span>
+                @if (prixOffre(o); as prix) {
+                  <span class="prix-offre">{{ prix }}</span>
+                }
+              </span>
+            </label>
+          }
+        </div>
+        @if (offreChoisie() === 'ACHAT_SONDAGES') {
+          <app-quantite-sondages class="quantite" [offre]="offreAchat()" [controle]="nombreSondages" />
+        }
+        <p class="texte-aide">{{ 'achat.inscription.aide' | transloco }}</p>
+      </fieldset>
+
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>{{ 'commun.champs.motDePasse' | transloco }}</mat-label>
         <mat-icon matPrefix fontIcon="lock" aria-hidden="true" />

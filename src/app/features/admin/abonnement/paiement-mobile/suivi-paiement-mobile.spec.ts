@@ -138,7 +138,7 @@ describe('suivi d’un paiement mobile', () => {
 
   it('activation : statut mis à jour puis nouveau jeton ; refus du rafraîchissement -> false', () => {
     const auth = { mettreAJourStatutAbonnement: vi.fn(), rafraichir: vi.fn(() => of('jeton')) };
-    const statut = statutMobileDeTest({ statut: 'REUSSI', abonnement: { ...reussi.abonnement, statut: 'ACTIF' } });
+    const statut = statutMobileDeTest({ statut: 'REUSSI', abonnement: { ...reussi.abonnement!, statut: 'ACTIF' } });
     const resultats: boolean[] = [];
     activerAbonnement(auth as unknown as AuthService, statut).subscribe((r) => resultats.push(r));
     expect(auth.mettreAJourStatutAbonnement).toHaveBeenCalledWith('ACTIF');

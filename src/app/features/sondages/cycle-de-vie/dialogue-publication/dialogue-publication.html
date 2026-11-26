@@ -6,6 +6,8 @@
     <div #zoneErreur class="zone-erreur" tabindex="-1">
       @if (traductionsIncompletes()) {
         <app-textes-manquants [sondageId]="sondage.id" [erreur]="erreur()" />
+      } @else if (refusCredits()) {
+        <!-- 402 CREDITS_EPUISES : le message dédié plus bas remplace le message générique. -->
       } @else {
         <app-message-erreur
           [erreur]="erreur()"
@@ -24,6 +26,31 @@
         <p>{{ incomplet }}</p>
       </app-encadre>
     } @else if (publier) {
+      @switch (cout()) {
+        @case ('epuise') {
+          <app-encadre type="erreur" role="alert" icone="block" [titre]="'achat.publication.epuiseTitre' | transloco" class="cout-publication">
+            <p>{{ 'achat.publication.epuise' | transloco }}</p>
+            @if (estAdmin()) {
+              <p class="actions-credits">
+                <button matButton="filled" type="button" class="acheter" (click)="allerVers(true)">{{ 'achat.acheter' | transloco }}</button>
+                <button matButton="outlined" type="button" class="s-abonner" (click)="allerVers(false)">{{ 'achat.sAbonner' | transloco }}</button>
+              </p>
+            } @else {
+              <p>{{ 'achat.publication.demanderAdmin' | transloco }}</p>
+            }
+          </app-encadre>
+        }
+        @case ('credit') {
+          <app-encadre type="info" role="status" icone="confirmation_number" class="cout-publication">
+            <p>{{ 'achat.publication.utilisera' | transloco: { solde: (solde() | nombreL) } }}</p>
+          </app-encadre>
+        }
+        @case ('nouvelle-version') {
+          <app-encadre type="info" role="status" icone="confirmation_number" class="cout-publication">
+            <p>{{ 'achat.publication.nouvelleVersion' | transloco: { solde: (solde() | nombreL) } }}</p>
+          </app-encadre>
+        }
+      }
       <app-encadre type="avertissement" [titre]="'sondages.publication.fige' | transloco">
         <p>{{ 'sondages.publication.figeTexte' | transloco }}</p>
       </app-encadre>
@@ -84,7 +111,7 @@
 
   <mat-dialog-actions align="end">
     <button matButton type="button" mat-dialog-close [disabled]="enCours()" cdkFocusInitial>{{ 'commun.annuler' | transloco }}</button>
-    <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours() || !!incomplet">
+    <button matButton="filled" type="submit" class="bouton-principal" [disabled]="enCours() || !!incomplet || (bloqueParSolde() && !refusCredits())">
       @if (enCours()) {
         <mat-spinner diameter="20" [attr.aria-label]="'commun.enregistrementEnCours' | transloco" />
       } @else if (publier) {

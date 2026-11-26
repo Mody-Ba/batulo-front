@@ -45,3 +45,13 @@ form {
     margin-bottom: var(--bt-espace-3);
   }
 }
+
+.actions-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bt-espace-2);
+
+  button {
+    min-height: 44px;
+  }
+}

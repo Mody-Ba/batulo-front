@@ -1,4 +1,4 @@
-import { AbonnementResponse, Formule, JOURS_ALERTE_EXPIRATION, StatutAbonnement } from './abonnement.model';
+import { AbonnementResponse, CreditsResponse, Formule, JOURS_ALERTE_EXPIRATION, StatutAbonnement, TypePaiement } from './abonnement.model';
 import { PersonnalisationResponse } from './personnalisation.model';
 import { UtilisateurResponse } from './utilisateur.model';
 import { traduire } from '../../core/i18n/traduire';
@@ -43,6 +43,8 @@ export interface AdminDetailResponse {
   nombreGestionnaires: number;
   /** Apparence de l'entreprise (logo, couleur, nom affiché), en lecture seule pour le super admin. */
   personnalisation?: PersonnalisationResponse | null;
+  /** Sondages achetés de l'entreprise (lecture seule) ; historique : GET .../admins/{id}/achats-sondages. */
+  credits?: CreditsResponse | null;
 }
 
 /** POST /api/super-admin/admins : mot de passe temporaire (24 h) envoyé par courriel, abonnement EN_ATTENTE_PAIEMENT. */
@@ -112,6 +114,8 @@ export interface AdminLigneResponse {
     joursRestants: number | null;
   } | null;
   nombreGestionnaires: number;
+  /** Sondages achetés encore disponibles (0 si l'entreprise n'a jamais acheté). */
+  soldeCredits?: number;
 }
 
 /** Filtres combinables de GET /api/super-admin/admins. */
@@ -135,6 +139,23 @@ export interface TableauDeBordSuperAdminResponse {
     desactive: number;
   };
   demandesAugmentationEnAttente: number;
+  /** Paiements réussis par type et devise, et sondages vendus. */
+  revenus?: RevenusResponse | null;
+}
+
+/** Une ligne de revenus : un type de paiement dans une devise (CAD par carte, MRU par paiement mobile). */
+export interface LigneRevenus {
+  type: TypePaiement;
+  devise: string;
+  montant: number;
+  nombrePaiements: number;
+}
+
+/** `revenus` du tableau de bord (schéma OpenAPI « Revenus »). */
+export interface RevenusResponse {
+  lignes: LigneRevenus[];
+  /** Total des sondages vendus à l'unité. */
+  sondagesVendus: number;
 }
 
 /** Compteur du tableau de bord correspondant à chaque statut. */

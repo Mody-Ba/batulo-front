@@ -29,8 +29,12 @@
   margin-top: var(--bt-espace-4);
 
   @media (min-width: 600px) {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
+}
+
+.bloc-quantite {
+  margin-top: var(--bt-espace-4);
 }
 
 .formule {

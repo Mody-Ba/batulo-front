@@ -1,4 +1,4 @@
-import { StatutAbonnement } from './abonnement.model';
+import { CreditsResponse, StatutAbonnement } from './abonnement.model';
 import { Role } from './role.model';
 import { UtilisateurResponse } from './utilisateur.model';
 
@@ -33,6 +33,11 @@ export interface JetonRafraichissementRequest {
 export interface ProfilResponse {
   utilisateur: UtilisateurResponse;
   statutAbonnement: StatutAbonnement | null;
+  /**
+   * Sondages achetés de l'entreprise ; null pour le super admin. compteCredits : accès complet même si
+   * statutAbonnement est EN_ATTENTE_PAIEMENT ou EXPIRE.
+   */
+  credits?: CreditsResponse | null;
 }
 
 /** POST /api/auth/changer-mot-de-passe (renvoie de nouveaux jetons) */

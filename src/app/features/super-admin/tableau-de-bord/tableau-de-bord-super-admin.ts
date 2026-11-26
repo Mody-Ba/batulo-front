@@ -3,10 +3,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { RouterLink } from '@angular/router';
-import { LIBELLES_STATUT_ABONNEMENT, StatutAbonnement } from '../../../core/models/abonnement.model';
+import {
+  LIBELLES_STATUT_ABONNEMENT,
+  LIBELLES_TYPE_PAIEMENT,
+  StatutAbonnement,
+  TypePaiement,
+} from '../../../core/models/abonnement.model';
+import { montantEnClair } from '../../../core/utils/montant';
 import {
   COMPTEUR_PAR_STATUT,
   STATUTS_ABONNEMENT,
+  LigneRevenus,
   TableauDeBordSuperAdminResponse,
 } from '../../../core/models/super-admin.model';
 import { AuthService } from '../../../core/services/auth.service';
@@ -14,7 +21,7 @@ import { SuperAdminService } from '../../../core/services/super-admin.service';
 import { DernieresNotifications } from '../../../shared/components/dernieres-notifications/dernieres-notifications';
 import { EntetePage } from '../../../shared/components/entete-page/entete-page';
 import { MessageErreur } from '../../../shared/components/message-erreur/message-erreur';
-import { NombreLPipe } from '../../../core/i18n/formats.pipes';
+import { NombreLPipe, PlurielPipe } from '../../../core/i18n/formats.pipes';
 import { traduire } from '../../../core/i18n/traduire';
 import { TranslocoPipe } from '@jsverse/transloco';
 
@@ -34,7 +41,7 @@ interface TuileStatut {
  */
 @Component({
   selector: 'app-tableau-de-bord-super-admin',
-  imports: [TranslocoPipe, NombreLPipe, 
+  imports: [TranslocoPipe, NombreLPipe, PlurielPipe,
     RouterLink,
     MatButtonModule,
     MatProgressBarModule,
@@ -49,6 +56,8 @@ export class TableauDeBordSuperAdmin {
   private readonly service = inject(SuperAdminService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthService);
+  protected readonly libellesType = LIBELLES_TYPE_PAIEMENT;
+  protected readonly montant = montantEnClair;
 
   protected readonly titre = computed(() => {
     const prenom = this.auth.utilisateur()?.prenom;
@@ -70,6 +79,13 @@ export class TableauDeBordSuperAdmin {
       nombre: entreprises[COMPTEUR_PAR_STATUT[statut]],
       aSurveiller: statut === 'EXPIRE_BIENTOT',
     }));
+  });
+
+  /** Revenus regroupés par type (abonnements, puis achats de sondages), une ligne par devise. */
+  protected readonly revenusParType = computed(() => {
+    const lignes = this.chiffres()?.revenus?.lignes ?? [];
+    const ordre: TypePaiement[] = ['ABONNEMENT', 'ACHAT_SONDAGES'];
+    return ordre.map((type) => ({ type, lignes: lignes.filter((l: LigneRevenus) => l.type === type) }));
   });
 
   constructor() {
