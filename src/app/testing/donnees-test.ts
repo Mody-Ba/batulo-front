@@ -1,3 +1,4 @@
+import { InvitationResponse, ResumeInvitationsResponse } from '../core/models/invitation.model';
 import {
   AbonnementResponse,
   FormuleResponse,
@@ -285,4 +286,32 @@ export function sondageDeTest(modifs: Partial<SondageResponse> = {}): SondageRes
     sections: [sectionDeTest()],
     ...modifs,
   };
+}
+
+/** Invité (InvitationResponse), à inviter par défaut. */
+export function inviteDeTest(modifs: Partial<InvitationResponse> = {}): InvitationResponse {
+  return {
+    id: 1,
+    prenom: 'Aminata',
+    nom: 'Diallo',
+    courriel: 'aminata@exemple.com',
+    telephone: null,
+    langue: null,
+    statut: 'A_INVITER',
+    envoiEnCours: false,
+    dateCreation: new Date(Date.now() - 100 * 3_600_000).toISOString(),
+    premierEnvoiLe: null,
+    dernierEnvoiLe: null,
+    derniereRelanceLe: null,
+    nombreEnvois: 0,
+    echecEnvoiLe: null,
+    ouverteLe: null,
+    reponduLe: null,
+    revoqueeLe: null,
+    ...modifs,
+  };
+}
+
+export function resumeInvitationsDeTest(modifs: Partial<ResumeInvitationsResponse> = {}): ResumeInvitationsResponse {
+  return { total: 3, aInviter: 1, invitees: 1, ouvertes: 0, repondues: 1, revoquees: 0, enEchec: 0, envoyees: 2, tauxReponse: 50, ...modifs };
 }

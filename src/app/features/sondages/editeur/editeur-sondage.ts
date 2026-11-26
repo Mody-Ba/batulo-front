@@ -104,6 +104,8 @@ export class EditeurSondage implements PeutQuitter {
       validators: [Validators.maxLength(REGLES_SONDAGE.descriptionMax)],
     }),
     reponseUnique: new FormControl(true, { nonNullable: true }),
+    // Réponses reçues par invitation associées aux personnes invitées (sinon anonymes).
+    reponsesNominatives: new FormControl(false, { nonNullable: true }),
     // Page d'accueil du formulaire du répondant.
     objetEnquete: new FormControl('', {
       nonNullable: true,
@@ -285,6 +287,7 @@ export class EditeurSondage implements PeutQuitter {
         titre: sondage.titre,
         description: sondage.description ?? '',
         reponseUnique: sondage.reponseUnique,
+        reponsesNominatives: sondage.reponsesNominatives ?? false,
         objetEnquete: sondage.objetEnquete ?? '',
         texteConfidentialite: sondage.texteConfidentialite ?? '',
         consentementRequis: sondage.consentementRequis ?? false,
@@ -315,6 +318,7 @@ export class EditeurSondage implements PeutQuitter {
       texteConfidentialite: v.texteConfidentialite.trim() || null,
       consentementRequis: v.consentementRequis,
       texteConsentement: v.texteConsentement.trim() || null,
+      reponsesNominatives: v.reponsesNominatives,
     };
   }
 }

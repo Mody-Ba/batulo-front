@@ -160,7 +160,7 @@ export class PageStatistiques {
 
   protected exporter(sondage: SondageResponse): void {
     this.dialog.open<DialogueExport, DonneesExport>(DialogueExport, {
-      data: { sondageId: sondage.id, filtres: this.filtres(), resume: this.resume(sondage) },
+      data: { sondageId: sondage.id, filtres: this.filtres(), resume: this.resume(sondage), nominatif: !!sondage.reponsesNominatives },
       width: '520px',
       maxWidth: 'calc(100vw - 32px)',
     });

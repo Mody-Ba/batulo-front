@@ -112,6 +112,8 @@ export interface SondageResponse {
   languePrincipale?: LangueContenu;
   /** Langues traduites dans l'écran « Traductions » (sans la principale, 2 au plus). */
   languesSupplementaires?: LangueContenu[];
+  /** true : réponses reçues par invitation associées aux personnes invitées (brouillon, recopié comme reponseUnique). */
+  reponsesNominatives?: boolean;
   creePar: AuteurResponse | null;
   dateCreation: string;
   dateModification: string;
@@ -439,6 +441,11 @@ export interface SondageRequest {
   /** true : le répondant coche la case avant de commencer ; texteConsentement est alors obligatoire (400 TEXTE_CONSENTEMENT_REQUIS). */
   consentementRequis: boolean;
   texteConsentement: string | null;
+  /**
+   * true : associer les réponses reçues par invitation aux personnes invitées (nom et courriel). Toujours envoyé par
+   * l'éditeur et requeteSondage().
+   */
+  reponsesNominatives?: boolean;
 }
 
 /**
@@ -467,6 +474,7 @@ export function requeteSondage(sondage: SondageResponse, modifs: Partial<Sondage
     texteConfidentialite: sondage.texteConfidentialite ?? null,
     consentementRequis: sondage.consentementRequis ?? false,
     texteConsentement: sondage.texteConsentement ?? null,
+    reponsesNominatives: sondage.reponsesNominatives ?? false,
     ...modifs,
   };
 }

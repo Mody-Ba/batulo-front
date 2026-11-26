@@ -22,13 +22,24 @@ export class FormulairePublicService {
   /**
    * `jetonRepondant` (s'il existe déjà sur cet appareil) : envoyé dans l'en-tête X-Jeton-Repondant, jamais dans
    * l'URL ; le backend répond alors `dejaRepondu` pour un sondage à réponse unique. `langue` : langue du contenu
-   * souhaitée (non proposée : la principale ; la langue servie est dans `langue` de la réponse).
+   * souhaitée (non proposée : la principale ; la langue servie est dans `langue` de la réponse). `jetonInvitation` : lien
+   * personnel (paramètre « i » de la page), dans l'en-tête X-Jeton-Invitation, jamais dans l'URL de l'API ; sans
+   * `langue`, le serveur sert la langue préférée de l'invité. 404 INVITATION_INVALIDE, 410 INVITATION_REVOQUEE.
    */
-  lire(jeton: string, jetonRepondant?: string | null, langue?: string | null): Observable<FormulairePublicResponse> {
+  lire(
+    jeton: string,
+    jetonRepondant?: string | null,
+    langue?: string | null,
+    jetonInvitation?: string | null,
+  ): Observable<FormulairePublicResponse> {
+    const entetes: Record<string, string> = {
+      ...(jetonRepondant ? { 'X-Jeton-Repondant': jetonRepondant } : {}),
+      ...(jetonInvitation ? { 'X-Jeton-Invitation': jetonInvitation } : {}),
+    };
     return this.http.get<FormulairePublicResponse>(`${this.url}/${encodeURIComponent(jeton)}`, {
       context: this.contexte(),
       ...(langue ? { params: { langue } } : {}),
-      ...(jetonRepondant ? { headers: new HttpHeaders({ 'X-Jeton-Repondant': jetonRepondant }) } : {}),
+      ...(Object.keys(entetes).length ? { headers: new HttpHeaders(entetes) } : {}),
     });
   }
 

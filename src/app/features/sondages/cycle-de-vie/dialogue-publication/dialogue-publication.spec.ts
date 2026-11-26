@@ -112,6 +112,7 @@ describe('DialoguePublication', () => {
       texteConfidentialite: null,
       consentementRequis: true,
       texteConsentement: 'J’accepte',
+      reponsesNominatives: false,
     });
     expect(service['publier']).toHaveBeenCalled();
   });

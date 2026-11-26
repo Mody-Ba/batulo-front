@@ -19,7 +19,9 @@
       "INTROUVABLE": "Cette adresse n’existe pas.",
       "ERREUR_INTERNE": "Une erreur inattendue est survenue.",
       "REQUETE_INVALIDE": "La requête est absente ou mal formée.",
-      "LANGUE_INVALIDE": "Cette langue n’est pas proposée par ce sondage."
+      "LANGUE_INVALIDE": "Cette langue n’est pas proposée par ce sondage.",
+      "INVITATION_INVALIDE": "Ce lien personnel n’est pas valide.",
+      "INVITATION_REVOQUEE": "Ce lien personnel a été désactivé."
     },
     "commun": {
       "allerAuContenu": "Aller au contenu"
@@ -59,7 +61,10 @@
       "introuvable": "Lien introuvable",
       "trop-de-requetes": "Trop de demandes",
       "injoignable": "Connexion impossible",
-      "inattendu": "Le sondage ne peut pas être affiché"
+      "inattendu": "Le sondage ne peut pas être affiché",
+      "lien-revoque": "Lien désactivé",
+      "lien-invalide": "Lien personnel invalide",
+      "lien-utilise": "Lien déjà utilisé"
     },
     "titres": {
       "sondage": "{{titre}} · Batulo",
@@ -156,6 +161,12 @@
     },
     "langueContenu": {
       "erreur": "Le formulaire n’a pas pu être chargé dans cette langue. Vos réponses sont gardées."
+    },
+    "invitation": {
+      "nominatif": "Lien personnel : vos réponses seront associées à votre nom et à votre courriel.",
+      "revoque": "Ce lien personnel a été désactivé par l’organisateur de l’enquête. Si vous pensez qu’il s’agit d’une erreur, contactez-le.",
+      "invalide": "Ce lien personnel n’est pas valide. Vérifiez qu’il est complet, tel que reçu par courriel.",
+      "utilise": "Ce lien personnel a déjà servi : votre réponse a bien été enregistrée. Merci !"
     }
   }
 }

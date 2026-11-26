@@ -58,11 +58,11 @@ src/app/
   core/
     models/        un fichier par domaine (auth, utilisateur, abonnement, notification, inscription, page, erreur, role,
                    gestionnaire, sondage, assignation, tableau-de-bord, super-admin, demande-abonnement,
-                   formulaire-public, statistiques, messagerie, personnalisation, traduction)
+                   formulaire-public, statistiques, messagerie, personnalisation, traduction, invitation)
     services/      un service par domaine (auth = session en signals, inscription, mot-de-passe, notification,
                    abonnement, stripe = chargement de Stripe.js, gestionnaire, sondage, assignation, tableau-de-bord,
                    super-admin, demande-abonnement, formulaire-public, statistiques, export, messagerie, personnalisation,
-                   traduction = langues et traductions du contenu d'un sondage)
+                   traduction = langues et traductions du contenu d'un sondage, invitation = invitations nominatives)
     interceptors/  auth.interceptor.ts + contexte-http.ts (SANS_AUTHENTIFICATION)
     guards/        auth.guards.ts (authGuard, roleGuard, connecteGuard, inviteGuard)
     i18n/          langues.ts (fr, en, ar, dir, locales), langue.service.ts (choix, RTL), traduire.ts (traduire, pluriels,
@@ -587,6 +587,44 @@ src/app/
   `libellesColonnes` et `LigneMatrice.libelle`. Réponses : colonne « Langue » (`reponse.langue`, fr si absente) et ligne
   dans le détail. La liste des réponses n'a pas de filtre par langue côté backend.
 
+## Invitations nominatives (phase 4, étape 4)
+- Contrat : `invitation.model.ts` (copie des records du backend, voir la section « Invitations nominatives » de son
+  CLAUDE.md), service `InvitationService` (`/api/sondages/{id}/invitations/**`, {id} = n'importe quelle version : la
+  liste est celle de la lignée). Le lien personnel n'est jamais renvoyé ni affiché par le front.
+- Onglet « Invitations » (`features/sondages/invitations/page-invitations`, `/sondages/:id/invitations[?statut&recherche
+  &page&taille]`, 4e onglet de `onglets-sondage`) : compteurs (`/resume`) et taux de réponse (`<progress>`, « sur N
+  invitations envoyées ») ; tableau Material (cartes sous 720 px) : nom, courriel, langue, statut en pastille, envoi,
+  relance, réponse ; recherche (300 ms) et pastilles de statut dans l'URL ; sélection multiple gardée d'une page et d'un
+  filtre à l'autre (par id). Ajout et modification (`dialogue-invite` : courriel obligatoire, 409 INVITE_EXISTANT dans la
+  boîte), suppression et révocation (définitive) après confirmation `destructive` ; interdites si A_REPONDU (révoqué :
+  plus modifiable). Export du suivi (CSV, nom du serveur).
+- Import CSV (`dialogue-import`) : modèle téléchargeable (`modele-csv.ts` : BOM UTF-8, « ; », en-têtes
+  prenom;nom;courriel;telephone;langue), zone de dépôt ou « Choisir un fichier » (.csv vérifié avant envoi), rapport
+  (`rapport-import` : acceptées, refusées avec ligne, courriel et raison traduite `invitations.refus.*`, sinon message du
+  serveur), « Importer un autre fichier » ; la page relit toujours la liste à la fermeture.
+- Reprise (`dialogue-reprise`) : sources = `GET /api/sondages?derniereVersion=true` (toutes les pages, 10 au plus), sauf
+  ce sondage et ses versions ; POST `.../reprendre { sondageSourceId }` ; rapport : « N personnes ajoutées », doublons
+  (DEJA_INVITE) comptés à part comme ignorés, autres refus listés.
+- Envoi et relance (`regles-envoi.ts`, affichage seulement : le serveur décide) : boutons désactivés, raison écrite sous les boutons
+  (`aria-describedby`) : lecture seule, jamais publié, terminé, limite horaire après un 429 LIMITE_ENVOIS bloquée une
+  heure pour la visite, rien à envoyer, sélection déjà invitée, délai de 24 h connu pour la sélection ; sélection ou
+  tous ; 202 -> rapport « N en file, M ignorés : raison (n) » ; suivi par `interrogationPeriodique` toutes les 3 s tant
+  qu'un invité affiché a `envoiEnCours` (10 min au plus, rien onglet caché), relancé aussi au chargement.
+- Éditeur : case « Associer les réponses aux personnes invitées » (`reponsesNominatives`, sous « Une réponse par
+  appareil », `aria-describedby` vers une explication qui suit le choix), dans le PUT de l'en-tête et `requeteSondage()`.
+- Formulaire public avec lien personnel (`/s/:jeton?i=…`, entrée `i`) : jeton envoyé en en-tête `X-Jeton-Invitation`
+  (lecture) et `jetonInvitation` (envoi), jamais de jeton d'appareil ni de drapeau « déjà répondu » local ; aucune
+  `?langue=` à la première lecture (le serveur sert la langue préférée de l'invité, l'interface s'y aligne pour la visite ;
+  `alignementVers` empêche l'ancienne langue de relire le contenu pendant ce changement) ; brouillon à part
+  (`{jeton}.invitation`). Écrans : « Lien déjà utilisé » (`invitation.dejaRepondu` ou 409 DEJA_REPONDU), « Lien désactivé »
+  (410 INVITATION_REVOQUEE), « Lien personnel invalide » (404 INVITATION_INVALIDE) ; pas de « Nouvelle réponse » ;
+  mention `role="note"` sur l'accueil et le questionnaire si `invitation.reponsesNominatives`.
+- Réponses : colonne « Invité » (nom et courriel, « Anonyme (lien public) » sans invité) seulement si le sondage est
+  nominatif ou si une réponse affichée porte `invite` (vue toutes versions) ; invité dans le détail ; dialogue d'export :
+  note sur les colonnes « Invité » et « Courriel de l'invité » si le sondage est nominatif.
+- Textes : `invitations.*`, `statutsInvitation.*`, `editeur.nominatif.*`, `public.invitation.*` et
+  `public.titresIndisponible.lien-*` dans les trois langues. Chunk `page-invitations` : environ 56 ko bruts.
+
 ## Règles du backend utiles au front
 - Erreurs toujours en JSON `{ code, message }` (+ `erreurs[]` par question pour les réponses à un sondage).
   Afficher l'erreur avec `<app-message-erreur [erreur]="…">` (message traduit par son code, voir « Langues de
@@ -657,6 +695,9 @@ src/app/
 - [x] **Phase 4, étape 3 (partie 3) – Langues du contenu des sondages** : langues de l'éditeur, écran « Traductions »,
   publication refusée avec les textes manquants, sélecteur unique du formulaire public, aperçu, statistiques et réponses
   par langue (voir la section dédiée ; contrat vérifié dans l'OpenAPI).
+- [x] **Phase 4, étape 4 – Invitations nominatives** : onglet « Invitations » (compteurs, tableau, ajout, import CSV,
+  reprise, envoi, relance, suivi, export), option nominative de l'éditeur, lien personnel du formulaire public, colonne
+  Invité des réponses (voir la section dédiée).
 
 Toutes les rubriques du menu (`layout/menu-lateral/liens-navigation.ts`) mènent à leur page ; `PageAVenir` reste
 disponible pour une future rubrique.

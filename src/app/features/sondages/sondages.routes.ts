@@ -55,6 +55,12 @@ export const routes: Routes = [
         loadComponent: () => import('./reponses/liste-reponses').then((m) => m.ListeReponses),
       },
       {
+        // Invitations nominatives : ?statut=&recherche=&page=&taille=
+        path: ':id/invitations',
+        title: 'titres.invitations',
+        loadComponent: () => import('./invitations/page-invitations').then((m) => m.PageInvitations),
+      },
+      {
         // ?lignee=&du=&au=&granularite=&critere=cle:valeur (répété)
         path: ':id/statistiques',
         title: 'titres.statistiques',

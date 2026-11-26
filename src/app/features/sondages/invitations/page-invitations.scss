@@ -1,0 +1,186 @@
+.compteurs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--bt-espace-3);
+}
+
+.tuile-invitation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-1);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+
+  .valeur {
+    font: var(--mat-sys-headline-medium);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .libelle {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  progress {
+    width: 100%;
+    height: 8px;
+    accent-color: var(--mat-sys-primary);
+  }
+}
+
+.details-compteurs {
+  margin: var(--bt-espace-2) 0 var(--bt-espace-4);
+}
+
+.barre-actions,
+.boutons-envoi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bt-espace-2);
+
+  .espace {
+    flex: 1;
+  }
+}
+
+.envois {
+  margin-block: var(--bt-espace-4);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container);
+
+  .raison,
+  .suivi {
+    margin: var(--bt-espace-2) 0 0;
+  }
+
+  .suivi {
+    display: flex;
+    align-items: center;
+    color: var(--mat-sys-primary);
+  }
+}
+
+.mat-icon {
+  margin-inline-end: var(--bt-espace-1);
+  vertical-align: middle;
+}
+
+.champ-recherche {
+  flex: 1 1 280px;
+  max-width: 420px;
+}
+
+.barre-selection {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-3);
+  margin-block-end: var(--bt-espace-2);
+  font: var(--mat-sys-title-small);
+}
+
+.courriel {
+  overflow-wrap: anywhere;
+}
+
+tr.coche,
+.carte.coche {
+  background: var(--mat-sys-secondary-container);
+}
+
+.envoi-en-cours {
+  margin-block-start: var(--bt-espace-1);
+}
+
+.pastille-statut.invitation {
+  height: 24px;
+  padding: 0 8px;
+  font: var(--mat-sys-label-medium);
+}
+
+.invitation-A_INVITER {
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.invitation-INVITEE {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.invitation-OUVERTE {
+  background: var(--bt-attente-fond);
+  color: var(--bt-attente-texte);
+}
+
+.invitation-A_REPONDU {
+  background: var(--bt-succes-fond);
+  color: var(--bt-succes-texte);
+}
+
+.invitation-EN_ECHEC {
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.invitation-REVOQUEE {
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  text-decoration: line-through;
+}
+
+.action-danger {
+  color: var(--mat-sys-error);
+}
+
+// Téléphone : une carte par invité.
+.cocher-page {
+  margin-block-end: var(--bt-espace-2);
+}
+
+.cartes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bt-espace-2);
+  padding: var(--bt-espace-3) var(--bt-espace-4);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: var(--bt-rayon);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.carte-entete {
+  display: flex;
+  align-items: center;
+  gap: var(--bt-espace-2);
+
+  .nom {
+    flex: 1;
+    font: var(--mat-sys-title-small);
+  }
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--bt-espace-1) var(--bt-espace-3);
+  margin: 0;
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  dd {
+    margin: 0;
+  }
+}

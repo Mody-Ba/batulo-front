@@ -40,7 +40,7 @@
       @if (page.contenu.length === 0) {
         <p class="etat-vide" role="status">{{ 'sondages.reponses.aucune' | transloco }}</p>
       } @else {
-        <ul class="reponses">
+        <ul class="reponses" [class.nominatives]="nominatif()">
           @for (r of page.contenu; track r.id) {
             <li>
               <button type="button" class="reponse" (click)="ouvrir(r)">
@@ -51,6 +51,17 @@
                   <span class="visuellement-cache">{{ 'sondages.reponses.langue' | transloco }}</span>
                   {{ nomLangue(r.langue ?? 'fr') }}
                 </span>
+                @if (nominatif()) {
+                  <span class="invite">
+                    @if (r.invite; as invite) {
+                      <span class="visuellement-cache">{{ 'sondages.reponses.invite' | transloco }}</span>
+                      <span class="nom-invite" dir="auto">{{ nomInvite(invite) }}</span>
+                      <span class="cellule-secondaire courriel-invite" dir="ltr">{{ invite.courriel }}</span>
+                    } @else {
+                      <span class="cellule-secondaire">{{ 'sondages.reponses.anonyme' | transloco }}</span>
+                    }
+                  </span>
+                }
                 <span class="cellule-secondaire resume">{{ resume(r, s) }}</span>
                 <mat-icon fontIcon="chevron_right" aria-hidden="true" />
               </button>

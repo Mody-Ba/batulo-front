@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Onglets de la fiche d'un sondage (une adresse par onglet : retour arrière et lien direct) : Fiche, Réponses,
- * Statistiques. Navigation simple, l'onglet courant porte aria-current="page".
+ * Statistiques, Invitations. Navigation simple, l'onglet courant porte aria-current="page".
  */
 @Component({
   selector: 'app-onglets-sondage',
@@ -14,6 +14,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       <a [routerLink]="['/sondages', id()]" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">{{ 'sondages.onglets.fiche' | transloco }}</a>
       <a [routerLink]="['/sondages', id(), 'reponses']" routerLinkActive="actif" ariaCurrentWhenActive="page">{{ 'admin.tdb.reponses' | transloco }}</a>
       <a [routerLink]="['/sondages', id(), 'statistiques']" routerLinkActive="actif" ariaCurrentWhenActive="page">{{ 'sondages.onglets.statistiques' | transloco }}</a>
+      <a [routerLink]="['/sondages', id(), 'invitations']" routerLinkActive="actif" ariaCurrentWhenActive="page">{{ 'sondages.onglets.invitations' | transloco }}</a>
     </nav>
   `,
   styles: `
